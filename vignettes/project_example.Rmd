@@ -1,6 +1,6 @@
 ---
 title: "Project example"
-author: "Anton Klåvus"
+author: "Anton Klåvus, Vilhelm Suksi"
 date: "`r Sys.Date()`"
 output:
   BiocStyle::html_document:
@@ -24,23 +24,14 @@ knitr::opts_chunk$set(
 )
 ```
 
-In this project example, core functionality of ```notame``` is demonstrated in 
+In this project example, core functionality of *notame* is demonstrated in 
 unison with the associated protocol article [@notame]. Since substantive 
 insight is not a focus of the project example, results visualizations are 
 omitted.
 
 # Project setup
 
-## Attach library
-
-Attach ```notame```.
-
-```{r}
-library(notame)
-```
-
 ## Set up path and logging
-
 Let's set up a path and start logging our project. Many functions of the 
 package will log information when they have finished. This helps in monitoring 
 the analysis process in case something goes wrong and in reviewing the results 
@@ -48,32 +39,15 @@ later. The log will also print to console, although we'll exclude console
 output for the rest of the document for brevity.
 
 ```{r, results = 'markup'}
+library(notame)
 ppath <- tempdir()
 init_log(log_file = file.path(ppath, "log.txt"))
 ```
 
 ## Read data
-
 Now we can read in the actual data! The data is from a project with samples 
 from three different groups. The data is scrambled; the feature information 
-does not correspond to the abundances given. The function ```read_from_excel``` 
-reads data from an Excel spreadsheet using the following format:  
-
-```{r, out.width = "600px", echo=FALSE}
-knitr::include_graphics("Data_input.png")
-```
-
-There are a few obligatory fields, including "Injection_order" in sample 
-information, "Mass" or "Average mz" in feature data and "Retention time", 
-"RetentionTime", "Average rt(min)" or "rt" in feature information (not case 
-sensitive). There are further optional fields, including "Sample_ID" and "QC" 
-in sample data as well as "Feature_ID" in feature data, which are automatically 
-generated if unavailable. One or more fields in feature data can be used to 
-split the data into parts, usually LC column x ionization mode, supplied as 
-arguments to the ```split_by``` parameter. If the file only contains one mode, 
-specify the name of the mode, e.g. "HILIC_pos" to the ```name``` parameter. 
-Please see documentation for more information.
-
+does not correspond to the abundances given. 
 
 ```{r}
 data <- read_from_excel(
@@ -82,13 +56,12 @@ data <- read_from_excel(
   split_by = c("Column", "Ion mode"))
 ```
 
-
-The function ```read_from_excel``` returns a list holding the three parts of 
+The function read_from_excel() returns a list holding the three parts of 
 the data:
 
-- ```exprs```: feature abundances across the samples  
-- ```pheno_data```: sample information  
-- ```feature_data```: feature information
+- `exprs`: feature abundances across the samples  
+- `pheno_data`: sample information  
+- `feature_data`: feature information
 
 ```{r, results = 'markup'}
 names(data)
@@ -97,11 +70,10 @@ sapply(data, dim)
 ```
 
 ## Construct MetaboSet objects
-
-These three parts can be used to construct MetaboSet objects using the  
-```construct_metabosets``` function. The function parameters are the three 
-parts of a dataset, plus special column names: ```group_col```, ```time_col``` 
-and ```subject_col``` which can be stored in the instance for convenience as 
+These three parts can be used to construct MetaboSet objects using 
+construct_metabosets(). The function parameters are the three 
+parts of a dataset, plus special column names: `group_col`, `time_col` 
+and `subject_col`, which can be stored in the instance for convenience as 
 many functions use the columns as default values.
 
 ```{r}
@@ -111,7 +83,7 @@ modes <- construct_metabosets(
 ```
 
 The function returns a list of MetaboSet objects, one per mode (LC column x 
-ionization mode) or whatever split was supplied to ```read_from_excel```.
+ionization mode) or whatever split was supplied to read_from_excel().
 
 ```{r, results = 'markup'}
 names(modes)
@@ -121,18 +93,16 @@ sapply(modes, class)
 # Data pretreatment
 
 ## Data pretreatment by mode
-
 Data pretreatment is performed to complete the dataset by way of reducing 
 unwanted variation and data preparation dependent on downstream methods. Steps 
 performed separately for each mode include marking missing values as NA, 
-flagging features with low detection [@qcguidelines] rate, drift correction 
+flagging features with low detection rate [@qcguidelines], drift correction 
 [@driftcorrection], and flagging of low-quality features [@qcguidelines]. 
 Visualizations are drawn to monitor the data pretreatment process and explore 
-the data globally. The ```visualizations``` wrapper does not include feature-
+the data globally. The visualizations() wrapper does not include feature-
 wise plots as it may not be feasible to inspect them at this stage of the 
-analysis. For example, drift correction visualizations are perhaps best drawn 
+analysis. For example, drift correction visualizations are best drawn 
 for a subset of interesting features after feature selection.
-
 
 ```{r}
 # Initialize empty list for processed objects
@@ -146,25 +116,24 @@ for (i in seq_along(modes)) {
   mode <- flag_detection(mode, qc_limit = 0.7, group_limit = 0.8)
   # Visualize data before drift correction
   visualizations(mode, prefix = paste0(ppath, "figures/", name, "_ORIG"))
-  # Correct Drift
+  # Correct drift
   corrected <- correct_drift(mode)
   # Visualize data after drift correction
   visualizations(corrected, prefix = paste0(ppath, "figures/", name, "_DRIFT"))
   # Flag low-quality features
   corrected <- corrected %>% assess_quality() %>% flag_quality()
   # Visualize data after removal of low-quality features
-  visualizations(corrected, 
-    prefix = paste0(ppath, "figures/", name, "_CLEANED"))
+  visualizations(corrected, prefix = paste0(ppath, "figures/", name, "_CLEAN"))
   # Save result of iteration
   processed[[i]] <- corrected
 }
 ```
 
 Feature-wise flagging information, quality metrics, and brief drift correction 
-notes are included in the feature information after the above steps. 
-```correct_drift``` performs drift correction on all features with sufficient 
-detection in QC samples by default. In case ```check_quality = TRUE```, 
-```correct_drift``` retains corrected values only for features with improved 
+notes are included in the feature information after the above steps.
+The correct_drift() function performs drift correction on all features with 
+sufficient detection in QC samples by default. In case `check_quality = TRUE`, 
+correct_drift() retains corrected values only for features with improved 
 quality metrics after drift correction, along with a note documenting this 
 action in feature information. 
 
@@ -173,7 +142,6 @@ fData(processed[[1]])$DC_note
 ```
 
 ## Data pretreatment for the complete dataset
-
 Next, it is time to merge the modes together and visualize the complete dataset.
 ```{r}
 merged <- merge_metabosets(processed)
@@ -194,8 +162,7 @@ last time before statistical analysis. Seed number should be set before random
 forest imputation to guarantee reproducibility of results.
 
 ```{r}
-# Set seed number for reproducibility
-set.seed(38)
+set.seed(2024)
 imputed <- impute_rf(merged_no_qc)
 visualizations(imputed, prefix = paste0(ppath, "figures/FULL_IMPUTED"))
 ```
@@ -220,12 +187,9 @@ different statistical analyses becomes easier.
 save(base, file = paste0(ppath, "full_data.RData"))
 ```
 
-Now we are ready for statistical analysis!
-
 # Feature selection
 
 ## Univariate analysis
-
 Let's try to find features that separate the study groups. First, we'll use 
 Welch's analysis of variance to evaluate the features in terms of the 
 probability of obtaining the observed abundances given the null hypothesis, 
@@ -257,7 +221,6 @@ base <- join_fData(base, combined_results)
 ```
 
 ## Supervised learning
-
 Univariate hypothesis testing does not take into account the multivariate, 
 interconnected nature of the data. Parametric tests as the one above also make 
 assumptions about the data which may undermine the reliability of the results, 
@@ -265,7 +228,6 @@ as they are likely to be violated in untargeted LC-MS datasets. Let's use
 supervised learning to see which features best predict group membership to get 
 another perspective. A random forest model doesn't require further data 
 pretreatment and makes minimal assumptions.
-
 
 ```{r}
 rf_results <- fit_rf(imputed, y = "Group")
