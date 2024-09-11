@@ -964,7 +964,7 @@ setMethod("manhattan_plot", c(object = "data.frame"),
 
 # -----M/Z vs RT PLOT -------
 
-#' Plot m/z vs retention time plot
+#' Plot m/z vs retention time plot (cloud plot)
 #'
 #' Plots a scatter plot of results of statistical tests, where each point 
 #' represents a feature. The plot has retention time on x-axis, m/z on y-axis 

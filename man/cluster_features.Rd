@@ -2,7 +2,7 @@
 % Please edit documentation in R/feature_clustering.R
 \name{cluster_features}
 \alias{cluster_features}
-\title{Cluster correlated features}
+\title{Cluster correlated features originating from the same metabolite}
 \usage{
 cluster_features(
   object,

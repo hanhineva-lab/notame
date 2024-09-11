@@ -2,7 +2,7 @@
 % Please edit documentation in R/stats.R
 \name{perform_oneway_anova}
 \alias{perform_oneway_anova}
-\title{Perform ANOVA}
+\title{Welch's ANOVA and classic ANOVA}
 \usage{
 perform_oneway_anova(object, formula_char, all_features = FALSE, ...)
 }

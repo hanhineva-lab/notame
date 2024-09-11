@@ -2,7 +2,7 @@
 % Please edit documentation in R/stats.R
 \name{perform_kruskal_wallis}
 \alias{perform_kruskal_wallis}
-\title{Perform Kruskal-Wallis Rank Sum Tests}
+\title{Kruskal-Wallis rank-sum test}
 \usage{
 perform_kruskal_wallis(object, formula_char, all_features = FALSE)
 }
@@ -19,7 +19,7 @@ Defaults to "Feature ~ group_col(object)}
 A data frame with the results.
 }
 \description{
-Performs Kruskal-Wallis Rank Sum Test for equality.
+Performs Kruskal-Wallis rank-sum test for equality.
 }
 \details{
 The model is fit on combined_data(object). Thus, column names

@@ -2,7 +2,7 @@
 % Please edit documentation in R/stats.R
 \name{perform_wilcoxon_signed_rank}
 \alias{perform_wilcoxon_signed_rank}
-\title{Perform Wilcoxon signed rank test}
+\title{Wilcoxon signed rank test}
 \usage{
 perform_wilcoxon_signed_rank(object, group, id, all_features = FALSE, ...)
 }

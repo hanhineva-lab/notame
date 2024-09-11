@@ -2,7 +2,7 @@
 % Please edit documentation in R/stats.R
 \name{perform_t_test}
 \alias{perform_t_test}
-\title{Perform t-tests}
+\title{Welch's and Student's t-test}
 \usage{
 perform_t_test(object, formula_char, all_features = FALSE, ...)
 }

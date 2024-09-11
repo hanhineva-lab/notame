@@ -109,15 +109,15 @@ summary_statistics <- function(object, grouping_cols = NA) {
 #' # Simple manipulation to linear model results
 #' lm_results <- perform_lm(drop_qcs(example_set), 
 #'   formula_char = "Feature ~ Group + Time")
-#' lm_results <- clean_stats_results(lm_results,
+#' lm_results <-summarize_results(lm_results,
 #'   rename = c("GroupB" = "GroupB_vs_A", "Time2" = "Time2_vs_1")
 #' )
 #'
 #' @export
-clean_stats_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
-                                                "t_value", "z_value", "R2"),
-                                rename = NULL, summary = TRUE, p_limit = 0.05,
-                                fdr = TRUE) {
+summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
+                                             "t_value", "z_value", "R2"),
+                              rename = NULL, summary = TRUE, p_limit = 0.05,
+                              fdr = TRUE) {
   df <- df[, !grepl(paste(remove, collapse = "|"), colnames(df))]
   if (!is.null(rename)) {
     for (name in names(rename)) {
@@ -426,7 +426,7 @@ fold_change <- function(object, group = group_col(object)) {
   cor_results
 }
 
-#' Perform correlation tests
+#' Correlation test
 #'
 #' Performs a correlation test between two sets of variables. All the variables 
 #' must be either feature names or column names of pheno data (sample 
@@ -1197,9 +1197,9 @@ perform_homoscedasticity_tests <- function(object, formula_char,
   results_df
 }
 
-#' Perform Kruskal-Wallis Rank Sum Tests
+#' Kruskal-Wallis rank-sum test
 #'
-#' Performs Kruskal-Wallis Rank Sum Test for equality.
+#' Performs Kruskal-Wallis rank-sum test for equality.
 #'
 #' @param object a MetaboSet object
 #' @param formula_char character, the formula to be used in the linear model 
@@ -1223,7 +1223,7 @@ perform_homoscedasticity_tests <- function(object, formula_char,
 #'
 #' @export
 perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE) {
-  log_text("Starting Kruskal_wallis tests.")
+  log_text("Starting Kruskal-Wallis tests.")
 
   kruskal_fun <- function(feature, formula, data) {
     result_row <- NULL
@@ -1241,13 +1241,13 @@ perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE) {
 
   results_df <- .perform_test(object, formula_char, kruskal_fun, all_features)
 
-  log_text("Kruskal_wallis tests performed.")
+  log_text("Kruskal-Wallis tests performed.")
 
   results_df
 }
 
 
-#' Perform ANOVA
+#' Welch's ANOVA and classic ANOVA
 #'
 #' Performs ANOVA with Welch's correction as default, to deal with 
 #' heterogeneity of variances.
@@ -1300,7 +1300,7 @@ perform_oneway_anova <- function(object, formula_char,
   results_df
 }
 
-#' Perform t-tests
+#' Welch's and Student's t-test 
 #'
 #' Performs t-tests, the R default is Welch's t-test (unequal variances), use 
 #' var.equal = TRUE for Student's t-test.
@@ -1511,7 +1511,7 @@ perform_paired_t_test <- function(object, group, id,
   df
 }
 
-#' Perform pairwise t-tests
+#' Pairwise and paired t-test
 #'
 #' Performs pairwise t-tests between all study groups.
 #' Use \code{is_paired} for pairwise paired t-tests.
@@ -1577,7 +1577,7 @@ perform_pairwise_t_test <- function(object, group = group_col(object),
 }
 
 
-#' Perform Mann-Whitney u test
+#' Mann-Whitney u test
 #'
 #' Performs Mann-Whitney u test.
 #' Uses base R function \code{wilcox.test}.
@@ -1640,7 +1640,7 @@ perform_mann_whitney <- function(object, formula_char,
   results_df
 }
 
-#' Perform Wilcoxon signed rank test
+#' Wilcoxon signed rank test
 #'
 #' Performs Wilcoxon signed rank test.
 #' Uses base R function \code{wilcox.test} with \code{paired = TRUE}.
@@ -1666,7 +1666,7 @@ perform_wilcoxon_signed_rank <- function(object, group, id,
                     all_features = all_features, ...)
 }
 
-#' Perform pairwise non-parametric tests
+#' Pairwise non-parametric tests
 #'
 #' Performs pairwise non-parametric tests between all study groups.
 #' Use \code{is_paired = FALSE} for Mann-Whitney u-tests

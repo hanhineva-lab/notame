@@ -4,7 +4,7 @@
 \alias{mz_rt_plot}
 \alias{mz_rt_plot,MetaboSet-method}
 \alias{mz_rt_plot,data.frame-method}
-\title{Plot m/z vs retention time plot}
+\title{Plot m/z vs retention time plot (cloud plot)}
 \usage{
 mz_rt_plot(
   object,

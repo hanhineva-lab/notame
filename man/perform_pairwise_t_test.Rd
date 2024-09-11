@@ -2,7 +2,7 @@
 % Please edit documentation in R/stats.R
 \name{perform_pairwise_t_test}
 \alias{perform_pairwise_t_test}
-\title{Perform pairwise t-tests}
+\title{Pairwise and paired t-test}
 \usage{
 perform_pairwise_t_test(
   object,

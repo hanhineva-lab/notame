@@ -9,7 +9,7 @@ perform_repeatability(object, group)
 \arguments{
 \item{object}{a MetaboSet object}
 
-\item{group}{column name of pData givinh the group labels}
+\item{group}{column name of pData giving the group labels}
 }
 \value{
 A data frame with one row per feature with the repeatability measure.

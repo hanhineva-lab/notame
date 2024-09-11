@@ -2,7 +2,7 @@
 % Please edit documentation in R/stats.R
 \name{perform_pairwise_non_parametric}
 \alias{perform_pairwise_non_parametric}
-\title{Perform pairwise non-parametric tests}
+\title{Pairwise non-parametric tests}
 \usage{
 perform_pairwise_non_parametric(
   object,

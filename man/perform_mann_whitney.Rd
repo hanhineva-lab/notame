@@ -2,7 +2,7 @@
 % Please edit documentation in R/stats.R
 \name{perform_mann_whitney}
 \alias{perform_mann_whitney}
-\title{Perform Mann-Whitney u test}
+\title{Mann-Whitney u test}
 \usage{
 perform_mann_whitney(object, formula_char, all_features = FALSE, ...)
 }

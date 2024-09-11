@@ -2,7 +2,7 @@
 % Please edit documentation in R/batch_correction.R
 \name{normalize_batches}
 \alias{normalize_batches}
-\title{Normalize batches}
+\title{Normalize between batches}
 \usage{
 normalize_batches(object, batch, group, ref_label, population = "all", ...)
 }

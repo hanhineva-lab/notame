@@ -2,7 +2,7 @@
 % Please edit documentation in R/batch_correction.R
 \name{ruvs_qc}
 \alias{ruvs_qc}
-\title{Remove Unwanted Variation}
+\title{Remove Unwanted Variation (RUV) between batches}
 \usage{
 ruvs_qc(object, batch, replicates, k = 3, ...)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/stats.R
 \name{perform_correlation_tests}
 \alias{perform_correlation_tests}
-\title{Perform correlation tests}
+\title{Correlation test}
 \usage{
 perform_correlation_tests(
   object,

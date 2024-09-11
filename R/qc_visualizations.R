@@ -14,7 +14,7 @@
   p
 }
 
-#' Distance density plot
+#' Plot distance density
 #'
 #' Plot density of distances between samples in QC samples and actual samples.
 #'

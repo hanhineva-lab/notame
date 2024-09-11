@@ -2,7 +2,7 @@
 % Please edit documentation in R/cluster_plots.R
 \name{plot_sample_heatmap}
 \alias{plot_sample_heatmap}
-\title{Draw heatmaps}
+\title{Sample heatmap}
 \usage{
 plot_sample_heatmap(
   object,

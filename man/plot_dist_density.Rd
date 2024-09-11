@@ -2,7 +2,7 @@
 % Please edit documentation in R/qc_visualizations.R
 \name{plot_dist_density}
 \alias{plot_dist_density}
-\title{Distance density plot}
+\title{Plot distance density}
 \usage{
 plot_dist_density(
   object,

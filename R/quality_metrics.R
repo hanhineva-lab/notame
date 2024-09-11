@@ -228,7 +228,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 }
 
 
-#' Flag contaminants
+#' Flag contaminants based on blanks
 #'
 #' Flags contaminant features by comparing the median values of blanks and 
 #' biological samples. Biological sampels are defined as samples that are not 

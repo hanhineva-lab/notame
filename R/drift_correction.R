@@ -233,7 +233,7 @@ inspect_dc <- function(orig, dc, check_quality,
   dc
 }
 
-#' Drift correction plots
+#' Save drift correction plots
 #'
 #' Plots the data before and after drift correction, with the regression line 
 #' drawn with the original data. If the drift correction was done on 

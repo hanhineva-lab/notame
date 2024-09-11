@@ -132,11 +132,9 @@ importance_rf <- function(rf) {
 #' \itemize{
 #' \item{\code{mixomics_pls} A simple PLS model with set number of components 
 #' and all features}
-#' \item{\code{mixomics_pls_optimize} Test different numbers of components,
-#' choose the one with minimal mean square error}
+#' \item{\code{mixomics_pls_optimize} Test different numbers of components}
 #' \item{\code{mixomics_spls_optimize} sPLS model: Test different numbers of 
-#' components and features,
-#' choose the one with minimal mean square error}
+#' components and features}
 #' }
 #'
 #' @param object a MetaboSet object
@@ -326,9 +324,8 @@ mixomics_spls_optimize <- function(object, y, ncomp, n_features =
 #' components and all features}
 #' \item{\code{mixomics_plsda_optimize} Test different numbers of components,
 #' choose the one with minimal balanced error rate}
-#' \item{\code{mixomics_splsda_optimize} sPLS-DA model: Test different numbers 
-#' of components and features,
-#' choose the one with minimal balanced error rate}
+#' \item{\code{mixomics_splsda_optimize} Test different numbers 
+#' of components and features, choose the one with minimal balanced error rate}
 #' }
 #'
 #' @param object a MetaboSet object
@@ -689,7 +686,7 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
 
 # PERMANOVA ----
 
-#' Perform PERMANOVA
+#' PERMANOVA
 #'
 #' Performs permutational multivariate analysis of variance. Uses package 
 #' called PERMANOVA.

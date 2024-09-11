@@ -124,7 +124,7 @@ save_plot <- function(p, file, ...) {
 }
 
 
-#' Write all relevant visualizations to pdf
+#' Write all relevant pretreatment visualizations to pdf
 #'
 #' A wrapper around all the major visualization functions, used for visualizing 
 #' data between major steps of data preprocessing. Saves all visualizations as 

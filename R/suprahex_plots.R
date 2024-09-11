@@ -1,4 +1,4 @@
-#' Suprahex plots
+#' Sample suprahex plots
 #'
 #' Plots supraHex plots of each sample using functions from the supraHex 
 #' package. See the supraHex paper and package vignette for more information.

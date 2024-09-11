@@ -1,4 +1,4 @@
-#' Draw dendrograms
+#' Sample dendrogram
 #'
 #' Draws a dendrogram of a hierarchical clustering applied to the samples of an 
 #' experiment.
@@ -68,7 +68,7 @@ plot_dendrogram <- function(object, all_features = FALSE,
 
   p
 }
-#' Draw heatmaps
+#' Sample heatmap
 #'
 #' Draws a heatmap of the distances between the samples of an experiment,
 #' the samples are ordered by hierarchical clustering.

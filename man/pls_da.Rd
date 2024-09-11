@@ -86,9 +86,8 @@ functions for prediction, performance evaluation etc.
 components and all features}
 \item{\code{mixomics_plsda_optimize} Test different numbers of components,
 choose the one with minimal balanced error rate}
-\item{\code{mixomics_splsda_optimize} sPLS-DA model: Test different numbers 
-of components and features,
-choose the one with minimal balanced error rate}
+\item{\code{mixomics_splsda_optimize} Test different numbers 
+of components and features, choose the one with minimal balanced error rate}
 }
 }
 \examples{

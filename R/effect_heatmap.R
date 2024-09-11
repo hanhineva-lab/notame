@@ -21,7 +21,7 @@
 }
 
 
-#' Draw a heatmap of effects between variables, such as correlations
+#' Heatmap of effects between variables, such as correlations
 #'
 #' Draws a heatmap of e.g. correlations between variables 
 #' (see perform_correlation_tests).

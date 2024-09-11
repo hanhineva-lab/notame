@@ -2,7 +2,7 @@
 % Please edit documentation in R/drift_correction.R
 \name{save_dc_plots}
 \alias{save_dc_plots}
-\title{Drift correction plots}
+\title{Save drift correction plots}
 \usage{
 save_dc_plots(
   orig,

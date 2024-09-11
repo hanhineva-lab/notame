@@ -2,7 +2,7 @@
 % Please edit documentation in R/cluster_plots.R
 \name{plot_dendrogram}
 \alias{plot_dendrogram}
-\title{Draw dendrograms}
+\title{Sample dendrogram}
 \usage{
 plot_dendrogram(
   object,

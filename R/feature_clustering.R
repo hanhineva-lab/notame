@@ -1,4 +1,4 @@
-#' Cluster correlated features
+#' Cluster correlated features originating from the same metabolite
 #'
 #' Clusters features potentially originating from the same compound. Features 
 #' with high Pearson correlation coefficient and small retention time 

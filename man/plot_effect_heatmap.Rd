@@ -2,7 +2,7 @@
 % Please edit documentation in R/effect_heatmap.R
 \name{plot_effect_heatmap}
 \alias{plot_effect_heatmap}
-\title{Draw a heatmap of effects between variables, such as correlations}
+\title{Heatmap of effects between variables, such as correlations}
 \usage{
 plot_effect_heatmap(
   data,

@@ -1,4 +1,4 @@
-#' Remove Unwanted Variation
+#' Remove Unwanted Variation (RUV) between batches
 #'
 #' An interface for the RUVs method in RUVSeq package.
 #'
@@ -47,13 +47,13 @@ ruvs_qc <- function(object, batch, replicates, k = 3, ...) {
 }
 
 
-#' Bhattacharyya distance between bathces in PCA space
+#' Bhattacharyya distance between batches in PCA space
 #'
 #' Computes Bhattacharyya distance between all pairs of batches after
 #' projecting the samples into PCA space with pcaMethods::pca. 
 #'
 #' @param object a MetaboSet object
-#' @param batch column name of pData givinh the batch labels
+#' @param batch column name of pData giving the batch labels
 #' @param all_features logical, should all features be used? If FALSE
 #' (the default), flagged features are removed before imputation.
 #' @param center logical, should the data be centered prior to PCA?
@@ -150,9 +150,8 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
 #' The repeatability ranges from 0 to 1. Higher repeatability depicts less
 #' variation between batches.
 #'
-#'
 #' @param object a MetaboSet object
-#' @param group column name of pData givinh the group labels
+#' @param group column name of pData giving the group labels
 #'
 #' @return A data frame with one row per feature with the repeatability measure.
 #'
@@ -254,7 +253,7 @@ align_batches <- function(object_na, object_fill, batch, mz, rt,
 }
 
 
-#' Normalize batches
+#' Normalize between batches
 #'
 #' Between-batch normalization by either reference samples or population median.
 #' Uses normalizeBatches function from the batchCorr package.

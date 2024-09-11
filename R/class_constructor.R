@@ -716,15 +716,13 @@ setMethod("show", c(object = "MetaboSet"),
 setGeneric("combined_data", signature = "object",
            function(object) standardGeneric("combined_data"))
 
-#' @describeIn MetaboSet sample information and features combined to a single 
-#' data frame, one row per sample.
+#' @describeIn MetaboSet Retrieve both sample information and features
 #' @export
 setMethod("combined_data", c(object = "MetaboSet"), 
   function(object) {
     cbind(pData(object), t(exprs(object)))
   }
 )
-
 
 #' Get and set name of the special column for group labels
 #' @param object a MetaboSet object
@@ -927,7 +925,7 @@ setMethod("flag<-", "MetaboSet",
 setGeneric("join_fData", signature = c("object", "dframe"),
            function(object, dframe) standardGeneric("join_fData"))
 
-#' @describeIn MetaboSet join new information to fData
+#' @describeIn MetaboSet join new information to feature data
 #' @param dframe a data frame with the new information
 #' @export
 setMethod("join_fData", c("MetaboSet", "data.frame"),
@@ -961,7 +959,7 @@ setMethod("join_fData", c("MetaboSet", "data.frame"),
 setGeneric("join_pData", signature = c("object", "dframe"),
            function(object, dframe) standardGeneric("join_pData"))
 
-#' @describeIn MetaboSet join new information to fData
+#' @describeIn MetaboSet join new information to pheno data
 #' @param dframe a data frame with the new information
 #' @export
 setMethod("join_pData", c("MetaboSet", "data.frame"),

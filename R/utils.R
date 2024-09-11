@@ -4,23 +4,28 @@
 #' Provides functionality for untargeted LC-MS metabolomics research as 
 #' specified in the associated publication in the 'Metabolomics Data
 #' Processing and Data Analysis—Current Best Practices' special issue of the 
-#' Metabolites journal (2020). This includes data pretreatment and quality 
-#' control, uni- and multivariate analysis as well as quality control 
-#' visualizations, feature-wise visualizations and results visualizations. Raw 
-#' data preprocessing and functionality related to biological context, such as 
-#' pathway analysis, is not included.
+#' Metabolites journal (2020). This includes data pretreatment, feature 
+#' selection and supporting visualizations. Raw data preprocessing and 
+#' functionality related to biological context, such as pathway analysis, is 
+#' not included.
 #'
 #' @details
 #' In roughly chronological order, the functionality of notame is as follows. 
 #' Please see the vignettes and paper for more information.
 #' 
 #' Data pretreatment (for reducing unwanted variation and completing the 
-#' dataset):
+#' dataset, returning modifed objects):
 #' \itemize{
 #' \item \code{\link{mark_nas}} mark specified values as missing
 #' \item \code{\link{flag_detection}} flag features with low detection rate
 #' \item \code{\link{flag_contaminants}} flag contaminants based on blanks
-#' \item \code{\link{correct_drift}} QC-based cubic spline drift correction
+#' \item \code{\link{correct_drift}} correct drift using cubic spline
+#' \item \code{\link{align_batches}} align features between batches
+#' \item \code{\link{normalize_batches}} normalize between batches
+#' \item \code{\link{ruvs_qc}} Remove Unwanted Variation (RUV) between batches
+#' \item \code{\link{pca_bhattacharyya_dist}} Bhattacharyya distance between 
+#' batches in PCA space
+#' \item \code{\link{perform_repeatability}} compute repeatability measures
 #' \item \code{\link{assess_quality}} assess quality information of features
 #' \item \code{\link{quality}} extract quality information of features
 #' \item \code{\link{flag_quality}} flag low-quality features
@@ -30,50 +35,34 @@
 #' imputation
 #' \item \code{\link{cluster_features}} cluster correlated features originating 
 #' from the same metabolite
-#' \item \code{\link{align_batches}} align features between batches
-#' \item \code{\link{normalize_batches}}, \code{\link{ruvs_qc}} normalize 
-#' between batches
-#' \item \code{\link{pca_bhattacharyya_dist}}, 
-#' \code{\link{perform_repeatability}} evaluate between-batch normalization
-#' }
-#'
-#' Data pretreatment visualizations (for visualization of data pretreatment and 
-#' exploring the data at large):
-#' \itemize{
-#' \item \code{\link{visualizations}} write all relevant data pretreatment 
-#' visualizations to pdf
-#' \item \code{\link{plot_injection_lm}} p-value histograms relating 
-#' injection order to each feature
-#' \item \code{\link{plot_sample_boxplots}} sample boxplots relating 
-#' abundance to, for example, study group or injection order
-#' \item \code{\link{plot_dist_density}} density plot of euclidean 
-#' distances between samples
-#' \item \code{\link{plot_tsne}}, \code{\link{plot_pca}} t-SNE and PCA 
-#' plots colored by, for example, study group or injection order
-#' \item \code{\link{plot_tsne_arrows}}, \code{\link{plot_pca_arrows}} t-
-#' SNE and PCA plots with arrows representing the change in samples across time 
-#' points 
-#' \item \code{\link{plot_tsne_hexbin}}, \code{\link{plot_pca_hexbin}}
-#' hexbin t-SNE and PCA plots colored by injection order
-#' \item \code{\link{plot_dendrogram}} sample dendrogram, hierarchically 
-#' clustered using Ward's criterion on Euclidean distances between samples
-#' \item \code{\link{plot_sample_heatmap}} heatmap of Euclidean distances 
-#' between samples, ordered by hierarchical clustering using Ward's criterion
-#' \item \code{\link{plot_pca_loadings}} PCA loadings plot
-#' \item \code{\link{plot_sample_suprahex}} suprahex plots of samples 
-#' \item \code{\link{plot_quality}} distributions of quality metrics plot 
-#' }
-#'
-#' Transformations:
-#' \itemize{
 #' \item \code{\link{log}} logarithms
 #' \item \code{\link{exponential}} exponential
 #' \item \code{\link{pqn_normalization}} probabilistic quotient normalization
 #' \item \code{\link{inverse_normalize}} inverse-rank normalization
 #' \item \code{\link{scale}} scale
 #' }
+#'
+#' Data pretreatment visualizations (for visualization of data pretreatment and 
+#' exploring the data at large, saved to file by default):
+#' \itemize{
+#' \item \code{\link{visualizations}} write all relevant data pretreatment 
+#' visualizations to pdf
+#' \item \code{\link{plot_injection_lm}} estimate the magnitude of drift
+#' \item \code{\link{plot_sample_boxplots}} plot a boxplot for each sample
+#' \item \code{\link{plot_dist_density}} plot distance density
+#' \item \code{\link{plot_tsne}}, \code{\link{plot_pca}} t-SNE and PCA plot
+#' \item \code{\link{plot_tsne_arrows}}, \code{\link{plot_pca_arrows}} t-SNE 
+#' and PCA plots with arrows
+#' \item \code{\link{plot_tsne_hexbin}}, \code{\link{plot_pca_hexbin}}
+#' t-SNE and PCA hexbin plots
+#' \item \code{\link{plot_dendrogram}} sample dendrogram
+#' \item \code{\link{plot_sample_heatmap}} sample heatmap
+#' \item \code{\link{plot_pca_loadings}} PCA loadings plot
+#' \item \code{\link{plot_sample_suprahex}} sample suprahex plots
+#' \item \code{\link{plot_quality}} plot quality metrics
+#' }
 #' 
-#' Univariate analysis (return data.frames):
+#' Feature selection – Univariate analysis (return data.frames):
 #' \itemize{
 #' \item \code{\link{perform_lm}} linear models 
 #' \item \code{\link{perform_logistic}} logistic regression
@@ -87,52 +76,55 @@
 #' \item \code{\link{perform_wilcoxon_signed_rank}} Wilcoxon signed rank test
 #' \item \code{\link{perform_pairwise_non_parametric}} pairwise non-parametric 
 #' tests
-#' \item \code{\link{perform_correlation_tests}} correlations tests
-#' \item \code{\link{perform_auc}} area under curve for each subject and feature
+#' \item \code{\link{perform_correlation_tests}} correlation test
+#' \item \code{\link{perform_auc}} area under curve
 #' \item \code{\link{perform_homoscedasticity_tests}} test homoscedasticity
 #' \item \code{\link{cohens_d}} Cohen's D
 #' \item \code{\link{fold_change}} fold change
 #' \item \code{\link{summary_statistics}} summary statistics
-#' \item \code{\link{clean_stats_results}} statistics cleaning
+#' \item \code{\link{summarize_results}} statistics cleaning
 #' }
 #'
-#' Multivariate analysis (return various objects):
+#' Feature selection – Supervised learning (return various objects):
 #' \itemize{
 #' \item \code{\link{muvr_analysis}} multivariate modelling with minimally 
-#' biased variable selection (MUVR2) with random forest, PLS(-DA)
-#' and elastic net regression
-#' \item \code{\link{mixomics_pls}}, \code{\link{mixomics_plsda}} PLS(-DA)
+#' biased variable selection (MUVR2) 
+#' \item \code{\link{mixomics_pls}}, \code{\link{mixomics_plsda}} a simple 
+#' PLS(-DA) model with set number of components and all features
 #' \item \code{\link{mixomics_pls_optimize}},
-#' \code{\link{mixomics_plsda_optimize}} optimal number of components for
-#' PLS(-DA)
+#' \code{\link{mixomics_plsda_optimize}} test different numbers of components 
+#' for PLS(-DA)
 #' \item \code{\link{mixomics_spls_optimize}},
-#' \code{\link{mixomics_spls_optimize}} optimal number of components 
-#' and features in each component for PLS(-DA)
-#' \item \code{\link{fit_rf}}, \code{\link{importance_rf}} random forest
+#' \code{\link{mixomics_splsda_optimize}} test different numbers of 
+#' components and features for PLS(-DA)
+#' \item \code{\link{fit_rf}}, \code{\link{importance_rf}} fit random forest
 #' and feature importance
-#'  \item \code{\link{perform_permanova}} PERMANOVA
+#' \item \code{\link{perform_permanova}} PERMANOVA
 #' }
 #'
 #' Feature-wise visualizations (these are often drawn for a subset of 
-#' interesting features after analysis):
+#' interesting features after analysis, saved by default):
 #' \itemize{
 #' \item \code{\link{save_beeswarm_plots}} save beeswarm plots of each feature 
-#' \item \code{\link{save_group_boxplots}} save box plots of each feature
+#' by group
+#' \item \code{\link{save_group_boxplots}} save box plots of each feature by 
+#' group
 #' \item \code{\link{save_scatter_plots}} save scatter plots of each feature 
 #' against a set variable
 #' \item \code{\link{save_subject_line_plots}} save line plots with mean
-#' \item \code{\link{save_group_lineplots}} save line plots with error bars by 
+#' \item \code{\link{save_group_lineplots}} save line plots with errorbars by 
 #' group
 #' \item \code{\link{save_dc_plots}} save drift correction plots
 #' \item \code{\link{save_batch_plots}} save batch correction plots
 #' }
 #'
-#' Results visualizations (save them using \code{\link{save_plot}}):
+#' Results visualizations (returned by default, save them using 
+#' \code{\link{save_plot}}):
 #' \itemize{
 #' \item \code{\link{plot_p_histogram}} histogram of p-values
 #' \item \code{\link{volcano_plot}} volcano plot
 #' \item \code{\link{manhattan_plot}} manhattan plot
-#' \item \code{\link{mz_rt_plot}} m/z vs retention time plot (aka cloud plot)
+#' \item \code{\link{mz_rt_plot}} m/z vs retention time plot (cloud plot)
 #' \item \code{\link{plot_effect_heatmap}} heatmap of effects between 
 #' variables, such as correlations
 #' }

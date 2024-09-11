@@ -81,11 +81,9 @@ two components.
 \itemize{
 \item{\code{mixomics_pls} A simple PLS model with set number of components 
 and all features}
-\item{\code{mixomics_pls_optimize} Test different numbers of components,
-choose the one with minimal mean square error}
+\item{\code{mixomics_pls_optimize} Test different numbers of components}
 \item{\code{mixomics_spls_optimize} sPLS model: Test different numbers of 
-components and features,
-choose the one with minimal mean square error}
+components and features}
 }
 }
 \examples{

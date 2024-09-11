@@ -2,7 +2,7 @@
 % Please edit documentation in R/visualization_utils.R
 \name{visualizations}
 \alias{visualizations}
-\title{Write all relevant visualizations to pdf}
+\title{Write all relevant pretreatment visualizations to pdf}
 \usage{
 visualizations(
   object,

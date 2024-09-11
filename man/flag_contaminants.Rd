@@ -2,7 +2,7 @@
 % Please edit documentation in R/quality_metrics.R
 \name{flag_contaminants}
 \alias{flag_contaminants}
-\title{Flag contaminants}
+\title{Flag contaminants based on blanks}
 \usage{
 flag_contaminants(
   object,

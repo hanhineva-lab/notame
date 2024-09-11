@@ -56,8 +56,7 @@ purely for convenience, as many functions use these as defaults.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{combined_data(MetaboSet)}: sample information and features combined to a single 
-data frame, one row per sample.
+\item \code{combined_data(MetaboSet)}: Retrieve both sample information and features
 
 \item \code{group_col(MetaboSet)}: get name of column for group labels
 
@@ -75,9 +74,9 @@ data frame, one row per sample.
 
 \item \code{flag(MetaboSet) <- value}: set flags
 
-\item \code{join_fData(object = MetaboSet, dframe = data.frame)}: join new information to fData
+\item \code{join_fData(object = MetaboSet, dframe = data.frame)}: join new information to feature data
 
-\item \code{join_pData(object = MetaboSet, dframe = data.frame)}: join new information to fData
+\item \code{join_pData(object = MetaboSet, dframe = data.frame)}: join new information to pheno data
 
 }}
 \section{Slots}{

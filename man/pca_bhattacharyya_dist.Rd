@@ -2,7 +2,7 @@
 % Please edit documentation in R/batch_correction.R
 \name{pca_bhattacharyya_dist}
 \alias{pca_bhattacharyya_dist}
-\title{Bhattacharyya distance between bathces in PCA space}
+\title{Bhattacharyya distance between batches in PCA space}
 \usage{
 pca_bhattacharyya_dist(
   object,
@@ -17,7 +17,7 @@ pca_bhattacharyya_dist(
 \arguments{
 \item{object}{a MetaboSet object}
 
-\item{batch}{column name of pData givinh the batch labels}
+\item{batch}{column name of pData giving the batch labels}
 
 \item{all_features}{logical, should all features be used? If FALSE
 (the default), flagged features are removed before imputation.}

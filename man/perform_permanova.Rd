@@ -2,7 +2,7 @@
 % Please edit documentation in R/multivariate.R
 \name{perform_permanova}
 \alias{perform_permanova}
-\title{Perform PERMANOVA}
+\title{PERMANOVA}
 \usage{
 perform_permanova(
   object,

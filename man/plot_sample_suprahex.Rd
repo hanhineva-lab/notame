@@ -2,7 +2,7 @@
 % Please edit documentation in R/suprahex_plots.R
 \name{plot_sample_suprahex}
 \alias{plot_sample_suprahex}
-\title{Suprahex plots}
+\title{Sample suprahex plots}
 \usage{
 plot_sample_suprahex(
   object,
