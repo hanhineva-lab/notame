@@ -38,7 +38,7 @@ data between major steps of data preprocessing. Saves all visualizations as
 PDFs with a set prefix on filenames.
 }
 \details{
-If \code{merge} is \code{TRUE} and \code{format} id \code{pdf},
+If \code{merge} is \code{TRUE} and \code{format} is \code{pdf},
 then a file containing all the visualizations named \code{prefix.pdf} will 
 be created. NOTE: on Windows this requires installation of pdftk 
 (\url{https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/})

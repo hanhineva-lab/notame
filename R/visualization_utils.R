@@ -62,6 +62,7 @@ save_plot <- function(p, file, ...) {
 # Helper function for handling errors and keeping track of file names
 .save_name <- function(object, prefix, format, fun, name, 
                        width = 7, height = 7, ...) {
+  save_seed <- .Random.seed
   file_names <- ""
   p <- NULL
   tryCatch(
@@ -72,12 +73,14 @@ save_plot <- function(p, file, ...) {
       message("Problem with plot named ", name, ":\n", e$message)
     }
   )
-
+  
   if (!is.null(p)) {
     file_name <- paste0(prefix, "_", name, ".", format)
     save_plot(p, file = file_name, width = width, height = height)
     assign("file_names", paste(file_names, file_name))
   }
+  assign(".Random.seed", save_seed, envir = .GlobalEnv)
+
 }
 
 .merge_to_pdf <- function(prefix, file_names, remove_singles) {
@@ -142,7 +145,7 @@ save_plot <- function(p, file, ...) {
 #'
 #' @return None, the function is invoked for its plot-saving side effect.
 #'
-#' @details If \code{merge} is \code{TRUE} and \code{format} id \code{pdf},
+#' @details If \code{merge} is \code{TRUE} and \code{format} is \code{pdf},
 #' then a file containing all the visualizations named \code{prefix.pdf} will 
 #' be created. NOTE: on Windows this requires installation of pdftk 
 #' (\url{https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/})

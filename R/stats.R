@@ -1067,8 +1067,9 @@ perform_logistic <- function(object, formula_char, all_features = FALSE, ...) {
 #' in pData(object) can be specified. To make the formulas flexible, the word 
 #' "Feature" must be used to signal the role of the features in the formula. 
 #' "Feature" will be replaced by the actual Feature IDs during model fitting, 
-#' see the example.
-#'
+#' see the example. With bootstrap ("boot") confidence intervals, the results 
+#' are reproducible if RNGseed is set for the BiocParallel backend. 
+#' 
 #' @examples
 #' # A simple example without QC samples
 #' # Features predicted by Group and Time as fixed effects with Subject ID as a 
