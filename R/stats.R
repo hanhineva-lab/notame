@@ -1301,157 +1301,173 @@ perform_oneway_anova <- function(object, formula_char,
   results_df
 }
 
-#' Welch's and Student's t-test 
+#' Pairwise and paired t-tests
 #'
-#' Performs t-tests, the R default is Welch's t-test (unequal variances), use 
-#' var.equal = TRUE for Student's t-test.
+#' Performs pairwise and paired t-tests. The R default is Welch's t-test 
+#' (unequal variances), use var.equal = TRUE for Student's t-test. Use 
+#' \code{is_paired} for paired t-tests.
 #'
 #' @param object a MetaboSet object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
+#' @param is_paired logical, use paired t-test
+#' @param id character, name of the subject identification column for paired 
+#' version
 #' @param all_features should all features be included in FDR correction?
-#' @param ... additional parameters to t.test
+#' @param ... other parameters passed to stats::t.test
 #'
-#' @details The model is fit on combined_data(object). Thus, column names
-#' in pData(object) can be specified. To make the formulas flexible, the word 
-#' "Feature" must be used to signal the role of the features in the formula. 
-#' "Feature" will be replaced by the actual Feature IDs during model fitting. 
-#' For example, if testing for equality of means in study groups, use 
-#' "Feature ~ Group".
+#' @details P-values of each comparison are corrected separately from each 
+#' other.
 #'
 #' @return A data frame with the results.
 #'
 #' @examples
-#' t_test_results <- perform_t_test(drop_qcs(merged_sample), 
+#' # Including QCs as a study group for example
+#' t_test_results <- perform_t_test(merged_sample, 
 #'   formula_char = "Feature ~ Group")
-#'
-#' @seealso \code{\link{t.test}}
+#' # Using paired mode (pairs with QC are skipped as there are no common IDs in 
+#' # 'example_set')
+#' t_test_results <- perform_t_test(example_set,
+#'   formula_char = "Feature ~ Time", is_paired = TRUE, id = "Subject_ID")
+#' # Only two groups
+#' t_test_results <- perform_t_test(drop_qcs(merged_sample),
+#'   formula_char = "Feature ~ Group")
+#' 
+#' @seealso \code{\link[stats]{t.test}}
 #'
 #' @export
-perform_t_test <- function(object, formula_char, all_features = FALSE, ...) {
-  message("Remember that t.test returns difference between group means",
-          " in different order than lm.\n",
-          "This function mimics this behavior, so the effect size is",
-          " mean of reference level minus mean of second level.")
-  exp_var <- unlist(strsplit(formula_char, " ~ "))[2]
-  pair <- levels(pData(object)[, exp_var])
-  if (length(pair) != 2) {
-    stop("'",exp_var, "' in formula should contain exactly two levels.")
+perform_t_test <- function(object, formula_char,
+                           is_paired = FALSE, id = NULL, 
+                           all_features = FALSE, ...) {
+  message("The functionality of this function has changed.", 
+          " It now encompasses pairwise and paired t-tests.")
+  
+  group <- unlist(strsplit(formula_char, " ~ "))[2]
+
+  if (!is.factor(pData(object)[, group])) {
+    stop("Group column should be a factor")
   }
 
-  log_text(paste0("Starting t-tests for ", paste0(pair, collapse = " & ")))
-
-  t_fun <- function(feature, formula, data) {
-    result_row <- NULL
-    tryCatch(
-      {
-        t_res <- stats::t.test(formula = formula, data = data, ...)
-        conf_level <- attr(t_res$conf.int, "conf.level") * 100
-        result_row <- data.frame(
-          Feature_ID = feature,
-          Mean1 = t_res$estimate[1],
-          Mean2 = t_res$estimate[2],
-          Estimate = t_res$estimate[1] - t_res$estimate[2],
-          "LCI" = t_res$conf.int[1],
-          "UCI" = t_res$conf.int[2],
-          t_test_P = t_res$p.value,
-          stringsAsFactors = FALSE
-        )
-        colnames(result_row)[5:6] <- paste0(colnames(result_row)[5:6],
-                                            conf_level)
-        colnames(result_row)[2:3] <- paste0(pair, "_Mean")
-        prefix <- paste0(pair[1], "_vs_", pair[2], "_")
-        colnames(result_row)[4] <- paste0(prefix, "Estimate")
-        colnames(result_row)[-(seq_len(4))] <- 
-          paste0(prefix, colnames(result_row)[-(seq_len(4))])
-      },
-      error = function(e) {
-        message(feature, ": ", e$message)
-      }
-    )
-
-    result_row
+  results_df <- .setup_simple_test(object, group = group, 
+                                   id = id, test = "t_test", 
+                                   all_features = all_features, 
+                                   is_paired = is_paired, ...)
+  
+  if (length(featureNames(object)) != nrow(results_df)) {
+    warning("Results don't contain all features.")
   }
-
-  results_df <- .perform_test(object, formula_char, t_fun, all_features)
   rownames(results_df) <- results_df$Feature_ID
-
-  log_text("t-tests performed.")
-
   results_df
 }
 
-.calc_paired <- function(feature, group1, group2, pair, test, ...) {
+.adjust_p_values <- function(x, flags) {
+  p_cols <- colnames(x)[grepl("_P$", colnames(x))]
+  for (p_col in p_cols) {
+    p_values <- x[, p_col, drop = TRUE]
+    p_values[!is.na(flags)] <- NA
+    x <- tibble::add_column(.data = x,
+                            FDR = stats::p.adjust(p_values, method = "BH"),
+                            .after = p_col)
+    p_idx <- which(colnames(x) == p_col)
+    colnames(x)[p_idx + 1] <- paste0(p_col, "_FDR")
+  }
+  x
+}
+
+# Calculate pairwise and/or paired statistics
+.calc_simple_test <- function(feature, subset1, subset2, 
+                              pair, test, is_paired, ...) {
   result_row <- NULL
   tryCatch({
     if (test == "t_test") {
-      res <- stats::t.test(group1[, feature], group2[, feature], 
-                           paired = TRUE, ...)
+      res <- stats::t.test(feature[subset1], feature[subset2],
+                           paired = is_paired, ...)
     } else if (test == "Wilcox") {
-      res <- stats::wilcox.test(group1[, feature], group2[, feature],
-                                paired = TRUE, conf.int = TRUE, ...)
+      res <- stats::wilcox.test(feature[subset1], feature[subset2],
+                                paired = is_paired, conf.int = TRUE, ...)
     }
-
+    # Change name of test for reporting if non-paired non-parametric
+    if (test == "Wilcox" & is_paired == FALSE) {
+      test <- "Mann_Whitney"
+    }
+    # Get a single-row data.frame with results
     conf_level <- attr(res$conf.int, "conf.level") * 100
-
-    result_row <- data.frame(Feature_ID = feature, Statistic = res$statistic,
+    result_row <- data.frame(Statistic = res$statistic,
                              Estimate = res$estimate[1], LCI = res$conf.int[1],
                              UCI = res$conf.int[2], P = res$p.value,
                              stringsAsFactors = FALSE)
     ci_idx <- grepl("CI", colnames(result_row))
     colnames(result_row)[ci_idx] <- paste0(colnames(result_row)[ci_idx],
                                            conf_level)
-    colnames(result_row)[-1] <- paste0(pair[1], "_vs_", pair[2], "_", test, "_",
-                                       colnames(result_row)[-1])
+    colnames(result_row) <- paste0(pair[1], "_vs_", pair[2], "_", 
+                                   test, "_", colnames(result_row))
+    result_row
   },
-  error = function(e) message(feature, ": ", e$message))
-  result_row
-}
+  error = function(e) e$message)
+} 
 
-.help_paired_test <- function(object, group, id, test,
-                              all_features = FALSE, ...) {
+# Sets up subsets, calls .calc_simple_test and processes results for simple tests
+.help_simple_test <- function(object, group, id, test,
+                              all_features = FALSE, is_paired, ...) {
   results_df <- NULL
   data <- combined_data(object)
   features <- featureNames(object)
   groups <- data[, group]
-  pair <- levels(groups)[seq_len(2)]
+  pair <- levels(groups)
   if (!is(groups, "factor")) groups <- as.factor(groups)
-  if (length(levels(groups)) > 2) {
-    warning("More than two groups detected, only using the first two.", "\n", 
-            "For multiple comparisons, please see perform_pairwise_t_test()", 
-            call. = FALSE)
+  # Find samples of complete pairs by group or samples by group
+  if (is_paired){
+    if (is.null(id)) {
+      stop("Subject ID column is missing, please provide it")
+    }
+    # Get group indices
+    subset1 <- which(groups == pair[1])
+    subset2 <- which(groups == pair[2])
+    # Get complete pairs 
+    common_ids <- as.numeric(intersect(data[subset1, id], data[subset2, id]))
+    # Keep only complete pairs, order by id
+    subset1 <- subset1[data[subset1, id] %in%            
+                       common_ids][order(common_ids)]         
+    subset2 <- subset2[data[subset2, id] %in% 
+                       common_ids][order(common_ids)]         
+    log_text(paste0("Starting paired tests for ", 
+                    paste0(pair, collapse = " & ")))
+    log_text(paste("Found", length(common_ids), "complete pairs."))
+    # If there are no complete pairs, return an empty data.frame
+    if (length(common_ids) == 0) {
+      warning(paste0("Skipped ", paste0(pair, collapse = " & "), 
+                     ": no common IDs."))
+      return(data.frame("Feature_ID" = features))
+    }
+  } else {
+    # Get group indices
+    subset1 <- which(groups == pair[1])
+    subset2 <- which(groups == pair[2])
+    log_text(paste0("Starting tests for ", paste0(pair, collapse = " & ")))
   }
-
-  # Split to groups
-  group1 <- data[which(groups == pair[1]), ]
-  group2 <- data[which(groups == pair[2]), ]
-  # Keep only complete pairs, order by id
-  common_ids <- intersect(group1[, id], group2[, id])
-  group1 <- group1[group1[, id] %in% common_ids, ][order(common_ids), ]
-  group2 <- group2[group2[, id] %in% common_ids, ][order(common_ids), ]
-
-  log_text(paste0("Starting paired tests for ", paste0(pair, collapse = " & ")))
-  log_text(paste("Found", length(common_ids), "complete pairs."))
-  if (length(common_ids) == 0) {
-    warning(paste0("Skipped ", paste0(pair, collapse = " & "), 
-                   ": no common IDs."))
-    return(data.frame("Feature_ID" = features))
-  }
-  results_df <- BiocParallel::bplapply(features, .calc_paired, group1,
-                                       group2, pair, test, ...)
-  results_df <- do.call(rbind, results_df)
-
-  # Check that results actually contain something
-  # If the tests are run on parallel, error messages are not visible
-  if (nrow(results_df) == 0) {
-    stop("All the tests failed.", 
-         " To see the problems, run the tests without parallelization.",
+  
+  # Calculate paired or unpaired test for the subsets
+  results <- BiocParallel::bplapply(data[, features], .calc_simple_test, 
+                                    subset1, subset2, pair, test, 
+                                    is_paired, ...)
+  # Message errors and make boolean list for keeping features without errors
+  errors <- mapply(function(result, fname) {
+    if (length(result) != 5) {
+      message(fname, ": ", result)
+      TRUE
+    } else {FALSE}
+  }, results, names(results))
+  # Check that results actually contain results
+  if (sum(errors == TRUE) == length(results)) {
+    stop("All the tests failed.",
          call. = FALSE)
   }
-  rownames(results_df) <- results_df$Feature_ID
+  # Keep features without errors
+  results_df <- data.frame(Feature_ID = features, 
+                           do.call(rbind, results[!errors]),
+                           check.names = FALSE)
   # Rows full of NA for features where the test failed
   results_df <- .fill_results(results_df, features)
-
   # FDR correction
   if (all_features) {
     flags <- rep(NA_character_, nrow(results_df))
@@ -1460,278 +1476,137 @@ perform_t_test <- function(object, formula_char, all_features = FALSE, ...) {
   }
   results_df <- .adjust_p_values(results_df, flags)
 
-  log_text("Paired tests performed.")
-
+  if (is_paired) {
+    log_text("Paired tests performed.")
+  } else {
+    log_text("Tests performed")
+  }
   results_df
 }
 
 #' Perform paired t-tests
-#'
-#' Performs paired t-tests between two groups.
-#'
-#' @param object a MetaboSet object
-#' @param group character, column name of pData with the group information
-#' @param id character, column name of pData with the identifiers for the pairs
-#' @param all_features should all features be included in FDR correction?
-#' @param ... additional parameters to t.test
-#'
-#' @return A data frame with the results.
-#'
-#' @examples
-#' paired_t_results <- perform_paired_t_test(drop_qcs(example_set), 
-#'   group = "Time", id = "Subject_ID")
-#'
-#' @seealso \code{\link{t.test}}
-#'
+#' DEPRECATED
+#' @rdname notame-defunct
 #' @export
 perform_paired_t_test <- function(object, group, id, 
                                   all_features = FALSE, ...) {
-  message("Remember that t.test returns difference between group means",
-          " in different order than lm.\n",
-          "This function mimics this behavior, so the effect size is",
-          " mean of reference level minus mean of second level.")
-
-  .help_paired_test(object, group, id, test = "t_test",
-                    all_features = all_features, ...)
+  .Defunct("perform_t_test")
 }
 
-.help_pairwise_test <- function(object, fun, group_, ...) {
+# Calls .help_simple_test in a loop with an object set up for each pairwise comparison, also in the case of two groups
+.setup_simple_test <- function(object, group, ...) {
   df <- NULL
-  groups <- levels(pData(object)[, group_])
+  groups <- levels(pData(object)[, group])
   combinations <- utils::combn(groups, 2)
   for (i in seq_len(ncol(combinations))) {
     group1 <- as.character(combinations[1, i])
     group2 <- as.character(combinations[2, i])
     # Subset the pair of groups
-    object_tmp <- object[, pData(object)[, group_] %in% c(group1, group2)]
+    object_tmp <- object[, pData(object)[, group] %in% c(group1, group2)]
     pData(object_tmp) <- droplevels(pData(object_tmp))
 
-    res <- fun(object_tmp, ...)
+    res <- .help_simple_test(object_tmp, group = group, ...)
     ifelse(is.null(df), df <- res, df <- dplyr::left_join(df, res))
   }
   df
 }
 
 #' Pairwise and paired t-test
-#'
-#' Performs pairwise t-tests between all study groups.
-#' Use \code{is_paired} for pairwise paired t-tests.
-#' NOTE! Does not use formula interface.
-#'
-#' @param object a MetaboSet object
-#' @param group character, column name of phenoData giving the groups
-#' @param is_paired logical, use pairwise paired t-test
-#' @param id character, name of the subject identification column for paired 
-#' version
-#' @param all_features should all features be included in FDR correction?
-#' @param ... other parameters passed to perform_t_test, and eventually to base 
-#' R t.test
-#'
-#' @details P-values of each comparison are corrected separately from each 
-#' other.
-#'
-#' @return A data frame with the results.
-#'
-#' @examples
-#' # Including QCs as a study group for example
-#' t_test_results <- perform_pairwise_t_test(merged_sample, group = "Group")
-#' # Using paired mode (pairs with QC are skipped as there are no common IDs in 
-#' # 'example_set')
-#' t_test_results <- perform_pairwise_t_test(example_set, group = "Time",
-#'   is_paired = TRUE, id = "Subject_ID")
-#'
-#' @seealso \code{\link{perform_t_test}},
-#' \code{\link{perform_paired_t_test}},
-#' \code{\link{t.test}}
-#'
+#' DEPRECATED
+#' @rdname notame-defunct
 #' @export
 perform_pairwise_t_test <- function(object, group = group_col(object),
                                     is_paired = FALSE, id = NULL, 
                                     all_features = FALSE, ...) {
-  results_df <- NULL
-
-  if (!is.factor(pData(object)[, group])) {
-    stop("Group column should be a factor.")
-  }
-
-  if (is_paired) {
-    if (is.null(id)) {
-      stop("Subject ID column is missing, please provide it.")
-    }
-    log_text("Starting pairwise paired t-tests.")
-    results_df <- .help_pairwise_test(object, perform_paired_t_test,
-                                      group_ = group, group = group, id = id,
-                                      all_features = all_features, ...)
-    log_text("Pairwise paired t-tests performed")
-  } else {
-    log_text("Starting pairwise t-tests")
-    results_df <- .help_pairwise_test(object, perform_t_test, group,
-                                      formula_char = paste("Feature ~", group),
-                                      all_features = all_features, ...)
-    log_text("Pairwise t-tests performed")
-  }
-  if (length(featureNames(object)) != nrow(results_df)) {
-    warning("Results don't contain all features.")
-  }
-  rownames(results_df) <- results_df$Feature_ID
-  results_df
+  .Defunct("perform_t_test")
 }
 
-
-#' Mann-Whitney u test
+#' Pairwise and paired non-parametric tests
 #'
-#' Performs Mann-Whitney u test.
-#' Uses base R function \code{wilcox.test}.
+#' Performs pairwise and paired non-parametric tests. The default is Mann-
+#' Whitney U test, use \code{is_paired} for Wilcoxon signed rank tests.
 #'
 #' @param object a MetaboSet object
-#' @param formula_char character, the formula to be used in the linear model 
-#' (see Details)
+#' @param formula_char character, the formula to be used in the tests
+#' @param is_paired logical, use paired test
+#' @param id character, name of the subject identification column for paired 
+#' version
 #' @param all_features should all features be included in FDR correction?
-#' @param ... other parameters to \code{\link{wilcox.test}}
+#' @param ... other parameters passed to test stats::wilcox.test
 #'
-#' @details The model is fit on combined_data(object). Thus, column names
+#' @details P-values of each comparison are corrected separately from each 
+#' other. The model is fit on combined_data(object). Thus, column names
 #' in pData(object) can be specified. To make the formulas flexible, the word 
-#' "Feature"  must be used to signal the role of the features in the formula. 
-#' "Feature" will be replaced by the actual Feature IDs during model fitting. 
-#' For example, if testing for equality of medians in study groups, use 
+#' "Feature" must be used to signal the role of the features in the formula. 
+#' "Feature" will be replaced by the actual features during model fitting. 
+#' For example, if testing for equality of means in study groups, use 
 #' "Feature ~ Group".
 #'
 #' @return A data frame with the results.
 #'
-#' @seealso \code{\link{wilcox.test}}
-#'
 #' @examples
-#' perform_mann_whitney(drop_qcs(example_set), formula_char = "Feature ~ Group")
-#'
-#' @export
-perform_mann_whitney <- function(object, formula_char, 
-                                 all_features = FALSE, ...) {
-  log_text("Starting Mann-Whitney (a.k.a. Wilcoxon) tests")
-  exp_var <- unlist(strsplit(formula_char, " ~ "))[2]
-  pair <- levels(pData(object)[, exp_var])
-  prefix <- paste0(pair[1], "_vs_", pair[2], "_Mann_Whitney_")
-  mw_fun <- function(feature, formula, data) {
-    result_row <- NULL
-    tryCatch(
-      {
-        mw_res <- stats::wilcox.test(formula = formula, data = data, 
-                              conf.int = TRUE, ...)
-
-        conf_level <- attr(mw_res$conf.int, "conf.level") * 100
-
-        result_row <- data.frame(Feature_ID = feature, U = mw_res$statistic,
-                                 Estimate = mw_res$estimate[1],
-                                 LCI = mw_res$conf.int[1],
-                                 UCI = mw_res$conf.int[2],
-                                 P = mw_res$p.value, stringsAsFactors = FALSE)
-        ci_idx <- grepl("CI", colnames(result_row))
-        colnames(result_row)[ci_idx] <- paste0(colnames(result_row)[ci_idx],
-                                               conf_level)
-        colnames(result_row)[-1] <- paste0(prefix, colnames(result_row)[-1])
-      },
-      error = function(e) message(feature, ": ", e$message))
-
-    result_row
-  }
-
-  results_df <- .perform_test(object, formula_char, mw_fun, all_features)
-
-  log_text("Mann-Whitney tests performed.")
-
-  results_df
-}
-
-#' Wilcoxon signed rank test
-#'
-#' Performs Wilcoxon signed rank test.
-#' Uses base R function \code{wilcox.test} with \code{paired = TRUE}.
-#'
-#' @param object a MetaboSet object
-#' @param group character, name of the group column
-#' @param id character, column name of pData with the identifiers for the pairs
-#' @param all_features should all features be included in FDR correction?
-#' @param ... other parameters to \code{\link{wilcox.test}}
-#'
-#' @return A data frame with the results.
-#'
-#' @seealso \code{\link{wilcox.test}}
-#'
-#' @examples
-#' perform_wilcoxon_signed_rank(drop_qcs(example_set), 
-#'   group = "Time", id = "Subject_ID")
-#'
-#' @export
-perform_wilcoxon_signed_rank <- function(object, group, id, 
-                                         all_features = FALSE, ...) {
-  .help_paired_test(object, group, id, test = "Wilcox",
-                    all_features = all_features, ...)
-}
-
-#' Pairwise non-parametric tests
-#'
-#' Performs pairwise non-parametric tests between all study groups.
-#' Use \code{is_paired = FALSE} for Mann-Whitney u-tests
-#' Use \code{is_paired = TRUE} for Wilcoxon signed rank tests.
-#' NOTE! Does not use formula interface.
-#'
-#' @param object a MetaboSet object
-#' @param group character, column name of phenoData giving the groups
-#' @param is_paired logical, use pairwise tests
-#' @param id character, name of the subject identification column for paired 
-#' version
-#' @param all_features should all features be included in FDR correction?
-#' @param ... other parameters passed to test functions
-#'
-#' @details P-values of each comparison are corrected separately from each 
-#' other.
-#'
-#' @return A data frame with the results.
-#'
-#' @examples
-#' # Including QCs as a study group for example
-#' mann_whitney_results <- perform_pairwise_non_parametric(merged_sample, 
-#'   group = "Group")
+#' # Including QCs as a study group for example for pairwise tests
+#' mann_whitney_results <- perform_non_parametric(merged_sample, 
+#'   formula_char = "Feature ~ Group")
 #' # Using paired mode (pairs with QC are skipped as there are no common IDs in 
 #' # 'example_set')
-#' wilcoxon_signed_results <- perform_pairwise_non_parametric(example_set,
-#'   group = "Time",
+#' wilcoxon_signed_results <- perform_non_parametric(example_set,
+#'   formula_char = "Feature ~ Time",
 #'   is_paired = TRUE,
-#'   id = "Subject_ID"
-#' )
+#'   id = "Subject_ID")
+#' # Only two groups
+#' mann_whitney_results <- perform_non_parametric(drop_qcs(example_set), 
+#'   formula_char = "Feature ~ Group", is_paired = FALSE)
 #'
-#' @seealso \code{\link{perform_mann_whitney}},
-#' \code{\link{perform_wilcoxon_signed_rank}},
-#' \code{\link{wilcox.test}}
+#' @seealso \code{\link[stats]{wilcox.test}}
 #'
 #' @export
-perform_pairwise_non_parametric <- function(object, group = group_col(object), 
-                                            is_paired = FALSE, id = NULL,
-                                            all_features = FALSE, ...) {
-  results_df <- NULL
+perform_non_parametric <- function(object, formula_char, 
+                                   is_paired = FALSE, id = NULL,
+                                   all_features = FALSE, ...) {
+  group <- unlist(strsplit(formula_char, " ~ "))[2]
 
   if (!is.factor(pData(object)[, group])) {
     stop("Group column should be a factor")
   }
 
-  if (is_paired) {
-    if (is.null(id)) {
-      stop("Subject ID column is missing, please provide it")
-    }
-    log_text("Starting pairwise Wilcoxon signed rank tests")
-    results_df <- .help_pairwise_test(object, perform_wilcoxon_signed_rank,
-                                      group_ = group, group = group, id = id, 
-                                      all_features = all_features, ...)
-    log_text("Wilcoxon signed rank tests performed")
-  } else {
-    log_text("Starting pairwise Mann-Whitney tests")
-    results_df <- .help_pairwise_test(object, perform_mann_whitney, group,
-                                      formula_char = paste("Feature ~", group),
-                                      all_features = all_features, ...)
-    log_text("Mann-Whitney tests performed")
-  }
+  results_df <- .setup_simple_test(object, group = group, 
+                                   id = id, test = "Wilcox", 
+                                   all_features = all_features, 
+                                   is_paired = is_paired, ...)
+  
   if (length(featureNames(object)) != nrow(results_df)) {
     warning("Results don't contain all features.")
   }
   rownames(results_df) <- results_df$Feature_ID
   results_df
+}
+
+#' Mann-Whitney u test
+#' DEPRECATED
+#' @rdname notame-defunct
+#' @export
+perform_mann_whitney <- function(object, formula_char, 
+                                 all_features = FALSE, ...) {
+  .Defunct("perform_non_parametric")
+}
+
+#' Wilcoxon signed rank test
+#' DEPRECATED
+#' @rdname notame-defunct
+#' @export
+perform_wilcoxon_signed_rank <- function(object, group, id, 
+                                         all_features = FALSE, ...) {
+  .Defunct("perform_non_parametric")
+
+}
+
+#' Pairwise non-parametric tests
+#' DEPRECATED
+#' @rdname notame-defunct
+#' @export
+perform_pairwise_non_parametric <- function(object, group = group_col(object), 
+                                            is_paired = FALSE, id = NULL,
+                                            all_features = FALSE, ...) {
+  .Defunct("perform_non_parametric")
 }

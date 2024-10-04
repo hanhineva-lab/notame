@@ -179,6 +179,16 @@ NULL
 #' @import methods
 NULL
 
+#' Defunct functions in notame
+#' 
+#' These functions are defunct and no longer available.
+#'
+#' @details Defunct functions are: perform_paired_t_test(),
+#' parform_pairwise_t_test(), perform_mann_whitney(), 
+#' perform_wilcoxon_signed_rank()
+#' and perform_pairwise_non_parametric().
+#' @name notame-defunct
+
 utils::globalVariables(c('i', '.'))
 
 #' Set default color scales on load
