@@ -1341,6 +1341,10 @@ perform_t_test <- function(object, formula_char,
                            all_features = FALSE, ...) {
   message("The functionality of this function has changed.", 
           " It now encompasses pairwise and paired t-tests.")
+  message("Remember that t.test returns difference between group means",
+          " in different order than lm.\n",
+          "This function mimics this behavior, so the effect size is",
+          " mean of first level minus mean of second level.")
   
   group <- unlist(strsplit(formula_char, " ~ "))[2]
 
