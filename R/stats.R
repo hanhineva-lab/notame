@@ -1410,7 +1410,8 @@ perform_t_test <- function(object, formula_char,
   error = function(e) e$message)
 } 
 
-# Sets up subsets, calls .calc_simple_test and processes results for simple tests
+# Sets up subsets, calls .calc_simple_test and processes results for simple
+# tests
 .help_simple_test <- function(object, group, id, test,
                               all_features = FALSE, is_paired, ...) {
   results_df <- NULL
@@ -1488,16 +1489,8 @@ perform_t_test <- function(object, formula_char,
   results_df
 }
 
-#' Perform paired t-tests
-#' DEPRECATED
-#' @rdname notame-defunct
-#' @export
-perform_paired_t_test <- function(object, group, id, 
-                                  all_features = FALSE, ...) {
-  .Defunct("perform_t_test")
-}
-
-# Calls .help_simple_test in a loop with an object set up for each pairwise comparison, also in the case of two groups
+# Calls .help_simple_test in a loop with an object set up for each pairwise
+# comparison, also in the case of two groups
 .setup_simple_test <- function(object, group, ...) {
   df <- NULL
   groups <- levels(pData(object)[, group])
@@ -1513,16 +1506,6 @@ perform_paired_t_test <- function(object, group, id,
     ifelse(is.null(df), df <- res, df <- dplyr::left_join(df, res))
   }
   df
-}
-
-#' Pairwise and paired t-test
-#' DEPRECATED
-#' @rdname notame-defunct
-#' @export
-perform_pairwise_t_test <- function(object, group = group_col(object),
-                                    is_paired = FALSE, id = NULL, 
-                                    all_features = FALSE, ...) {
-  .Defunct("perform_t_test")
 }
 
 #' Pairwise and paired non-parametric tests
@@ -1584,33 +1567,4 @@ perform_non_parametric <- function(object, formula_char,
   }
   rownames(results_df) <- results_df$Feature_ID
   results_df
-}
-
-#' Mann-Whitney u test
-#' DEPRECATED
-#' @rdname notame-defunct
-#' @export
-perform_mann_whitney <- function(object, formula_char, 
-                                 all_features = FALSE, ...) {
-  .Defunct("perform_non_parametric")
-}
-
-#' Wilcoxon signed rank test
-#' DEPRECATED
-#' @rdname notame-defunct
-#' @export
-perform_wilcoxon_signed_rank <- function(object, group, id, 
-                                         all_features = FALSE, ...) {
-  .Defunct("perform_non_parametric")
-
-}
-
-#' Pairwise non-parametric tests
-#' DEPRECATED
-#' @rdname notame-defunct
-#' @export
-perform_pairwise_non_parametric <- function(object, group = group_col(object), 
-                                            is_paired = FALSE, id = NULL,
-                                            all_features = FALSE, ...) {
-  .Defunct("perform_non_parametric")
 }

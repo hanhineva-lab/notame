@@ -210,7 +210,7 @@ top_features <- anova_results$Feature_ID[which(anova_results$ANOVA_P_FDR < 0.2)]
 top_index <- fData(base)$Feature_ID %in% top_features
 
 pairwise_results <- perform_t_test(base[top_index, ], 
-  formula_char = "Feature ~ Group")
+                                   formula_char = "Feature ~ Group")
 ```
 
 The next step is to join the results from Welch's one-way analysis of variance 
