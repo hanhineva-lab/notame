@@ -75,7 +75,7 @@ Computes PCA using one of the methods provided in the Bioconductor package
 pcaMethods and plots the two first principal components.
 }
 \examples{
-plot_pca(merged_sample, color = "Injection_order", shape = "Group")
+plot_pca(example_set, color = "Injection_order", shape = "Group")
 
 }
 \seealso{

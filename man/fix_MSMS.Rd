@@ -46,10 +46,10 @@ m/z  (Abundance)
 }
 \examples{
 # Spectra before fixing
-fData(merged_sample)$MS_MS_spectrum[
-  !is.na(fData(merged_sample)$MS_MS_spectrum)]
+fData(example_set)$MS_MS_spectrum[
+  !is.na(fData(example_set)$MS_MS_spectrum)]
 # Fixing spectra with default settings
-fixed_MSMS_peaks <- fix_MSMS(merged_sample)
+fixed_MSMS_peaks <- fix_MSMS(example_set)
 # Spectra after fixing
 fData(fixed_MSMS_peaks)$MS_MS_Spectrum_clean[
   !is.na(fData(fixed_MSMS_peaks)$MS_MS_Spectrum_clean)]

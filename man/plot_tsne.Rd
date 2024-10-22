@@ -80,7 +80,7 @@ of \code{pcaMethods::pca}, the  method can be changed to "ppca" if nipals
 fails.
 }
 \examples{
-plot_tsne(merged_sample, color = "Time", shape = "Group")
+plot_tsne(example_set, color = "Time", shape = "Group")
 
 }
 \seealso{

@@ -408,7 +408,8 @@ test_that("Cohens D warnings work", {
 test_that("Paired t-test works", {
   ex <- drop_qcs(example_set)
   cd <- combined_data(ex)
-  t_res <- perform_paired_t_test(ex, group = "Time", id = "Subject_ID")
+  t_res <- perform_t_test(ex, formula_char = "Feature ~ Time", 
+                          id = "Subject_ID", is_paired = TRUE)
   feature <- "HILIC_pos_259_9623a4_4322"
   mean1 <- finite_mean(cd[cd$Time == 1, colnames(cd) == feature])
   mean2 <- finite_mean(cd[cd$Time == 2, colnames(cd) == feature])
@@ -440,29 +441,30 @@ test_that("Pairwise t-test works", {
   pData(object)$Subject_ID <- factor(rep(1:8, 3))
   pData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
 
-  pwt_res <- perform_pairwise_t_test(object, group = "Time")
+  pwt_res <- perform_t_test(object, formula_char = "Feature ~ Time")
 
   expect_identical(rownames(pwt_res), featureNames(drop_qcs(example_set)))
-  prefixes <- c("1_vs_2_", "1_vs_3_", "2_vs_3_")
-  suffixes <- c("Estimate", "LCI95", "UCI95", "t_test_P", "t_test_P_FDR")
+  prefixes <- c("1_vs_2_t_test_", "1_vs_3_t_test_", "2_vs_3_t_test_")
+  suffixes <- c("Statistic", "Estimate", "LCI95", 
+                "UCI95", "P", "P_FDR")
   cols <- expand.grid(prefixes, suffixes)
   # Check column names
   expect_identical(colnames(pwt_res), c(
-    "Feature_ID", "1_Mean", "2_Mean",
+    "Feature_ID",
     do.call(paste0, cols[order(cols$Var1) & cols$Var1 == prefixes[1], ]),
-    "3_Mean",
-    do.call(paste0, cols[order(cols$Var1), ])[6:15]
+    do.call(paste0, cols[order(cols$Var1), ])[7:18]
   ))
   # These should be identical as no paired mode
   pData(object)$Subject_ID <- factor(rep(1:12, 2))
-  expect_identical(perform_pairwise_t_test(object, group = "Time"), pwt_res)
+  expect_identical(perform_t_test(object, 
+                                  formula_char = "Feature ~ Time"), 
+                   pwt_res)
   # These shouldn't match cause paired mode
   # In this case 4 pairs in each
-  expect_failure(expect_identical(perform_pairwise_t_test(object,
-    group = "Time",
-    id = "Subject_ID",
-    is_paired = TRUE
-  ), pwt_res))
+  expect_failure(expect_identical(perform_t_test(object,
+                                  formula_char = "Feature ~ Time",
+                                  id = "Subject_ID", is_paired = TRUE), 
+                 pwt_res))
 })
 
 test_that("Pairwise paired t-test works", {
@@ -473,11 +475,8 @@ test_that("Pairwise paired t-test works", {
 
   flag(object)[1:2] <- "Flagged"
 
-  pwpt_res <- perform_pairwise_t_test(object,
-    group = "Time",
-    id = "Subject_ID",
-    is_paired = TRUE
-  )
+  pwpt_res <- perform_t_test(object, formula_char = "Feature ~ Time", 
+                             id = "Subject_ID", is_paired = TRUE)
 
   expect_identical(rownames(pwpt_res), featureNames(drop_qcs(example_set)))
   prefixes <- paste0(c("1_vs_2_", "1_vs_3_", "2_vs_3_"), "t_test_")
@@ -491,11 +490,8 @@ test_that("Pairwise paired t-test works", {
   expect(all(is.na(pwpt_res[1:2, fdr_cols])), "Pairwise paired t-tests don't skip flagged features")
   # Change Subject IDs
   pData(object)$Subject_ID <- factor(rep(1:12, 2))
-  pwpt_res_2 <- perform_pairwise_t_test(object,
-    group = "Time",
-    id = "Subject_ID",
-    is_paired = TRUE
-  )
+  pwpt_res_2 <- perform_t_test(object, formula_char = "Feature ~ Time",
+                               id = "Subject_ID", is_paired = TRUE)
   # These shouldn't match because means are counted only from paired samples
   # In this case 4 pairs in each
   expect_failure(expect_identical(pwpt_res_2, pwpt_res))
@@ -527,17 +523,17 @@ test_that("Mann-Whitney U-tests work", {
 
   cols <- c("Feature_ID", paste0(
     "A_vs_B_Mann_Whitney_",
-    c("U", "Estimate", "LCI95", "UCI95", "P", "P_FDR")
+    c("Statistic", "Estimate", "LCI95", "UCI95", "P", "P_FDR")
   ))
 
   mw_res <- suppressWarnings({
-    perform_mann_whitney(object, formula_char = "Feature ~ Group")
+    perform_non_parametric(object, formula_char = "Feature ~ Group")
   })
 
   expect_identical(colnames(mw_res), cols)
 
   expect_equal(stats::cor(sign(median_diffs), sign(mw_res$A_vs_B_Mann_Whitney_Estimate), method = "spearman"), 1)
-  expect_identical(unname(us), mw_res$A_vs_B_Mann_Whitney_U)
+  expect_identical(unname(us), mw_res$A_vs_B_Mann_Whitney_Statistic)
 })
 
 
@@ -557,7 +553,9 @@ test_that("Wilcoxon signed rank tests work", {
     c("Statistic", "Estimate", "LCI95", "UCI95", "P", "P_FDR")
   ))
 
-  wil_res <- perform_wilcoxon_signed_rank(object, group = "Time", id = "Subject_ID")
+  wil_res <- perform_non_parametric(object, 
+                                    formula_char = "Feature ~ Time",
+                                    is_paired = TRUE, id = "Subject_ID")
 
   expect_identical(colnames(wil_res), cols)
   expect_equal(stats::cor(sign(median_diffs), sign(wil_res$`1_vs_2_Wilcox_Estimate`)), 1)
@@ -575,26 +573,29 @@ test_that("Pairwise Mann-Whitney tests work", {
       x[1] - x[2]
     })
 
-  pwnp_res <- suppressWarnings(perform_pairwise_non_parametric(object, group = "Time"))
+  pwnp_res <- suppressWarnings(
+    perform_non_parametric(object, formula_char = "Feature ~ Time"))
 
   expect_identical(rownames(pwnp_res), featureNames(drop_qcs(example_set)))
   prefixes <- paste0(c("1_vs_2_", "1_vs_3_", "2_vs_3_"), "Mann_Whitney_")
-  suffixes <- c("U", "Estimate", "LCI95", "UCI95", "P", "P_FDR")
+  suffixes <- c("Statistic", "Estimate", "LCI95", "UCI95", "P", "P_FDR")
   cols <- expand.grid(suffixes, prefixes)
   cols <- c("Feature_ID", paste0(cols$Var2, cols$Var1))
   # Check column names
   expect_identical(colnames(pwnp_res), cols)
   # These should be identical as no paired mode
   pData(object)$Subject_ID <- factor(rep(1:12, 2))
-  expect_identical(suppressWarnings(perform_pairwise_non_parametric(object, group = "Time")), pwnp_res)
+  expect_identical(
+    suppressWarnings(perform_non_parametric(object, 
+                                            formula_char = "Feature ~ Time")), 
+    pwnp_res)
   # These shouldn't match cause paired mode
   # In this case 4 pairs in each
   expect_failure(expect_identical(
-    suppressWarnings(perform_pairwise_non_parametric(object,
-      group = "Time",
-      id = "Subject_ID",
-      is_paired = TRUE
-    )),
+    suppressWarnings(perform_non_parametric(object,
+                                            formula_char = "Feature ~ Time", 
+                                            id = "Subject_ID",
+                                            is_paired = TRUE)),
     pwnp_res
   ))
 })

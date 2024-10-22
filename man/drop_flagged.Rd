@@ -20,8 +20,8 @@ Removes all features that have been flagged by quality control functions.
 Only features that do not have a flag (Flag == NA) are retained.
 }
 \examples{
-dim(merged_sample)
-flagged <- flag_quality(merged_sample)
+dim(example_set)
+flagged <- flag_quality(example_set)
 noflags <- drop_flagged(flagged)
 dim(noflags)
 

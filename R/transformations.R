@@ -11,7 +11,7 @@
 #' set to NA.
 #'
 #' @examples
-#' nas_marked <- mark_nas(merged_sample, value = 0)
+#' nas_marked <- mark_nas(example_set, value = 0)
 #'
 #' @export
 mark_nas <- function(object, value) {
@@ -49,10 +49,10 @@ mark_nas <- function(object, value) {
 #'
 #' @examples
 #' # Spectra before fixing
-#' fData(merged_sample)$MS_MS_spectrum[
-#'   !is.na(fData(merged_sample)$MS_MS_spectrum)]
+#' fData(example_set)$MS_MS_spectrum[
+#'   !is.na(fData(example_set)$MS_MS_spectrum)]
 #' # Fixing spectra with default settings
-#' fixed_MSMS_peaks <- fix_MSMS(merged_sample)
+#' fixed_MSMS_peaks <- fix_MSMS(example_set)
 #' # Spectra after fixing
 #' fData(fixed_MSMS_peaks)$MS_MS_Spectrum_clean[
 #'   !is.na(fData(fixed_MSMS_peaks)$MS_MS_Spectrum_clean)]
@@ -109,8 +109,8 @@ fix_MSMS <- function(object, ms_ms_spectrum_col = "MS_MS_spectrum",
 #' @return A MetaboSet object as the one supplied, without QC samples.
 #'
 #' @examples
-#' dim(merged_sample)
-#' noqc <- drop_qcs(merged_sample)
+#' dim(example_set)
+#' noqc <- drop_qcs(example_set)
 #' dim(noqc)
 #'
 #' @export
@@ -133,8 +133,8 @@ drop_qcs <- function(object) {
 #' @return A MetaboSet object without the previously flagged features.
 #'
 #' @examples
-#' dim(merged_sample)
-#' flagged <- flag_quality(merged_sample)
+#' dim(example_set)
+#' flagged <- flag_quality(example_set)
 #' noflags <- drop_flagged(flagged)
 #' dim(noflags)
 #'
@@ -159,7 +159,7 @@ drop_flagged <- function(object, all_features = FALSE) {
 #' @return A MetaboSet object with the new exprs values.
 #'
 #' @examples
-#' ex_set <- merged_sample[1:5, 1:5]
+#' ex_set <- example_set[1:5, 1:5]
 #' exprs(ex_set)
 #' # Create a matrix of replacment values for rows 1, 3, 5 and columns 1, 3, 4
 #' replacement <- matrix(1:9,
@@ -281,7 +281,7 @@ impute_rf <- function(object, all_features = FALSE, ...) {
 #' @return A MetaboSet object with an imputed assay.
 #'
 #' @examples
-#' missing <- mark_nas(merged_sample, 0)
+#' missing <- mark_nas(example_set, 0)
 #' imputed <- impute_simple(missing, value = "min")
 #'
 #' @export
@@ -343,7 +343,7 @@ impute_simple <- function(object, value, na_limit = 0) {
 #' @return A MetaboSet object as the one supplied, with normalized features.
 #'
 #' @examples
-#' normalized <- inverse_normalize(merged_sample)
+#' normalized <- inverse_normalize(example_set)
 #' @export
 inverse_normalize <- function(object) {
   exprs(object) <- exprs(object) %>%
@@ -364,7 +364,7 @@ inverse_normalize <- function(object) {
 #' @return A data frame with the number of features at each stage of flagging.
 #'
 #' @examples
-#' flagged <- merged_sample %>%
+#' flagged <- example_set %>%
 #'   mark_nas(0) %>%
 #'   flag_detection() %>%
 #'   flag_quality()
@@ -502,7 +502,7 @@ setMethod("exponential", c(object = "MetaboSet"),
 #' @return A MetaboSet object with altered feature abundances.
 #'
 #' @examples
-#' pqn_set <- pqn_normalization(merged_sample)
+#' pqn_set <- pqn_normalization(example_set)
 #'
 #' @export
 pqn_normalization <- function(object, ref = c("qc", "all"),

@@ -113,7 +113,7 @@ test_that("Easy example data is read correctly", {
   dimnames(ad) <- list(rownames(fd), rownames(pd))
 
   # Read the file
-  read <- read_from_excel(system.file("extdata", "easy_data.xlsx", package = "notame"),
+  read <- read_from_excel(system.file("testdata", "easy_data.xlsx", package = "notame"),
     sheet = 1,
     corner_row = 4, corner_column = "D",
     name = "easy", id_prefix = "TEST_"
@@ -172,7 +172,7 @@ test_that("Data is split correctly", {
 
 
   # Read the file
-  read <- read_from_excel(system.file("extdata", "split_data.xlsx", package = "notame"),
+  read <- read_from_excel(system.file("testdata", "split_data.xlsx", package = "notame"),
     sheet = 1,
     corner_row = 4, corner_column = "F",
     split_by = c("Column", "Mode"), id_prefix = "TEST_"
@@ -187,7 +187,7 @@ test_that("Data is split correctly", {
 test_that("Splitting data works as expected", {
   split_by <- c("Ion mode", "gswregh") # Wrong column name
   expect_error(read_from_excel(
-    system.file("extdata", "sample_data_whole.xlsx",
+    system.file("testdata", "sample_data_whole.xlsx",
       package = "notame"
     ),
     corner_row = 4,
@@ -200,7 +200,7 @@ test_that("Creating dummy injection order works as expected", {
   names <- list("HILIC_neg", "HILIC_pos", "RP_neg", "RP_pos")
   modes <- list()
   for (name in names) {
-    file <- system.file("extdata", paste0(name, "_sample.xlsx"), package = "notame")
+    file <- system.file("testdata", paste0(name, "_sample.xlsx"), package = "notame")
     mode <- read_from_excel(file, name = name)
     modes[name] <- construct_metabosets(mode$exprs, mode$pheno_data, mode$feature_data)
   }

@@ -39,7 +39,7 @@ quality <- function(object) {
 #' @return A MetaboSet object with quality metrics in fData.
 #' 
 #' @examples
-#' ex_set <- assess_quality(merged_sample)
+#' ex_set <- assess_quality(example_set)
 #' fData(ex_set)
 #'
 #' @export
@@ -114,10 +114,10 @@ assess_quality <- function(object) {
 #'   (RSD < 0.1 & RSD_r < 0.1 & D_ratio < 0.1)")
 #'
 #' @examples
-#' ex_set <- flag_quality(merged_sample)
+#' ex_set <- flag_quality(example_set)
 #' fData(ex_set)
 #' # Custom condition
-#' ex_set <- flag_quality(merged_sample, 
+#' ex_set <- flag_quality(example_set, 
 #'   condition = "RSD_r < 0.3 & D_ratio_r < 0.6")
 #' fData(ex_set)
 #'
@@ -172,7 +172,7 @@ flag_quality <- function(object, condition =
 #' @return A MetaboSet object with the features flagged.
 #'
 #' @examples
-#' ex_set <- flag_detection(merged_sample)
+#' ex_set <- flag_detection(example_set)
 #' fData(ex_set)
 #'
 #' @export
@@ -194,7 +194,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
                                              featureNames(object))] %>%
       tidyr::gather("Feature_ID", "Intensity", featureNames(object)) %>%
       dplyr::group_by(.data$Feature_ID, !!as.name(group)) %>%
-      dplyr::summarise(proportion_found = prop_found("Intensity")) %>%
+      dplyr::summarise(proportion_found = prop_found(.data$Intensity)) %>%
       tidyr::spread(!!as.name(group), "proportion_found")
     # Remove a possible QC column
     proportions$QC <- NULL

@@ -22,7 +22,7 @@ If an error occurs with the plot, an empty file is created.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
-lm_results <- perform_lm(drop_qcs(merged_sample), 
+lm_results <- perform_lm(drop_qcs(example_set), 
   formula_char = "Feature ~ Group")
 
 p <- volcano_plot(lm_results,

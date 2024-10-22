@@ -73,12 +73,12 @@ A separate plot is drawn and saved for each feature.
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
 # Default beeswarms by group
-save_beeswarm_plots(drop_qcs(merged_sample)[1:10],
+save_beeswarm_plots(drop_qcs(example_set)[1:10],
   file_path = "./beeswarm_plots.pdf",
   format = "pdf"
 )
 # x and color can be a different variable
-save_beeswarm_plots(drop_qcs(merged_sample)[1:10],
+save_beeswarm_plots(drop_qcs(example_set)[1:10],
   file_path = "./beeswarm_plots/",
   format = "png",
   x = "Time",
@@ -86,7 +86,7 @@ save_beeswarm_plots(drop_qcs(merged_sample)[1:10],
 )
 
 # Plot one feature
-save_beeswarm_plots(drop_qcs(merged_sample)[5, ], save = FALSE)
+save_beeswarm_plots(drop_qcs(example_set)[1, ], save = FALSE)
 \dontshow{setwd(.old_wd)}
 
 }

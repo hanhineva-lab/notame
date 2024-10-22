@@ -1323,14 +1323,14 @@ perform_oneway_anova <- function(object, formula_char,
 #'
 #' @examples
 #' # Including QCs as a study group for example
-#' t_test_results <- perform_t_test(merged_sample, 
+#' t_test_results <- perform_t_test(example_set, 
 #'   formula_char = "Feature ~ Group")
 #' # Using paired mode (pairs with QC are skipped as there are no common IDs in 
 #' # 'example_set')
 #' t_test_results <- perform_t_test(example_set,
 #'   formula_char = "Feature ~ Time", is_paired = TRUE, id = "Subject_ID")
 #' # Only two groups
-#' t_test_results <- perform_t_test(drop_qcs(merged_sample),
+#' t_test_results <- perform_t_test(drop_qcs(example_set),
 #'   formula_char = "Feature ~ Group")
 #' 
 #' @seealso \code{\link[stats]{t.test}}
@@ -1550,7 +1550,7 @@ perform_pairwise_t_test <- function(object, group = group_col(object),
 #'
 #' @examples
 #' # Including QCs as a study group for example for pairwise tests
-#' mann_whitney_results <- perform_non_parametric(merged_sample, 
+#' mann_whitney_results <- perform_non_parametric(example_set, 
 #'   formula_char = "Feature ~ Group")
 #' # Using paired mode (pairs with QC are skipped as there are no common IDs in 
 #' # 'example_set')

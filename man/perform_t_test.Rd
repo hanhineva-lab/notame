@@ -42,14 +42,14 @@ other.
 }
 \examples{
 # Including QCs as a study group for example
-t_test_results <- perform_t_test(merged_sample, 
+t_test_results <- perform_t_test(example_set, 
   formula_char = "Feature ~ Group")
 # Using paired mode (pairs with QC are skipped as there are no common IDs in 
 # 'example_set')
 t_test_results <- perform_t_test(example_set,
   formula_char = "Feature ~ Time", is_paired = TRUE, id = "Subject_ID")
 # Only two groups
-t_test_results <- perform_t_test(drop_qcs(merged_sample),
+t_test_results <- perform_t_test(drop_qcs(example_set),
   formula_char = "Feature ~ Group")
 
 }

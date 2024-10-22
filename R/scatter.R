@@ -81,7 +81,7 @@
 #' consist of multiple parts and is harder to modify.
 #'
 #' @examples
-#' plot_pca(merged_sample, color = "Injection_order", shape = "Group")
+#' plot_pca(example_set, color = "Injection_order", shape = "Group")
 #'
 #' @seealso \code{\link[pcaMethods]{pca}}
 #'
@@ -150,7 +150,7 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' consist of multiple parts and is harder to modify.
 #'
 #' @examples
-#' plot_tsne(merged_sample, color = "Time", shape = "Group")
+#' plot_tsne(example_set, color = "Time", shape = "Group")
 #'
 #' @seealso \code{\link[Rtsne]{Rtsne}}
 #'
@@ -298,7 +298,7 @@ plot_tsne <- function(object, all_features = FALSE, center = TRUE,
 #' @return A ggplot object.
 #'
 #' @examples
-#' plot_pca_loadings(merged_sample, n_features = c(2, 4))
+#' plot_pca_loadings(example_set, n_features = c(2, 4))
 #'
 #' @seealso \code{\link[pcaMethods]{pca}}
 #'
@@ -372,7 +372,7 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' @return A ggplot object.
 #'
 #' @examples
-#' plot_pca_hexbin(merged_sample)
+#' plot_pca_hexbin(example_set)
 #'
 #' @seealso \code{\link[pcaMethods]{pca}}
 #'
@@ -426,7 +426,7 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' A ggplot object.
 #'
 #' @examples
-#' plot_tsne_hexbin(merged_sample)
+#' plot_tsne_hexbin(example_set)
 #'
 #' @seealso \code{\link[Rtsne]{Rtsne}}
 #'
@@ -662,7 +662,7 @@ minus_log10 <- scales::trans_new("minus_log10",
 #'
 #' @examples
 #' # naturally, this looks messy as there are not enough p-values
-#' lm_results <- perform_lm(drop_qcs(merged_sample), 
+#' lm_results <- perform_lm(drop_qcs(example_set), 
 #'   formula_char = "Feature ~ Group")
 #' volcano_plot(lm_results,
 #'   x = "GroupB_Estimate",
@@ -835,17 +835,17 @@ setMethod("volcano_plot", c(object = "data.frame"),
 #'
 #' @examples
 #' # naturally, this looks messy as there are not enough p-values
-#' lm_results <- perform_lm(drop_qcs(merged_sample), 
+#' lm_results <- perform_lm(drop_qcs(example_set), 
 #'   formula_char = "Feature ~ Group")
-#' lm_data <- dplyr::left_join(fData(merged_sample), lm_results)
+#' lm_data <- dplyr::left_join(fData(example_set), lm_results)
 #' # Traditional Manhattan plot from data frame
-#' manhattan_plot(lm_data,
-#'   x = "Average_Mz",
+#' manhattan_plot(lm_results,
+#'   x = "Mass",
 #'   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
 #'   fdr_limit = 0.1
 #' )
 #' # Directed Manhattan plot from MetaboSet
-#' with_results <- join_fData(merged_sample, lm_results)
+#' with_results <- join_fData(example_set, lm_results)
 #' manhattan_plot(with_results,
 #'   x = "Average_Mz", effect = "GroupB_Estimate",
 #'   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
@@ -994,8 +994,8 @@ setMethod("manhattan_plot", c(object = "data.frame"),
 #'
 #' @examples
 #' # Compute results from a linear model
-#' lm_results <- perform_lm(merged_sample, formula_char = "Feature ~ Group")
-#' with_results <- join_fData(merged_sample, lm_results)
+#' lm_results <- perform_lm(example_set, formula_char = "Feature ~ Group")
+#' with_results <- join_fData(example_set, lm_results)
 #'
 #' # Plot from the MetaboSet object
 #' # automatically facet by analytical mode in variable Split

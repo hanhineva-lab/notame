@@ -179,16 +179,6 @@ NULL
 #' @import methods
 NULL
 
-#' Defunct functions in notame
-#' 
-#' These functions are defunct and no longer available.
-#'
-#' @details Defunct functions are: perform_paired_t_test(),
-#' parform_pairwise_t_test(), perform_mann_whitney(), 
-#' perform_wilcoxon_signed_rank()
-#' and perform_pairwise_non_parametric().
-#' @name notame-defunct
-
 utils::globalVariables(c('i', '.'))
 
 #' Set default color scales on load
@@ -244,7 +234,7 @@ utils::globalVariables(c('i', '.'))
 #' @examples
 #'
 #' citations()
-#' plot_tsne(merged_sample)
+#' plot_tsne(example_set)
 #' # Rtsne added to citations
 #' citations()
 #'
@@ -329,7 +319,7 @@ finite_quantile <- function(x, ...) {
 #' @return A numeric, the proportion of non-missing values in a vector.
 #'
 #' @examples
-#' example_set <- mark_nas(example_set)
+#' example_set <- mark_nas(example_set, value = 0)
 #' prop_na(exprs(example_set))
 #' 
 #' @noRd

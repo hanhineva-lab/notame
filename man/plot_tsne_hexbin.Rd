@@ -60,7 +60,7 @@ of \code{pcaMethods::pca}, the  method can be changed to "ppca" if nipals
 fails.
 }
 \examples{
-plot_tsne_hexbin(merged_sample)
+plot_tsne_hexbin(example_set)
 
 }
 \seealso{

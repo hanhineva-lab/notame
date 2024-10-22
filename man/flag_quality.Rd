@@ -45,10 +45,10 @@ conditions:
 \deqn{RSD < 0.1 \& RSD_r < 0.1 \& D_ratio < 0.1}
 }
 \examples{
-ex_set <- flag_quality(merged_sample)
+ex_set <- flag_quality(example_set)
 fData(ex_set)
 # Custom condition
-ex_set <- flag_quality(merged_sample, 
+ex_set <- flag_quality(example_set, 
   condition = "RSD_r < 0.3 & D_ratio_r < 0.6")
 fData(ex_set)
 

@@ -87,7 +87,7 @@ and the original is retained.
 By default, the column used for color is also used for shape.
 }
 \examples{
-corrected <- correct_drift(merged_sample)
+corrected <- correct_drift(example_set)
 
 }
 \seealso{

@@ -31,11 +31,11 @@ Uses normalizeBatches function from the batchCorr package.
 }
 \examples{
 # Batch correction
-batch_normalized <- normalize_batches(merged_sample,
+batch_normalized <- normalize_batches(example_set,
   batch = "Batch", group = "QC", ref_label = "QC")
 # Evaluate batch correction
-pca_bhattacharyya_dist(merged_sample, batch = "Batch")
-pca_bhattacharyya_dist(batch_normalized, batch = "Batch")
+pca_bhattacharyya_dist(example_set, batch = "Batch")
+pca_bhattacharyya_dist(example_set, batch = "Batch")
 
 }
 \seealso{

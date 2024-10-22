@@ -32,6 +32,6 @@ samples and the median of the reference is used for normalization.
 Check parameters for more options.
 }
 \examples{
-pqn_set <- pqn_normalization(merged_sample)
+pqn_set <- pqn_normalization(example_set)
 
 }

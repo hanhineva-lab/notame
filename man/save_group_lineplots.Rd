@@ -87,16 +87,16 @@ A separate plot is drawn for each feature.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
-save_group_lineplots(drop_qcs(merged_sample)[1:10],
+save_group_lineplots(drop_qcs(example_set)[1:10],
   file_path = "./group_line_plots.pdf",
   format = "pdf"
 )
-save_group_lineplots(drop_qcs(merged_sample)[1:10],
+save_group_lineplots(drop_qcs(example_set)[1:10],
   file_path = "./group_line_plots/",
   format = "png"
 )
 # Plot one feature
-save_group_lineplots(drop_qcs(merged_sample[5, ]), save = FALSE)
+save_group_lineplots(drop_qcs(example_set[1, ]), save = FALSE)
 \dontshow{setwd(.old_wd)}
 
 }

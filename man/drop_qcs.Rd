@@ -16,8 +16,8 @@ A MetaboSet object as the one supplied, without QC samples.
 Drop QC samples
 }
 \examples{
-dim(merged_sample)
-noqc <- drop_qcs(merged_sample)
+dim(example_set)
+noqc <- drop_qcs(example_set)
 dim(noqc)
 
 }

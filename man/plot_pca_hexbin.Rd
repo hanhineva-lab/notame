@@ -55,7 +55,7 @@ where the value of the coloring variable is summarised for each bin, by
 default as the mean of the values inside the bin.
 }
 \examples{
-plot_pca_hexbin(merged_sample)
+plot_pca_hexbin(example_set)
 
 }
 \seealso{

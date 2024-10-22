@@ -73,19 +73,19 @@ A separate plot is drawn and saved for each feature.
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
 # Default boxplots by group
-save_group_boxplots(drop_qcs(merged_sample)[1:10],
+save_group_boxplots(drop_qcs(example_set)[1:10],
   file_path = "./group_boxplots.pdf",
   format = "pdf", title = NULL
 )
 # x and color can be a different variable
-save_group_boxplots(drop_qcs(merged_sample)[1:10],
+save_group_boxplots(drop_qcs(example_set)[1:10],
   file_path = "./time_boxplots/",
   format = "emf",
   x = "Time",
   color = "Group", title = NULL
 )
 # Plot one feature
-save_group_boxplots(drop_qcs(merged_sample)[5, ], save = FALSE)
+save_group_boxplots(drop_qcs(example_set)[1, ], save = FALSE)
 \dontshow{setwd(.old_wd)}
 
 }

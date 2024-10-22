@@ -35,9 +35,9 @@
 #' @return A ggplot object.
 #'
 #' @examples
-#' plot_dist_density(merged_sample)
+#' plot_dist_density(example_set)
 #' # Drift correction tightens QCs together
-#' plot_dist_density(correct_drift(merged_sample))
+#' plot_dist_density(correct_drift(example_set))
 #'
 #' @seealso \code{\link[stats]{dist}}
 #'
@@ -89,7 +89,7 @@ plot_dist_density <- function(object, all_features = FALSE,
 #' @seealso \code{\link{plot_p_histogram}}
 #'
 #' @examples
-#' plot_injection_lm(merged_sample)
+#' plot_injection_lm(example_set)
 #'
 #' @export
 plot_injection_lm <- function(object, all_features = FALSE) {
@@ -243,7 +243,7 @@ plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE) {
 #' @return A ggplot object.
 #'
 #' @examples
-#' plot_sample_boxplots(merged_sample, order_by = "Group", fill_by = "Group")
+#' plot_sample_boxplots(example_set, order_by = "Group", fill_by = "Group")
 #'
 #' @export
 plot_sample_boxplots <- function(
