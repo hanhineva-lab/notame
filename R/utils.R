@@ -69,13 +69,10 @@
 #' \item \code{\link{perform_lmer}} linear mixed models 
 #' \item \code{\link{perform_oneway_anova}} Welch’s ANOVA and classic ANOVA
 #' \item \code{\link{perform_lm_anova}} linear models ANOVA table
-#' \item \code{\link{perform_t_test}} Welch's and Student's t-test 
-#' \item \code{\link{perform_pairwise_t_test}} pairwise and paired t-test
+#' \item \code{\link{perform_t_test}} pairwise and paired t-tests
 #' \item \code{\link{perform_kruskal_wallis}} Kruskal-Wallis rank-sum test
-#' \item \code{\link{perform_mann_whitney}} Mann-Whitney u test
-#' \item \code{\link{perform_wilcoxon_signed_rank}} Wilcoxon signed rank test
-#' \item \code{\link{perform_pairwise_non_parametric}} pairwise non-parametric 
-#' tests
+#' \item \code{\link{perform_non_parametric}} pairwise and paired non-
+#' parametric tests
 #' \item \code{\link{perform_correlation_tests}} correlation test
 #' \item \code{\link{perform_auc}} area under curve
 #' \item \code{\link{perform_homoscedasticity_tests}} test homoscedasticity
@@ -178,16 +175,6 @@ NULL
 #' @import BiocGenerics
 #' @import methods
 NULL
-
-#' Defunct functions in notame
-#' 
-#' These functions are defunct and no longer available.
-#'
-#' @details Defunct functions are: perform_paired_t_test(),
-#' parform_pairwise_t_test(), perform_mann_whitney(), 
-#' perform_wilcoxon_signed_rank()
-#' and perform_pairwise_non_parametric().
-#' @name notame-defunct
 
 utils::globalVariables(c('i', '.'))
 
