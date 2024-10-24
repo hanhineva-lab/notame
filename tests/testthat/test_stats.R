@@ -532,7 +532,7 @@ test_that("Mann-Whitney U-tests work", {
 
   expect_identical(colnames(mw_res), cols)
 
-  expect_equal(stats::cor(sign(median_diffs), sign(mw_res$A_vs_B_Mann_Whitney_Statistic), method = "spearman"), 1)
+  expect_equal(stats::cor(sign(median_diffs), sign(mw_res$A_vs_B_Mann_Whitney_Estimate), method = "spearman"), 1)
   expect_identical(unname(us), mw_res$A_vs_B_Mann_Whitney_Statistic)
 })
 
