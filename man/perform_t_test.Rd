@@ -2,9 +2,16 @@
 % Please edit documentation in R/stats.R
 \name{perform_t_test}
 \alias{perform_t_test}
-\title{Welch's and Student's t-test}
+\title{Pairwise and paired t-tests}
 \usage{
-perform_t_test(object, formula_char, all_features = FALSE, ...)
+perform_t_test(
+  object,
+  formula_char,
+  is_paired = FALSE,
+  id = NULL,
+  all_features = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{a MetaboSet object}
@@ -12,30 +19,40 @@ perform_t_test(object, formula_char, all_features = FALSE, ...)
 \item{formula_char}{character, the formula to be used in the linear model 
 (see Details)}
 
+\item{is_paired}{logical, use paired t-test}
+
+\item{id}{character, name of the subject identification column for paired 
+version}
+
 \item{all_features}{should all features be included in FDR correction?}
 
-\item{...}{additional parameters to t.test}
+\item{...}{other parameters passed to stats::t.test}
 }
 \value{
 A data frame with the results.
 }
 \description{
-Performs t-tests, the R default is Welch's t-test (unequal variances), use 
-var.equal = TRUE for Student's t-test.
+Performs pairwise and paired t-tests. The R default is Welch's t-test 
+(unequal variances), use var.equal = TRUE for Student's t-test. Use 
+\code{is_paired} for paired t-tests.
 }
 \details{
-The model is fit on combined_data(object). Thus, column names
-in pData(object) can be specified. To make the formulas flexible, the word 
-"Feature" must be used to signal the role of the features in the formula. 
-"Feature" will be replaced by the actual Feature IDs during model fitting. 
-For example, if testing for equality of means in study groups, use 
-"Feature ~ Group".
+P-values of each comparison are corrected separately from each 
+other.
 }
 \examples{
-t_test_results <- perform_t_test(drop_qcs(merged_sample), 
+# Including QCs as a study group for example
+t_test_results <- perform_t_test(merged_sample, 
+  formula_char = "Feature ~ Group")
+# Using paired mode (pairs with QC are skipped as there are no common IDs in 
+# 'example_set')
+t_test_results <- perform_t_test(example_set,
+  formula_char = "Feature ~ Time", is_paired = TRUE, id = "Subject_ID")
+# Only two groups
+t_test_results <- perform_t_test(drop_qcs(merged_sample),
   formula_char = "Feature ~ Group")
 
 }
 \seealso{
-\code{\link{t.test}}
+\code{\link[stats]{t.test}}
 }
