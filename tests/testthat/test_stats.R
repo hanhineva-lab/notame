@@ -182,7 +182,7 @@ test_that("P-value correction works", {
 # Linear model ----
 test_that("Linear model works", {
   cd <- combined_data(drop_qcs(example_set))
-  lm_fit <- stats::lm(HILIC_pos_259_9623a4_4322 ~ Time,
+  lm_fit <- stats::lm(HILIC_neg_259_9623a4_4322 ~ Time,
     data = cd
   )
   smry <- summary(lm_fit)
@@ -220,7 +220,7 @@ test_that("Linear model works", {
 # Logistic regression ----
 test_that("Logistic regression works", {
   cd <- combined_data(drop_qcs(example_set))
-  glm_fit <- stats::glm(Group ~ HILIC_pos_259_9623a4_4322,
+  glm_fit <- stats::glm(Group ~ HILIC_neg_259_9623a4_4322,
     data = cd,
     family = stats::binomial()
   )
@@ -251,7 +251,7 @@ test_that("Logistic regression works", {
 })
 
 test_that("Cohens D values are counted right", {
-  object <- drop_qcs(example_set)
+  object <- drop_qcs(example_set)[, 1:30]
   pData(object)$Group <- factor(c("A", "B", "C"))
 
   data <- combined_data(object)
@@ -282,7 +282,7 @@ test_that("Cohens D values are counted right", {
 })
 
 test_that("Cohens D values between time points are counted right", {
-  object <- drop_qcs(example_set)
+  object <- drop_qcs(example_set[, 1:30])
   pData(object)$Group <- factor(rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
   pData(object)$Subject_ID <- factor(rep(1:8, 3))
   pData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
@@ -375,7 +375,7 @@ test_that("Cohens D values between time points are counted right", {
 })
 
 test_that("Cohens D warnings work", {
-  object <- drop_qcs(example_set)
+  object <- drop_qcs(example_set[, 1:30])
   pData(object)$Group <- factor(rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
   pData(object)$Subject_ID <- factor(rep(1:8, 3))
   pData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
@@ -410,7 +410,7 @@ test_that("Paired t-test works", {
   cd <- combined_data(ex)
   t_res <- perform_t_test(ex, formula_char = "Feature ~ Time", 
                           id = "Subject_ID", is_paired = TRUE)
-  feature <- "HILIC_pos_259_9623a4_4322"
+  feature <- "HILIC_neg_259_9623a4_4322"
   mean1 <- finite_mean(cd[cd$Time == 1, colnames(cd) == feature])
   mean2 <- finite_mean(cd[cd$Time == 2, colnames(cd) == feature])
   # Check comparison order
@@ -436,7 +436,7 @@ test_that("Paired t-test works", {
 
 # Pairwise t-tests ----
 test_that("Pairwise t-test works", {
-  object <- drop_qcs(example_set)
+  object <- drop_qcs(example_set[, 1:30])
   pData(object)$Group <- factor(rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
   pData(object)$Subject_ID <- factor(rep(1:8, 3))
   pData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
@@ -468,7 +468,7 @@ test_that("Pairwise t-test works", {
 })
 
 test_that("Pairwise paired t-test works", {
-  object <- drop_qcs(example_set)
+  object <- drop_qcs(example_set[, 1:30])
   pData(object)$Group <- factor(rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
   pData(object)$Subject_ID <- factor(rep(1:8, 3))
   pData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
@@ -532,7 +532,7 @@ test_that("Mann-Whitney U-tests work", {
 
   expect_identical(colnames(mw_res), cols)
 
-  expect_equal(stats::cor(sign(median_diffs), sign(mw_res$A_vs_B_Mann_Whitney_Estimate), method = "spearman"), 1)
+  expect_equal(stats::cor(sign(median_diffs), sign(mw_res$A_vs_B_Mann_Whitney_Statistic), method = "spearman"), 1)
   expect_identical(unname(us), mw_res$A_vs_B_Mann_Whitney_Statistic)
 })
 

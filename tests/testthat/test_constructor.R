@@ -6,7 +6,7 @@ data("example_set")
 
 test_that("Changing feature names updates all occurrences", {
   set <- example_set
-  featureNames(set) <- letters[1:20]
+  featureNames(set) <- paste0(letters[1:20], 1:80)
   expect_equal(featureNames(set), featureNames(assayData(set)))
   expect_equal(featureNames(set), featureNames(featureData(set)))
   expect_equal(featureNames(set), fData(set)$Feature_ID)
@@ -16,12 +16,11 @@ test_that("Changing feature names only works if valid names are given", {
   set <- example_set
   expect_error(featureNames(set) <- NULL)
   # Numbers are not allowed
-  expect_error(featureNames(set) <- 1:20)
+  expect_error(featureNames(set) <- 1:80)
   # Number of new names should equal number of rows
   expect_error(featureNames(set) <- letters[1:15])
   # Duplicates are not allowed
-  names <- letters[1:20]
-  names[2] <- "a"
+  names <- paste0(letters[1:80])
   expect_warning(
     expect_error(featureNames(set) <- names),
     "non-unique value when setting"

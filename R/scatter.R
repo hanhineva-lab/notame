@@ -150,7 +150,7 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' consist of multiple parts and is harder to modify.
 #'
 #' @examples
-#' plot_tsne(example_set, color = "Time", shape = "Group")
+#' plot_tsne(example_set, color = "Time", shape = "Group", perplexity = 10)
 #'
 #' @seealso \code{\link[Rtsne]{Rtsne}}
 #'
@@ -426,7 +426,7 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' A ggplot object.
 #'
 #' @examples
-#' plot_tsne_hexbin(example_set)
+#' plot_tsne_hexbin(example_set, perplexity = 10)
 #'
 #' @seealso \code{\link[Rtsne]{Rtsne}}
 #'
@@ -587,9 +587,9 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' consist of multiple parts and is harder to modify.
 #'
 #' @examples
-#' plot_tsne_arrows(drop_qcs(example_set), perplexity = 5)
+#' plot_tsne_arrows(drop_qcs(example_set), perplexity = 10)
 #' # If the sample size is large, plot groups separately
-#' plot_tsne_arrows(drop_qcs(example_set), perplexity = 5) +
+#' plot_tsne_arrows(drop_qcs(example_set), perplexity = 10) +
 #'   facet_wrap(~Group)
 #'
 #' @seealso \code{\link[Rtsne]{Rtsne}}
@@ -839,7 +839,7 @@ setMethod("volcano_plot", c(object = "data.frame"),
 #'   formula_char = "Feature ~ Group")
 #' lm_data <- dplyr::left_join(fData(example_set), lm_results)
 #' # Traditional Manhattan plot from data frame
-#' manhattan_plot(lm_results,
+#' manhattan_plot(lm_data,
 #'   x = "Mass",
 #'   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
 #'   fdr_limit = 0.1
@@ -847,7 +847,7 @@ setMethod("volcano_plot", c(object = "data.frame"),
 #' # Directed Manhattan plot from MetaboSet
 #' with_results <- join_fData(example_set, lm_results)
 #' manhattan_plot(with_results,
-#'   x = "Average_Mz", effect = "GroupB_Estimate",
+#'   x = "Mass", effect = "GroupB_Estimate",
 #'   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
 #'   fdr_limit = 0.1
 #' )

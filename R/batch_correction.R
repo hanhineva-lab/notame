@@ -206,10 +206,11 @@ perform_repeatability <- function(object, group) {
 #' # Initialize objects
 #' example_set_fill <- example_set
 #' example_set_na <- example_set
+#' # todo change mass of feature 2 to be within 0.002 of feature 1
 #' # Introduce over 80% missing values in QC samples per batch of two features 
 #' # so they are considered "missing", with orthogonal batch presence
-#' exprs(example_set)[2, c(1, 14, 27, 40, 53)] <- NA
-#' exprs(example_set)[
+#' exprs(example_set_na)[2, c(1, 14, 27, 40, 53)] <- NA
+#' exprs(example_set_na)[
 #'   3, c(79, 92, 105, 118, 131, 144, 157, 170, 183, 196, 209)] <- NA
 #' batch_aligned <- align_batches(example_set_na, example_set_fill, 
 #'   batch = "Batch", mz = "Average_Mz", rt = "Average_Rt_min_", 
@@ -336,7 +337,7 @@ normalize_batches <- function(object, batch, group, ref_label,
 #'   batch = "Batch", replicates = replicates)
 #' # Plots of each feature
 #' save_batch_plots(
-#'   orig = example_set[1:10], corrected = example_set[1:10],
+#'   orig = example_set[1:10], corrected = batch_corrected[1:10],
 #'   file = "batch_plots.pdf"
 #' )
 #' \dontshow{setwd(.old_wd)}

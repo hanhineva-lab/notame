@@ -540,9 +540,9 @@ setValidity(
 #'
 #' @examples
 #' data <- read_from_excel(
-#'   file = system.file("extdata", "sample_data_whole.xlsx", 
-#'   package = "notame"), sheet = 1, corner_row = 4, corner_column = "X",
-#'   split_by = c("Column", "Ion mode"))
+#'   file = system.file("extdata", "example_set.xlsx", 
+#'   package = "notame"), sheet = 1, corner_row = 11, corner_column = "H",
+#'   split_by = c("Column", "Ion_mode"))
 #' 
 #' modes <- construct_metabosets(exprs = data$exprs, 
 #'   pheno_data = data$pheno_data, feature_data = data$feature_data,
