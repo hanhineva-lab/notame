@@ -51,9 +51,9 @@ does not correspond to the abundances given.
 
 ```{r}
 data <- read_from_excel(
-  file = system.file("extdata", "sample_data_whole.xlsx", package = "notame"), 
-  sheet = 1, corner_row = 4, corner_column = "X", 
-  split_by = c("Column", "Ion mode"))
+  file = system.file("extdata", "example_set.xlsx", package = "notame"), 
+  sheet = 1, corner_row = 11, corner_column = "H", 
+  split_by = c("Column", "Ion_mode"))
 ```
 
 The function read_from_excel() returns a list holding the three parts of 
@@ -142,7 +142,9 @@ fData(processed[[1]])$DC_note
 ```
 
 ## Data pretreatment for the complete dataset
+
 Next, it is time to merge the modes together and visualize the complete dataset.
+
 ```{r}
 merged <- merge_metabosets(processed)
 visualizations(merged, prefix = paste0(ppath, "figures/_FULL"))
@@ -190,35 +192,11 @@ save(base, file = paste0(ppath, "full_data.RData"))
 # Feature selection
 
 ## Univariate analysis
-Let's try to find features that separate the study groups. First, we'll use 
-Welch's analysis of variance to evaluate the features in terms of the 
-probability of obtaining the observed abundances given the null hypothesis, 
-namely that there is no difference in feature abundance across study groups.
+First, we'll use a linear model to evaluate the features in terms of the probability of obtaining the observed abundances given the null hypothesis, namely that there is no difference in feature abundance across study groups.
 
 ```{r}
-anova_results <- perform_oneway_anova(base, formula_char = "Feature ~ Group")
-```
-
-Now we have an idea of which features are more or less likely to display a true 
-difference in feature levels (judged by p-value) across the three study groups. 
-Next, we will conduct pairwise Welch's t-tests to find out between which groups 
-these interesting features differ in abundance.
-
-```{r}
-top_features <- anova_results$Feature_ID[which(anova_results$ANOVA_P_FDR < 0.2)]
-
-top_index <- fData(base)$Feature_ID %in% top_features
-
-pairwise_results <- perform_t_test(base[top_index, ], 
-                                   formula_char = "Feature ~ Group")
-```
-
-The next step is to join the results from Welch's one-way analysis of variance 
-and post-hoc t-tests and add the results to the instance.
-
-```{r}
-combined_results <- dplyr::left_join(anova_results, pairwise_results)
-base <- join_fData(base, combined_results)
+lm_results <- perform_lm(log(base), formula_char = "Feature ~ Group")
+base <- join_fData(base, lm_results)
 ```
 
 ## Supervised learning
@@ -231,11 +209,11 @@ another perspective. A random forest model doesn't require further data
 pretreatment and makes minimal assumptions.
 
 ```{r}
-rf_results <- fit_rf(imputed, y = "Group")
+rf_results <- fit_rf(base, y = "Group")
 
 rf_importance <- importance_rf(rf_results)
 
-base <- join_fData(imputed, 
+base <- join_fData(base, 
   rf_importance[, c("Feature_ID", "MeanDecreaseAccuracy")])
 ```
 

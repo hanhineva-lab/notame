@@ -45,16 +45,18 @@ alignBatches from batchCorr package. See more details in the original paper.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
+fData(example_set)[3, ]$Average_Mz <- fData(example_set)[2, ]$Average_Mz + 
+0.001
 # Initialize objects
 example_set_fill <- example_set
 example_set_na <- example_set
 # Introduce over 80\% missing values in QC samples per batch of two features 
 # so they are considered "missing", with orthogonal batch presence
-exprs(example_set)[2, c(1, 14, 27, 40, 53)] <- NA
-exprs(example_set)[
-  3, c(79, 92, 105, 118, 131, 144, 157, 170, 183, 196, 209)] <- NA
+exprs(example_set_na)[2, c(1, 7, 13, 19)] <- NA
+exprs(example_set_na)[
+  3, c(26, 32, 38, 44)] <- NA
 batch_aligned <- align_batches(example_set_na, example_set_fill, 
-  batch = "Batch", mz = "Average_Mz", rt = "Average_Rt_min_", 
+  batch = "Batch", mz = "Average_Mz", rt = "Average_Rt_min", 
   mzdiff = 0.002, rtdiff = 15, plot_folder = "./Figures")
 \dontshow{setwd(.old_wd)}
 

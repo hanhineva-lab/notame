@@ -102,7 +102,7 @@ lm_results <- perform_lm(drop_qcs(example_set),
   formula_char = "Feature ~ Group")
 lm_data <- dplyr::left_join(fData(example_set), lm_results)
 # Traditional Manhattan plot from data frame
-manhattan_plot(lm_results,
+manhattan_plot(lm_data,
   x = "Mass",
   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
   fdr_limit = 0.1
@@ -110,7 +110,7 @@ manhattan_plot(lm_results,
 # Directed Manhattan plot from MetaboSet
 with_results <- join_fData(example_set, lm_results)
 manhattan_plot(with_results,
-  x = "Average_Mz", effect = "GroupB_Estimate",
+  x = "Mass", effect = "GroupB_Estimate",
   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
   fdr_limit = 0.1
 )

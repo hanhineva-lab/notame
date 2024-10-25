@@ -250,18 +250,20 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' @examples 
 #' # Make a blank sample which has one (first) feature exceeding the threshold
 #' ## Abundance matrix
-#' exprs <- matrix(c(155, rep(0, 19)), ncol = 1, nrow = 20, 
-#'                 dimnames = list(NULL, "Demo_31"))
+#' med <- median(exprs(example_set)[1, example_set$QC != "QC"])
+#' exprs <- matrix(c(med * 0.05 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
+#'                   dimnames = list(NULL, "Demo_51"))
 #' exprs <- cbind(exprs(example_set), exprs)
 #' ## Sample metadata
 #' pheno_data <- pData(example_set)[1, ]
-#' rownames(pheno_data) <- "Demo_31"
-#' pheno_data$Sample_ID <- "Demo_31"
-#' pheno_data$Injection_order <- 31
+#' rownames(pheno_data) <- "Demo_51"
+#' pheno_data$Sample_ID <- "Demo_51"
+#' pheno_data$Injection_order <- 51
 #' pheno_data[c("Subject_ID", "Group", "QC", "Time")] <- "Blank"
 #' pheno_data <- rbind(pData(example_set), pheno_data)
 #' ## Feature metadata
 #' feature_data <- fData(example_set)
+#'
 #' # Construct MetaboSet object with blank sample
 #' ex_set <- construct_metabosets(exprs = exprs, 
 #'                                pheno_data = pheno_data,
@@ -269,7 +271,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #'                                split_data = FALSE)
 #' # Flag contaminant(s)
 #' contaminants_flagged <- flag_contaminants(ex_set, blank_col = "QC", 
-#'                                          blank_label = "Blank")
+#'                                           blank_label = "Blank")
 #' 
 #' @export
 flag_contaminants <- function(object, blank_col, blank_label, 

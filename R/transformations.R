@@ -49,6 +49,9 @@ mark_nas <- function(object, value) {
 #'
 #' @examples
 #' # Spectra before fixing
+#' fData(example_set)$MS_MS_spectrum <- NA
+#' fData(example_set)[1, ]$MS_MS_spectrum <- "28.769:53 44.933:42 52.106:89 
+#' 69.518:140"
 #' fData(example_set)$MS_MS_spectrum[
 #'   !is.na(fData(example_set)$MS_MS_spectrum)]
 #' # Fixing spectra with default settings

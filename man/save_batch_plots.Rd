@@ -51,7 +51,7 @@ batch_corrected <- ruvs_qc(example_set,
   batch = "Batch", replicates = replicates)
 # Plots of each feature
 save_batch_plots(
-  orig = example_set[1:10], corrected = example_set[1:10],
+  orig = example_set[1:10], corrected = batch_corrected[1:10],
   file = "batch_plots.pdf"
 )
 \dontshow{setwd(.old_wd)}

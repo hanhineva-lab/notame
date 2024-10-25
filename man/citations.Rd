@@ -22,7 +22,7 @@ The output is written to the current log file, if specified.
 \examples{
 
 citations()
-plot_tsne(example_set)
+plot_tsne(example_set, perplexity = 10)
 # Rtsne added to citations
 citations()
 
