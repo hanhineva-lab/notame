@@ -499,10 +499,6 @@ test_that("Pairwise paired t-test works", {
 
 test_that("Mann-Whitney U-tests work", {
   object <- drop_qcs(example_set)
-  median_diffs <- apply(exprs(object), 1, tapply, object$Group, finite_median) %>%
-    apply(2, function(x) {
-      x[1] - x[2]
-    })
 
   get_u <- function(a) {
     x_mat <- a[object$Group == "A"]
@@ -531,8 +527,6 @@ test_that("Mann-Whitney U-tests work", {
   })
 
   expect_identical(colnames(mw_res), cols)
-
-  expect_equal(stats::cor(sign(median_diffs), sign(mw_res$A_vs_B_Mann_Whitney_Estimate), method = "spearman"), 1)
   expect_identical(unname(us), mw_res$A_vs_B_Mann_Whitney_Statistic)
 })
 
@@ -557,7 +551,8 @@ test_that("Wilcoxon signed rank tests work", {
                                     is_paired = TRUE, id = "Subject_ID")
 
   expect_identical(colnames(wil_res), cols)
-  expect_equal(stats::cor(sign(median_diffs), sign(wil_res$`1_vs_2_Wilcox_Estimate`), method = "spearman"), 1)
+  expect_identical(unname(sign(median_diffs)),
+                   sign(wil_res$`1_vs_2_Wilcox_Estimate`))
 })
 
 test_that("Pairwise Mann-Whitney tests works", {

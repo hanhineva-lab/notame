@@ -65,7 +65,7 @@ rownames(pheno_data) <- pheno_data$Sample_ID
 set.seed(2024)
 means_b1 <- stats::runif(n_features * length(modes), 3000, 33000)
 set.seed(2024)
-means_b2 <- stats::runif(n_features * length(modes), 4000, 44000)
+means_b2 <- stats::runif(n_features * length(modes), 10000, 40000)
 
 # Normally distributed data around the mean
 assay_data_b1 <- t(sapply(means_b1, function(x) {
