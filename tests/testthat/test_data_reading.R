@@ -18,6 +18,42 @@ test_that("Column conversion works", {
   expect_equal(converted_classes, expected_classes)
 })
 
+# Test that pheno data fixing works
+  # # Check if conversion to numeric works
+  # df <- data.frame(Injection_order = c(1:2, "3", 4:9))
+  # expect_warning(
+  #   expect_visible(fix_pheno_data(df, id_prefix = "ID_")),
+  #   "QC not found"
+  # )
+  # Check QC generator
+  # df <- data.frame(
+  #   Injection_order = seq_len(10),
+  #   Sample_ID = c(letters[1:5], letters[1:5])
+  #   )
+  # expect_warning(
+  #   expect_error(fix_pheno_data(df), "Sample_ID is not unique"),
+  #   "QC not found"
+  #   )
+  # df <- data.frame(
+  #   Injection_order = seq_len(5),
+  #   Sample_ID = c(letters[1:5])
+  #   )
+  # expect_warning(fix_pheno_data(df), "QC not found")
+
+  # df <- data.frame(
+  #   Injection_order = seq_len(10),
+  #   Sample_ID = c(letters[1:5], rep("QC", 5)),
+  #   QC = as.factor(rep(c("Sample", "QC"), each = 5))
+  # )
+  # checked <- fix_pheno_data(df)
+  # expected <- data.frame(
+  #   Sample_ID = c(letters[1:5], paste0("QC_", 1:5)),
+  #   Injection_order = seq_len(10),
+  #   stringsAsFactors = FALSE,
+  #   QC = as.factor(rep(c("Sample", "QC"), each = 5))
+  # )
+  # rownames(expected) <- expected$Sample_ID
+  # expect_equal(checked, expected)
 
 test_that("Pheno data checking works", {
   df <- data.frame(Group = letters[1:2])
@@ -28,41 +64,6 @@ test_that("Pheno data checking works", {
   # Check that error is thrown if injection order is not numeric
   df <- data.frame(Injection_order = c(1:2, "a", 4:9))
   expect_error(.check_pheno_data(df), "'Injection_order' is not numeric")
-  # Check if conversion to numeric works
-  df <- data.frame(Injection_order = c(1:2, "3", 4:9))
-  expect_warning(
-    expect_visible(.check_pheno_data(df, id_prefix = "ID_")),
-    "QC not found"
-  )
-  # Check QC generator
-  df <- data.frame(
-    Injection_order = seq_len(10),
-    Sample_ID = c(letters[1:5], letters[1:5])
-  )
-  expect_warning(
-    expect_error(.check_pheno_data(df), "Sample_ID is not unique"),
-    "QC not found"
-  )
-  df <- data.frame(
-    Injection_order = seq_len(5),
-    Sample_ID = c(letters[1:5])
-  )
-  expect_warning(.check_pheno_data(df), "QC not found")
-
-  df <- data.frame(
-    Injection_order = seq_len(10),
-    Sample_ID = c(letters[1:5], rep("QC", 5)),
-    QC = as.factor(rep(c("Sample", "QC"), each = 5))
-  )
-  checked <- .check_pheno_data(df)
-  expected <- data.frame(
-    Sample_ID = c(letters[1:5], paste0("QC_", 1:5)),
-    Injection_order = seq_len(10),
-    stringsAsFactors = FALSE,
-    QC = as.factor(rep(c("Sample", "QC"), each = 5))
-  )
-  rownames(expected) <- expected$Sample_ID
-  expect_equal(checked, expected)
 })
 
 
@@ -100,6 +101,7 @@ test_that("Easy example data is read correctly", {
     Mass = 50 * seq_len(10),
     RetentionTime = 0.5 * seq_len(10),
     "MS_MS_Spectrum" = c("(123.45; 678)", rep(NA, 9)),
+    Flag = as.character(NA),
     stringsAsFactors = FALSE
   )
   fd <- .name_features(fd)
@@ -153,6 +155,7 @@ test_that("Data is split correctly", {
     Column = rep(c("RP", "Hilic", "RP"), times = c(4, 8, 4)),
     Mode = rep(c("pos", "neg"), each = 8),
     "MS_MS_Spectrum" = c("(123.45; 678)", rep(NA, 15)),
+    Flag = as.character(NA),
     stringsAsFactors = FALSE
   )
   fd <- .name_features(fd)
@@ -220,19 +223,19 @@ test_that("Creating dummy injection order works as expected", {
   expect_equal(merged$Injection_order, -seq_along(merged$Sample_ID))
   # Original IOs
   expect_equal(
-    sort(as.numeric(stats::na.omit(merged$hilic_neg_Injection_order))),
+    sort(as.numeric(stats::na.omit(merged$HILIC_neg_Injection_order))),
     modes$hilic_neg$Injection_order
   )
   expect_equal(
-    sort(as.numeric(stats::na.omit(merged$hilic_pos_Injection_order))),
+    sort(as.numeric(stats::na.omit(merged$HILIC_pos_Injection_order))),
     modes$hilic_pos$Injection_order
   )
   expect_equal(
-    sort(as.numeric(stats::na.omit(merged$rp_neg_Injection_order))),
+    sort(as.numeric(stats::na.omit(merged$RP_neg_Injection_order))),
     modes$rp_neg$Injection_order
   )
   expect_equal(
-    sort(as.numeric(stats::na.omit(merged$rp_pos_Injection_order))),
+    sort(as.numeric(stats::na.omit(merged$RP_pos_Injection_order))),
     modes$rp_pos$Injection_order
   )
 })

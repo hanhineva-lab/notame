@@ -17,7 +17,8 @@ Depends:
     R (>= 4.4.0),
     Biobase,
     ggplot2,
-    magrittr
+    magrittr,
+    SummarizedExperiment
 Imports:
     BiocGenerics,
     BiocParallel,

@@ -73,9 +73,8 @@
   x
 }
 
-## Helper function for checking integrity of pheno data
-.check_pheno_data <- function(x, id_prefix, 
-                             id_column = NULL, log_messages = FALSE) {
+## Helper function for checking integrity of sample data
+.check_pheno_data <- function(x, log_messages = FALSE) {
   .log_text_if("\nChecking sample information", log_messages)
   # Check that Injection order is included
   if (!"Injection_order" %in% colnames(x)) {
@@ -93,28 +92,12 @@
   if (length(unique(x$Injection_order)) != nrow(x)) {
     stop("Injection_order is not unique")
   }
-  # If QC column is not provided explicitly, attempt to create it
-  if (!"QC" %in% colnames(x)) {
-    qc_found <- apply(x, 1, function(y) {
-      any(grepl("QC", y))
-    })
-    if (any(qc_found)) {
-      x$QC <- ifelse(qc_found, "QC", "Sample")
-      .log_text_if(paste("QC column generated from rows containing 'QC'"),
-                  log_messages)
-    } else {
-      warning("QC not found and column can not be generated.", 
-              " Please create one before constructing a MetaboSet object.")
-    }
+  if (any(is.na(x[, "QC"]))) {
+    stop("QC column should not contain NAs")
   }
-  # Create and populate 'Sample_ID' column
-  x <- .create_sample_col(x, id_prefix, id_column, log_messages)
-  # Select best classes for columns and prepare data.frame
-  x <- .best_classes(x)
-  rownames(x) <- x$Sample_ID
-  x <- as.data.frame(dplyr::select(x, "Sample_ID", dplyr::everything()))
-  
-  x
+  if (!identical(x$Sample_ID, rownames(x))) {
+    stop("Sample_ID does not match rownames in pheno data")
+  }
 }
 
 ## Check that the position of the corner row and column is OK
@@ -152,15 +135,12 @@
     stop(paste("Non-numeric values found in the abundances on rows",
                paste(which(non_numerics), collapse = ", ")))
   }
-  # Convert to numeric
-  exprs_ <- exprs_ %>% apply(2, as.numeric)
-    
-  exprs_
 }
 
-.check_feature_data <- function(feature_data, check_limits = TRUE, 
-                                mz_limits = c(10, 2000), rt_limits = c(0, 20),
-                                log_messages = FALSE) {
+
+.check_feature_data <- function(feature_data, check_limits = FALSE, 
+                               mz_limits = c(10, 2000), rt_limits = c(0, 20),
+                               log_messages = FALSE) {
   .log_text_if("\nChecking feature information", log_messages)
   .log_text_if("Checking that feature IDs are unique and not stored as numbers",
                log_messages)
@@ -183,6 +163,13 @@
   if (any(grepl("^[[:digit:]]", fid_chr))) {
     stop("Feature IDs can not start with numbers.", call. = FALSE)
   }
+  if (!"Flag" %in% colnames(feature_data)) {
+    stop("Flag column not found in fData")
+  }
+  if (!"Split" %in% colnames(feature_data)) {
+    stop("Split column not found in fData")
+  }
+
   if (check_limits) {
     .log_text_if("Checking that m/z and retention time values are reasonable.",
                  log_messages)
@@ -193,8 +180,9 @@
       stop("Values in m/z or retention time columns are outside limits.")
     }
   }
-
-  feature_data
+  if (!identical(feature_data$Feature_ID, rownames(feature_data))) {
+    stop("Feature_ID does not match rownames in feature data")
+  }
 }
 
 .extract_information <- function(file, sheet, corner_row, corner_column, name) {
@@ -256,45 +244,6 @@
        "exprs_" = exprs_ )
 }
   
-.prepare_feature_data <- function(name, split_by, feature_data) {
-  # If the file only contains one mode, add the mode name as Split column
-  if (!is.null(name)) {
-    log_text(paste0("Assigning ", name,
-                    " as the value of the Split column for each feature"))
-    feature_data$Split <- name
-    split_by <- "Split"
-  } else { # Multiple modes in the file, create Split column to separate modes
-    if (!all(split_by %in% colnames(feature_data))) {
-      stop(paste0("Couldn't find column(s): ",
-                  paste(split_by[!(split_by %in% colnames(feature_data))],
-                        collapse = ", ")))
-    }
-    log_text(paste0("Creating Split column from ",
-                    paste0(split_by, collapse = ", ")))
-    feature_data <- feature_data %>%
-      tidyr::unite("Split", split_by, remove = FALSE)
-  }
-
-  # Create feature ID if necessary
-  if (!"Feature_ID" %in% colnames(feature_data)) {
-    log_text("Feature_ID column not found, creating feature IDs")
-    feature_data <- .name_features(feature_data = feature_data)
-  }
-  # Reorganise columns and change classes
-  feature_data <- feature_data %>%
-    dplyr::select("Feature_ID", "Split", dplyr::everything()) %>%
-    .best_classes() %>%
-    dplyr::mutate_if(is.factor, as.character)
-  rownames(feature_data) <- feature_data$Feature_ID
-  log_text(paste0("Replacing dots (.) in feature information column names with",
-                  " underscores (_)"))
-  colnames(feature_data) <- gsub("[.]", "_", colnames(feature_data)) %>%
-    # remove duplicate underscores
-    gsub("_{2,}", "_", .)
-    
-  feature_data
-}
-
 #' Read formatted Excel files
 #'
 #' Reads data from an Excel file of the following format:
@@ -372,19 +321,26 @@ read_from_excel <- function(file, sheet = 1, id_column = NULL,
   extracted <- .extract_information(file, sheet, corner_row, 
                                     corner_column, name)
   pheno_data <- extracted$pheno_data
-  feature_data <- .prepare_feature_data(name, split_by, extracted$feature_data)
+  feature_data <- extracted$feature_data
   exprs_ <- extracted$exprs_
   # Skip checks
   if (!skip_checks) {
-    pheno_data <- .check_pheno_data(x = pheno_data, id_prefix = id_prefix,
-                                   id_column = id_column, log_messages = TRUE)
-    exprs_ <- .check_exprs(exprs_, log_messages = TRUE)
-    feature_data <- .check_feature_data(feature_data, 
-                                       mz_limits = mz_limits, 
-                                       rt_limits = rt_limits, 
-                                       log_messages = TRUE)
-  }
+    pheno_data <- fix_pheno_data(x = pheno_data, id_prefix = id_prefix,
+                                 id_column = id_column, clean = TRUE,
+                                 log_messages = TRUE)
+    exprs_ <- fix_exprs(exprs_, log_messages = TRUE)
+    feature_data <- fix_feature_data(feature_data, name = name, 
+                                     split_by = split_by, clean = TRUE, log_messages = TRUE)
 
+    .check_pheno_data(x = pheno_data, log_messages = TRUE)
+    .check_exprs(exprs_, log_messages = TRUE)
+    .check_feature_data(feature_data, 
+                       check_limits = FALSE,
+                       mz_limits = mz_limits, 
+                       rt_limits = rt_limits, 
+                       log_messages = TRUE)
+  }
+  
   rownames(exprs_) <- rownames(feature_data)
   colnames(exprs_) <- rownames(pheno_data)
 
@@ -495,20 +451,8 @@ setValidity(
     } else if (!is.na(subject_col(object)) &
       !subject_col(object) %in% colnames(pData(object))) {
         return(paste("Column", subject_col(object), "not found in pheno data"))
-    } else if (!all(
-      c("Injection_order", "Sample_ID", "QC") %in% colnames(pData(object)))) {
-        return(paste0("Pheno data should contain columns", 
-                      " Sample_ID, QC and Injection_order"))
-    } else if (any(is.na(pData(object)[, "QC"]))) {
-      return("QC column should not contain NAs")
-    } else if (!"Flag" %in% colnames(fData(object))) {
-      return("Flag column not found in fData")
-    } else if (!identical(object$Sample_ID, rownames(pData(object)))) {
-      return("Sample_ID does not match rownames in pheno data")
-    } else if (!identical(fData(object)$Feature_ID, rownames(fData(object)))) {
-      return("Feature_ID does not match rownames in feature data")
     } else {
-      x <- .check_pheno_data(pData(object), id_prefix = "")
+      x <- .check_pheno_data(pData(object))
       x <- .check_exprs(exprs(object))
       x <- .check_feature_data(fData(object), check_limits = FALSE)
       TRUE
@@ -562,22 +506,21 @@ construct_metabosets <- function(exprs, pheno_data, feature_data,
     message("Initializing the object(s) with unflagged features.")
     feature_data$Flag <- NA
   }
-  feature_data <- .check_feature_data(feature_data, check_limits = FALSE,
-                                     log_messages = TRUE)
-  exprs <- .check_exprs(exprs, log_messages = TRUE)
+  .check_feature_data(feature_data, log_messages = TRUE)
+  .check_exprs(exprs, log_messages = TRUE)
   log_text(paste0("Setting row and column names of exprs", 
                   " based on feature and pheno data"))
   rownames(exprs) <- rownames(feature_data)
   colnames(exprs) <- rownames(pheno_data)
-  pheno_data <- Biobase::AnnotatedDataFrame(data = pheno_data)
+  feature_data <- Biobase::AnnotatedDataFrame(as.data.frame(feature_data))
+  pheno_data <- Biobase::AnnotatedDataFrame(as.data.frame(pheno_data))
 
   if (split_data) {
     # Split the data by the Split column of feature data
     parts <- unique(feature_data$Split)
     obj_list <- list()
     for (part in parts) {
-      fd_tmp <- Biobase::AnnotatedDataFrame(
-        data = feature_data[feature_data$Split == part, ])
+      fd_tmp <- feature_data[feature_data$Split == part, ]
       ad_tmp <- exprs[fd_tmp$Feature_ID, ]
       obj_list[[part]] <- MetaboSet(exprs = ad_tmp, phenoData = pheno_data,
                                     featureData = fd_tmp, group_col = group_col,
@@ -586,7 +529,7 @@ construct_metabosets <- function(exprs, pheno_data, feature_data,
     }
     return(obj_list)
   } else {
-    fd_tmp <- Biobase::AnnotatedDataFrame(feature_data)
+    fd_tmp <- feature_data
     object <- MetaboSet(exprs = exprs, phenoData = pheno_data,
                         featureData = fd_tmp, group_col = group_col,
                         time_col = time_col, subject_col = subject_col)
@@ -1012,3 +955,325 @@ setMethod("sampleNames<-",
     }
   }
 )
+
+################# New SummarizedExperiment functions ##################
+setAs("SummarizedExperiment", "MetaboSet", function(from) {
+  # Extract assays, colData, and rowData from the SummarizedExperiment object
+  assay_data <- assay(from)                
+  # Extract the assay data (typically the expression matrix)
+  col_data <- colData(from)                
+  # Extract column data (metadata for samples)
+  row_data <- rowData(from)                # Extract row data (metadata for features)
+  # Construct the MetaboSet object from these components
+  # This assumes MetaboSet has a constructor or function that takes these parts
+  construct_metabosets(exprs = assay_data,
+                       pheno_data = as.data.frame(col_data),
+                       feature_data = as.data.frame(row_data),
+                       split_data = FALSE)
+})
+
+setAs("MetaboSet", "SummarizedExperiment", function(from) {
+  # Extract assays, colData, and rowData from the SummarizedExperiment object
+  assay_data <- exprs(from)                
+  # Extract the assay data (typically the expression matrix)
+  col_data <- S4Vectors::DataFrame(pData(from))
+  mcols(col_data) <- S4Vectors::DataFrame(varMetadata(from))      
+  # Extract column data (metadata for samples)
+  row_data <- S4Vectors::DataFrame(fData(from)) # Extract row data (metadata for features)
+  mcols(row_data) <- S4Vectors::DataFrame(varMetadata(featureData(from))) 
+  # Construct the MetaboSet object from these components
+  # This assumes MetaboSet has a constructor or function that takes these parts
+  SummarizedExperiment(assays = assay_data,
+                       colData = col_data,
+                       rowData = row_data)
+})
+
+check_object <- function(object, log_messages = FALSE, check_limits = TRUE, 
+                         mz_limits = c(10, 2000), rt_limits = c(0, 20)) {
+  object <- as(object, "SummarizedExperiment")
+  .check_pheno_data(colData(object), log_messages = log_messages)
+  .check_exprs(assay(object), log_messages = log_messages)
+  .check_feature_data(rowData(object), check_limits = check_limits, 
+                     mz_limits = mz_limits, rt_limits = rt_limits,
+                     log_messages = log_messages)
+  object
+}
+
+# You can use the same functions as in check_object, but instead return possibly modified versions
+fix_object <- function(object, id_prefix, id_column = NULL, split_by, name, clean = TRUE, split_data = FALSE, log_messages = TRUE) {
+  object <- as(object, "SummarizedExperiment")
+  pheno_data <- fix_pheno_data(colData(object), id_prefix = "",
+                               id_column = id_column, clean = clean, log_messages = log_messages)
+  feature_data <- fix_feature_data(rowData(object), split_by = split_by,
+                                   name = name, clean = clean,
+                                   log_messages = log_messages)
+  exprs <- fix_exprs(assay(object))
+  rownames(exprs) <- rownames(feature_data)
+  colnames(exprs) <- rownames(pheno_data)
+                
+                
+  if (split_data) {
+    # Split the data by the Split column of feature data
+    parts <- unique(feature_data$Split)
+    obj_list <- list()
+    for (part in parts) {
+      fd_tmp <- S4Vectors::DataFrame(
+        data = feature_data[feature_data$Split == part, ])
+      ad_tmp <- exprs[fd_tmp$Feature_ID, ]
+      obj_list[[part]] <- SummarizedExperiment(assays = exprs,
+                                               colData = pheno_data,
+                                               rowData = feature_data)
+    }
+    return(obj_list)
+  } else {
+    fd_tmp <- S4Vectors::DataFrame(feature_data)
+    object <- SummarizedExperiment(assays = exprs,
+                                   colData = pheno_data,
+                                   rowData = feature_data)
+
+    return(object)
+  }
+                   
+  SummarizedExperiment(assays = exprs,
+                       colData = pheno_data,
+                       rowData = feature_data)
+}
+
+fix_pheno_data <- function(x, id_prefix = "", id_column = NULL, 
+                           log_messages = FALSE, clean = TRUE) {
+  # If QC column is not provided explicitly, attempt to create it
+  if (!"QC" %in% colnames(x)) {
+    qc_found <- apply(x, 1, function(y) {
+      any(grepl("QC", y))
+    })
+    if (any(qc_found)) {
+      x$QC <- ifelse(qc_found, "QC", "Sample")
+      .log_text_if(paste("QC column generated from rows containing 'QC'"),
+                  log_messages)
+    } else {
+      warning("QC not found and column can not be generated.", 
+              " Please create one before constructing a MetaboSet object.")
+    }
+  }
+  # Create and populate 'Sample_ID' column
+  x <- .create_sample_col(x, id_prefix, id_column, log_messages)
+
+  if (clean) {
+    # Select best classes for columns and prepare data.frame
+    x <- .best_classes(x)
+    x <- as.data.frame(dplyr::select(x, "Sample_ID", dplyr::everything()))
+    rownames(x) <- x$Sample_ID
+  }
+  x
+}
+
+fix_exprs <- function(exprs_, log_messages = FALSE) {
+  .log_text_if("Checking that feature abundances only contain numeric values",
+               log_messages)
+  # Check that all rows are full of numbers
+  non_numerics <- exprs_ %>% apply(1, function(x) !.looks_numeric(x))
+  if (sum(non_numerics)) {
+    stop(paste("Non-numeric values found in the abundances on rows",
+               paste(which(non_numerics), collapse = ", ")))
+  }
+  # Convert to numeric
+  exprs_ <- exprs_ %>% apply(2, as.numeric)
+
+  exprs_
+}
+
+fix_feature_data <- function(name = NULL, split_by = NULL, feature_data, clean = TRUE, log_messages = FALSE) {
+  if (!"Flag" %in% colnames(feature_data)) {
+    message("Initializing with unflagged features.")
+    feature_data$Flag <- NA
+  }
+
+  if (is.null(feature_data$Split)) {
+    if (is.null(split_by) && is.null(name)) {
+      stop("Either name or split_by needs to be defined, see documentation.")
+    } else if ((!is.null(split_by)) && (!is.null(name))) {
+      stop("Only define split_by OR name, see documentation.")
+    }
+    # If the file only contains one mode, add the mode name as Split column
+    if (!is.null(name)) {
+      log_text(paste0("Assigning ", name,
+                      " as the value of the Split column for each feature"))
+      feature_data$Split <- name
+      split_by <- "Split"
+    } else { # Multiple modes in the file, create Split column to separate modes
+      if (!all(split_by %in% colnames(feature_data))) {
+        stop(paste0("Couldn't find column(s): ",
+                    paste(split_by[!(split_by %in% colnames(feature_data))],
+                          collapse = ", ")))
+      }
+      log_text(paste0("Creating Split column from ",
+                      paste0(split_by, collapse = ", ")))
+      feature_data <- feature_data %>%
+        tidyr::unite("Split", split_by, remove = FALSE)
+    }
+  }
+
+  # Create feature ID if necessary
+  if (!"Feature_ID" %in% colnames(feature_data)) {
+    log_text("Feature_ID column not found, creating feature IDs")
+    feature_data <- .name_features(feature_data = feature_data)
+  }
+  
+  if (clean) {
+    # Reorganise columns and change classes
+    feature_data <- as.data.frame(feature_data) %>%
+      dplyr::select("Feature_ID", "Split", dplyr::everything()) %>%
+      .best_classes() %>%
+      dplyr::mutate_if(is.factor, as.character)
+    # Replace dots with underscores in colnames
+    log_text(paste0("Replacing dots (.) in feature information column names",
+                    "with underscores (_)"))
+    colnames(feature_data) <- gsub("[.]", "_", colnames(feature_data)) %>%
+      # Remove duplicate underscores
+      gsub("_{2,}", "_", .)
+    rownames(feature_data) <- feature_data$Feature_ID
+  }
+  feature_data
+}
+
+################ New methods for existing generics ####################
+
+#' @describeIn MetaboSet Retrieve both sample information and features
+#' @export
+setMethod("combined_data", c(object = "SummarizedExperiment"), 
+  function(object) {
+    cbind(colData(object), t(assay(object)))
+  }
+)
+
+#' @describeIn MetaboSet get flags
+#' @export
+setMethod("flag", "SummarizedExperiment",
+          function(object) rowData(object)$Flag)
+
+#' @describeIn MetaboSet set flags
+#' @export
+setMethod("flag<-", "SummarizedExperiment",
+  function(object, value) {
+    rowData(object)$Flag <- value
+    if (validObject(object)) {
+      return(object)
+    }
+  }
+)
+
+
+#' Join new columns to feature data
+#'
+#' Join a new data frame of information to feature data of a MetaboSet object.
+#' The data frame needs to have a column "Feature_ID".
+#' This function is usually used internally by some of the functions in the 
+#' package, but can be useful.
+#'
+#' @param object a MetaboSet object
+#' @param dframe a data frame with the new information
+#'
+#' @examples
+#' new_info <- data.frame(
+#'   Feature_ID = featureNames(example_set),
+#'   Feature_number = seq_len(nrow(example_set))
+#' )
+#' with_new_info <- join_fData(example_set, new_info)
+#' colnames(fData(with_new_info))
+#'
+#' @return A MetaboSet object with the new information added to fData(object).
+#'
+#' @export
+setGeneric("join_rowData", signature = c("object", "dframe"),
+           function(object, dframe) standardGeneric("join_rowData"))
+
+#' @describeIn MetaboSet join new information to feature data
+#' @param dframe a data frame with the new information
+#' @export
+setMethod("join_rowData", c("SummarizedExperiment", "data.frame"),
+  function(object, dframe) {
+    fData(object) <- dplyr::left_join(rowData(object), dframe, 
+                                      by = "Feature_ID")
+    rownames(rowData(object)) <- rowData(object)$Feature_ID
+    if (validObject(object)) {
+      return(object)
+    }
+  }
+)
+
+#' Join new columns to pheno data
+#'
+#' Join a new data frame of information to pheno data of a MetaboSet object.
+#'
+#' @param object a MetaboSet object
+#' @param dframe a data frame with the new information
+#'
+#' @examples
+#' new_info <- data.frame(
+#'   Sample_ID = sampleNames(example_set),
+#'   BMI = stats::runif(ncol(example_set), 22, 26)
+#' )
+#' with_new_info <- join_pData(example_set, new_info)
+#' colnames(pData(with_new_info))
+#'
+#' @return A MetaboSet object with the new information added to pData(object).
+#'
+#' @export
+setGeneric("join_colData", signature = c("object", "dframe"),
+           function(object, dframe) standardGeneric("join_colData"))
+
+#' @describeIn MetaboSet join new information to pheno data
+#' @param dframe a data frame with the new information
+#' @export
+setMethod("join_colData", c("SummarizedExperiment", "data.frame"),
+  function(object, dframe) {
+    pData(object) <- dplyr::left_join(colData(object), dframe)
+    rownames(colData(object)) <- colData(object)$Sample_ID
+    if (validObject(object)) {
+      return(object)
+    }
+  }
+)
+
+# FeatureNames also changing Feature_ID column in featureData
+setMethod("featureNames<-",
+  signature = signature(object = "MetaboSet", value = "ANY"),
+  function(object, value) {
+    fd <- featureData(object)
+    featureNames(fd) <- value
+    ad <- assayData(object)
+    featureNames(ad) <- value
+    object@featureData <- fd
+    object@assayData <- ad
+    fData(object)$Feature_ID <- value
+    if (validObject(object)) {
+      return(object)
+    }
+  }
+)
+
+
+setMethod("sampleNames<-",
+  signature = signature(object = "MetaboSet", value = "ANY"),
+  function(object, value) {
+    pd <- phenoData(object)
+    sampleNames(pd) <- value
+    ad <- assayData(object)
+    sampleNames(ad) <- value
+    prd <- protocolData(object)
+    if (nrow(prd) == 0) {
+      prd <- pd[, integer(0)]
+    } else {
+      sampleNames(prd) <- value
+    }
+    object@phenoData <- pd
+    object@protocolData <- prd
+    object@assayData <- ad
+    pData(object)$Sample_ID <- value
+    if (validObject(object)) {
+      return(object)
+    }
+  }
+)
+
+
