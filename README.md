@@ -1,3 +1,5 @@
+# NOTE This is a development version. There is active development with breaking changes until the package has been approved in Bioconductor. Yet, everything in the main branch is to our knowledge working as it should. The original notame package this development is based on can be installed using `devtools::install_github("antonvsdata/notame@v0.3.1")`
+
 # notame - Workflow for non-targeted LC-MS metabolic profiling 
 
 This package can be used to analyze preprocessed LC-MS data in non-targeted metabolomics. Notame was developed at the [research group of nutritional metabolomics at University of Eastern Finland](https://www3.uef.fi/en/web/kttravi/metabolomics2) and [Afekta Technologies](https://afekta.com/), a spinoff metabolomics company. We use notame as a way to bundle together all the preprocessing methods we use for our non-targeted LC-MS metabolomics data, so it mainly consists of methods found in other packages, and a bunch of visualizations we have found useful.
@@ -33,7 +35,7 @@ notame functions depend on a ton of other R packages. The packages you need to i
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools")
 }
-devtools::install_github("antonvsdata/notame")
+devtools::install_github("hanhineva-lab/notame")
 ```
 
 After installing the package, you can install rest of the packages you need on the fly OR use a handy function called ```install_dependencies```, which lets you install packages for core preprocessing, batch correction, specific visualizations etc.
@@ -46,23 +48,8 @@ To install the current development version between releases, install the package
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools")
 }
-devtools::install_github("antonvsdata/notame", ref = "dev")
+devtools::install_github("hanhineva-lab/notame", ref = "dev")
 ```
-
-### Troubleshooting installation
-
-If ```devtools::install_github``` gives you a weird error, run the following line and try again. Read more from [the original issue](https://github.com/r-lib/devtools/issues/1900)  
-```
-devtools::install_github("r-lib/remotes", ref = "e56a41e1d0cad55cbe7d60b274b99ab7b7a76b5c")
-```
-
-If you are having problems with new package versions (Something like: Error: (converted from warning) package 'ggplot2' was built under R version 3.6.1), try running the following line to prevent the error:
-
-```
-Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS = TRUE)
-```
-
-Read more [on the issue of remotes package](https://github.com/r-lib/remotes/issues/403) and [the environment variables tutorial](https://github.com/r-lib/remotes#environment-variables)
 
 ## Documentation
 
