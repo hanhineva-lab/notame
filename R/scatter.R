@@ -841,14 +841,14 @@ setMethod("volcano_plot", c(object = "data.frame"),
 #' lm_data <- dplyr::left_join(as.data.frame(rowData(example_set)), lm_results)
 #' # Traditional Manhattan plot from data frame
 #' manhattan_plot(lm_data,
-#'   x = "Average_Mz",
+#'   x = "Mass",
 #'   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
 #'   fdr_limit = 0.1
 #' )
 #' # Directed Manhattan plot from MetaboSet
 #' with_results <- join_rowData(example_set, lm_results)
 #' manhattan_plot(with_results,
-#'   x = "Average_Mz", effect = "GroupB_Estimate",
+#'   x = "Mass", effect = "GroupB_Estimate",
 #'   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
 #'   fdr_limit = 0.1
 #' )
