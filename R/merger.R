@@ -185,9 +185,9 @@
 #'   rp_neg_sample, rp_pos_sample
 #' )
 #' # Merge batches
-#' batch1 <- merged_sample[, merged_sample$Batch == 1]
-#' batch2 <- merged_sample[, merged_sample$Batch == 2]
-#' merged <- merge_batches(batch1, batch2)
+#' batch1 <- example_set[, example_set$Batch == 1]
+#' batch2 <- example_set[, example_set$Batch == 2]
+#' merged <- merge_metabosets(batch1, batch2, merge = "samples")
 #'
 #' @export
 merge_metabosets <- function(..., merge = c("features", "samples")) {

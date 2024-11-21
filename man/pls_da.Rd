@@ -91,7 +91,7 @@ of components and features, choose the one with minimal balanced error rate}
 }
 }
 \examples{
-noqc <- drop_qcs(merged_sample)
+noqc <- drop_qcs(example_set)
 plsda_res <- mixomics_plsda(noqc, y = "Group", ncomp = 2)
 set.seed(38)
 plsda_opt <- mixomics_plsda_optimize(noqc, y = "Group", ncomp = 3)

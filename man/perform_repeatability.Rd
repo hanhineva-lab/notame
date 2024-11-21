@@ -22,11 +22,11 @@ variation between batches.
 }
 \examples{
 # Batch correction
-replicates <- list(which(merged_sample$QC == "QC"))
-batch_corrected <- ruvs_qc(merged_sample, 
+replicates <- list(which(example_set$QC == "QC"))
+batch_corrected <- ruvs_qc(example_set, 
   batch = "Batch", replicates = replicates)
 # Evaluate batch correction
-rep_orig <- perform_repeatability(merged_sample, group = "Group")
+rep_orig <- perform_repeatability(example_set, group = "Group")
 mean(rep_orig$Repeatability, na.rm = TRUE)
 rep_corr <- perform_repeatability(batch_corrected, group = "Group")
 mean(rep_corr$Repeatability, na.rm = TRUE)

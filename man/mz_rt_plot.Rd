@@ -84,8 +84,8 @@ and the size of the points is scaled based on p-value
 }
 \examples{
 # Compute results from a linear model
-lm_results <- perform_lm(merged_sample, formula_char = "Feature ~ Group")
-with_results <- join_fData(merged_sample, lm_results)
+lm_results <- perform_lm(example_set, formula_char = "Feature ~ Group")
+with_results <- join_fData(example_set, lm_results)
 
 # Plot from the MetaboSet object
 # automatically facet by analytical mode in variable Split

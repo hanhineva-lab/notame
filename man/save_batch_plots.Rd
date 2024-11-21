@@ -46,12 +46,12 @@ the default scale only has 2 values, so it can only accomodate 2 shapes.
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
 # Batch correction
-replicates <- list(which(merged_sample$QC == "QC"))
-batch_corrected <- ruvs_qc(merged_sample, 
+replicates <- list(which(example_set$QC == "QC"))
+batch_corrected <- ruvs_qc(example_set, 
   batch = "Batch", replicates = replicates)
 # Plots of each feature
 save_batch_plots(
-  orig = merged_sample[1:10], corrected = batch_corrected[1:10],
+  orig = example_set[1:10], corrected = batch_corrected[1:10],
   file = "batch_plots.pdf"
 )
 \dontshow{setwd(.old_wd)}

@@ -47,7 +47,7 @@ Plots supraHex plots of each sample using functions from the supraHex
 package. See the supraHex paper and package vignette for more information.
 }
 \examples{
-plot_sample_suprahex(merged_sample[, 1:20],
+plot_sample_suprahex(example_set[, 1:20],
   xdim = 5, title.xy = c(0.35, 1),
   grid_xdim = 7, grid_ydim = 7, sample_labels = "Group"
 )

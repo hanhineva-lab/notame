@@ -22,7 +22,7 @@ by injection order alone. The expected uniform distribution is represented
 by a dashed red line.
 }
 \examples{
-plot_injection_lm(merged_sample)
+plot_injection_lm(example_set)
 
 }
 \seealso{

@@ -54,7 +54,7 @@ Computes PCA using one of the methods provided in the Bioconductor package
 pcaMethods and plots the loadings of first principal components.
 }
 \examples{
-plot_pca_loadings(merged_sample, n_features = c(2, 4))
+plot_pca_loadings(example_set, n_features = c(2, 4))
 
 }
 \seealso{

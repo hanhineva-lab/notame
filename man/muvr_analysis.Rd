@@ -86,7 +86,7 @@ Many of these return different plots depending on the model specification.
 }
 \examples{
 # PLS simple
-rf_model <- muvr_analysis(drop_qcs(merged_sample), 
+rf_model <- muvr_analysis(drop_qcs(example_set), 
   y = "Group", nRep = 2, method = "PLS")
 
 # RF with covariate and repeated measures (not longitudinal)

@@ -45,7 +45,7 @@ For example, if testing for equality of means in study groups, use
 }
 \examples{
 # Including QCs as a study group for example for pairwise tests
-mann_whitney_results <- perform_non_parametric(merged_sample, 
+mann_whitney_results <- perform_non_parametric(example_set, 
   formula_char = "Feature ~ Group")
 # Using paired mode (pairs with QC are skipped as there are no common IDs in 
 # 'example_set')

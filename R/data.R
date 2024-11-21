@@ -1,39 +1,24 @@
 #' Toy data set
 #'
-#' Contains imaginary data used in testing the package functions.
-#' For more realistic data, see \code{\link{merged_sample}}
-#' This dataset includes multiple observations from same subjects,
-#' sampled at two timepoints and divided to two groups.
-#' The dataset has 30 samples and 20 features.
+#' Contains imaginary data used in testing the package functions. The dataset 
+#' has 50 samples and 80 features. This dataset includes multiple observations 
+#' from same subjects, sampled at two timepoints in separate batches and 
+#' divided to two groups. The analytical modes are also available as separate 
+#' MetaboSet objects.
+#' Note that across batches, the features don't have different feature ID's, 
+#' m/z and retention time as would be the case with real-world data. In 
+#' essence, the example data reflects that features were aligned perfectly 
+#' between batches. 
 "example_set"
 
-
-#' Sample dataset
-#'
-#' Sample data from samples in two groups, at two timepoints.
-#' Contains 83 features from four analytical modes. The analytical modes are
-#' available as separate MetaboSet objects and also as a merged object.
-#'
-#' @format
-#' \describe{
-#'   \item{hilic_neg_sample}{features from HILIC column with negative
-#' ionization}
-#'   \item{hilic_pos_sample}{features from HILIC column with positive 
-#' ionization}
-#'   \item{rp_neg_sample}{features from RP column with negative ionization}
-#'   \item{rp_pos_sample}{features from RP column with positive ionization}
-#'   \item{merged_sample}{all features merged together}
-#' }
-"merged_sample"
-
-#' @rdname merged_sample
+#' @rdname example_set
 "hilic_neg_sample"
 
-#' @rdname merged_sample
+#' @rdname example_set
 "hilic_pos_sample"
 
-#' @rdname merged_sample
+#' @rdname example_set
 "rp_neg_sample"
 
-#' @rdname merged_sample
+#' @rdname example_set
 "rp_pos_sample"

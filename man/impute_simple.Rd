@@ -44,7 +44,7 @@ number!).
 }
 }
 \examples{
-missing <- mark_nas(merged_sample, 0)
+missing <- mark_nas(example_set, 0)
 imputed <- impute_simple(missing, value = "min")
 
 }

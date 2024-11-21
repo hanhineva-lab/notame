@@ -57,15 +57,15 @@ By default, the column used for color is also used for shape.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
-dc <- dc_cubic_spline(merged_sample)
+dc <- dc_cubic_spline(example_set)
 corrected <- dc$object
 inspected <- inspect_dc(
-  orig = merged_sample, dc = corrected,
+  orig = example_set, dc = corrected,
   check_quality = TRUE
 )
 save_dc_plots(
-  orig = merged_sample[1:10], dc = corrected[1:10], 
-  predicted = dc$predicted[1:10, ],
+  orig = example_set[1], dc = corrected[1], 
+  predicted = dc$predicted[1, ],
   file = "drift_plots.pdf"
 )
 \dontshow{setwd(.old_wd)}

@@ -13,12 +13,12 @@
 #'
 #' @examples
 #' # Batch correction
-#' replicates <- list(which(merged_sample$QC == "QC"))
-#' batch_corrected <- ruvs_qc(merged_sample, 
+#' replicates <- list(which(example_set$QC == "QC"))
+#' batch_corrected <- ruvs_qc(example_set, 
 #'   batch = "Batch", replicates = replicates)
 #' # Evaluate batch correction
-#' pca_bhattacharyya_dist(merged_sample, batch = "Batch")
-#' pca_bhattacharyya_dist(batch_corrected, batch = "Batch")
+#' pca_bhattacharyya_dist(example_set, batch = "Batch")
+#' pca_bhattacharyya_dist(example_set, batch = "Batch")
 #'
 #' @export
 ruvs_qc <- function(object, batch, replicates, k = 3, ...) {
@@ -67,11 +67,11 @@ ruvs_qc <- function(object, batch, replicates, k = 3, ...) {
 #'
 #' @examples
 #' # Batch correction
-#' replicates <- list(which(merged_sample$QC == "QC"))
-#' batch_corrected <- ruvs_qc(merged_sample, 
+#' replicates <- list(which(example_set$QC == "QC"))
+#' batch_corrected <- ruvs_qc(example_set, 
 #'   batch = "Batch", replicates = replicates)
 #' # Evaluate batch correction
-#' pca_bhattacharyya_dist(merged_sample, batch = "Batch")
+#' pca_bhattacharyya_dist(example_set, batch = "Batch")
 #' pca_bhattacharyya_dist(batch_corrected, batch = "Batch")
 #'
 #' @export
@@ -157,11 +157,11 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
 #'
 #' @examples
 #' # Batch correction
-#' replicates <- list(which(merged_sample$QC == "QC"))
-#' batch_corrected <- ruvs_qc(merged_sample, 
+#' replicates <- list(which(example_set$QC == "QC"))
+#' batch_corrected <- ruvs_qc(example_set, 
 #'   batch = "Batch", replicates = replicates)
 #' # Evaluate batch correction
-#' rep_orig <- perform_repeatability(merged_sample, group = "Group")
+#' rep_orig <- perform_repeatability(example_set, group = "Group")
 #' mean(rep_orig$Repeatability, na.rm = TRUE)
 #' rep_corr <- perform_repeatability(batch_corrected, group = "Group")
 #' mean(rep_corr$Repeatability, na.rm = TRUE)
@@ -203,16 +203,18 @@ perform_repeatability <- function(object, group) {
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
+#' fData(example_set)[3, ]$Average_Mz <- fData(example_set)[2, ]$Average_Mz + 
+#' 0.001
 #' # Initialize objects
-#' merged_sample_fill <- merged_sample
-#' merged_sample_na <- merged_sample
+#' example_set_fill <- example_set
+#' example_set_na <- example_set
 #' # Introduce over 80% missing values in QC samples per batch of two features 
 #' # so they are considered "missing", with orthogonal batch presence
-#' exprs(merged_sample_na)[2, c(1, 14, 27, 40, 53)] <- NA
-#' exprs(merged_sample_na)[
-#'   3, c(79, 92, 105, 118, 131, 144, 157, 170, 183, 196, 209)] <- NA
-#' batch_aligned <- align_batches(merged_sample_na, merged_sample_fill, 
-#'   batch = "Batch", mz = "Average_Mz", rt = "Average_Rt_min_", 
+#' exprs(example_set_na)[2, c(1, 7, 13, 19)] <- NA
+#' exprs(example_set_na)[
+#'   3, c(26, 32, 38, 44)] <- NA
+#' batch_aligned <- align_batches(example_set_na, example_set_fill, 
+#'   batch = "Batch", mz = "Average_Mz", rt = "Average_Rt_min", 
 #'   mzdiff = 0.002, rtdiff = 15, plot_folder = "./Figures")
 #' \dontshow{setwd(.old_wd)}
 #'
@@ -273,11 +275,11 @@ align_batches <- function(object_na, object_fill, batch, mz, rt,
 #'
 #' @examples
 #' # Batch correction
-#' batch_normalized <- normalize_batches(merged_sample,
+#' batch_normalized <- normalize_batches(example_set,
 #'   batch = "Batch", group = "QC", ref_label = "QC")
 #' # Evaluate batch correction
-#' pca_bhattacharyya_dist(merged_sample, batch = "Batch")
-#' pca_bhattacharyya_dist(batch_normalized, batch = "Batch")
+#' pca_bhattacharyya_dist(example_set, batch = "Batch")
+#' pca_bhattacharyya_dist(example_set, batch = "Batch")
 #'
 #' @seealso \code{\link[batchCorr]{normalizeBatches}} 
 #'
@@ -331,12 +333,12 @@ normalize_batches <- function(object, batch, group, ref_label,
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
 #' # Batch correction
-#' replicates <- list(which(merged_sample$QC == "QC"))
-#' batch_corrected <- ruvs_qc(merged_sample, 
+#' replicates <- list(which(example_set$QC == "QC"))
+#' batch_corrected <- ruvs_qc(example_set, 
 #'   batch = "Batch", replicates = replicates)
 #' # Plots of each feature
 #' save_batch_plots(
-#'   orig = merged_sample[1:10], corrected = batch_corrected[1:10],
+#'   orig = example_set[1:10], corrected = batch_corrected[1:10],
 #'   file = "batch_plots.pdf"
 #' )
 #' \dontshow{setwd(.old_wd)}

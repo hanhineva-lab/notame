@@ -158,10 +158,10 @@ importance_rf <- function(rf) {
 #' @return An object of class "mixo_pls" or "mixo_spls".
 #'
 #' @examples
-#' pls_res <- mixomics_pls(merged_sample, y = "Injection_order", ncomp = 3)
-#' pls_opt <- mixomics_pls_optimize(merged_sample, 
+#' pls_res <- mixomics_pls(example_set, y = "Injection_order", ncomp = 3)
+#' pls_opt <- mixomics_pls_optimize(example_set, 
 #'   y = "Injection_order", ncomp = 3)
-#' pls_res <- mixomics_spls_optimize(merged_sample,
+#' pls_res <- mixomics_spls_optimize(example_set,
 #'   y = "Injection_order", ncomp = 3,
 #'   n_features <- c(1:10, 12, 15, 20)
 #' )
@@ -351,7 +351,7 @@ mixomics_spls_optimize <- function(object, y, ncomp, n_features =
 #' @return An object of class "mixo_plsda".
 #'
 #' @examples
-#' noqc <- drop_qcs(merged_sample)
+#' noqc <- drop_qcs(example_set)
 #' plsda_res <- mixomics_plsda(noqc, y = "Group", ncomp = 2)
 #' set.seed(38)
 #' plsda_opt <- mixomics_plsda_optimize(noqc, y = "Group", ncomp = 3)
@@ -540,7 +540,7 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
 #'
 #' @examples
 #' # PLS simple
-#' rf_model <- muvr_analysis(drop_qcs(merged_sample), 
+#' rf_model <- muvr_analysis(drop_qcs(example_set), 
 #'   y = "Group", nRep = 2, method = "PLS")
 #'
 #' # RF with covariate and repeated measures (not longitudinal)

@@ -20,7 +20,7 @@
 #' @return A ggplot object.
 #'
 #' @examples
-#' plot_dendrogram(merged_sample)
+#' plot_dendrogram(example_set)
 #'
 #' @seealso \code{\link{dist}} \code{\link{hclust}}
 #'
@@ -96,7 +96,7 @@ plot_dendrogram <- function(object, all_features = FALSE,
 #' consist of multiple parts and is harder to modify.
 #'
 #' @examples
-#' plot_sample_heatmap(merged_sample)
+#' plot_sample_heatmap(example_set)
 #'
 #' @seealso \code{\link{dist}} \code{\link{hclust}}
 #'

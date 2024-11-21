@@ -87,10 +87,10 @@ components and features}
 }
 }
 \examples{
-pls_res <- mixomics_pls(merged_sample, y = "Injection_order", ncomp = 3)
-pls_opt <- mixomics_pls_optimize(merged_sample, 
+pls_res <- mixomics_pls(example_set, y = "Injection_order", ncomp = 3)
+pls_opt <- mixomics_pls_optimize(example_set, 
   y = "Injection_order", ncomp = 3)
-pls_res <- mixomics_spls_optimize(merged_sample,
+pls_res <- mixomics_spls_optimize(example_set,
   y = "Injection_order", ncomp = 3,
   n_features <- c(1:10, 12, 15, 20)
 )

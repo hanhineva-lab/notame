@@ -32,7 +32,7 @@ test_that("Flagging works as expected", {
   single_change <- matrix(1111,
     nrow = 1, ncol = 1,
     dimnames = list(
-      "HILIC_pos_108_1065a2_6121",
+      "HILIC_neg_108_1065a2_6121",
       "Demo_1"
     )
   )

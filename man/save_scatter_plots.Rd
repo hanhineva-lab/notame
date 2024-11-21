@@ -76,14 +76,14 @@ A separate plot is drawn and saved for each feature.
 \dontshow{.old_wd <- setwd(tempdir())}
 # Against injection order, colored by group
 save_scatter_plots(
-  object = merged_sample[1:10],
+  object = example_set[1:10],
   x = "Injection_order",
   color = "Group",
   file_path = "./scatter_plots.pdf",
   format = "pdf"
 )
 # Plot one feature
-save_scatter_plots(merged_sample[5, ], save = FALSE, color = "Group")
+save_scatter_plots(example_set[1, ], save = FALSE, color = "Group")
 \dontshow{setwd(.old_wd)}
 
 }

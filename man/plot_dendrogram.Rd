@@ -49,7 +49,7 @@ Draws a dendrogram of a hierarchical clustering applied to the samples of an
 experiment.
 }
 \examples{
-plot_dendrogram(merged_sample)
+plot_dendrogram(example_set)
 
 }
 \seealso{

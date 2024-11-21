@@ -37,7 +37,7 @@ as "Low_group_detection". The detection rates for all the groups are
 recorded in \code{fData(object)}.
 }
 \examples{
-ex_set <- flag_detection(merged_sample)
+ex_set <- flag_detection(example_set)
 fData(ex_set)
 
 }

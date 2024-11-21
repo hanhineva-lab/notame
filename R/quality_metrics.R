@@ -39,7 +39,7 @@ quality <- function(object) {
 #' @return A MetaboSet object with quality metrics in fData.
 #' 
 #' @examples
-#' ex_set <- assess_quality(merged_sample)
+#' ex_set <- assess_quality(example_set)
 #' fData(ex_set)
 #'
 #' @export
@@ -114,10 +114,10 @@ assess_quality <- function(object) {
 #'   (RSD < 0.1 & RSD_r < 0.1 & D_ratio < 0.1)")
 #'
 #' @examples
-#' ex_set <- flag_quality(merged_sample)
+#' ex_set <- flag_quality(example_set)
 #' fData(ex_set)
 #' # Custom condition
-#' ex_set <- flag_quality(merged_sample, 
+#' ex_set <- flag_quality(example_set, 
 #'   condition = "RSD_r < 0.3 & D_ratio_r < 0.6")
 #' fData(ex_set)
 #'
@@ -172,7 +172,7 @@ flag_quality <- function(object, condition =
 #' @return A MetaboSet object with the features flagged.
 #'
 #' @examples
-#' ex_set <- flag_detection(merged_sample)
+#' ex_set <- flag_detection(example_set)
 #' fData(ex_set)
 #'
 #' @export
@@ -194,7 +194,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
                                              featureNames(object))] %>%
       tidyr::gather("Feature_ID", "Intensity", featureNames(object)) %>%
       dplyr::group_by(.data$Feature_ID, !!as.name(group)) %>%
-      dplyr::summarise(proportion_found = prop_found("Intensity")) %>%
+      dplyr::summarise(proportion_found = prop_found(.data$Intensity)) %>%
       tidyr::spread(!!as.name(group), "proportion_found")
     # Remove a possible QC column
     proportions$QC <- NULL
@@ -250,18 +250,20 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' @examples 
 #' # Make a blank sample which has one (first) feature exceeding the threshold
 #' ## Abundance matrix
-#' exprs <- matrix(c(155, rep(0, 19)), ncol = 1, nrow = 20, 
-#'                 dimnames = list(NULL, "Demo_31"))
+#' med <- median(exprs(example_set)[1, example_set$QC != "QC"])
+#' exprs <- matrix(c(med * 0.05 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
+#'                   dimnames = list(NULL, "Demo_51"))
 #' exprs <- cbind(exprs(example_set), exprs)
 #' ## Sample metadata
 #' pheno_data <- pData(example_set)[1, ]
-#' rownames(pheno_data) <- "Demo_31"
-#' pheno_data$Sample_ID <- "Demo_31"
-#' pheno_data$Injection_order <- 31
+#' rownames(pheno_data) <- "Demo_51"
+#' pheno_data$Sample_ID <- "Demo_51"
+#' pheno_data$Injection_order <- 51
 #' pheno_data[c("Subject_ID", "Group", "QC", "Time")] <- "Blank"
 #' pheno_data <- rbind(pData(example_set), pheno_data)
 #' ## Feature metadata
 #' feature_data <- fData(example_set)
+#'
 #' # Construct MetaboSet object with blank sample
 #' ex_set <- construct_metabosets(exprs = exprs, 
 #'                                pheno_data = pheno_data,
@@ -269,7 +271,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #'                                split_data = FALSE)
 #' # Flag contaminant(s)
 #' contaminants_flagged <- flag_contaminants(ex_set, blank_col = "QC", 
-#'                                          blank_label = "Blank")
+#'                                           blank_label = "Blank")
 #' 
 #' @export
 flag_contaminants <- function(object, blank_col, blank_label, 

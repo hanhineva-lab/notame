@@ -3,18 +3,42 @@
 \docType{data}
 \name{example_set}
 \alias{example_set}
+\alias{hilic_neg_sample}
+\alias{hilic_pos_sample}
+\alias{rp_neg_sample}
+\alias{rp_pos_sample}
 \title{Toy data set}
 \format{
-An object of class \code{MetaboSet} with 20 rows and 30 columns.
+An object of class \code{MetaboSet} with 80 rows and 50 columns.
+
+An object of class \code{MetaboSet} with 20 rows and 50 columns.
+
+An object of class \code{MetaboSet} with 20 rows and 50 columns.
+
+An object of class \code{MetaboSet} with 20 rows and 50 columns.
+
+An object of class \code{MetaboSet} with 20 rows and 50 columns.
 }
 \usage{
 example_set
+
+hilic_neg_sample
+
+hilic_pos_sample
+
+rp_neg_sample
+
+rp_pos_sample
 }
 \description{
-Contains imaginary data used in testing the package functions.
-For more realistic data, see \code{\link{merged_sample}}
-This dataset includes multiple observations from same subjects,
-sampled at two timepoints and divided to two groups.
-The dataset has 30 samples and 20 features.
+Contains imaginary data used in testing the package functions. The dataset 
+has 50 samples and 80 features. This dataset includes multiple observations 
+from same subjects, sampled at two timepoints in separate batches and 
+divided to two groups. The analytical modes are also available as separate 
+MetaboSet objects.
+Note that across batches, the features don't have different feature ID's, 
+m/z and retention time as would be the case with real-world data. In 
+essence, the example data reflects that features were aligned perfectly 
+between batches.
 }
 \keyword{datasets}

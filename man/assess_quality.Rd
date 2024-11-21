@@ -18,7 +18,7 @@ Assess features using the quality metrics defined in (Broadhurst
 \code{flag_quality}
 }
 \examples{
-ex_set <- assess_quality(merged_sample)
+ex_set <- assess_quality(example_set)
 fData(ex_set)
 
 }

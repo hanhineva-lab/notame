@@ -232,7 +232,7 @@ utils::globalVariables(c('i', '.'))
 #' @examples
 #'
 #' citations()
-#' plot_tsne(merged_sample)
+#' plot_tsne(example_set, perplexity = 10)
 #' # Rtsne added to citations
 #' citations()
 #'
@@ -317,7 +317,7 @@ finite_quantile <- function(x, ...) {
 #' @return A numeric, the proportion of non-missing values in a vector.
 #'
 #' @examples
-#' example_set <- mark_nas(example_set)
+#' example_set <- mark_nas(example_set, value = 0)
 #' prop_na(exprs(example_set))
 #' 
 #' @noRd

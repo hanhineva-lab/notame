@@ -113,7 +113,7 @@ test_that("Easy example data is read correctly", {
   dimnames(ad) <- list(rownames(fd), rownames(pd))
 
   # Read the file
-  read <- read_from_excel(system.file("extdata", "easy_data.xlsx", package = "notame"),
+  read <- read_from_excel(system.file("testdata", "easy_data.xlsx", package = "notame"),
     sheet = 1,
     corner_row = 4, corner_column = "D",
     name = "easy", id_prefix = "TEST_"
@@ -172,7 +172,7 @@ test_that("Data is split correctly", {
 
 
   # Read the file
-  read <- read_from_excel(system.file("extdata", "split_data.xlsx", package = "notame"),
+  read <- read_from_excel(system.file("testdata", "split_data.xlsx", package = "notame"),
     sheet = 1,
     corner_row = 4, corner_column = "F",
     split_by = c("Column", "Mode"), id_prefix = "TEST_"
@@ -187,7 +187,7 @@ test_that("Data is split correctly", {
 test_that("Splitting data works as expected", {
   split_by <- c("Ion mode", "gswregh") # Wrong column name
   expect_error(read_from_excel(
-    system.file("extdata", "sample_data_whole.xlsx",
+    system.file("testdata", "sample_data_whole.xlsx",
       package = "notame"
     ),
     corner_row = 4,
@@ -197,7 +197,7 @@ test_that("Splitting data works as expected", {
 })
 
 test_that("Creating dummy injection order works as expected", {
-  names <- list("HILIC_neg", "HILIC_pos", "RP_neg", "RP_pos")
+  names <- list("hilic_neg", "hilic_pos", "rp_neg", "rp_pos")
   modes <- list()
   for (name in names) {
     file <- system.file("extdata", paste0(name, "_sample.xlsx"), package = "notame")
@@ -205,13 +205,13 @@ test_that("Creating dummy injection order works as expected", {
     modes[name] <- construct_metabosets(mode$exprs, mode$pheno_data, mode$feature_data)
   }
   # Modify data
-  modes$HILIC_neg$Injection_order <- modes$HILIC_neg$Injection_order + 1
-  inj_ord_rn <- modes$RP_neg$Injection_order + 2
-  modes$RP_neg$Injection_order <- inj_ord_rn
-  inj_ord_rp <- modes$RP_pos$Injection_order[5:221] + 5
-  modes$RP_pos$Injection_order[5:221] <- inj_ord_rp
-  sampleNames(modes$HILIC_neg)[2] <- "ID_666"
-  sampleNames(modes$RP_pos)[22] <- "ID_999"
+  modes$hilic_neg$Injection_order <- modes$hilic_neg$Injection_order + 1
+  inj_ord_rn <- modes$rp_neg$Injection_order + 2
+  modes$rp_neg$Injection_order <- inj_ord_rn
+  inj_ord_rp <- modes$rp_pos$Injection_order[5:50] + 5
+  modes$rp_pos$Injection_order[5:50] <- inj_ord_rp
+  sampleNames(modes$hilic_neg)[2] <- "ID_666"
+  sampleNames(modes$rp_pos)[22] <- "ID_999"
 
   expect_warning(merged <- merge_metabosets(modes),
     regexp = "Sample IDs are not identical|Unequal amount of samples"
@@ -220,19 +220,19 @@ test_that("Creating dummy injection order works as expected", {
   expect_equal(merged$Injection_order, -seq_along(merged$Sample_ID))
   # Original IOs
   expect_equal(
-    sort(as.numeric(stats::na.omit(merged$HILIC_neg_Injection_order))),
-    modes$HILIC_neg$Injection_order
+    sort(as.numeric(stats::na.omit(merged$hilic_neg_Injection_order))),
+    modes$hilic_neg$Injection_order
   )
   expect_equal(
-    sort(as.numeric(stats::na.omit(merged$HILIC_pos_Injection_order))),
-    modes$HILIC_pos$Injection_order
+    sort(as.numeric(stats::na.omit(merged$hilic_pos_Injection_order))),
+    modes$hilic_pos$Injection_order
   )
   expect_equal(
-    sort(as.numeric(stats::na.omit(merged$RP_neg_Injection_order))),
-    modes$RP_neg$Injection_order
+    sort(as.numeric(stats::na.omit(merged$rp_neg_Injection_order))),
+    modes$rp_neg$Injection_order
   )
   expect_equal(
-    sort(as.numeric(stats::na.omit(merged$RP_pos_Injection_order))),
-    modes$RP_pos$Injection_order
+    sort(as.numeric(stats::na.omit(merged$rp_pos_Injection_order))),
+    modes$rp_pos$Injection_order
   )
 })
