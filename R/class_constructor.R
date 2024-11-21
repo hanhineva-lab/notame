@@ -564,13 +564,13 @@ write_to_excel <- function(object, file, ...) {
   # Bottom part consists of (from left to right):
   # - feature data with results
   # - abundance values
-  bottom <- cbind(fData(object), exprs(object))
+  bottom <- as.data.frame(cbind(rowData(object), assay(object)))
   # All columns must be characters to allow combination with the top block
   bottom <- bottom %>%
     dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) %>%
     rbind(colnames(.), .)
   # Top block holds the sample information
-  pd <- pData(object)
+  pd <- as.data.frame(colData(object))
   datafile_cols <- colnames(pd)[grepl("Datafile", colnames(pd))]
   if (length(datafile_cols)) {
     last_datafile <- datafile_cols[length(datafile_cols)]
@@ -582,11 +582,11 @@ write_to_excel <- function(object, file, ...) {
   # NA blocks to fill the empty space
   empty1 <- matrix(NA_character_,
                    nrow = nrow(top),
-                   ncol = ncol(fData(object)) - 1)
+                   ncol = ncol(rowData(object)) - 1)
   top <- cbind(empty1, top)
   colnames(top) <- colnames(bottom)
   # Replace exprs column names with the last column (now row) of sample info
-  replace_idx <- (ncol(fData(object)) + 1):ncol(bottom)
+  replace_idx <- (ncol(rowData(object)) + 1):ncol(bottom)
   bottom[1, replace_idx] <- top[nrow(top), replace_idx]
   # All combined
   big <- rbind(top[seq_len(nrow(top) - 1), ], bottom)
@@ -996,11 +996,11 @@ check_object <- function(object, log_messages = FALSE, check_limits = TRUE,
   .check_feature_data(rowData(object), check_limits = check_limits, 
                      mz_limits = mz_limits, rt_limits = rt_limits,
                      log_messages = log_messages)
-  object
 }
 
-# You can use the same functions as in check_object, but instead return possibly modified versions
-fix_object <- function(object, id_prefix, id_column = NULL, split_by, name, clean = TRUE, split_data = FALSE, log_messages = TRUE) {
+
+fix_object <- function(object, id_prefix, id_column = NULL, split_by, name,
+                       clean = TRUE, split_data = FALSE, log_messages = TRUE) {
   object <- as(object, "SummarizedExperiment")
   pheno_data <- fix_pheno_data(colData(object), id_prefix = "",
                                id_column = id_column, clean = clean, log_messages = log_messages)
@@ -1082,7 +1082,8 @@ fix_exprs <- function(exprs_, log_messages = FALSE) {
   exprs_
 }
 
-fix_feature_data <- function(name = NULL, split_by = NULL, feature_data, clean = TRUE, log_messages = FALSE) {
+fix_feature_data <- function(name = NULL, split_by = NULL, feature_data, 
+                             clean = TRUE, log_messages = FALSE) {
   if (!"Flag" %in% colnames(feature_data)) {
     message("Initializing with unflagged features.")
     feature_data$Flag <- NA
@@ -1142,7 +1143,7 @@ fix_feature_data <- function(name = NULL, split_by = NULL, feature_data, clean =
 #' @export
 setMethod("combined_data", c(object = "SummarizedExperiment"), 
   function(object) {
-    cbind(colData(object), t(assay(object)))
+    cbind(as.data.frame(colData(object)), t(assay(object)))
   }
 )
 
@@ -1162,7 +1163,6 @@ setMethod("flag<-", "SummarizedExperiment",
   }
 )
 
-
 #' Join new columns to feature data
 #'
 #' Join a new data frame of information to feature data of a MetaboSet object.
@@ -1175,11 +1175,11 @@ setMethod("flag<-", "SummarizedExperiment",
 #'
 #' @examples
 #' new_info <- data.frame(
-#'   Feature_ID = featureNames(example_set),
+#'   Feature_ID = rownames(example_set),
 #'   Feature_number = seq_len(nrow(example_set))
 #' )
-#' with_new_info <- join_fData(example_set, new_info)
-#' colnames(fData(with_new_info))
+#' with_new_info <- join_rowData(example_set, new_info)
+#' colnames(rowData(with_new_info))
 #'
 #' @return A MetaboSet object with the new information added to fData(object).
 #'
@@ -1192,8 +1192,8 @@ setGeneric("join_rowData", signature = c("object", "dframe"),
 #' @export
 setMethod("join_rowData", c("SummarizedExperiment", "data.frame"),
   function(object, dframe) {
-    fData(object) <- dplyr::left_join(rowData(object), dframe, 
-                                      by = "Feature_ID")
+    rowData(object) <- merge(rowData(object), dframe,
+                             by = "Feature_ID", sort = FALSE)
     rownames(rowData(object)) <- rowData(object)$Feature_ID
     if (validObject(object)) {
       return(object)
@@ -1210,10 +1210,10 @@ setMethod("join_rowData", c("SummarizedExperiment", "data.frame"),
 #'
 #' @examples
 #' new_info <- data.frame(
-#'   Sample_ID = sampleNames(example_set),
+#'   Sample_ID = colnames(example_set),
 #'   BMI = stats::runif(ncol(example_set), 22, 26)
 #' )
-#' with_new_info <- join_pData(example_set, new_info)
+#' with_new_info <- join_colData(example_set, new_info)
 #' colnames(pData(with_new_info))
 #'
 #' @return A MetaboSet object with the new information added to pData(object).
@@ -1227,7 +1227,7 @@ setGeneric("join_colData", signature = c("object", "dframe"),
 #' @export
 setMethod("join_colData", c("SummarizedExperiment", "data.frame"),
   function(object, dframe) {
-    pData(object) <- dplyr::left_join(colData(object), dframe)
+    colData(object) <- merge(colData(object), dframe, by = "Sample_ID")
     rownames(colData(object)) <- colData(object)$Sample_ID
     if (validObject(object)) {
       return(object)
@@ -1237,15 +1237,15 @@ setMethod("join_colData", c("SummarizedExperiment", "data.frame"),
 
 # FeatureNames also changing Feature_ID column in featureData
 setMethod("featureNames<-",
-  signature = signature(object = "MetaboSet", value = "ANY"),
+  signature = signature(object = "SummarizedExperiment", value = "ANY"),
   function(object, value) {
-    fd <- featureData(object)
-    featureNames(fd) <- value
-    ad <- assayData(object)
-    featureNames(ad) <- value
-    object@featureData <- fd
-    object@assayData <- ad
-    fData(object)$Feature_ID <- value
+    fd <- rowData(object)
+    rownames(fd) <- value
+    ad <- assay(object)
+    rownames(ad) <- value
+    rowData(object) <- fd
+    assay(object) <- ad
+    rowData(object)$Feature_ID <- value
     if (validObject(object)) {
       return(object)
     }
@@ -1254,7 +1254,7 @@ setMethod("featureNames<-",
 
 
 setMethod("sampleNames<-",
-  signature = signature(object = "MetaboSet", value = "ANY"),
+  signature = signature(object = "SummarizedExperiment", value = "ANY"),
   function(object, value) {
     pd <- phenoData(object)
     sampleNames(pd) <- value

@@ -12,18 +12,19 @@
 #' @export
 quality <- function(object) {
   if (!all(c("RSD", "RSD_r", "D_ratio", "D_ratio_r") %in%
-      colnames(fData(object)))) {
+      colnames(rowData(object)))) {
     return(NULL)
   }
-  fData(object)[c("Feature_ID", "RSD", "RSD_r", "D_ratio", "D_ratio_r")]
+  as.data.frame(
+    rowData(object)[c("Feature_ID", "RSD", "RSD_r", "D_ratio", "D_ratio_r")])
 }
 
 .erase_quality <- function(object) {
   if (!all(c("RSD", "RSD_r", "D_ratio", "D_ratio_r") %in%
-      colnames(fData(object)))) {
+      colnames(rowData(object)))) {
     return(NULL)
   }
-  fData(object)[c("RSD", "RSD_r", "D_ratio", "D_ratio_r")] <- NULL
+  rowData(object)[c("RSD", "RSD_r", "D_ratio", "D_ratio_r")] <- NULL
   object
 }
 
@@ -49,8 +50,8 @@ assess_quality <- function(object) {
     object <- .erase_quality(object)
   }
 
-  qc_data <- exprs(object)[, object$QC == "QC"]
-  sample_data <- exprs(object)[, object$QC != "QC"]
+  qc_data <- assay(object)[, object$QC == "QC"]
+  sample_data <- assay(object)[, object$QC != "QC"]
   features <- rownames(sample_data)
   
   quality_metrics <- BiocParallel::bplapply(features, function(feature) {
@@ -67,7 +68,7 @@ assess_quality <- function(object) {
   })
       
   quality_metrics <- do.call(rbind, quality_metrics)
-  object <- join_fData(object, quality_metrics)
+  object <- join_rowData(object, quality_metrics)
 }
   
 #' Flag low-quality features
@@ -134,17 +135,18 @@ flag_quality <- function(object, condition =
     "assays applied in untargeted clinical metabolomic studies.",
     "Metabolomics : Official journal of the Metabolomic Society",
     "vol. 14,6 (2018): 72. doi:10.1007/s11306-018-1367-3"))
-  good <- paste0("fData(object) %>% dplyr::filter(", condition, ")") %>%
+  good <- paste0("as.data.frame(rowData(object)) %>% 
+                 dplyr::filter(", condition, ")") %>%
     parse(text = .) %>%
     eval()
   good <- good$Feature_ID
 
-  idx <- is.na(flag(object)) & !fData(object)$Feature_ID %in% good
+  idx <- is.na(flag(object)) & !rowData(object)$Feature_ID %in% good
   flag(object)[idx] <- "Low_quality"
 
   percentage <- scales::percent(sum(flag(object) == "Low_quality", 
                                     na.rm =TRUE) 
-                                / nrow(fData(object)))
+                                / nrow(rowData(object)))
   log_text(paste0("\n", percentage, " of features flagged for low quality"))
 
   object
@@ -172,27 +174,28 @@ flag_quality <- function(object, condition =
 #' @return A MetaboSet object with the features flagged.
 #'
 #' @examples
-#' ex_set <- flag_detection(example_set)
-#' fData(ex_set)
+#' ex_set <- mark_nas(example_set, value = 0)
+#' ex_set <- flag_detection(ex_set, group = "Group")
+#' rowData(ex_set)
 #'
 #' @export
 flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
                            group = group_col(object)) {
-  found_qc <- Biobase::esApply(object[, object$QC == "QC"], 1, prop_found)
+  found_qc <- apply(assay(object[, object$QC == "QC"]), 1, prop_found)
   bad_qc <- names(which(found_qc < qc_limit))
 
   found_qc_df <- data.frame(Feature_ID = names(found_qc),
                             Detection_rate_QC = found_qc,
                             stringsAsFactors = FALSE)
 
-  idx <- is.na(flag(object)) & fData(object)$Feature_ID %in% bad_qc
+  idx <- is.na(flag(object)) & rowData(object)$Feature_ID %in% bad_qc
   flag(object)[idx] <- "Low_qc_detection"
 
   # Compute proportions found in each study group
   if (!is.na(group)) {
     proportions <- combined_data(object)[, c("Sample_ID", group,
-                                             featureNames(object))] %>%
-      tidyr::gather("Feature_ID", "Intensity", featureNames(object)) %>%
+                                             rownames(object))] %>%
+      tidyr::gather("Feature_ID", "Intensity", rownames(object)) %>%
       dplyr::group_by(.data$Feature_ID, !!as.name(group)) %>%
       dplyr::summarise(proportion_found = prop_found(.data$Intensity)) %>%
       tidyr::spread(!!as.name(group), "proportion_found")
@@ -205,7 +208,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
       any(x >= group_limit)
     })
 
-    idx <- is.na(flag(object)) & (!fData(object)$Feature_ID %in% 
+    idx <- is.na(flag(object)) & (!rowData(object)$Feature_ID %in% 
       proportions$Feature_ID[proportions$good])
     flag(object)[idx] <- "Low_group_detection"
     # Add detection rates to feature data
@@ -218,11 +221,11 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
   percentage <- scales::percent(sum(flag(object) %in% c("Low_qc_detection",
                                                         "Low_group_detection"), 
                                     na.rm = TRUE) / 
-                                nrow(fData(object)))
+                                nrow(rowData(object)))
   log_text(paste0("\n", percentage, 
                   " of features flagged for low detection rate"))
 
-  object <- join_fData(object, proportions)
+  object <- join_rowData(object, proportions)
 
   object
 }
@@ -250,25 +253,24 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' @examples 
 #' # Make a blank sample which has one (first) feature exceeding the threshold
 #' ## Abundance matrix
-#' med <- median(exprs(example_set)[1, example_set$QC != "QC"])
-#' exprs <- matrix(c(med * 0.05 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
+#' med <- median(assay(example_set)[1, example_set$QC != "QC"])
+#' assay <- matrix(c(med * 0.05 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
 #'                   dimnames = list(NULL, "Demo_51"))
-#' exprs <- cbind(exprs(example_set), exprs)
+#' assay <- cbind(assay(example_set), assay)
 #' ## Sample metadata
-#' pheno_data <- pData(example_set)[1, ]
+#' pheno_data <- colData(example_set)[1, ]
 #' rownames(pheno_data) <- "Demo_51"
 #' pheno_data$Sample_ID <- "Demo_51"
 #' pheno_data$Injection_order <- 51
 #' pheno_data[c("Subject_ID", "Group", "QC", "Time")] <- "Blank"
-#' pheno_data <- rbind(pData(example_set), pheno_data)
+#' pheno_data <- rbind(colData(example_set), pheno_data)
 #' ## Feature metadata
-#' feature_data <- fData(example_set)
+#' feature_data <- rowData(example_set)
 #'
-#' # Construct MetaboSet object with blank sample
-#' ex_set <- construct_metabosets(exprs = exprs, 
-#'                                pheno_data = pheno_data,
-#'                                feature_data = feature_data,
-#'                                split_data = FALSE)
+#' # Construct SummarizedExperiment object with blank sample
+#' ex_set <- SummarizedExperiment(assays = assay, 
+#'                                colData = pheno_data,
+#'                                rowData = feature_data)
 #' # Flag contaminant(s)
 #' contaminants_flagged <- flag_contaminants(ex_set, blank_col = "QC", 
 #'                                           blank_label = "Blank")
@@ -276,12 +278,12 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' @export
 flag_contaminants <- function(object, blank_col, blank_label, 
                               flag_thresh = 0.05, flag_label = "Contaminant") {
-  blanks <- object[, pData(object)[, blank_col] == blank_label]
+  blanks <- object[, colData(object)[, blank_col] == blank_label]
   samples <- object[, object$QC != "QC" &
-                    pData(object)[, blank_col] != blank_label]
+                    colData(object)[, blank_col] != blank_label]
 
-  blank_median <- apply(exprs(blanks), 1, finite_median)
-  sample_median <- apply(exprs(samples), 1, finite_median)
+  blank_median <- apply(assay(blanks), 1, finite_median)
+  sample_median <- apply(assay(samples), 1, finite_median)
   blank_flag <- blank_median / sample_median > flag_thresh
 
   idx <- is.na(flag(object)) & !is.na(blank_flag)
@@ -292,10 +294,10 @@ flag_contaminants <- function(object, blank_col, blank_label,
                                 nrow(object))
   log_text(paste0("\n", percentage, " of features flagged as contaminants"))
 
-  blank_ratio <- data.frame(Feature_ID = featureNames(object), 
+  blank_ratio <- data.frame(Feature_ID = rownames(object), 
                             Blank_ratio = blank_median / sample_median,
                             stringsAsFactors = FALSE)
-  object <- join_fData(object, blank_ratio)
+  object <- join_rowData(object, blank_ratio)
 
   object
 }

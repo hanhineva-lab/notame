@@ -8,7 +8,7 @@
   }
   .add_citation("PCA was performed using pcaMethods package:",
                 citation("pcaMethods"))
-  res_pca <- pcaMethods::pca(object, nPcs = max(pcs), scale = scale, 
+  res_pca <- pcaMethods::pca(t(assay(object)), nPcs = max(pcs), scale = scale, 
                              center = center, ...)
   pca_scores <- as.data.frame(pcaMethods::scores(res_pca))[, pcs]
   r2 <- summary(res_pca)["R2", pcs]
@@ -28,17 +28,17 @@
          " Please install it.", call. = FALSE)
   }
   .add_citation("Rtsne package was used for t-SNE figures:", citation("Rtsne"))
-  prepd <- pcaMethods::prep(object, center = center, scale = scale)
+  prepd <- pcaMethods::prep(t(assay(object)), center = center, scale = scale)
 
-  if (sum(is.na(exprs(prepd))) > 0) {
-    res_pca <- pcaMethods::pca(object, method = pca_method, 
+  if (sum(is.na(prepd)) > 0) {
+    res_pca <- pcaMethods::pca(t(assay(object)), method = pca_method, 
                                nPcs = min(nrow(object), ncol(object), 50),
                                scale = "none", center = FALSE)
     pca_scores <- pcaMethods::scores(res_pca)
     res_tsne <- Rtsne::Rtsne(pca_scores, perplexity = perplexity,
                              pca = FALSE, ...)
   } else {
-    res_tsne <- Rtsne::Rtsne(t(exprs(prepd)), perplexity = perplexity, ...)
+    res_tsne <- Rtsne::Rtsne(prepd, perplexity = perplexity, ...)
   }
   data.frame(res_tsne$Y)
 }
@@ -99,9 +99,9 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
   pca_results <- .pca_helper(object, pcs, center, scale, ...)
   pca_scores <- pca_results$pca_scores
   pc_names <- colnames(pca_scores)
-  pca_scores[color] <- pData(object)[, color]
-  pca_scores[shape] <- pData(object)[, shape]
-  pca_scores[label] <- pData(object)[, label]
+  pca_scores[color] <- colData(object)[, color]
+  pca_scores[shape] <- colData(object)[, shape]
+  pca_scores[label] <- colData(object)[, label]
 
   .scatter_plot(pca_scores, x = pc_names[1], y = pc_names[2], 
                 xlab = pca_results$labels[1], ylab = pca_results$labels[2],
@@ -170,9 +170,9 @@ plot_tsne <- function(object, all_features = FALSE, center = TRUE,
   tsne_scores <- .t_sne_helper(object, center, scale, 
                                perplexity, pca_method, ...)
   # Add columns for plotting
-  tsne_scores[color] <- pData(object)[, color]
-  tsne_scores[shape] <- pData(object)[, shape]
-  tsne_scores[label] <- pData(object)[, label]
+  tsne_scores[color] <- colData(object)[, color]
+  tsne_scores[shape] <- colData(object)[, shape]
+  tsne_scores[label] <- colData(object)[, label]
 
   .scatter_plot(tsne_scores, x = "X1", y = "X2", color = color, shape = shape,
                 label = label, density = density, title = title, 
@@ -319,8 +319,8 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
   
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  pca_res <- pcaMethods::pca(object, nPcs = max(pcs), center = center, 
-                             scale = scale, ...)
+  pca_res <- pcaMethods::pca(t(assay(object)), nPcs = max(pcs), 
+                             center = center, scale = scale, ...)
 
   loads <- as.data.frame(pcaMethods::loadings(pca_res))[, pcs]
   pc_names <- colnames(loads)
@@ -389,7 +389,7 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
   pca_results <- .pca_helper(object, pcs, center, scale, ...)
   pca_scores <- pca_results$pca_scores
   pc_names <- colnames(pca_scores)
-  pca_scores[fill] <- pData(object)[, fill]
+  pca_scores[fill] <- colData(object)[, fill]
 
   .hexbin_plot(data = pca_scores, x = pc_names[1], y = pc_names[2], 
                xlab = pca_results$labels[1], ylab = pca_results$labels[2],
@@ -445,7 +445,7 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
   tsne_scores <- .t_sne_helper(object, center, scale,
                                perplexity, pca_method, ...)
   # Add columns for plotting
-  tsne_scores[fill] <- pData(object)[, fill]
+  tsne_scores[fill] <- colData(object)[, fill]
 
   .hexbin_plot(tsne_scores, x = "X1", y = "X2", fill = fill, 
                summary_fun = summary_fun, bins = bins,
@@ -517,7 +517,8 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
 #' @return A ggplot object.
 #'
 #' @examples
-#' plot_pca_arrows(drop_qcs(example_set))
+#' plot_pca_arrows(drop_qcs(example_set), color = "Group", time = "Time",
+#'   subject = "Subject_ID")
 #' # If the sample size is large, plot groups separately
 #' plot_pca_arrows(drop_qcs(example_set)) +
 #'   facet_wrap(~Group)
@@ -539,9 +540,9 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
   pca_results <- .pca_helper(object, pcs, center, scale, ...)
   pca_scores <- pca_results$pca_scores
   pc_names <- colnames(pca_scores)
-  pca_scores[color] <- pData(object)[, color]
-  pca_scores[time] <- pData(object)[, time]
-  pca_scores[subject] <- pData(object)[, subject]
+  pca_scores[color] <- colData(object)[, color]
+  pca_scores[time] <- colData(object)[, time]
+  pca_scores[subject] <- colData(object)[, subject]
 
   .arrow_plot(data = pca_scores, x = pc_names[1], y = pc_names[2], 
               color = color, time = time, subject = subject,
@@ -550,8 +551,6 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
               xlab = pca_results$labels[1], ylab = pca_results$labels[2],
               text_base_size = text_base_size, line_width = line_width)
 }
-
-
 
 #' t-SNE plot with arrows
 #'
@@ -587,10 +586,12 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' consist of multiple parts and is harder to modify.
 #'
 #' @examples
-#' plot_tsne_arrows(drop_qcs(example_set), perplexity = 10)
+#' plot_tsne_arrows(drop_qcs(example_set), perplexity = 10, color = "Group", 
+#'   time = "Time", subject = "Subject_ID")
 #' # If the sample size is large, plot groups separately
-#' plot_tsne_arrows(drop_qcs(example_set), perplexity = 10) +
-#'   facet_wrap(~Group)
+#' plot_tsne_arrows(drop_qcs(example_set), perplexity = 10, color = "Group", 
+#'   time = "Time", subject = "Subject_ID") +
+#'     facet_wrap(~Group)
 #'
 #' @seealso \code{\link[Rtsne]{Rtsne}}
 #'
@@ -598,9 +599,9 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
 plot_tsne_arrows <- function(object, all_features = FALSE, center = TRUE, 
                              scale = "uv", perplexity = 30, 
                              pca_method = "nipals",
-                             color = group_col(object),
-                             time = time_col(object), 
-                             subject = subject_col(object),
+                             color = NULL,
+                             time = NULL, 
+                             subject = NULL,
                              alpha = 0.6, arrow_style = arrow(), 
                              title = "t-SNE changes",
                              subtitle = paste("Perplexity:", perplexity),
@@ -611,9 +612,9 @@ plot_tsne_arrows <- function(object, all_features = FALSE, center = TRUE,
 
   tsne_scores <- .t_sne_helper(object, center, scale, 
                                perplexity, pca_method, ...)
-  tsne_scores[color] <- pData(object)[, color]
-  tsne_scores[time] <- pData(object)[, time]
-  tsne_scores[subject] <- pData(object)[, subject]
+  tsne_scores[color] <- colData(object)[, color]
+  tsne_scores[time] <- colData(object)[, time]
+  tsne_scores[subject] <- colData(object)[, subject]
 
   .arrow_plot(data = tsne_scores, x = "X1", y = "X2", color = color,
               time = time, subject = subject, alpha = alpha, 
@@ -686,7 +687,7 @@ setGeneric("volcano_plot", signature = "object",
 
 #' @rdname volcano_plot
 #' @export
-setMethod("volcano_plot", c(object = "MetaboSet"),
+setMethod("volcano_plot", c(object = "SummarizedExperiment"),
   function(object, x, p, p_fdr = NULL, color = NULL,
            p_breaks = c(0.05, 0.01, 0.001, 1e-4), fdr_limit = 0.05,
            log2_x = FALSE, center_x_axis = TRUE, x_lim = NULL, 
@@ -694,7 +695,7 @@ setMethod("volcano_plot", c(object = "MetaboSet"),
            color_scale = getOption("notame.color_scale_con"),
            title = "Volcano plot", subtitle = NULL,
            text_base_size = 14, label_text_size = 4, ...) {
-    .volcano_plotter(fData(object), x, p, p_fdr, color, p_breaks, fdr_limit,
+    .volcano_plotter(rowData(object), x, p, p_fdr, color, p_breaks, fdr_limit,
                      log2_x, center_x_axis, x_lim, label, label_limit,
                      color_scale, title, subtitle,
                      text_base_size, label_text_size, ...)
@@ -837,17 +838,17 @@ setMethod("volcano_plot", c(object = "data.frame"),
 #' # naturally, this looks messy as there are not enough p-values
 #' lm_results <- perform_lm(drop_qcs(example_set), 
 #'   formula_char = "Feature ~ Group")
-#' lm_data <- dplyr::left_join(fData(example_set), lm_results)
+#' lm_data <- dplyr::left_join(as.data.frame(rowData(example_set)), lm_results)
 #' # Traditional Manhattan plot from data frame
 #' manhattan_plot(lm_data,
-#'   x = "Mass",
+#'   x = "Average_Mz",
 #'   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
 #'   fdr_limit = 0.1
 #' )
 #' # Directed Manhattan plot from MetaboSet
-#' with_results <- join_fData(example_set, lm_results)
+#' with_results <- join_rowData(example_set, lm_results)
 #' manhattan_plot(with_results,
-#'   x = "Mass", effect = "GroupB_Estimate",
+#'   x = "Average_Mz", effect = "GroupB_Estimate",
 #'   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
 #'   fdr_limit = 0.1
 #' )
@@ -865,14 +866,14 @@ setGeneric("manhattan_plot", signature = "object",
 
 #' @rdname manhattan_plot
 #' @export
-setMethod("manhattan_plot", c(object = "MetaboSet"),
+setMethod("manhattan_plot", c(object = "SummarizedExperiment"),
   function(object, x, p, effect = NULL, p_fdr = NULL, color = NULL,
            p_breaks = c(0.05, 0.01, 0.001, 1e-4), fdr_limit = 0.05,
            x_lim = NULL, y_lim = NULL,
            color_scale = getOption("notame.color_scale_con"),
            title = "Manhattan plot", subtitle = NULL, ...) {
-    .manhattan_plotter(fData(object), x, p, effect, p_fdr, color, p_breaks,
-                       fdr_limit, x_lim, y_lim, color_scale, 
+    .manhattan_plotter(as.data.frame(rowData(object)), x, p, effect, p_fdr, 
+                       color, p_breaks, fdr_limit, x_lim, y_lim, color_scale, 
                        title, subtitle, ...)
   }
 )
@@ -995,7 +996,7 @@ setMethod("manhattan_plot", c(object = "data.frame"),
 #' @examples
 #' # Compute results from a linear model
 #' lm_results <- perform_lm(example_set, formula_char = "Feature ~ Group")
-#' with_results <- join_fData(example_set, lm_results)
+#' with_results <- join_rowData(example_set, lm_results)
 #'
 #' # Plot from the MetaboSet object
 #' # automatically facet by analytical mode in variable Split
@@ -1015,13 +1016,13 @@ setGeneric("mz_rt_plot", signature = "object",
 
 #' @rdname mz_rt_plot
 #' @export
-setMethod("mz_rt_plot", c(object = "MetaboSet"),
+setMethod("mz_rt_plot", c(object = "SummarizedExperiment"),
   function(object, p_col = NULL, p_limit = NULL, mz_col = NULL, rt_col = NULL,
            color = NULL, title = "m/z vs retention time", subtitle = NULL,
            color_scale = getOption("notame.color_scale_con"), 
            all_features = FALSE) {
-    .mz_rt_plotter(fData(drop_flagged(object, all_features)), p_col, p_limit,
-                   mz_col, rt_col, color, title, subtitle, 
+    .mz_rt_plotter(as.data.frame(rowData(drop_flagged(object, all_features))),
+                   p_col, p_limit, mz_col, rt_col, color, title, subtitle, 
                    color_scale, all_features)
   }
 )

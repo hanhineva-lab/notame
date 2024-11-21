@@ -145,38 +145,30 @@ colnames(assay_data) <- rownames(pheno_data)
 feature_data <- bind_rows(feature_data_modes)
   
 # Construct objects, with all modes and separately
-example_set <- construct_metabosets(
-  exprs = assay_data, pheno_data = pheno_data, feature_data = feature_data,
-  group_col = "Group", time_col = "Time", subject_col = "Subject_ID",
-  split_data = FALSE)
+example_set <- SummarizedExperiment(assays = assay_data, 
+                                    colData = pheno_data,                     
+                                    rowData = feature_data)
+                                    
 
-hilic_neg_sample <- construct_metabosets(
-  exprs = assay_data[feature_data$Split == "HILIC_neg", ],
-  pheno_data = pheno_data, 
-  feature_data = feature_data[feature_data$Split == "HILIC_neg", ],
-  group_col = "Group", time_col = "Time", subject_col = "Subject_ID",
-  split_data = FALSE)
+hilic_neg_sample <- SummarizedExperiment(
+  assays = assay_data[feature_data$Split == "HILIC_neg", ],
+  colData = pheno_data, 
+  rowData = feature_data[feature_data$Split == "HILIC_neg", ])
 
-hilic_pos_sample <- construct_metabosets(
-  exprs = assay_data[feature_data$Split == "HILIC_pos", ],
-  pheno_data = pheno_data, 
-  feature_data = feature_data[feature_data$Split == "HILIC_pos", ],
-  group_col = "Group", time_col = "Time", subject_col = "Subject_ID", 
-  split_data = FALSE)
+hilic_pos_sample <- SummarizedExperiment(
+  assays = assay_data[feature_data$Split == "HILIC_pos", ],
+  colData = pheno_data, 
+  rowData = feature_data[feature_data$Split == "HILIC_pos", ])
   
-rp_neg_sample <- construct_metabosets(
-  exprs = assay_data[feature_data$Split == "RP_neg", ],
-  pheno_data = pheno_data, 
-  feature_data = feature_data[feature_data$Split == "RP_neg", ],
-  group_col = "Group", time_col = "Time", subject_col = "Subject_ID",
-  split_data = FALSE)
+rp_neg_sample <- SummarizedExperiment(
+  assays = assay_data[feature_data$Split == "RP_neg", ],
+  colData = pheno_data, 
+  rowData = feature_data[feature_data$Split == "RP_neg", ])
   
-rp_pos_sample <- construct_metabosets(
-  exprs = assay_data[feature_data$Split == "RP_pos", ],
-  pheno_data = pheno_data, 
-  feature_data = feature_data[feature_data$Split == "RP_pos", ],
-  group_col = "Group", time_col = "Time", subject_col = "Subject_ID",
-  split_data = FALSE)
+rp_pos_sample <- SummarizedExperiment(
+  assays = assay_data[feature_data$Split == "RP_pos", ],
+  colData = pheno_data, 
+  rowData = feature_data[feature_data$Split == "RP_pos", ])
 
 usethis::use_data(example_set, overwrite = TRUE)
 usethis::use_data(hilic_neg_sample, overwrite = TRUE)

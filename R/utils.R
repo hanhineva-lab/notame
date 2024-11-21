@@ -231,7 +231,7 @@ utils::globalVariables(c('i', '.'))
 #' @examples
 #'
 #' citations()
-#' plot_tsne(example_set, perplexity = 10)
+#' plot_tsne(example_set, perplexity = 10, group = "Group", color = "Group")
 #' # Rtsne added to citations
 #' citations()
 #'

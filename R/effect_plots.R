@@ -40,8 +40,8 @@
     if (i %% 500 == 0) {
       message("Iteration ", i, "/", nrow(object))
     }
-    fname <- featureNames(object)[i]
-    name <- fData(object)[i, title]
+    fname <- rownames(object)[i]
+    name <- rowData(object)[i, title]
 
     p <- plot_fun(object, fname)
 
@@ -53,7 +53,7 @@
       }
       save_plot(p, file, ...)
     } else {
-      p
+      plot(p)
     }
   }
 
@@ -79,7 +79,7 @@
     if (i %% 500 == 0) {
       message("Iteration ", i, "/", nrow(object))
     }
-    fname <- featureNames(object)[i]
+    fname <- rownames(object)[i]
     p <- plot_fun(object, fname)
     plot_list[[i]] <- p
   }
@@ -125,27 +125,27 @@
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
-#' save_subject_line_plots(drop_qcs(example_set)[1:10],
-#'   file_path = "./subject_line_plots.pdf",
+#' save_subject_line_plots(drop_qcs(example_set)[1:10], x = "Time", 
+#'   id = "Subject_ID", file_path = "./subject_line_plots.pdf",
 #'   format = "pdf"
 #' )
 #'
 #' # Plot one feature
-#' save_subject_line_plots(drop_qcs(example_set[1, ]), save = FALSE)
+#' save_subject_line_plots(drop_qcs(example_set[1, ]), save = FALSE, x = "Time",
+#'   id = "Subject_ID")
 #' \dontshow{setwd(.old_wd)}
 #'
 #' @export
 save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
                                     file_path = NULL, format = "emf",
-                                    x = time_col(object), 
-                                    id = subject_col(object),
+                                    x = NULL, id = NULL,
                                     title = "Feature_ID",
                                     subtitle = NULL, color = NA,
                                     color_scale =
                                     getOption("notame.color_scale_dis"),
                                     facet = NULL, text_base_size = 14,
                                     line_width = 0.3, mean_line_width = 1.2,
-                                    title_line_length = 40,theme =
+                                    title_line_length = 40, theme =
                                     theme_bw(base_size = text_base_size), ...) {
   if (is.na(x)) {
     stop("The time column is missing")
@@ -183,9 +183,11 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
     splitted_title <-
       p <- p +
       theme +
-      labs(title = stringr::str_wrap(fData(object)[fname, title],
+      labs(title = stringr::str_wrap(rowData(object)[fname, title],
                                      title_line_length),
-           subtitle = fData(object)[fname, subtitle], y = "Abundance")
+           subtitle = ifelse(is.na(subtitle), character(0), 
+                             rowData(example_set)[fname, subtitle]),
+           y = "Abundance")
     p
   }
 
@@ -238,17 +240,18 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
 #' # Default boxplots by group
 #' save_group_boxplots(drop_qcs(example_set)[1:10],
 #'   file_path = "./group_boxplots.pdf",
-#'   format = "pdf", title = NULL
+#'   format = "pdf", x = "Group", color = "Group"
 #' )
 #' # x and color can be a different variable
 #' save_group_boxplots(drop_qcs(example_set)[1:10],
 #'   file_path = "./time_boxplots/",
 #'   format = "emf",
 #'   x = "Time",
-#'   color = "Group", title = NULL
+#'   color = "Group"
 #' )
 #' # Plot one feature
-#' save_group_boxplots(drop_qcs(example_set)[1, ], save = FALSE)
+#' save_group_boxplots(drop_qcs(example_set)[1, ], save = FALSE, x = "Group", 
+#'                     color = "Group")
 #' \dontshow{setwd(.old_wd)}
 #' 
 #' @export
@@ -274,9 +277,11 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
                    size = point_size, position = position_dodge(dodge_amount)) +
       color_scale +
       theme +
-      labs(title = stringr::str_wrap(fData(object)[fname, title],
+      labs(title = stringr::str_wrap(rowData(object)[fname, title],
                                      title_line_length),
-           subtitle = fData(object)[fname, subtitle], y = "Abundance")
+           subtitle = ifelse(is.na(subtitle), character(0), 
+                             rowData(example_set)[fname, subtitle]), 
+           y = "Abundance")
     if (x == color) {
       p <- p + guides(color = "none")
     }
@@ -332,7 +337,7 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
 #' # Default beeswarms by group
 #' save_beeswarm_plots(drop_qcs(example_set)[1:10],
 #'   file_path = "./beeswarm_plots.pdf",
-#'   format = "pdf"
+#'   format = "pdf", x = "Group", color = "Group"
 #' )
 #' # x and color can be a different variable
 #' save_beeswarm_plots(drop_qcs(example_set)[1:10],
@@ -343,7 +348,7 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
 #' )
 #' 
 #' # Plot one feature
-#' save_beeswarm_plots(drop_qcs(example_set)[1, ], save = FALSE)
+#' save_beeswarm_plots(drop_qcs(example_set)[1, ], save = FALSE, x = "Group", color = "Group")
 #' \dontshow{setwd(.old_wd)}
 #'
 #' @export
@@ -371,9 +376,10 @@ save_beeswarm_plots <- function(object, all_features = FALSE, save = TRUE,
       ggbeeswarm::geom_beeswarm(cex = cex, size = size) +
       color_scale +
       theme +
-      labs(title = stringr::str_wrap(fData(object)[fname, title],
+      labs(title = stringr::str_wrap(rowData(object)[fname, title],
                                      title_line_length),
-           subtitle = fData(object)[fname, subtitle],
+           subtitle = ifelse(is.na(subtitle), character(0), 
+                             rowData(example_set)[fname, subtitle]),
            y = "Abundance")
     if (x == color) {
       p <- p + guides(color = "none")
@@ -459,9 +465,10 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
                        shape_scale = shape_scale, point_size = point_size,
                        fixed = FALSE, apply_theme_bw = FALSE) +
       theme +
-      labs(title = stringr::str_wrap(fData(object)[fname, title],
+      labs(title = stringr::str_wrap(rowData(object)[fname, title],
                                      title_line_length),
-           subtitle = fData(object)[fname, subtitle],
+           subtitle = ifelse(is.na(subtitle), character(0), 
+                             rowData(example_set)[fname, subtitle]),
            y = "Abundance")
     p
   }
@@ -524,14 +531,15 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
 #' \dontshow{.old_wd <- setwd(tempdir())}
 #' save_group_lineplots(drop_qcs(example_set)[1:10],
 #'   file_path = "./group_line_plots.pdf",
-#'   format = "pdf"
+#'   format = "pdf", x = "Time", group = "Group"
 #' )
 #' save_group_lineplots(drop_qcs(example_set)[1:10],
 #'   file_path = "./group_line_plots/",
-#'   format = "png"
+#'   format = "png", x = "Time", group = "Group"
 #' )
 #' # Plot one feature
-#' save_group_lineplots(drop_qcs(example_set[1, ]), save = FALSE)
+#' save_group_lineplots(drop_qcs(example_set[1, ]), save = FALSE, x = "Time",
+#'   group = "Group")
 #' \dontshow{setwd(.old_wd)}
 #'
 #' @export
@@ -576,9 +584,10 @@ save_group_lineplots <- function(object, all_features = FALSE, save = TRUE,
                    fun.max = fun.max) +
       color_scale +
       theme +
-      labs(title = stringr::str_wrap(fData(object)[fname, title],
+      labs(title = stringr::str_wrap(rowData(object)[fname, title],
                                      title_line_length),
-           subtitle = fData(object)[fname, subtitle],
+           subtitle = ifelse(is.na(subtitle), character(0), 
+                             rowData(example_set)[fname, subtitle]),
            y = "Abundance")
     if (x == group) {
       p <- p + guides(color = "none")

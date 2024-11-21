@@ -40,8 +40,8 @@ fit_rf <- function(object, y, all_features = FALSE,
 
   object <- drop_flagged(object, all_features = all_features)
 
-  x <- combined_data(object)[, c(featureNames(object), covariates)]
-  rf <- randomForest::randomForest(x = x, y = pData(object)[, y], 
+  x <- combined_data(object)[, c(rownames(object), covariates)]
+  rf <- randomForest::randomForest(x = x, y = colData(object)[, y], 
                                    importance = importance, ...)
 
   rf
@@ -84,13 +84,13 @@ importance_rf <- function(rf) {
 #' @noRd
 .get_x <- function(object, covariates) {
   # Convert covariates to numeric
-  if (any(!vapply(pData(object)[, covariates], .looks_numeric, logical(1)))) {
+  if (any(!vapply(colData(object)[, covariates], .looks_numeric, logical(1)))) {
     stop("All covariates should be convertable to numeric.")
   }
-  pData(object)[covariates] <- lapply(pData(object)[covariates], as.numeric)
+  colData(object)[covariates] <- lapply(colData(object)[covariates], as.numeric)
 
   # Extract X
-  x <- combined_data(object)[, c(featureNames(object), covariates)]
+  x <- combined_data(object)[, c(rownames(object), covariates)]
   x
 }
 
@@ -183,14 +183,14 @@ mixomics_pls <- function(object, y, ncomp, plot_scores = TRUE,
   object <- drop_flagged(object, all_features = all_features)
 
   predictors <- .get_x(object, covariates)
-  outcome <- pData(object)[y]
+  outcome <- colData(object)[y]
 
   log_text("Fitting PLS")
   pls_model <- mixOmics::pls(predictors, outcome, ncomp = ncomp, ...)
 
   if (plot_scores && ncomp > 1) {
     .plot_pls(pls_model, outcome, y, 
-             title = "PLS: first 2 components and the outcome variable")
+              title = "PLS: first 2 components and the outcome variable")
   }
   pls_model
 }
@@ -273,7 +273,7 @@ mixomics_spls_optimize <- function(object, y, ncomp, n_features =
   object <- drop_flagged(object, all_features = all_features)
 
   predictors <- .get_x(object, covariates)
-  outcome <- pData(object)[y]
+  outcome <- colData(object)[y]
 
   # Test different number of components and features with cross validation
   log_text("Tuning sPLS")
@@ -379,7 +379,7 @@ mixomics_plsda <- function(object, y, ncomp, plot_scores = TRUE,
   object <- drop_flagged(object, all_features = all_features)
 
   predictors <- .get_x(object, covariates)
-  outcome <- pData(object)[, y]
+  outcome <- colData(object)[, y]
   # outcome needs to be a factor, this ensures the levels are right
   if (!is(outcome, "factor")) {
     outcome <- as.factor(outcome)
@@ -450,7 +450,7 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
   object <- drop_flagged(object, all_features = all_features)
 
   predictors <- .get_x(object, covariates)
-  outcome <- pData(object)[, y]
+  outcome <- colData(object)[, y]
   # outcome needs to be a factor, this ensures the levels are right
   if (!is(outcome, "factor")) {
     outcome <- as.factor(outcome)
@@ -582,7 +582,7 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
                 citation("MUVR2"))
 
   # MUVR2 can only use numeric predictors
-  classes <- vapply(pData(object)[, c(covariates, static_covariates)], 
+  classes <- vapply(colData(object)[, c(covariates, static_covariates)], 
                     class, character(1))
   if (length(classes) && any(classes != "numeric")) {
     stop("MUVR2 can only deal with numeric inputs,", 
@@ -591,10 +591,10 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
 
   object <- drop_flagged(object, all_features = all_features)
 
-  if (any(!vapply(pData(object)[, covariates], .looks_numeric, logical(1)))) {
+  if (any(!vapply(colData(object)[, covariates], .looks_numeric, logical(1)))) {
     stop("All covariates should be convertable to numeric.")
   }
-  pData(object)[covariates] <- lapply(pData(object)[covariates], as.numeric)
+  colData(object)[covariates] <- lapply(colData(object)[covariates], as.numeric)
   
   # Do do.call with MUVR2::MUVR2_EN if method == "EN", to avoid nesting
   if (method == "EN") {
@@ -612,8 +612,8 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
     if (is.null(y)) {
       stop("y variable needs to be defined unless doing multi-level modeling.")
     }
-    predictors <- combined_data(object)[, c(featureNames(object), covariates)]
-    outcome <- pData(object)[, y]
+    predictors <- combined_data(object)[, c(rownames(object), covariates)]
+    outcome <- colData(object)[, y]
 
     # Independent samples
     if (is.null(id)) {
@@ -624,7 +624,7 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
       muvr_model <- do.call(func, c(args, add_args))
     } else {
       # Multiple measurements
-      ID <- as.numeric(pData(object)[, id])
+      ID <- as.numeric(colData(object)[, id])
       args <- list(X = predictors, Y = outcome, ID = ID, nRep = nRep, 
                    nOuter = nOuter, nInner = nInner, varRatio = varRatio, 
                    method = method)
@@ -636,8 +636,8 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
       stop("id and multi_level_var needed for multi-level modeling.")
     }
     # Check that multi_level_var has only 2 unique values
-    ml_var <- pData(object)[, multi_level_var] <-
-      as.factor(pData(object)[, multi_level_var])
+    ml_var <- colData(object)[, multi_level_var] <-
+      as.factor(colData(object)[, multi_level_var])
     if (length(levels(ml_var)) != 2) {
       stop("The multilevel variable should have exactly 2 unique values.")
     } else {
@@ -649,9 +649,9 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
     cd <- combined_data(object)
     cd <- cd[order(cd[, id]), ]
     x1 <- cd[cd[, multi_level_var] == levels(ml_var)[1],
-             c(featureNames(object), covariates)]
+             c(rownames(object), covariates)]
     x2 <- cd[cd[, multi_level_var] == levels(ml_var)[2],
-             c(featureNames(object), covariates)]
+             c(rownames(object), covariates)]
     predictors <- x2 - x1
     # Add static covariates, where we don't want to compute change, such as sex
     predictors[, static_covariates] <- 
@@ -719,16 +719,16 @@ perform_permanova <- function(object, group, all_features = FALSE,
                       "analysis of variance:"),
                 citation("PERMANOVA"))
 
-  if (!is.factor(pData(object)[, group])) {
+  if (!is.factor(colData(object)[, group])) {
     stop("Group column is not a factor.")
   }
 
   log_text("Starting PERMANOVA tests")
   object <- drop_flagged(object, all_features = all_features)
-  data <- t(exprs(object))
+  data <- t(assay(object))
   data <- PERMANOVA::IniTransform(data, transform = transform)
   initialized <- PERMANOVA::DistContinuous(data, coef = coef)
-  res <- PERMANOVA::PERMANOVA(initialized, pData(object)[, group], ...)
+  res <- PERMANOVA::PERMANOVA(initialized, colData(object)[, group], ...)
   log_text("PERMANOVA performed")
 
   res

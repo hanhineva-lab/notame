@@ -40,8 +40,8 @@ plot_sample_suprahex <- function(object, all_features = FALSE,
                 citation("supraHex"))
 
   object <- drop_flagged(object, all_features = all_features)
-  data <- scale(exprs(object))
-  colnames(data) <- pData(object)[, sample_labels]
+  data <- scale(assay(object))
+  colnames(data) <- colData(object)[, sample_labels]
 
   s_map <- supraHex::sPipeline(data = data, ...)
   s_reorder <- supraHex::sCompReorder(sMap = s_map, xdim = grid_xdim, 

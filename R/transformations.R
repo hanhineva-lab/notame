@@ -15,9 +15,9 @@
 #'
 #' @export
 mark_nas <- function(object, value) {
-  ex <- exprs(object)
+  ex <- assay(object)
   ex[ex == value] <- NA
-  exprs(object) <- ex
+  assay(object) <- ex
   object
 }
 
@@ -49,22 +49,22 @@ mark_nas <- function(object, value) {
 #'
 #' @examples
 #' # Spectra before fixing
-#' fData(example_set)$MS_MS_spectrum <- NA
-#' fData(example_set)[1, ]$MS_MS_spectrum <- "28.769:53 44.933:42 52.106:89 
+#' rowData(example_set)$MS_MS_spectrum <- NA
+#' rowData(example_set)[1, ]$MS_MS_spectrum <- "28.769:53 44.933:42 52.106:89 
 #' 69.518:140"
-#' fData(example_set)$MS_MS_spectrum[
-#'   !is.na(fData(example_set)$MS_MS_spectrum)]
+#' rowData(example_set)$MS_MS_spectrum[
+#'   !is.na(rowData(example_set)$MS_MS_spectrum)]
 #' # Fixing spectra with default settings
 #' fixed_MSMS_peaks <- fix_MSMS(example_set)
 #' # Spectra after fixing
-#' fData(fixed_MSMS_peaks)$MS_MS_Spectrum_clean[
-#'   !is.na(fData(fixed_MSMS_peaks)$MS_MS_Spectrum_clean)]
+#' rowData(fixed_MSMS_peaks)$MS_MS_Spectrum_clean[
+#'   !is.na(rowData(fixed_MSMS_peaks)$MS_MS_Spectrum_clean)]
 #'
 #' @export
 fix_MSMS <- function(object, ms_ms_spectrum_col = "MS_MS_spectrum",
                      peak_num = 10, min_abund = 5, deci_num = 3) {
 
-  spec <- fData(object)[, ms_ms_spectrum_col]
+  spec <- rowData(object)[, ms_ms_spectrum_col]
   to_metab <- NULL
 
   for (i in seq_along(spec)) {
@@ -99,9 +99,9 @@ fix_MSMS <- function(object, ms_ms_spectrum_col = "MS_MS_spectrum",
                          collapse = ", ")
   }
 
-  fData(object)$MS_MS_Spectrum_clean <- to_metab
+  rowData(object)$MS_MS_Spectrum_clean <- to_metab
   log_text(paste0("Saving fixed MS/MS spectra to column",
-                  " \'MS_MS_Spectrum_clean\' in fData"))
+                  " \'MS_MS_Spectrum_clean\' in rowData"))
   object
 }
 
@@ -119,7 +119,7 @@ fix_MSMS <- function(object, ms_ms_spectrum_col = "MS_MS_spectrum",
 #' @export
 drop_qcs <- function(object) {
   object <- object[, object$QC != "QC"]
-  pData(object) <- droplevels(pData(object))
+  colData(object) <- droplevels(colData(object))
   object
 }
 
@@ -163,13 +163,13 @@ drop_flagged <- function(object, all_features = FALSE) {
 #'
 #' @examples
 #' ex_set <- example_set[1:5, 1:5]
-#' exprs(ex_set)
+#' assay(ex_set)
 #' # Create a matrix of replacment values for rows 1, 3, 5 and columns 1, 3, 4
 #' replacement <- matrix(1:9,
 #'   ncol = 3,
 #'   dimnames = list(
-#'     featureNames(ex_set)[c(1, 3, 5)],
-#'     sampleNames(ex_set)[c(1, 3, 4)]
+#'     rownames(ex_set)[c(1, 3, 5)],
+#'     colnames(ex_set)[c(1, 3, 4)]
 #'   )
 #' )
 #' replacement
@@ -179,16 +179,16 @@ drop_flagged <- function(object, all_features = FALSE) {
 #' @noRd
 merge_exprs <- function(object, y) {
   # Colnames and rownames should be found in the object
-  if (!all(colnames(y) %in% colnames(exprs(object))) || is.null(colnames(y))) {
+  if (!all(colnames(y) %in% colnames(assay(object))) || is.null(colnames(y))) {
     stop("Column names of y do not match column names of exprs(object).")
   }
-  if (!all(rownames(y) %in% rownames(exprs(object))) || is.null(rownames(y))) {
+  if (!all(rownames(y) %in% rownames(assay(object))) || is.null(rownames(y))) {
     stop("Row names of y do not match row names of exprs(object).")
   }
 
-  exprs_tmp <- exprs(object)
+  exprs_tmp <- assay(object)
   exprs_tmp[rownames(y), colnames(y)] <- y
-  exprs(object) <- exprs_tmp
+  assay(object) <- exprs_tmp
   object
 }
 
@@ -235,14 +235,14 @@ impute_rf <- function(object, all_features = FALSE, ...) {
   }
 
   # Impute missing values
-  mf <- missForest::missForest(xmis = t(exprs(dropped)), ...)
+  mf <- missForest::missForest(xmis = t(assay(dropped)), ...)
   imputed <- t(mf$ximp)
   # Log imputation error
   log_text(paste0("Out-of-bag error in random forest imputation: ",
                   round(mf$OOBerror, digits = 3)))
   # Assign imputed data to the droppped
-  rownames(imputed) <- rownames(exprs(dropped))
-  colnames(imputed) <- colnames(exprs(dropped))
+  rownames(imputed) <- rownames(assay(dropped))
+  colnames(imputed) <- colnames(assay(dropped))
   # Attach imputed abundances to object
   object <- merge_exprs(object, imputed)
   log_text(paste("Random forest imputation finished at", Sys.time(), "\n"))
@@ -289,7 +289,7 @@ impute_rf <- function(object, all_features = FALSE, ...) {
 #'
 #' @export
 impute_simple <- function(object, value, na_limit = 0) {
-  imp <- exprs(object)
+  imp <- assay(object)
   nas <- apply(imp, 1, prop_na)
   imp <- imp[nas > na_limit, , drop = FALSE]
   if (nrow(imp) == 0) {
@@ -369,17 +369,17 @@ inverse_normalize <- function(object) {
 #' @examples
 #' flagged <- example_set %>%
 #'   mark_nas(0) %>%
-#'   flag_detection() %>%
+#'   flag_detection(group = "Group") %>%
 #'   flag_quality()
 #' flag_report(flagged)
 #'
 #' @export
 flag_report <- function(object) {
-  splits <- sort(unique(fData(object)$Split))
+  splits <- sort(unique(rowData(object)$Split))
   report <- data.frame()
   flag(object)[is.na(flag(object))] <- "Kept"
   for (split in splits) {
-    tmp <- object[fData(object)$Split == split, ]
+    tmp <- object[rowData(object)$Split == split, ]
     report_row <- flag(tmp) %>%
       table() %>%
       as.matrix() %>%
@@ -488,6 +488,80 @@ setMethod("exponential", c(object = "MetaboSet"),
 )
 
 
+# ---------- Logarithms ----------
+
+#' Logarithm
+#'
+#' Log-transforms the exprs part of a MetaboSet object. Shortcuts for log2 and 
+#' log10 also implemented.
+#' For more information, see \code{\link{log}}.
+#'
+#' @param x a MetaboSet object
+#' @param base the base of the logarithm
+#'
+#' @return A MetaboSet object with the assay transformed.
+#'
+#' @rdname log
+#' @export
+setMethod("log", "SummarizedExperiment", 
+  function(x, base = exp(1)) {
+    assay(x) <- log(assay(x), base = base)
+    x
+  }
+)
+
+#' @rdname log
+#' @export
+setMethod("log2", "SummarizedExperiment", 
+  function(x) {
+    assay(x) <- log2(assay(x))
+    x
+  }
+)
+
+#' @rdname log
+#' @export
+setMethod("log10", "SummarizedExperiment", 
+  function(x) {
+    assay(x) <- log10(assay(x))
+    x
+  }
+)
+
+# scale
+setGeneric("scale")
+
+#' Scale exprs data
+#'
+#' Applies the base R function scale to transposed exprs matrix. See ?scale for 
+#' details.
+#'
+#' @param x a MetaboSet object
+#' @param center,scale as in base scale function
+#' 
+#' @return A Metaboset object with modified assay.
+#'
+#' @rdname scale
+#'
+#' @export
+setMethod("scale", "SummarizedExperiment", 
+  function(x, center = TRUE, scale = TRUE) {
+    assay(x) <- t(scale(t(assay(x)), center = center, scale = scale))
+    x
+  }
+)
+
+#' @rdname exponential
+#' @export
+setMethod("exponential", c(object = "SummarizedExperiment"),
+  function(object, base = exp(1)) {
+    assay(object) <- base^assay(object)
+    object
+  }
+)
+
+
+
 #' Probabilistic quotient normalization
 #'
 #' Apply probabilistic quotient normalization (PQN) to the exprs part of a 
@@ -515,7 +589,7 @@ pqn_normalization <- function(object, ref = c("qc", "all"),
   ref <- match.arg(ref)
   method <- match.arg(method)
   # Use only good-quality features for calculating reference spectra
-  ref_data <- exprs(drop_flagged(object, all_features))
+  ref_data <- assay(drop_flagged(object, all_features))
   # Select reference samples
   switch(ref, qc = reference <- ref_data[, object$QC == "QC"],
          all = reference <- ref_data)
@@ -531,11 +605,11 @@ pqn_normalization <- function(object, ref = c("qc", "all"),
   quotients <- ref_data / reference_spectrum
   quotient_md <- apply(quotients, 2, finite_median)
   # Do the normalization
-  data <- exprs(object)
+  data <- assay(object)
   pqn_data <- t(t(data) / quotient_md)
   colnames(pqn_data) <- colnames(data)
   rownames(pqn_data) <- rownames(data)
-  exprs(object) <- pqn_data
+  assay(object) <- pqn_data
 
   object
 }

@@ -57,10 +57,10 @@ plot_dist_density <- function(object, all_features = FALSE,
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
 
-  object <- pcaMethods::prep(object, center = center, scale = scale)
+  assay <- pcaMethods::prep(t(assay(object)), center = center, scale = scale)
 
-  qc_data <- t(exprs(object)[, object$QC == "QC"])
-  sample_data <- t(exprs(object)[, object$QC != "QC"])
+  qc_data <- assay[object$QC == "QC", ]
+  sample_data <- assay[!object$QC == "QC", ]
 
   qc_dist <- stats::dist(qc_data, method = dist_method) %>% as.numeric()
   sample_dist <- stats::dist(sample_data, method = dist_method) %>% as.numeric()
@@ -275,7 +275,7 @@ plot_sample_boxplots <- function(
 
   data$Sample_ID <- factor(data$Sample_ID, levels = data$Sample_ID)
 
-  data <- tidyr::gather(data, "Variable", "Value", rownames(exprs(object)))
+  data <- tidyr::gather(data, "Variable", "Value", rownames(object))
 
   p <- ggplot(data, aes(x = .data$Sample_ID, y = .data$Value, fill = fill_by))
 

@@ -31,26 +31,26 @@
 #' @examples
 #' # The parameters are really weird because example data is imaginary
 #' clustered <- cluster_features(example_set, rt_window = 1, corr_thresh = 0.5, 
-#' d_thresh = 0.6)
+#'   d_thresh = 0.6)
 #'
 #' @export
 cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
                              all_features = FALSE, rt_window = 1 / 60,
                              corr_thresh = 0.9, d_thresh = 0.8, 
-                             plotting = FALSE, min_size_plotting = 3, 
+                             plotting = TRUE, min_size_plotting = 3, 
                              prefix = NULL) {
   # Drop flagged compounds before clustering
   orig <- object
   object <- drop_flagged(object, all_features)
 
   if (is.null(mz_col) || is.null(rt_col)) {
-    cols <- .find_mz_rt_cols(fData(object))
+    cols <- .find_mz_rt_cols(rowData(object))
   }
   mz_col <- mz_col %||% cols$mz_col
   rt_col <- rt_col %||% cols$rt_col
 
-  data <- as.data.frame(t(exprs(object)))
-  features <- fData(object)
+  data <- as.data.frame(t(assay(object)))
+  features <- as.data.frame(rowData(object))
   # Start log
   log_text(paste("\nStarting feature clustering at", Sys.time()))
 
@@ -79,7 +79,7 @@ cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
                  "clusters of 2 or more features, clustering finished at",
                  Sys.time()))
   # Compute median peak area and assing cluster ID
-  features$MPA <- apply(exprs(object), 1, finite_median)
+  features$MPA <- apply(assay(object), 1, finite_median)
   features <- assign_cluster_id(data, clusters, features, "Feature_ID")
 
   if (plotting) {
@@ -90,7 +90,7 @@ cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
     log_text(paste("Saved cluster plots to:", prefix))
   }
   # Add cluster IDs to the ORIGINAL object (flagged features still there)
-  clustered <- join_fData(orig, features[c("Feature_ID", "MPA",
+  clustered <- join_rowData(orig, features[c("Feature_ID", "MPA",
                                             "Cluster_ID", "Cluster_size",
                                             "Cluster_features")])
                                             

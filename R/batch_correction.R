@@ -2,7 +2,7 @@
 #'
 #' An interface for the RUVs method in RUVSeq package.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment object
 #' @param batch the column name for batch labels
 #' @param replicates list of numeric vectors, indexes of replicates
 #' @param k The number of factors of unwanted variation to be estimated from 
@@ -18,7 +18,7 @@
 #'   batch = "Batch", replicates = replicates)
 #' # Evaluate batch correction
 #' pca_bhattacharyya_dist(example_set, batch = "Batch")
-#' pca_bhattacharyya_dist(example_set, batch = "Batch")
+#' pca_bhattacharyya_dist(batch_corrected, batch = "Batch")
 #'
 #' @export
 ruvs_qc <- function(object, batch, replicates, k = 3, ...) {
@@ -27,9 +27,11 @@ ruvs_qc <- function(object, batch, replicates, k = 3, ...) {
          " Please install it.", call. = FALSE)
   }
   .add_citation("RUVSeq was used for batch correction:", citation("RUVSeq"))
+  object <- check_object(object)
+  
   # Transform data to pseudo counts for RUVs
-  exprs(object)[exprs(object) == 0] <- 1
-  exprs(object) <- round(exprs(object))
+  assay(object)[assay(object) == 0] <- 1
+  assay(object) <- round(assay(object))
   # Pad each replicate vector with -1 and transform to matrix
   max_len <- max(vapply(replicates, length, integer(1)))
   scIdx <- matrix(-1, nrow = length(replicates), ncol = max_len)
@@ -38,11 +40,11 @@ ruvs_qc <- function(object, batch, replicates, k = 3, ...) {
     scIdx[i, seq_along(replicates[[i]])] <- replicates[[i]]
   }
   # Perform batch correction
-  ruv_results <- RUVSeq::RUVs(x = exprs(object), cIdx = featureNames(object),
+  ruv_results <- RUVSeq::RUVs(x = assay(object), cIdx = rownames(object),
                               k = k, scIdx = scIdx, ...)
   # Include results in object
-  exprs(object) <- ruv_results$normalizedCounts
-  pData(object) <- cbind(pData(object), ruv_results$W)
+  assay(object) <- ruv_results$normalizedCounts
+  colData(object) <- cbind(colData(object), ruv_results$W)
   object
 }
 
@@ -89,16 +91,17 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
                 citation("pcaMethods"))
   .add_citation("fpc package was used for Bhattacharyaa distance computation:",
                 citation("fpc"))
+  object <- check_object(object)
   # Drop flagged features if not told otherwise
   object <- drop_flagged(object, all_features)
   # PCA to 2 dimenstions
-  pca_res <- pcaMethods::pca(object, center = center, scale = scale, 
+  pca_res <- pcaMethods::pca(t(assay(object)), center = center, scale = scale, 
                              nPcs = nPcs, ...)
   pca_scores <- pcaMethods::scores(pca_res)
   # Split to batches
   batches <- list()
-  for (b in unique(pData(object)[, batch])) {
-    batches[[b]] <- pca_scores[pData(object)[, batch] == b, ]
+  for (b in unique(colData(object)[, batch])) {
+    batches[[b]] <- pca_scores[colData(object)[, batch] == b, ]
   }
   # Compute means and covariance matrices for Bhattacharyya distance
   muarray <- vapply(batches, colMeans, double(nPcs))
@@ -168,14 +171,14 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
 #'
 #' @export
 perform_repeatability <- function(object, group) {
-  group <- pData(object)[, group]
-  features <- featureNames(object)
+  group <- colData(object)[, group]
+  features <- rownames(object)
   repeatability <- BiocParallel::bplapply(
     X = features, 
     FUN = function(feature) {
       result_row <- data.frame(
         Feature_ID = feature,
-        Repeatability = .repeatability(exprs(object)[feature, ], group))
+        Repeatability = .repeatability(assay(object)[feature, ], group))
       }
     )
   do.call(rbind, repeatability)
@@ -203,16 +206,15 @@ perform_repeatability <- function(object, group) {
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
-#' fData(example_set)[3, ]$Average_Mz <- fData(example_set)[2, ]$Average_Mz + 
-#' 0.001
+#' rowData(example_set)[3, ]$Average_Mz <- 
+#'   rowData(example_set)[2, ]$Average_Mz + 0.001
 #' # Initialize objects
 #' example_set_fill <- example_set
 #' example_set_na <- example_set
 #' # Introduce over 80% missing values in QC samples per batch of two features 
 #' # so they are considered "missing", with orthogonal batch presence
-#' exprs(example_set_na)[2, c(1, 7, 13, 19)] <- NA
-#' exprs(example_set_na)[
-#'   3, c(26, 32, 38, 44)] <- NA
+#' assay(example_set_na)[2, c(1, 7, 13, 19)] <- NA
+#' assay(example_set_na)[3, c(26, 32, 38, 44)] <- NA
 #' batch_aligned <- align_batches(example_set_na, example_set_fill, 
 #'   batch = "Batch", mz = "Average_Mz", rt = "Average_Rt_min", 
 #'   mzdiff = 0.002, rtdiff = 15, plot_folder = "./Figures")
@@ -238,19 +240,19 @@ align_batches <- function(object_na, object_fill, batch, mz, rt,
     report <- FALSE
   }
   # Extract peak mz and rt information
-  p_info <- as.matrix(fData(object_na)[, c(mz, rt)])
+  p_info <- as.matrix(rowData(object_na)[, c(mz, rt)])
   colnames(p_info) <- c("mz", "rt")
   # Align batches based on the QCs
   aligned <- batchCorr::alignBatches(peakInfo = p_info, 
-                                     PeakTabNoFill = t(exprs(object_na)),
-                                     PeakTabFilled = t(exprs(object_fill)),
-                                     batches = pData(object_na)[, batch],
+                                     PeakTabNoFill = t(assay(object_na)),
+                                     PeakTabFilled = t(assay(object_fill)),
+                                     batches = colData(object_na)[, batch],
                                      sampleGroups = object_na$QC, 
                                      selectGroup = "QC", NAhard = NAhard,
                                      mzdiff = mzdiff, rtdiff = rtdiff, 
                                      report = report, reportPath = plot_folder)
   # Attach aligned features
-  exprs(object_fill) <- t(aligned$PTalign)
+  assay(object_fill) <- t(aligned$PTalign)
   object_fill
 }
 
@@ -279,7 +281,7 @@ align_batches <- function(object_na, object_fill, batch, mz, rt,
 #'   batch = "Batch", group = "QC", ref_label = "QC")
 #' # Evaluate batch correction
 #' pca_bhattacharyya_dist(example_set, batch = "Batch")
-#' pca_bhattacharyya_dist(example_set, batch = "Batch")
+#' pca_bhattacharyya_dist(batch_normalized, batch = "Batch")
 #'
 #' @seealso \code{\link[batchCorr]{normalizeBatches}} 
 #'
@@ -294,19 +296,19 @@ normalize_batches <- function(object, batch, group, ref_label,
   .add_citation("batchCorr was used for batch correction:",
                 citation("batchCorr"))
   # Perform batch correction
-  norm_data <- batchCorr::normalizeBatches(peakTableCorr = t(exprs(object)), 
-                                           batches = pData(object)[, batch],
+  norm_data <- batchCorr::normalizeBatches(peakTableCorr = t(assay(object)), 
+                                           batches = colData(object)[, batch],
                                            sampleGroup = 
-                                           pData(object)[, group], 
+                                           colData(object)[, group], 
                                            refGroup = ref_label,
                                            population = population, ...)
   # Include corrected abundances and correction information in object
-  exprs(object) <- t(norm_data$peakTable)
+  assay(object) <- t(norm_data$peakTable)
   ref_corrected <- as.data.frame(t(norm_data$refCorrected))
   colnames(ref_corrected) <- paste0("Ref_corrected_",
                                     seq_len(ncol(ref_corrected)))
-  ref_corrected$Feature_ID <- featureNames(object)
-  object <- join_fData(object, ref_corrected)
+  ref_corrected$Feature_ID <- rownames(object)
+  object <- join_rowData(object, ref_corrected)
 }
 
 #' Save batch correction plots
@@ -334,8 +336,8 @@ normalize_batches <- function(object, batch, group, ref_label,
 #' \dontshow{.old_wd <- setwd(tempdir())}
 #' # Batch correction
 #' replicates <- list(which(example_set$QC == "QC"))
-#' batch_corrected <- ruvs_qc(example_set, 
-#'   batch = "Batch", replicates = replicates)
+#' batch_corrected <- normalize_batches(example_set, 
+#'   batch = "Batch", group = "QC", ref_label = "QC")
 #' # Plots of each feature
 #' save_batch_plots(
 #'   orig = example_set[1:10], corrected = batch_corrected[1:10],
@@ -359,7 +361,7 @@ save_batch_plots <- function(orig, corrected, file, width = 14, height = 10,
   batch_mean_helper <- function(data) {
     data %>%
       dplyr::group_by(!!dplyr::sym(batch)) %>%
-      dplyr::summarise_at(featureNames(orig), finite_mean) %>%
+      dplyr::summarise_at(rownames(orig), finite_mean) %>%
       dplyr::left_join(batch_injections, ., by = batch)
   }
 
@@ -401,7 +403,7 @@ save_batch_plots <- function(orig, corrected, file, width = 14, height = 10,
   }
   # Save plots with original and corrected data to pdf
   grDevices::pdf(file, width = width, height = height)
-  for (feature in featureNames(orig)) {
+  for (feature in rownames(orig)) {
     p1 <- batch_plot_helper(data_orig, feature, batch_means_orig)
     p2 <- batch_plot_helper(data_corr, feature, batch_means_corr)
     p <- cowplot::plot_grid(p1, p2, nrow = 2)

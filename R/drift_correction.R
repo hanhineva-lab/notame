@@ -82,24 +82,24 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
   # Start log
   log_text(paste("\nStarting drift correction at", Sys.time()))
   # Zero values do not behave correctly
-  if (sum(exprs(object) == 0, na.rm = TRUE)) {
+  if (sum(assay(object) == 0, na.rm = TRUE)) {
     log_text(paste0("Zero values in feature abundances detected.",
                     " Zeroes will be replaced with 1.1."))
-    exprs(object)[exprs(object) == 0] <- 1.1
+    assay(object)[assay(object) == 0] <- 1.1
   }
   # Extract data and injection order for QC samples and the full dataset
-  features <- featureNames(object)
+  features <- rownames(object)
   qc <- object[, object$QC == "QC"]
   qc_order <- qc$Injection_order
-  qc_data <- exprs(qc)
+  qc_data <- assay(qc)
   full_order <- object$Injection_order
-  full_data <- exprs(object)
+  full_data <- assay(object)
   # log-transform before fiting the cubic spline
   if (log_transform) {
-    if (sum(exprs(object) == 1, na.rm = TRUE)) {
+    if (sum(assay(object) == 1, na.rm = TRUE)) {
       log_text(paste0("Values of 1 in feature abundances detected.", 
                      " 1s will be replaced with 1.1."))
-      exprs(object)[exprs(object) == 1] <- 1.1
+      exprs(object)[assay(object) == 1] <- 1.1
     }
     qc_data <- log(qc_data)
     full_data <- log(full_data)
@@ -116,7 +116,7 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
   if (log_transform) {
     corrected <- exp(corrected)
   }
-  exprs(object) <- corrected
+  assay(object) <- corrected
   # Recompute quality metrics
   object <- assess_quality(object)
   
@@ -203,9 +203,9 @@ inspect_dc <- function(orig, dc, check_quality,
     dc <- assess_quality(dc)
   }
 
-  orig_data <- exprs(orig)
-  dc_data <- exprs(dc)
-  features <- featureNames(orig)
+  orig_data <- assay(orig)
+  dc_data <- assay(dc)
+  features <- rownames(orig)
   qdiff <- quality(dc)[2:5] - quality(orig)[2:5]
 
   log_text(paste("Inspecting drift correction results", Sys.time()))
@@ -215,9 +215,9 @@ inspect_dc <- function(orig, dc, check_quality,
   
   inspected <- do.call(.comb, inspected)
 
-  exprs(dc) <- inspected$data
+  assay(dc) <- inspected$data
   dc <- assess_quality(dc)
-  dc <- join_fData(dc, inspected$dc_notes)
+  dc <- join_rowData(dc, inspected$dc_notes)
 
   log_text(paste("Drift correction results inspected at", Sys.time()))
 

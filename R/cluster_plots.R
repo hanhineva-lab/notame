@@ -20,13 +20,13 @@
 #' @return A ggplot object.
 #'
 #' @examples
-#' plot_dendrogram(example_set)
+#' plot_dendrogram(example_set, color = "Group")
 #'
 #' @seealso \code{\link{dist}} \code{\link{hclust}}
 #'
 #' @export
 plot_dendrogram <- function(object, all_features = FALSE, 
-                            color = group_col(object), 
+                            color = NULL, 
                             dist_method = "euclidean", clust_method = "ward.D2",
                             center = TRUE, scale = "uv", 
                             title = "Dendrogram of hierarchical clustering",
@@ -43,17 +43,18 @@ plot_dendrogram <- function(object, all_features = FALSE,
   subtitle <- subtitle %||% paste("Distance method:", dist_method, 
                                   "Clustering method:", clust_method)
 
-  object <- pcaMethods::prep(object, center = center, scale = scale)
+  assay(object) <- pcaMethods::prep(assay(object), center = center, 
+                                    scale = scale)
 
-  d_data <- stats::dist(t(exprs(object)), method = dist_method) %>%
+  d_data <- stats::dist(t(assay(object)), method = dist_method) %>%
     stats::hclust(method = clust_method) %>%
     stats::as.dendrogram() %>%
     ggdendro::dendro_data()
 
   labels <- ggdendro::label(d_data) %>%
     dplyr::mutate(label = .data$label) %>%
-    dplyr::left_join(pData(object)[c("Sample_ID", color)], 
-                     by = c("label" = "Sample_ID"))
+    dplyr::left_join(colData(object)[c("Sample_ID", color)], 
+                     by = c("label" = "Sample_ID"), copy = TRUE)
   labels[, color] <- as.factor(labels[, color])
   p <- ggplot(ggdendro::segment(d_data)) +
     geom_segment(aes(x = .data$x, y = .data$y,
@@ -96,7 +97,7 @@ plot_dendrogram <- function(object, all_features = FALSE,
 #' consist of multiple parts and is harder to modify.
 #'
 #' @examples
-#' plot_sample_heatmap(example_set)
+#' plot_sample_heatmap(example_set, group = "Group")
 #'
 #' @seealso \code{\link{dist}} \code{\link{hclust}}
 #'
@@ -105,7 +106,7 @@ plot_sample_heatmap <- function(object, all_features = FALSE,
                                 dist_method = "euclidean", 
                                 clust_method = "ward.D2",
                                 center = TRUE, scale = "uv",
-                                group_bar = TRUE, group = group_col(object),
+                                group_bar = TRUE, group = NULL,
                                 title = "Heatmap of distances between samples",
                                 subtitle = NULL, fill_scale_con =
                                 getOption("notame.fill_scale_con"),
@@ -122,10 +123,11 @@ plot_sample_heatmap <- function(object, all_features = FALSE,
   subtitle <- subtitle %||% paste("Distance method:", dist_method, 
                                   "Clustering method:", clust_method)
 
-  object <- pcaMethods::prep(object, center = center, scale = scale)
+  assay <- pcaMethods::prep(t(assay(object)), center = center, 
+                            scale = scale)
 
   # Distances
-  distances <- stats::dist(t(exprs(object)), method = dist_method)
+  distances <- stats::dist(assay, method = dist_method)
   # Hierarchical clustering for ordering
   hc <- stats::hclust(distances, method = clust_method)
   hc_order <- hc$labels[hc$order]
@@ -150,7 +152,7 @@ plot_sample_heatmap <- function(object, all_features = FALSE,
     coord_fixed()
   # Group bar
   if (group_bar && !is.na(group)) {
-    pheno_data <- pData(object)
+    pheno_data <- colData(object)
     pheno_data$Sample_ID <- factor(pheno_data$Sample_ID, levels = hc_order,
                                    ordered = TRUE)
 

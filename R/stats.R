@@ -39,7 +39,7 @@
 #' @export
 summary_statistics <- function(object, grouping_cols = NA) {
   data <- combined_data(object)
-  features <- Biobase::featureNames(object)
+  features <- colnames(object)
   # Get sample grouping and group names for saving results accordingly
   if (is.na(grouping_cols)[1]) {
     groups <- rep(1, nrow(data))
@@ -152,7 +152,7 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
 
 .help_cohens_d <- function(object, group, id, time) {
   data <- combined_data(object)
-  features <- Biobase::featureNames(object)
+  features <- rownames(object)
   group_levels <- levels(data[, group])
   time_levels <- NULL
 
@@ -212,16 +212,16 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
   if (is.null(id)) {
     stop("Please specify id column.", call. = FALSE)
   }
-  time_combos <- utils::combn(levels(pData(object)[, time]), 2)
+  time_combos <- utils::combn(levels(colData(object)[, time]), 2)
   for (i in seq_len(ncol(group_combos))) {
     for (j in seq_len(ncol(time_combos))) {
       object_split <- object[, which(
-        pData(object)[, group] %in% group_combos[, i] &
-          pData(object)[, time] %in% time_combos[, j])]
-      pData(object_split) <- droplevels(pData(object_split))
+        colData(object)[, group] %in% group_combos[, i] &
+          colData(object)[, time] %in% time_combos[, j])]
+      colData(object_split) <- droplevels(colData(object_split))
       # Check data is valid for Cohen's D
-      group_table <- table(pData(object_split)[, c(id, group)])
-      time_table <- table(pData(object_split)[, c(id, time)])
+      group_table <- table(colData(object_split)[, c(id, group)])
+      time_table <- table(colData(object_split)[, c(id, time)])
       column <- paste0("Cohen_d_", group_combos[1, i], "_", group_combos[2, i],
                        "_", time_combos[2, j], "_minus_", time_combos[1, j])
       if (any(apply(group_table, 2, count_obs_geq_than, 2) < 2)) {
@@ -270,13 +270,13 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
 #' @return A data frame with Cohen's d for each feature.
 #'
 #' @examples
-#' d_results <- cohens_d(drop_qcs(example_set))
+#' d_results <- cohens_d(drop_qcs(example_set), group = "Group")
 #' d_results_time <- cohens_d(drop_qcs(example_set),
-#'   time = "Time", id = "Subject_ID"
+#'   group = "Group", time = "Time", id = "Subject_ID"
 #' )
 #'
 #' @export
-cohens_d <- function(object, group = group_col(object),
+cohens_d <- function(object, group = NULL,
                      id = NULL, time = NULL) {
   res <- NULL
   # Check that both group and time are factors and have at least two levels
@@ -284,20 +284,21 @@ cohens_d <- function(object, group = group_col(object),
     if (is.null(column)) {
       next
     }
-    if (!is.factor(pData(object)[, column])) {
+    if (!is.factor(colData(object)[, column])) {
       stop("Column ", column, " should be a factor!")
     }
-    if (length(levels(pData(object)[, column])) < 2) {
+    if (length(levels(colData(object)[, column])) < 2) {
       stop("Column ", column, " should have at least two levels!")
     }
   }
-  group_combos <- utils::combn(levels(pData(object)[, group]), 2)
+  group_combos <- utils::combn(levels(colData(object)[, group]), 2)
 
   if (is.null(time)) {
     for (i in seq_len(ncol(group_combos))) {
       object_split <- object[, which(
-        pData(object)[, group] %in% c(group_combos[1, i], group_combos[2, i]))]
-      pData(object_split) <- droplevels(pData(object_split))
+        colData(object)[, group] %in% c(group_combos[1, i], 
+                                        group_combos[2, i]))]
+      colData(object_split) <- droplevels(colData(object_split))
 
       if (is.null(res)) {
         res <- .help_cohens_d(object_split, group, id, time)
@@ -338,7 +339,7 @@ cohens_d <- function(object, group = group_col(object),
 #'
 #' @examples
 #' # Between groups
-#' fc <- fold_change(example_set)
+#' fc <- fold_change(example_set, group = "Group")
 #' # Between time points
 #' fc <- fold_change(example_set, group = "Time")
 #'
@@ -348,7 +349,7 @@ fold_change <- function(object, group = group_col(object)) {
 
   data <- combined_data(object)
   groups <- utils::combn(levels(data[, group]), 2)
-  features <- Biobase::featureNames(object)
+  features <- rownames(object)
   # Calculate fold changes between groupings
   results_df <- BiocParallel::bplapply(features, FUN = .calc_fold_change,
                                        group, data, groups)
@@ -464,22 +465,22 @@ fold_change <- function(object, group = group_col(object)) {
 #' @examples
 #' # Correlations between all features
 #' correlations <- perform_correlation_tests(example_set, 
-#'   x = featureNames(example_set))
+#'   x = rownames(example_set))
 #'
 #' # Spearman Correlations between features and sample information variables
 #' # Drop QCs and convert time to numeric
 #' no_qc <- drop_qcs(example_set)
 #' no_qc$Time <- as.numeric(no_qc$Time)
 #' correlations <- perform_correlation_tests(no_qc,
-#'   x = featureNames(example_set),
+#'   x = rownames(example_set),
 #'   y = c("Time", "Injection_order"), method = "spearman"
 #' )
 #'
 #' # Correlations between variables from two distinct MetaboSets
 #' cross_object_cor <- perform_correlation_tests(hilic_neg_sample,
-#'   x = featureNames(hilic_neg_sample),
+#'   x = rownames(hilic_neg_sample),
 #'   object2 = hilic_pos_sample,
-#'   y = featureNames(hilic_pos_sample),
+#'   y = rownames(hilic_pos_sample),
 #'   all_pairs = FALSE
 #' )
 #' @seealso \code{\link{cor.test}}, \code{\link[rmcorr]{rmcorr}}
@@ -591,7 +592,7 @@ perform_correlation_tests <- function(object, x, y = x, id = NULL,
 #'
 #' @examples
 #' # Drop QC samples before computing AUCs
-#' aucs <- perform_auc(drop_qcs(example_set))
+#' aucs <- perform_auc(drop_qcs(example_set), time = "Time", subject = "Subject_ID", group = "Group")
 #' # t-test with the AUCs
 #' t_test_results <- perform_t_test(aucs, formula_char = "Feature ~ Group")
 #'
@@ -620,15 +621,15 @@ perform_auc <- function(object, time = time_col(object),
   pheno_data$Injection_order <- seq_len(nrow(pheno_data))
   rownames(pheno_data) <- pheno_data$Sample_ID
 
-  features <- featureNames(object)
+  features <- rownames(object)
   aucs <- BiocParallel::bplapply(features, .calc_auc, data, pheno_data,
                                  time, subject, group)
   aucs <- do.call(rbind, aucs)
 
   # Construct new MetaboSet object (with all modes together)
-  new_object <- construct_metabosets(exprs = aucs, feature_data = fData(object),
-                                     pheno_data = pheno_data, group_col = group,
-                                     subject_col = subject) %>%
+  new_object <- SummarizedExperiment(assays = aucs, 
+                                     rowData = rowData(object),
+                                     colData = pheno_data) %>%
     merge_metabosets()
 
   log_text("AUC computation finished")
@@ -688,7 +689,7 @@ perform_auc <- function(object, time = time_col(object),
 .perform_test <- function(object, formula_char, result_fun, all_features, 
                          fdr = TRUE, packages = NULL, ...) {
   data <- combined_data(object)
-  features <- Biobase::featureNames(object)
+  features <- rownames(object)
 
   results_df <- BiocParallel::bplapply(features, .help_perform_test, data,
                                        formula_char, result_fun, ...)
@@ -1348,7 +1349,7 @@ perform_t_test <- function(object, formula_char,
   
   group <- unlist(strsplit(formula_char, " ~ "))[2]
 
-  if (!is.factor(pData(object)[, group])) {
+  if (!is.factor(colData(object)[, group])) {
     stop("Group column should be a factor")
   }
 
@@ -1357,7 +1358,7 @@ perform_t_test <- function(object, formula_char,
                                    all_features = all_features, 
                                    is_paired = is_paired, ...)
   
-  if (length(featureNames(object)) != nrow(results_df)) {
+  if (length(rownames(object)) != nrow(results_df)) {
     warning("Results don't contain all features.")
   }
   rownames(results_df) <- results_df$Feature_ID
@@ -1416,7 +1417,7 @@ perform_t_test <- function(object, formula_char,
                               all_features = FALSE, is_paired, ...) {
   results_df <- NULL
   data <- combined_data(object)
-  features <- featureNames(object)
+  features <- rownames(object)
   groups <- data[, group]
   pair <- levels(groups)
   if (!is(groups, "factor")) groups <- as.factor(groups)
@@ -1493,14 +1494,14 @@ perform_t_test <- function(object, formula_char,
 # comparison, also in the case of two groups
 .setup_simple_test <- function(object, group, ...) {
   df <- NULL
-  groups <- levels(pData(object)[, group])
+  groups <- levels(colData(object)[, group])
   combinations <- utils::combn(groups, 2)
   for (i in seq_len(ncol(combinations))) {
     group1 <- as.character(combinations[1, i])
     group2 <- as.character(combinations[2, i])
     # Subset the pair of groups
-    object_tmp <- object[, pData(object)[, group] %in% c(group1, group2)]
-    pData(object_tmp) <- droplevels(pData(object_tmp))
+    object_tmp <- object[, colData(object)[, group] %in% c(group1, group2)]
+    colData(object_tmp) <- droplevels(colData(object_tmp))
 
     res <- .help_simple_test(object_tmp, group = group, ...)
     ifelse(is.null(df), df <- res, df <- dplyr::left_join(df, res))
@@ -1553,7 +1554,7 @@ perform_non_parametric <- function(object, formula_char,
                                    all_features = FALSE, ...) {
   group <- unlist(strsplit(formula_char, " ~ "))[2]
 
-  if (!is.factor(pData(object)[, group])) {
+  if (!is.factor(colData(object)[, group])) {
     stop("Group column should be a factor")
   }
 
@@ -1562,7 +1563,7 @@ perform_non_parametric <- function(object, formula_char,
                                    all_features = all_features, 
                                    is_paired = is_paired, ...)
   
-  if (length(featureNames(object)) != nrow(results_df)) {
+  if (length(rownames(object)) != nrow(results_df)) {
     warning("Results don't contain all features.")
   }
   rownames(results_df) <- results_df$Feature_ID

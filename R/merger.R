@@ -16,8 +16,8 @@
   }
   common <- intersect(sampleNames(x), sampleNames(y))
   if (!is.na(fun(x))) {
-    if (!identical(pData(x)[common, fun(x)], pData(y)[common, fun(y)])) {
-      stop(name, " columns contain different elements for common samples")
+    if (!identical(colData(x)[common, fun(x)], colData(y)[common, fun(y)])) {
+        stop(name, " columns contSummarizedExperimentain different elements for common samples")
     }
   }
 }
@@ -34,29 +34,23 @@
   # Lots of checks to ensure that everything goes smoothly
 
   # Amount of samples must be equal
-  if (nrow(pData(x)) != nrow(pData(y))) {
+  if (nrow(colData(x)) != nrow(colData(y))) {
     warning("Unequal amount of samples")
   }
   # Resulting feature ID must be unique
-  feature_id <- c(fData(x)$Feature_ID, fData(y)$Feature_ID)
+  feature_id <- c(rowData(x)$Feature_ID, rowData(y)$Feature_ID)
   if (!.all_unique(feature_id)) {
     stop("Merge would result in duplicated feature ID")
   }
-  # group_col, time_col, subject_col need to match
-  funs <- list("group_col" = group_col, "time_col" = time_col, 
-               "subject_col" = subject_col)
-  for (i in seq_along(funs)) {
-    .check_column_match(x, y, funs[[i]], names(funs)[i])
-  }
-  common <- intersect(sampleNames(x), sampleNames(y))
-  if (!identical(pData(x)[common, "Injection_order"], 
-                 pData(y)[common, "Injection_order"])) {
+  common <- intersect(colnames(x), colnames(y))
+  if (!identical(colData(x)[common, "Injection_order"], 
+                 colData(y)[common, "Injection_order"])) {
     stop("Injection orders of common samples are not identical")
   }
-  if (!identical(pData(x)$Sample_ID, pData(y)$Sample_ID)) {
+  if (!identical(colData(x)$Sample_ID, colData(y)$Sample_ID)) {
     warning("Sample IDs are not identical")
-    samples_x <- setdiff(sampleNames(x), sampleNames(y))
-    samples_y <- setdiff(sampleNames(y), sampleNames(x))
+    samples_x <- setdiff(colnames(x), colnames(y))
+    samples_y <- setdiff(colnames(y), colnames(x))
     log_text("Merging objects with unequal amounts of samples.")
     log_text("Samples only in first object:")
     log_text(paste0(paste(samples_x, collapse = ", "), "\n"))
@@ -65,21 +59,20 @@
   }
 
 
-  overlap_cols <- intersect(colnames(pData(x)), colnames(pData(y))) %>%
-    setdiff(c("Sample_ID", "Injection_order", group_col(x), 
-              time_col(x), subject_col(x)))
+  overlap_cols <- intersect(colnames(colData(x)), colnames(colData(y))) %>%
+    setdiff(c("Sample_ID", "Injection_order"))
 
   if (length(overlap_cols)) {
     for (overlap_col in overlap_cols) {
-      if (!identical(pData(x)[common, overlap_col], 
-                     pData(y)[common, overlap_col])) {
+      if (!identical(colData(x)[common, overlap_col], 
+                     colData(y)[common, overlap_col])) {
         stop("Columns named ", overlap_col, 
              " in pheno data have different content")
       }
     }
   }
 
-  if (!identical(colnames(fData(x)), colnames(fData(y)))) {
+  if (!identical(colnames(rowData(x)), colnames(rowData(y)))) {
     stop("fData have different column names")
   }
 }
@@ -87,21 +80,21 @@
 # Merge two MetaboSet objects together
 .merge_mode_helper <- function(x, y) {
   # Create dummy injection order if original ones differ
-  common <- intersect(sampleNames(x), sampleNames(y))
-  if (!identical(pData(x)[common, "Injection_order"], 
-      pData(y)[common, "Injection_order"])) {
+  common <- intersect(colnames(x), colnames(y))
+  if (!identical(colData(x)[common, "Injection_order"], 
+      colData(y)[common, "Injection_order"])) {
     log_text(paste0("Injection order differs between modes.",
                     "Creating dummy injection order"))
-    x_modes <- unique(fData(x)$Split)
+    x_modes <- unique(rowData(x)$Split)
     # Save original injection order for first mode
     if (length(x_modes) == 1) {
-      pData(x)[, paste0(x_modes, "_Injection_order")] <- x$Injection_order
+      colData(x)[, paste0(x_modes, "_Injection_order")] <- x$Injection_order
     }
-    dummy_injection <- as.numeric(-seq_along(pData(x)$Sample_ID))
+    dummy_injection <- as.numeric(-seq_along(colData(x)$Sample_ID))
     names(dummy_injection) <- x$Sample_ID
-    pData(x)$Injection_order <- dummy_injection
+    colData(x)$Injection_order <- dummy_injection
     # Save original injection order in other modes
-    pData(y)[, paste0(unique(fData(y)$Split), "_Injection_order")] <-
+    colData(y)[, paste0(unique(fData(y)$Split), "_Injection_order")] <-
       y$Injection_order
     # Update dummy injection
     y_in_x <- y$Sample_ID %in% x$Sample_ID
@@ -109,39 +102,33 @@
     names(new_io) <- y$Sample_ID[!y_in_x]
     dummy_injection <- append(dummy_injection, new_io)
 
-    pData(y)$Injection_order <- dummy_injection[match(pData(y)$Sample_ID,
-                                                      names(dummy_injection))]
+    colData(y)$Injection_order <- dummy_injection[match(colData(y)$Sample_ID,
+                                                        names(dummy_injection))]
     log_text("Dummy injection order (row numbers) created")
   }
   # Check that the match is ok
   .check_match(x, y)
 
-  merged_pdata <- dplyr::full_join(pData(x), pData(y),
-                                   by = intersect(colnames(pData(x)),
-                                                  colnames(pData(y)))) %>%
-    Biobase::AnnotatedDataFrame()
-  rownames(merged_pdata) <- merged_pdata$Sample_ID
-  merged_fdata <- rbind(fData(x), fData(y)) %>%
-    Biobase::AnnotatedDataFrame()
-  if (identical(colnames(exprs(x)), colnames(exprs(y)))) {
-    merged_exprs <- rbind(exprs(x), exprs(y))
+  merged_coldata <- dplyr::full_join(as.data.frame(colData(x)), 
+                                     as.data.frame(colData(y)),
+                                     by = intersect(colnames(colData(x)),
+                                                    colnames(colData(y)))) %>%
+    S4Vectors::DataFrame()
+  rownames(merged_coldata) <- merged_coldata$Sample_ID
+  merged_rowdata <- rbind(rowData(x), rowData(y)) %>%
+    S4Vectors::DataFrame()
+  if (identical(colnames(assay(x)), colnames(assay(y)))) {
+    merged_assay <- rbind(assay(x), assay(y))
   } else {
-    merged_exprs <- dplyr::bind_rows(as.data.frame(exprs(x)),
-                                     as.data.frame(exprs(y))) %>% 
+    merged_assay <- dplyr::bind_rows(as.data.frame(assay(x)),
+                                     as.data.frame(assay(y))) %>% 
       as.matrix()
-    rownames(merged_exprs) <- rownames(merged_fdata)
+    rownames(merged_assay) <- rownames(merged_rowData)
   }
 
-  merged_group_col <- ifelse(!is.na(group_col(x)), group_col(x), group_col(y))
-  merged_time_col <- ifelse(!is.na(time_col(x)), time_col(x), time_col(y))
-  merged_subject_col <- ifelse(!is.na(subject_col(x)), subject_col(x),
-                               subject_col(y))
-
-  merged_object <- MetaboSet(exprs = merged_exprs, phenoData = merged_pdata,
-                             featureData = merged_fdata,
-                             group_col = merged_group_col,
-                             time_col = merged_time_col,
-                             subject_col = merged_subject_col)
+  merged_object <- SummarizedExperiment(assays = merged_assay, 
+                                        colData = merged_coldata,
+                                        rowData = merged_rowdata)
 
   merged_object
 }
@@ -194,6 +181,57 @@ merge_metabosets <- function(..., merge = c("features", "samples")) {
   merge <- match.arg(merge)
   # Combine the objects to a list
   objects <- .to_list(...)
+  # Choose merging function
+  if (merge == "features") {
+    merge_fun <- .merge_mode_helper
+  } else {
+    merge_fun <- .merge_batch_helper
+  }
+  # Merge objects together one by one
+  merged <- NULL
+  for (object in objects) {
+    if (is.null(merged)) {
+      merged <- object
+    } else {
+      merged <- merge_fun(merged, object)
+    }
+  }
+  merged
+}
+
+#' Merge MetaboSet objects together
+#'
+#' Merges two or more MetaboSet objects together. Can be used to merge 
+#' analytical modes or batches.
+#'
+#'
+#' @param ... MetaboSet objects or a list of Metaboset objects
+#' @param merge what to merge? features is used for combining analytical modes,
+#' samples is used for batches
+#'
+#' @return A merged MetaboSet object.
+#'
+#' @details When merging samples, sample IDs that beging with "QC" or "Ref" are 
+#' combined so that they have running numbers on them. This means that if both 
+#' batches have samples called "QC_1", this will not result in an error,
+#' but the sample IDs will be adjusted so that they are unique.
+#'
+#' @examples
+#' # Merge analytical modes
+#' merged <- merge_metabosets(
+#'   hilic_neg_sample, hilic_pos_sample,
+#'   rp_neg_sample, rp_pos_sample
+#' )
+#' # Merge batches
+#' batch1 <- example_set[, example_set$Batch == 1]
+#' batch2 <- example_set[, example_set$Batch == 2]
+#' merged <- merge_metabosets(batch1, batch2, merge = "samples")
+#'
+#' @export
+merge_objects <- function(..., merge = c("features", "samples")) {
+  merge <- match.arg(merge)
+  # Combine the objects to a list
+  objects <- .to_list(...)
   # Class check
   if (!all(vapply(objects, class, character(1)) == "MetaboSet")) {
     stop("The arguments should only contain MetaboSet objects")
@@ -215,7 +253,6 @@ merge_metabosets <- function(..., merge = c("features", "samples")) {
   }
   merged
 }
-
 
 .fdata_batch_helper <- function(fx, fy) {
   non_identical_cols <- !identical(colnames(fx), colnames(fy))
@@ -248,44 +285,38 @@ merge_metabosets <- function(..., merge = c("features", "samples")) {
 
 
 .merge_batch_helper <- function(x, y) {
-  merged_pdata <- rbind(pData(x), pData(y))
-  if (anyDuplicated(merged_pdata$Sample_ID)) {
+  merged_coldata <- rbind(colData(x), colData(y))
+  if (anyDuplicated(merged_coldata$Sample_ID)) {
     log_text(paste0("Found duplicated sample IDs when merging, ",
                     "renaming QC and Ref samples"))
-    qc_idx <- grepl("QC", merged_pdata$Sample_ID)
-    merged_pdata$Sample_ID[qc_idx] <- 
-      paste0("QC_", seq_len(sum(grepl("QC", merged_pdata$Sample_ID))))
-    ref_idx <- grepl("Ref", merged_pdata$Sample_ID)
-    merged_pdata$Sample_ID[ref_idx] <- 
-      paste0("Ref_", seq_len(sum(grepl("Ref", merged_pdata$Sample_ID))))
+    qc_idx <- grepl("QC", merged_coldata$Sample_ID)
+    merged_coldata$Sample_ID[qc_idx] <- 
+      paste0("QC_", seq_len(sum(grepl("QC", merged_coldata$Sample_ID))))
+    ref_idx <- grepl("Ref", merged_coldata$Sample_ID)
+    merged_coldata$Sample_ID[ref_idx] <- 
+      paste0("Ref_", seq_len(sum(grepl("Ref", merged_coldata$Sample_ID))))
   }
 
-  rownames(merged_pdata) <- merged_pdata$Sample_ID
-  merged_pdata <- merged_pdata %>%
-    Biobase::AnnotatedDataFrame()
+  rownames(merged_coldata) <- merged_coldata$Sample_ID
+  merged_coldata <- merged_coldata %>%
+    S4Vectors::DataFrame()
 
-  if (identical(rownames(exprs(x)), rownames(exprs(y)))) {
-    merged_exprs <- cbind(exprs(x), exprs(y))
-    colnames(merged_exprs) <- rownames(merged_pdata)
+  if (identical(rownames(assay(x)), rownames(assay(y)))) {
+    merged_assay <- cbind(assay(x), assay(y))
+    colnames(merged_assay) <- rownames(merged_coldata)
   } else {
-    merged_exprs <- dplyr::bind_rows(as.data.frame(t(exprs(x))),
-                                     as.data.frame(t(exprs(y)))) %>% 
+    merged_assay <- dplyr::bind_rows(as.data.frame(t(assay(x))),
+                                     as.data.frame(t(assay(y)))) %>% 
      t()
-    colnames(merged_exprs) <- rownames(merged_pdata)
+    colnames(merged_assay) <- rownames(merged_coldata)
   }
 
-  merged_fdata <- .fdata_batch_helper(fData(x), fData(y)) %>%
-    Biobase::AnnotatedDataFrame()
-  merged_group_col <- ifelse(!is.na(group_col(x)), group_col(x), group_col(y))
-  merged_time_col <- ifelse(!is.na(time_col(x)), time_col(x), time_col(y))
-  merged_subject_col <- ifelse(!is.na(subject_col(x)),
-                               subject_col(x), subject_col(y))
+  merged_rowdata <- .fdata_batch_helper(rowData(x), rowData(y)) %>%
+    S4Vectors::DataFrame()
 
-  merged_object <- MetaboSet(exprs = merged_exprs, phenoData = merged_pdata,
-                             featureData = merged_fdata,
-                             group_col = merged_group_col,
-                             time_col = merged_time_col,
-                             subject_col = merged_subject_col)
+  merged_object <- SummarizedExperiment(assays = merged_assay, 
+                                        colData = merged_coldata,
+                                        rowData = merged_rowdata)
 
   merged_object
 }

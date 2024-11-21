@@ -205,12 +205,12 @@ save_plot <- function(p, file, ...) {
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
-#' visualizations(example_set, prefix="figures/example_set", perplexity=5)
+#' visualizations(example_set, prefix="figures/example_set", perplexity=5, group = "Group", color = "Group", time = "Time", id = "Subject_ID")
 #' \dontshow{setwd(.old_wd)}
 #'
 #' @export
 visualizations <- function(object, prefix, format = "pdf", perplexity = 30,
-                           merge = FALSE, remove_singles = FALSE) {
+                           merge = FALSE, remove_singles = FALSE, group = NULL, time = NULL, id = NULL, color = NULL) {
   file_names <- ""
   if (sum(object$QC == "QC")) {
     .save_name(object, prefix, format, fun = plot_dist_density, 
@@ -228,9 +228,10 @@ visualizations <- function(object, prefix, format = "pdf", perplexity = 30,
   .save_name(object, prefix, format, plot_tsne, "tSNE_injection",
              perplexity = perplexity, color = "Injection_order")
   # Clustering
-  .save_name(object, prefix, format, plot_dendrogram, "dendrogram", width = 15)
+  .save_name(object, prefix, format, plot_dendrogram, "dendrogram", 
+             width = 15, color = color)
   .save_name(object, prefix, format, plot_sample_heatmap, 
-             "heatmap_samples", width = 15, height = 16)
+             "heatmap_samples", width = 15, height = 16, group = group)
   # For large sets, plot hexbin plots
   if (ncol(object) > 60) {
     .save_name(object, prefix, format, plot_pca_hexbin, "PCA_hexbin")
@@ -238,37 +239,39 @@ visualizations <- function(object, prefix, format = "pdf", perplexity = 30,
                "tSNE_hexbin", perplexity = perplexity)
   }
   # If not grouped, plot PCA and t-SNE on QC information
-  if (is.na(group_col(object))) {
-    group_col(object) <- "QC"
+  if (is.null(colData(object)[, group])) {
+    group <- "QC"
   }
-  .save_name(object, prefix, format, plot_pca, "PCA_group")
+  .save_name(object, prefix, format, plot_pca, "PCA_group", color = group)
   .save_name(object, prefix, format, plot_tsne, 
-             "tSNE_group", perplexity = perplexity)
+             "tSNE_group", perplexity = perplexity, color = group)
   # Time point
-  if (!is.na(time_col(object))) {
+  if (!is.null(colData(object)[, time])) {
     .save_name(object, prefix, format, plot_pca, "PCA_time",
-               color = time_col(object))
+               color = time)
     .save_name(object, prefix, format, plot_tsne, "tSNE_time",
-               color = time_col(object), perplexity = perplexity)
+               color = time, perplexity = perplexity)
     .save_name(object, prefix, format, plot_dendrogram, "dendrogram_time",
-               color = time_col(object), width = 15)
+               color = time, width = 15)
   }
   # Time point OR group
-  if (!is.na(group_col(object)) || !is.na(time_col(object))) {
+  if (!is.null(colData(object)[, group]) || !is.null(colData(object)[, time])){
+    by = c(group, time)
     .save_name(object, prefix, format, plot_sample_boxplots, 
-               "boxplots_group", width = 15)
+               "boxplots_group", width = 15, 
+               order_by = by, fill_by = by)
   }
   # Time point AND group
-  if (!is.na(group_col(object)) && !is.na(time_col(object))) {
+  if (!is.null(colData(object)[, group]) && !is.null(colData(object)[, time])) {
     .save_name(object, prefix, format, plot_pca, "PCA_group_time",
-               color = time_col(object), shape = group_col(object))
+               color = time, shape = group)
     .save_name(object, prefix, format, plot_tsne, "tSNE_group_time", 
-               color = time_col(object), shape = group_col(object),
+               color = time, shape = group,
                perplexity = perplexity)
   }
   # Multiple time points per subject
-  if (!is.na(time_col(object)) &&
-    !is.na(subject_col(object)) &&
+  if (!is.null(colData(object)[, time]) &&
+    !is.null(colData(object)[, id]) &&
     sum(object$QC == "QC") == 0) {
     .save_name(object, prefix, format, plot_pca_arrows, "PCA_arrows")
     .save_name(object, prefix, format, plot_tsne_arrows, 
