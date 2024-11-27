@@ -1,16 +1,17 @@
 
 #' Extract quality information of features
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' 
 #' @return A data frame with quality metrics for each feature.
 #'
 #' @examples 
-#' example_set <- assess_quality(example_set)
-#' quality(example_set)
+#' ex_set <- assess_quality(example_set)
+#' quality(ex_set)
 #'
 #' @export
 quality <- function(object) {
+  object <- check_object(object)
   if (!all(c("RSD", "RSD_r", "D_ratio", "D_ratio_r") %in%
       colnames(rowData(object)))) {
     return(NULL)
@@ -25,6 +26,9 @@ quality <- function(object) {
     return(NULL)
   }
   rowData(object)[c("RSD", "RSD_r", "D_ratio", "D_ratio_r")] <- NULL
+  if (!is.null(attr(object, "original_class"))) {
+    object <- as(object, "MetaboSet")
+  }
   object
 }
 
@@ -35,19 +39,22 @@ quality <- function(object) {
 #' Assess features using the quality metrics defined in (Broadhurst 
 #' 2018). The quality metrics are described in Details section of 
 #' \code{flag_quality}
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #'
-#' @return A MetaboSet object with quality metrics in fData.
+#' @return A SummarizedExperiment or MetaboSet object with quality metrics in 
+#' feature data.
 #' 
 #' @examples
 #' ex_set <- assess_quality(example_set)
-#' fData(ex_set)
+#' rowData(ex_set)
 #'
 #' @export
 assess_quality <- function(object) {
+  object <- check_object(object)
   # Remove old quality metrics
   if (!is.null(quality(object))) {
     object <- .erase_quality(object)
+    object <- as(object, "SummarizedExperiment")
   }
 
   qc_data <- assay(object)[, object$QC == "QC"]
@@ -69,6 +76,11 @@ assess_quality <- function(object) {
       
   quality_metrics <- do.call(rbind, quality_metrics)
   object <- join_rowData(object, quality_metrics)
+  
+  if (!is.null(attr(object, "original_class"))) {
+    object <- as(object, "MetaboSet")
+  }
+  object
 }
   
 #' Flag low-quality features
@@ -78,7 +90,7 @@ assess_quality <- function(object) {
 #' keeping the features is given as a character, which is passed to 
 #' \code{dplyr::filter}.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param condition character, condition for keeping the features, see Details
 #'
 #' @details The quality metrics measure two things: internal spread of the QCs,
@@ -101,7 +113,7 @@ assess_quality <- function(object) {
 #' \deqn{RSD_r < 0.2 \& D_ratio_r < 0.4}
 #' \deqn{RSD < 0.1 \& RSD_r < 0.1 \& D_ratio < 0.1}
 #'
-#' @return a MetaboSet object with the features flagged.
+#' @return a SummarizedExperiment or MetaboSet object with the features flagged.
 #'
 #' @references Broadhurst, David et al. Guidelines and considerations for the 
 #' use of system suitability and quality control samples in mass spectrometry 
@@ -116,11 +128,11 @@ assess_quality <- function(object) {
 #'
 #' @examples
 #' ex_set <- flag_quality(example_set)
-#' fData(ex_set)
+#' rowData(ex_set)
 #' # Custom condition
 #' ex_set <- flag_quality(example_set, 
 #'   condition = "RSD_r < 0.3 & D_ratio_r < 0.6")
-#' fData(ex_set)
+#' rowData(ex_set)
 #'
 #' @export
 flag_quality <- function(object, condition = 
@@ -129,6 +141,7 @@ flag_quality <- function(object, condition =
   if (is.null(quality(object))) {
     object <- assess_quality(object)
   }
+  object <- check_object(object)
   .add_citation("Quality metrics were computed as per guidelines in:", paste(
     "Broadhurst, David et al. Guidelines and considerations for the use of",
     "system suitability and quality control samples in mass spectrometry",
@@ -148,7 +161,9 @@ flag_quality <- function(object, condition =
                                     na.rm =TRUE) 
                                 / nrow(rowData(object)))
   log_text(paste0("\n", percentage, " of features flagged for low quality"))
-
+  if (!is.null(attr(object, "original_class"))) {
+    object <- as(object, "MetaboSet")
+  }
   object
 }
 
@@ -163,15 +178,15 @@ flag_quality <- function(object, condition =
 #' kept. Features with low detection rate in QCs are flagged as 
 #' "Low_qc_detection", while low detection rate in the study groups is flagged 
 #' as "Low_group_detection". The detection rates for all the groups are 
-#' recorded in \code{fData(object)}.
+#' recorded in feature data.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param qc_limit the detection rate limit for QC samples
 #' @param group_limit the detection rate limit for study groups
 #' @param group the columns name in sample information to use as the grouping 
 #' variable
 #'
-#' @return A MetaboSet object with the features flagged.
+#' @return A SummarizedExperiment or MetaboSet object with the features flagged.
 #'
 #' @examples
 #' ex_set <- mark_nas(example_set, value = 0)
@@ -180,7 +195,8 @@ flag_quality <- function(object, condition =
 #'
 #' @export
 flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
-                           group = group_col(object)) {
+                           group = NULL) {
+  object <- check_object(object)
   found_qc <- apply(assay(object[, object$QC == "QC"]), 1, prop_found)
   bad_qc <- names(which(found_qc < qc_limit))
 
@@ -192,7 +208,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
   flag(object)[idx] <- "Low_qc_detection"
 
   # Compute proportions found in each study group
-  if (!is.na(group)) {
+  if (!is.null(group)) {
     proportions <- combined_data(object)[, c("Sample_ID", group,
                                              rownames(object))] %>%
       tidyr::gather("Feature_ID", "Intensity", rownames(object)) %>%
@@ -226,7 +242,9 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
                   " of features flagged for low detection rate"))
 
   object <- join_rowData(object, proportions)
-
+  if (!is.null(attr(object, "original_class"))) {
+    object <- as(object, "MetaboSet")
+  }
   object
 }
 
@@ -238,8 +256,8 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' marked as blanks and are not QCs. If the median of blanks > the median of 
 #' biological samples times a set ratio, the feature is flagged as contaminant.
 #'
-#' @param object a MetaboSet object
-#' @param blank_col character, the column name in pData with blank labels
+#' @param object a SummarizedExperiment or MetaboSet object
+#' @param blank_col character, the column name in pheno data with blank labels
 #' @param blank_label character, the label for blank samples in blank_col
 #' @param flag_thresh numeric, the ratio threshold for flagging contaminants.
 #' If the median of blanks > flag_thresh * median of biological samples, the 
@@ -248,7 +266,8 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' be changed if sample processing contaminants and carryover contaminants are 
 #' flagged separately.
 #'
-#' @return A MetaboSet object with contaminant features flagged.
+#' @return A SummarizedExperiment or MetaboSet object with contaminant features 
+#' flagged.
 #'
 #' @examples 
 #' # Make a blank sample which has one (first) feature exceeding the threshold
@@ -278,6 +297,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' @export
 flag_contaminants <- function(object, blank_col, blank_label, 
                               flag_thresh = 0.05, flag_label = "Contaminant") {
+  object <- check_object(object)
   blanks <- object[, colData(object)[, blank_col] == blank_label]
   samples <- object[, object$QC != "QC" &
                     colData(object)[, blank_col] != blank_label]
@@ -298,6 +318,8 @@ flag_contaminants <- function(object, blank_col, blank_label,
                             Blank_ratio = blank_median / sample_median,
                             stringsAsFactors = FALSE)
   object <- join_rowData(object, blank_ratio)
-
+  if (!is.null(attr(object, "original_class"))) {
+    object <- as(object, "MetaboSet")
+  }
   object
 }

@@ -39,14 +39,14 @@
 #' Corrects the drift in the features by applying smoothed cubic spline 
 #' regression to each feature separately.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment object
 #' @param log_transform logical, should drift correction be done on 
 #' log-transformed values? See Details
 #' @param spar smoothing parameter
 #' @param spar_lower,spar_upper lower and upper limits for the smoothing 
 #' parameter
 #'
-#' @return A list with object = MetaboSet object as the one supplied, 
+#' @return A list including a SummarizedExperiment object
 #' with drift corrected features and predicted = matrix of the predicted values 
 #' by the cubic spline (used in visualization).
 #'
@@ -99,7 +99,7 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
     if (sum(assay(object) == 1, na.rm = TRUE)) {
       log_text(paste0("Values of 1 in feature abundances detected.", 
                      " 1s will be replaced with 1.1."))
-      exprs(object)[assay(object) == 1] <- 1.1
+      assay(object)[assay(object) == 1] <- 1.1
     }
     qc_data <- log(qc_data)
     full_data <- log(full_data)
@@ -119,6 +119,7 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
   assay(object) <- corrected
   # Recompute quality metrics
   object <- assess_quality(object)
+  object <- as(object, "SummarizedExperiment")
   
   log_text(paste("Drift correction performed at", Sys.time()))
   return(list(object = object, predicted = dc_data$predicted))
@@ -168,12 +169,12 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
 #' otherwise the original feature is retained and the drift corrected feature 
 #' is discarded. The result of this operation is recorded in the feature data.
 #'
-#' @param orig a MetaboSet object, before drift correction
-#' @param dc a MetaboSet object, after drift correction
+#' @param orig a SummarizedExperiment object, before drift correction
+#' @param dc a SummarizedExperiment object, after drift correction
 #' @param check_quality logical, whether quality should be monitored.
 #' @param condition a character specifying the condition, see Details
 #'
-#' @return A MetaboSet object.
+#' @return A SummarizedExperiment object.
 #'
 #' @details The \code{condition} parameter should be a character giving a 
 #' condition compatible with dplyr::filter. The condition is applied on the 
@@ -198,9 +199,11 @@ inspect_dc <- function(orig, dc, check_quality,
                        condition = "RSD_r < 0 & D_ratio_r < 0") {
   if (is.null(quality(orig))) {
     orig <- assess_quality(orig)
+    orig <- as(orig, "SummarizedExperiment")
   }
   if (is.null(quality(dc))) {
     dc <- assess_quality(dc)
+    dc <- as(dc, "SummarizedExperiment")
   }
 
   orig_data <- assay(orig)
@@ -217,6 +220,7 @@ inspect_dc <- function(orig, dc, check_quality,
 
   assay(dc) <- inspected$data
   dc <- assess_quality(dc)
+  dc <- as(dc, "SummarizedExperiment")
   dc <- join_rowData(dc, inspected$dc_notes)
 
   log_text(paste("Drift correction results inspected at", Sys.time()))
@@ -242,9 +246,8 @@ inspect_dc <- function(orig, dc, check_quality,
 #' The plot shows 2 standard deviation spread for both QC samples and regular 
 #' samples.
 #'
-#' @param orig a MetaboSet object, before drift correction
-#' @param dc a MetaboSet object, after drift correction as returned by 
-#' correct_drift
+#' @param orig a SummarizedExperiment object, before drift correction
+#' @param dc a SummarizedExperiment object, after drift correction as returned #' by correct_drift
 #' @param predicted a matrix of predicted values, as returned by dc_cubic_spline
 #' @param file path to the PDF file where the plots should be saved
 #' @param log_transform logical, was the drift correction done on log-
@@ -277,8 +280,7 @@ inspect_dc <- function(orig, dc, check_quality,
 #' \dontshow{setwd(.old_wd)}
 #' @export
 save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
-                          width = 16, height = 8, color = "QC",
-                          shape = color, 
+                          width = 16, height = 8, color = "QC", shape = color, 
                           color_scale = getOption("notame.color_scale_dis"),
                           shape_scale = scale_shape_manual(values = c(15, 16))){
 
@@ -353,7 +355,7 @@ save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
 #' A wrapper function for applying cubic spline drift correction and saving
 #' before and after plots.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param log_transform logical, should drift correction be done on 
 #' log-transformed values? See Details
 #' @param spar smoothing parameter
@@ -371,8 +373,8 @@ save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
 #' @param color_scale,shape_scale the color and shape scales as returned by a 
 #' ggplot function
 #'
-#' @return A MetaboSet object as the one supplied, with drift corrected 
-#' features.
+#' @return A SummarizedExperiment or MetaboSet object as the one supplied, with 
+#' drift corrected features.
 #'
 #' @details If \code{log_transform = TRUE}, the correction will be done on 
 #' log-transformed values.
@@ -413,6 +415,7 @@ correct_drift <- function(object, log_transform = TRUE, spar = NULL,
                           height = 8, color = "QC", shape = NULL, 
                           color_scale = getOption("notame.color_scale_dis"),
                           shape_scale = scale_shape_manual(values = c(15, 16))){
+  object <- check_object(object)
   # Fit cubic spline and correct
   corrected_list <- dc_cubic_spline(object, log_transform = log_transform, 
                                     spar = spar, spar_lower = spar_lower,

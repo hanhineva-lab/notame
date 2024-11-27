@@ -169,11 +169,12 @@ NULL
 #' @importFrom utils citation
 #' @importFrom Biobase exprs exprs<- phenoData pData pData<- featureData fData 
 #' fData<- sampleNames sampleNames<- featureNames featureNames<- assayData 
-#' protocolData
+#' protocolData varMetadata
 #' @importFrom magrittr "%>%" "%<>%"
 #' @importClassesFrom Biobase ExpressionSet
 #' @import BiocGenerics
 #' @import methods
+#' @import SummarizedExperiment
 NULL
 
 utils::globalVariables(c('i', '.'))
@@ -317,8 +318,8 @@ finite_quantile <- function(x, ...) {
 #' @return A numeric, the proportion of non-missing values in a vector.
 #'
 #' @examples
-#' example_set <- mark_nas(example_set, value = 0)
-#' prop_na(exprs(example_set))
+#' ex_set <- mark_nas(example_set, value = 0)
+#' prop_na(assay(ex_set))
 #' 
 #' @noRd
 prop_na <- function(x) {
@@ -332,8 +333,8 @@ prop_na <- function(x) {
 #' @return A numeric, the proportion of non-missing values in vector.
 #'
 #' @examples
-#' example_set <- mark_nas(example_set, value = 0)
-#' prop_found(exprs(example_set))
+#' ex_set <- mark_nas(example_set, value = 0)
+#' prop_found(assay(example_set))
 #'
 #' @noRd
 prop_found <- function(x) {

@@ -3,7 +3,7 @@
 #' Draws a dendrogram of a hierarchical clustering applied to the samples of an 
 #' experiment.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param color character, name of the column used for coloring the sample 
@@ -36,9 +36,11 @@ plot_dendrogram <- function(object, all_features = FALSE,
     stop("Package \'pcaMethods\' needed for this function to work.", 
          " Please install it.", call. = FALSE)
   }
+  
   color <- color %||% NULL
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
   
   subtitle <- subtitle %||% paste("Distance method:", dist_method, 
                                   "Clustering method:", clust_method)
@@ -74,7 +76,7 @@ plot_dendrogram <- function(object, all_features = FALSE,
 #' Draws a heatmap of the distances between the samples of an experiment,
 #' the samples are ordered by hierarchical clustering.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param dist_method distance method used in clustering, see \code{\link{dist}}
@@ -118,13 +120,13 @@ plot_sample_heatmap <- function(object, all_features = FALSE,
   }
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
 
   # Default settings
   subtitle <- subtitle %||% paste("Distance method:", dist_method, 
                                   "Clustering method:", clust_method)
 
-  assay <- pcaMethods::prep(t(assay(object)), center = center, 
-                            scale = scale)
+  assay <- pcaMethods::prep(t(assay(object)), center = center, scale = scale)
 
   # Distances
   distances <- stats::dist(assay, method = dist_method)

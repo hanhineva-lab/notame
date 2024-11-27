@@ -1,35 +1,11 @@
-# Check that objects have same special columns
-#
-# Used to check that the special columns of pheno data parts of MetaboSet 
-# objects match when merging, called by check_match
-#
-# @param x,y MetaboSet objects
-# @param fun the function to apply, usually one of group_col, time_col or 
-# subject_col
-.check_column_match <- function(x, y, fun, name) {
-  check <- fun(x) == fun(y)
-  if (is.na(check)) {
-    check <- is.na(fun(x)) & is.na(fun(y))
-  }
-  if (!check) {
-    stop(name, " returns different column names")
-  }
-  common <- intersect(sampleNames(x), sampleNames(y))
-  if (!is.na(fun(x))) {
-    if (!identical(colData(x)[common, fun(x)], colData(y)[common, fun(y)])) {
-        stop(name, " columns contSummarizedExperimentain different elements for common samples")
-    }
-  }
-}
-
-# Check that two MetaboSet object can be combined
+# Check that two SummarizedExperiment objects can be combined
 #
 # Checks many matching criteria, basically pheno data needs to have similar 
 # special columns,
 # the number of samples needs to be the same and feature data need to have the
 # same columns names. Throws an error if any of the criteria is not fulfilled.
 #
-# @param x,y MetaboSet objects
+# @param x,y SummarizedExperiment objects
 .check_match <- function(x, y) {
   # Lots of checks to ensure that everything goes smoothly
 
@@ -73,11 +49,11 @@
   }
 
   if (!identical(colnames(rowData(x)), colnames(rowData(y)))) {
-    stop("fData have different column names")
+    stop("Feature data have different column names")
   }
 }
 
-# Merge two MetaboSet objects together
+# Merge two SummarizedExperiment objects together
 .merge_mode_helper <- function(x, y) {
   # Create dummy injection order if original ones differ
   common <- intersect(colnames(x), colnames(y))
@@ -94,7 +70,7 @@
     names(dummy_injection) <- x$Sample_ID
     colData(x)$Injection_order <- dummy_injection
     # Save original injection order in other modes
-    colData(y)[, paste0(unique(fData(y)$Split), "_Injection_order")] <-
+    colData(y)[, paste0(unique(rowData(y)$Split), "_Injection_order")] <-
       y$Injection_order
     # Update dummy injection
     y_in_x <- y$Sample_ID %in% x$Sample_ID
@@ -123,7 +99,7 @@
     merged_assay <- dplyr::bind_rows(as.data.frame(assay(x)),
                                      as.data.frame(assay(y))) %>% 
       as.matrix()
-    rownames(merged_assay) <- rownames(merged_rowData)
+    rownames(merged_assay) <- rownames(merged_rowdata)
   }
 
   merged_object <- SummarizedExperiment(assays = merged_assay, 
@@ -133,7 +109,7 @@
   merged_object
 }
 
-# Convert metaboset objects in ... to al list
+# Convert objects in ... to al list
 # OR if a list is given in the first place, preserve that list
 .to_list <- function(...) {
   # Combine the objects to a list
@@ -190,42 +166,45 @@ merge_metabosets <- function(..., merge = c("features", "samples")) {
   # Merge objects together one by one
   merged <- NULL
   for (object in objects) {
+    object <- check_object(object)
     if (is.null(merged)) {
       merged <- object
     } else {
       merged <- merge_fun(merged, object)
     }
   }
+  if (!is.null(attr(merged, "original_class"))) {
+    merged <- as(merged, "MetaboSet")
+  }
   merged
 }
 
-#' Merge MetaboSet objects together
+#' Merge SummarizedExperiment objects together
 #'
-#' Merges two or more MetaboSet objects together. Can be used to merge 
-#' analytical modes or batches.
+#' Merges two or more SummarizedExperiment objects together. Can be used to 
+#' merge analytical modes or batches.
 #'
-#'
-#' @param ... MetaboSet objects or a list of Metaboset objects
+#' @param ... SummarizedExperiment objects or a list of objects
 #' @param merge what to merge? features is used for combining analytical modes,
 #' samples is used for batches
 #'
-#' @return A merged MetaboSet object.
+#' @return A merged SummarizedExperiment object.
 #'
-#' @details When merging samples, sample IDs that beging with "QC" or "Ref" are 
+#' @details When merging samples, sample IDs that begin with "QC" or "Ref" are 
 #' combined so that they have running numbers on them. This means that if both 
 #' batches have samples called "QC_1", this will not result in an error,
 #' but the sample IDs will be adjusted so that they are unique.
 #'
 #' @examples
 #' # Merge analytical modes
-#' merged <- merge_metabosets(
+#' merged <- merge_objects(
 #'   hilic_neg_sample, hilic_pos_sample,
 #'   rp_neg_sample, rp_pos_sample
 #' )
 #' # Merge batches
 #' batch1 <- example_set[, example_set$Batch == 1]
 #' batch2 <- example_set[, example_set$Batch == 2]
-#' merged <- merge_metabosets(batch1, batch2, merge = "samples")
+#' merged <- merge_objects(batch1, batch2, merge = "samples")
 #'
 #' @export
 merge_objects <- function(..., merge = c("features", "samples")) {
@@ -233,8 +212,8 @@ merge_objects <- function(..., merge = c("features", "samples")) {
   # Combine the objects to a list
   objects <- .to_list(...)
   # Class check
-  if (!all(vapply(objects, class, character(1)) == "MetaboSet")) {
-    stop("The arguments should only contain MetaboSet objects")
+  if (!all(vapply(objects, class, character(1)) == "SummarizedExperiment")) {
+    stop("The arguments should only contain SummarizedExperiment objects")
   }
   # Choose merging function
   if (merge == "features") {
@@ -254,7 +233,7 @@ merge_objects <- function(..., merge = c("features", "samples")) {
   merged
 }
 
-.fdata_batch_helper <- function(fx, fy) {
+.rowdata_batch_helper <- function(fx, fy) {
   non_identical_cols <- !identical(colnames(fx), colnames(fy))
   if (non_identical_cols) {
     only_x_cols <- setdiff(colnames(fx), colnames(fy))
@@ -273,14 +252,15 @@ merge_objects <- function(..., merge = c("features", "samples")) {
   }
   new_features <- setdiff(fy$Feature_ID, fx$Feature_ID)
 
-  merged_fdata <- rbind(fx, fy[new_features, ])
+  merged_rowdata <- rbind(fx, fy[new_features, ])
 
   if (non_identical_cols) {
-    merged_fdata <-dplyr::left_join(merged_fdata, only_x, by = "Feature_ID") %>%
+    merged_rowdata <-dplyr::left_join(merged_rowdata, only_x, 
+                                      by = "Feature_ID") %>%
       dplyr::left_join(only_y, by = "Feature_ID")
-    rownames(merged_fdata) <- merged_fdata$Feature_ID
+    rownames(merged_rowdata) <- merged_rowdata$Feature_ID
   }
-  merged_fdata
+  merged_rowdata
 }
 
 
@@ -311,7 +291,7 @@ merge_objects <- function(..., merge = c("features", "samples")) {
     colnames(merged_assay) <- rownames(merged_coldata)
   }
 
-  merged_rowdata <- .fdata_batch_helper(rowData(x), rowData(y)) %>%
+  merged_rowdata <- .rowdata_batch_helper(rowData(x), rowData(y)) %>%
     S4Vectors::DataFrame()
 
   merged_object <- SummarizedExperiment(assays = merged_assay, 

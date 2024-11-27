@@ -34,6 +34,7 @@ Imports:
     methods,
     openxlsx,
     RColorBrewer,
+    S4Vectors,
     scales,
     stringr,
     stats, 

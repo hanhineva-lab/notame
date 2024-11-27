@@ -18,7 +18,7 @@
 #'
 #' Plot density of distances between samples in QC samples and actual samples.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? 
 #' If FALSE (the default), flagged features are removed before visualization.
 #' @param dist_method method for calculating the distances, passed to dist
@@ -56,6 +56,7 @@ plot_dist_density <- function(object, all_features = FALSE,
   }
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
 
   assay <- pcaMethods::prep(t(assay(object)), center = center, scale = scale)
 
@@ -80,7 +81,7 @@ plot_dist_density <- function(object, all_features = FALSE,
 #' by injection order alone. The expected uniform distribution is represented 
 #' by a dashed red line.
 #'
-#' @param object A MetaboSet object
+#' @param object A SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? 
 #' If FALSE (the default), flagged features are removed before visualization.
 #'
@@ -95,6 +96,7 @@ plot_dist_density <- function(object, all_features = FALSE,
 plot_injection_lm <- function(object, all_features = FALSE) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
 
   # Apply linear model to QC samples and biological samples separately
   lm_all <- perform_lm(object, "Feature ~ Injection_order")
@@ -172,7 +174,7 @@ plot_p_histogram <- function(p_values, hline = TRUE, combine = TRUE,
 #'
 #' Plots distribution of each quality metric, and a distribution of the flags.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param plot_flags logical, should the distribution of flags be added as a 
@@ -185,6 +187,9 @@ plot_p_histogram <- function(p_values, hline = TRUE, combine = TRUE,
 #'
 #' @export
 plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE) {
+  # Drop flagged features
+  object <- drop_flagged(object, all_features = all_features)
+  object <- check_object(object)
   if (plot_flags) {
     # Plot bar plot of flags
     flags <- flag(object)
@@ -200,8 +205,6 @@ plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE) {
   }
 
 
-  # Drop flagged features
-  object <- drop_flagged(object, all_features = all_features)
 
   if (is.null(quality(object))) {
     message("\n", "Quality metrics not found, computing them now")
@@ -229,7 +232,7 @@ plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE) {
 #' in the pheno data. By default, order and fill are both determined by the 
 #' combination of group and time columns.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param order_by character vector, names of columns used to order the samples
@@ -256,6 +259,7 @@ plot_sample_boxplots <- function(
     fill_scale = getOption("notame.fill_scale_dis"), zoom_boxplot = TRUE) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
 
   data <- combined_data(object)
 

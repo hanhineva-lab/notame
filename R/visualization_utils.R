@@ -133,7 +133,7 @@ save_plot <- function(p, file, ...) {
 #' data between major steps of data preprocessing. Saves all visualizations as 
 #' PDFs with a set prefix on filenames.
 #'
-#' @param object A MetaboSet object
+#' @param object A SummarizedExperiment or MetaboSet object
 #' @param prefix character, a file path prefix added to the file paths
 #' @param format character, format in which the plots should be saved, DOES NOT 
 #' support raster formats
@@ -142,7 +142,12 @@ save_plot <- function(p, file, ...) {
 #' see Details
 #' @param remove_singles logical, whether to remove single plot files after 
 #' merging. Only used if \code{merge = TRUE}
-#'
+#' @param group character, name of pheno data column containing the group labels
+#' @param time character, name of pheno data column containing timepoints
+#' @param id character, name of pheno data column containing subject identifiers
+#' @param color character, name of pheno data column used for coloring sample
+#' labels for dendrograms
+
 #' @return None, the function is invoked for its plot-saving side effect.
 #'
 #' @details If \code{merge} is \code{TRUE} and \code{format} is \code{pdf},
@@ -205,12 +210,15 @@ save_plot <- function(p, file, ...) {
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
-#' visualizations(example_set, prefix="figures/example_set", perplexity=5, group = "Group", color = "Group", time = "Time", id = "Subject_ID")
+#' visualizations(example_set, prefix="figures/example_set", perplexity=5,
+#'                group = "Group", color = "Group", time = "Time", 
+#'                id = "Subject_ID")
 #' \dontshow{setwd(.old_wd)}
 #'
 #' @export
 visualizations <- function(object, prefix, format = "pdf", perplexity = 30,
                            merge = FALSE, remove_singles = FALSE, group = NULL, time = NULL, id = NULL, color = NULL) {
+  object <- check_object(object)
   file_names <- ""
   if (sum(object$QC == "QC")) {
     .save_name(object, prefix, format, fun = plot_dist_density, 
@@ -256,7 +264,7 @@ visualizations <- function(object, prefix, format = "pdf", perplexity = 30,
   }
   # Time point OR group
   if (!is.null(colData(object)[, group]) || !is.null(colData(object)[, time])){
-    by = c(group, time)
+    by <- c(group, time)
     .save_name(object, prefix, format, plot_sample_boxplots, 
                "boxplots_group", width = 15, 
                order_by = by, fill_by = by)
@@ -273,9 +281,11 @@ visualizations <- function(object, prefix, format = "pdf", perplexity = 30,
   if (!is.null(colData(object)[, time]) &&
     !is.null(colData(object)[, id]) &&
     sum(object$QC == "QC") == 0) {
-    .save_name(object, prefix, format, plot_pca_arrows, "PCA_arrows")
-    .save_name(object, prefix, format, plot_tsne_arrows, 
-               "tSNE_arrows", perplexity = perplexity)
+    .save_name(object, prefix, format, plot_pca_arrows, "PCA_arrows", 
+               color = group, time = time, subject = id)
+    .save_name(object, prefix, format, plot_tsne_arrows, "tSNE_arrows", 
+               perplexity = perplexity, color = group, time = time, 
+               subject = id)
   }
   if (merge && format == "pdf") {
     .merge_to_pdf(prefix, file_names, remove_singles)

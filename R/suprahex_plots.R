@@ -3,7 +3,7 @@
 #' Plots supraHex plots of each sample using functions from the supraHex 
 #' package. See the supraHex paper and package vignette for more information.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features if FALSE, flagged features are droppped
 #' @param sample_labels the column for labels of samples in the plot
 #' @param grid_xdim,grid_ydim dimensions of the grid for the samples
@@ -38,8 +38,9 @@ plot_sample_suprahex <- function(object, all_features = FALSE,
   }
   .add_citation("supraHex package was used for suprahexagonal maps:",
                 citation("supraHex"))
-
   object <- drop_flagged(object, all_features = all_features)
+  object <- check_object(object)
+  
   data <- scale(assay(object))
   colnames(data) <- colData(object)[, sample_labels]
 

@@ -2,12 +2,12 @@
 #'
 #' Helper function for saving plots of individual features
 #' to either one multi-page PDF or separate EMF figures.
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param file_path character, a file path for PDF or prefix added to the file 
 #' paths for other formats
 #' @param format character, format in which the plots should be saved
-#' @param title,subtitle column names from fData to use as plot title/filename 
-#' and subtitle
+#' @param title,subtitle column names from rfeature data to use as plot 
+#' title/filename and subtitle
 #' @param text_base_size integer, base size for text in figures
 #' @param plot_fun a function with arguments:
 #' data frame from combined_data(object)
@@ -16,7 +16,7 @@
 #' @param ... other arguments to plotting function
 #' @noRd
 .save_feature_plots <- function(object, file_path, format, title, subtitle,
-                               text_base_size, plot_fun, ...) {
+                                text_base_size, plot_fun, ...) {
   if (is.null(file_path)) file_path <- getwd()
   if (endsWith(file_path, ".pdf") && format != "pdf") {
     message("Switching to PDF format based on file path")
@@ -67,7 +67,8 @@
 #' Helper function for generating a list of feature-wise plots given a plot 
 #' function.
 #'
-#' @param object a MetaboSet object, should contain only features to be plotted
+#' @param object a SummarizedExperiment object, should contain 
+#' only features to be plotted
 #' @param plot_fun function, a notame plot function
 #' @return a list of ggplot objects
 #' @noRd
@@ -93,7 +94,7 @@
 #' A line is drawn for each subject and a mean line is added.
 #' A separate plot is drawn and saved for each feature.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used?
 #' If FALSE (the default), flagged features are removed before visualization.
 #' @param save logical, if false, the plots are not saved but returned as a list
@@ -102,8 +103,8 @@
 #' @param format character, format in which the plots should be saved
 #' @param x character, name of the column to be used as x-axis
 #' @param id character, name of the column containing subject IDs
-#' @param title,subtitle column names from fData to use as plot title/filename 
-#' and subtitle.
+#' @param title,subtitle column names from feature data to use as plot 
+#' title/filename and subtitle.
 #' Set to NULL for no title/subtitle, this creates running numbered filenames
 #' @param color character, the column name to color the lines by (optional)
 #' @param color_scale the color scale as returned by a ggplot function
@@ -127,8 +128,7 @@
 #' \dontshow{.old_wd <- setwd(tempdir())}
 #' save_subject_line_plots(drop_qcs(example_set)[1:10], x = "Time", 
 #'   id = "Subject_ID", file_path = "./subject_line_plots.pdf",
-#'   format = "pdf"
-#' )
+#'   format = "emf", title = NULL)
 #'
 #' # Plot one feature
 #' save_subject_line_plots(drop_qcs(example_set[1, ]), save = FALSE, x = "Time",
@@ -153,7 +153,7 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
   if (is.na(id)) {
     stop("The subject column is missing")
   }
-
+  
   subject_line_fun <- function(object, fname) {
     data <- combined_data(object)
 
@@ -183,15 +183,16 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
     splitted_title <-
       p <- p +
       theme +
-      labs(title = stringr::str_wrap(rowData(object)[fname, title],
+      labs(title = stringr::str_wrap(ifelse(is.null(title), character(0),
+                                            rowData(object)[fname, title]),
                                      title_line_length),
-           subtitle = ifelse(is.na(subtitle), character(0), 
-                             rowData(example_set)[fname, subtitle]),
+           subtitle = ifelse(is.null(subtitle), character(0), 
+                             rowData(object)[fname, subtitle]),
            y = "Abundance")
     p
   }
-
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
   if (save) {
     .save_feature_plots(object, file_path, format, title, subtitle,
                         text_base_size, subject_line_fun, ...)
@@ -207,7 +208,7 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
 #' Draws a boxplot of feature abundances in each group.
 #' A separate plot is drawn and saved for each feature.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? 
 #' If FALSE (the default), flagged features are removed before visualization.
 #' @param save logical, if false, the plots are not saved but returned as a list
@@ -216,8 +217,8 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
 #' @param format character, format in which the plots should be saved
 #' @param x character, name of the column to be used as x-axis
 #' @param color character, name of the column to be used for coloring
-#' @param title,subtitle column names from fData to use as plot title/filename 
-#' and subtitle.
+#' @param title,subtitle column names from feature data to use as plot 
+#' title/filename and subtitle.
 #' Set to NULL for no title/subtitle, this creates running numbered filenames
 #' @param color_scale the color scale as returned by a ggplot function
 #' @param text_base_size integer, base size for text in figures
@@ -266,7 +267,7 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
                                 line_width = 0.5, point_size = 3,
                                 title_line_length = 40, theme =
                                 theme_bw(base_size = text_base_size), ...) {
-  boxplot_fun <- function(object, fname) {
+    boxplot_fun <- function(object, fname) {
     data <- combined_data(object)
     dodge_amount <- box_width + 0.05
     p <- ggplot(data, aes(x = .data[[x]], y = .data[[fname]], 
@@ -277,18 +278,20 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
                    size = point_size, position = position_dodge(dodge_amount)) +
       color_scale +
       theme +
-      labs(title = stringr::str_wrap(rowData(object)[fname, title],
+      labs(title = stringr::str_wrap(ifelse(is.null(title), character(0),
+                                            rowData(object)[fname, title]),
                                      title_line_length),
            subtitle = ifelse(is.na(subtitle), character(0), 
-                             rowData(example_set)[fname, subtitle]), 
+                             rowData(object)[fname, subtitle]), 
            y = "Abundance")
     if (x == color) {
       p <- p + guides(color = "none")
     }
     p
   }
-
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
+  
   if (save) {
     .save_feature_plots(object, file_path, format, title, subtitle,
                         text_base_size, boxplot_fun, ...)
@@ -304,7 +307,7 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
 #' Draws a beeswarm plot of feature abundances in each group.
 #' A separate plot is drawn and saved for each feature.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param save logical, if false, the plots are not saved but returned as a list
@@ -313,8 +316,8 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
 #' @param format character, format in which the plots should be saved
 #' @param x character, name of the column to be used as x-axis
 #' @param add_boxplots logical, should boxplots be added to the figure?
-#' @param title,subtitle column names from fData to use as plot title/filename 
-#' and subtitle.
+#' @param title,subtitle column names from feature data to use as plot 
+#' title/filename and subtitle.
 #' Set to NULL for no title/subtitle, this creates running numbered filenames
 #' @param color character, name of the column to be used for coloring
 #' @param color_scale the color scale as returned by a ggplot function
@@ -376,18 +379,20 @@ save_beeswarm_plots <- function(object, all_features = FALSE, save = TRUE,
       ggbeeswarm::geom_beeswarm(cex = cex, size = size) +
       color_scale +
       theme +
-      labs(title = stringr::str_wrap(rowData(object)[fname, title],
+      labs(title = stringr::str_wrap(ifelse(is.null(title), character(0),
+                                            rowData(object)[fname, title]),
                                      title_line_length),
            subtitle = ifelse(is.na(subtitle), character(0), 
-                             rowData(example_set)[fname, subtitle]),
+                             rowData(object)[fname, subtitle]),
            y = "Abundance")
     if (x == color) {
       p <- p + guides(color = "none")
     }
     p
   }
-
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
+
   if (save) {
     .save_feature_plots(object, file_path, format, title, subtitle,
                         text_base_size, beeswarm_fun, ...)
@@ -404,7 +409,7 @@ save_beeswarm_plots <- function(object, all_features = FALSE, save = TRUE,
 #' Draws a scatterplots with a feature on y-axis and another variable on x-axis.
 #' A separate plot is drawn and saved for each feature.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param x character, name of the column to be used as x-axis
 #' @param save logical, if false, the plots are not saved but returned as a list
 #' @param file_path character, a file path for PDF or prefix added to the file 
@@ -417,8 +422,8 @@ save_beeswarm_plots <- function(object, all_features = FALSE, save = TRUE,
 #' Set to NA to choose the appropriate scale based on the class of the coloring 
 #' variable.
 #' @param shape character, name of the column used for shape
-#' @param title,subtitle column names from fData to use as plot title/filename 
-#' and subtitle.
+#' @param title,subtitle column names from feature data to use as plot 
+#' title/filename and subtitle.
 #' Set to NULL for no title/subtitle, this creates running numbered filenames
 #' @param shape_scale the shape scale as returned by a ggplot function
 #' @param text_base_size integer, base size for text in figures
@@ -465,14 +470,17 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
                        shape_scale = shape_scale, point_size = point_size,
                        fixed = FALSE, apply_theme_bw = FALSE) +
       theme +
-      labs(title = stringr::str_wrap(rowData(object)[fname, title],
+      labs(title = stringr::str_wrap(ifelse(is.null(title), character(0),
+                                            rowData(object)[fname, title]),
                                      title_line_length),
            subtitle = ifelse(is.na(subtitle), character(0), 
-                             rowData(example_set)[fname, subtitle]),
+                             rowData(object)[fname, subtitle]),
            y = "Abundance")
     p
   }
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
+
   if (save) {
     .save_feature_plots(object, file_path, format, title, subtitle,
                         text_base_size, scatter_fun, ...)
@@ -490,7 +498,7 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
 #' A line is drawn for each group and error bars are added.
 #' A separate plot is drawn for each feature.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? 
 #' If FALSE (the default), flagged features are removed before visualization
 #' @param save logical, if false, the plots are not saved but returned as a list
@@ -500,8 +508,8 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
 #' @param x character, name of the column to be used as x-axis
 #' @param group character, name of the column containing group information, 
 #' used for coloring
-#' @param title,subtitle column names from fData to use as plot title/filename 
-#' and subtitle.
+#' @param title,subtitle column names from feature data to use as plot 
+#' title/filename and subtitle.
 #' Set to NULL for no title/subtitle, this creates running numbered filenames
 #' @param fun.data passed to ggplot2::stat_summary and used for errorbars,
 #' "A function that is given the complete data and should return a data frame 
@@ -584,18 +592,20 @@ save_group_lineplots <- function(object, all_features = FALSE, save = TRUE,
                    fun.max = fun.max) +
       color_scale +
       theme +
-      labs(title = stringr::str_wrap(rowData(object)[fname, title],
+      labs(title = stringr::str_wrap(ifelse(is.null(title), character(0),
+                                            rowData(object)[fname, title]),
                                      title_line_length),
            subtitle = ifelse(is.na(subtitle), character(0), 
-                             rowData(example_set)[fname, subtitle]),
+                             rowData(object)[fname, subtitle]),
            y = "Abundance")
     if (x == group) {
       p <- p + guides(color = "none")
     }
     p
   }
-
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
+
   if (save) {
     .save_feature_plots(object, file_path, format, title, 
                         subtitle, text_base_size, line_fun, ...)

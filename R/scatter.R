@@ -50,7 +50,7 @@
 #' Computes PCA using one of the methods provided in the Bioconductor package
 #' pcaMethods and plots the two first principal components.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
@@ -95,6 +95,7 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
                      text_base_size = 14, point_size = 2, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
 
   pca_results <- .pca_helper(object, pcs, center, scale, ...)
   pca_scores <- pca_results$pca_scores
@@ -118,7 +119,7 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' of \code{pcaMethods::pca}, the  method can be changed to "ppca" if nipals 
 #' fails.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
@@ -166,6 +167,8 @@ plot_tsne <- function(object, all_features = FALSE, center = TRUE,
                       text_base_size = 14, point_size = 2, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
+
   # t-SNE
   tsne_scores <- .t_sne_helper(object, center, scale, 
                                perplexity, pca_method, ...)
@@ -279,7 +282,7 @@ plot_tsne <- function(object, all_features = FALSE, center = TRUE,
 #' Computes PCA using one of the methods provided in the Bioconductor package
 #' pcaMethods and plots the loadings of first principal components.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
@@ -319,6 +322,8 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
   
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
+
   pca_res <- pcaMethods::pca(t(assay(object)), nPcs = max(pcs), 
                              center = center, scale = scale, ...)
 
@@ -353,7 +358,7 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' where the value of the coloring variable is summarised for each bin, by 
 #' default as the mean of the values inside the bin.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param all_features logical, should all features be used? If FALSE (the 
@@ -385,6 +390,7 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
                             ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
 
   pca_results <- .pca_helper(object, pcs, center, scale, ...)
   pca_scores <- pca_results$pca_scores
@@ -406,7 +412,7 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' of \code{pcaMethods::pca}, the  method can be changed to "ppca" if nipals 
 #' fails.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
@@ -440,6 +446,7 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
                              ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
 
   # t-SNE
   tsne_scores <- .t_sne_helper(object, center, scale,
@@ -493,7 +500,7 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
 #' Plots changes in PCA space according to time. All the observations of a 
 #' single subject are connected by an arrow ending at the last observation.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
@@ -520,7 +527,8 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
 #' plot_pca_arrows(drop_qcs(example_set), color = "Group", time = "Time",
 #'   subject = "Subject_ID")
 #' # If the sample size is large, plot groups separately
-#' plot_pca_arrows(drop_qcs(example_set)) +
+#' plot_pca_arrows(drop_qcs(example_set), color = "Group", 
+#'                 time = "Time", subject = "Subject_ID") +
 #'   facet_wrap(~Group)
 #'
 #' @seealso \code{\link[pcaMethods]{pca}}
@@ -536,6 +544,7 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
                             text_base_size = 14, line_width = 0.5, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
 
   pca_results <- .pca_helper(object, pcs, center, scale, ...)
   pca_scores <- pca_results$pca_scores
@@ -560,7 +569,7 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' using the nipals method of \code{pcaMethods::pca}, the method can be changed 
 #' to "ppca" if nipals fails.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
@@ -609,6 +618,7 @@ plot_tsne_arrows <- function(object, all_features = FALSE, center = TRUE,
                              text_base_size = 14, line_width = 0.5, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
 
   tsne_scores <- .t_sne_helper(object, center, scale, 
                                perplexity, pca_method, ...)
@@ -634,8 +644,9 @@ minus_log10 <- scales::trans_new("minus_log10",
 #'
 #' Draws a volcano plot of effect size and p-values.
 #'
-#' @param object a MetaboSet object or a data frame. If x is a MetaboSet 
-#' object, fData(x) is used. If x is a data frame, it is used as is.
+#' @param object a SummarizedExperiment object or a data frame. If x is a 
+#' SummarizedExperiment object, feature data of x is used. If x is a data 
+#' frame, it is used as is.
 #' @param x,p the column names of effect size (x-axis) and p-values
 #' @param p_fdr column name of FDR corrected p-values, used to draw a line 
 #' showing the fdr-corrected significance level
@@ -814,8 +825,9 @@ setMethod("volcano_plot", c(object = "data.frame"),
 #' the effect, so part of the points will "drop" from the p = 1 (-log10(p) = 0) 
 #' line. This results in a so-called directed Manhattan plot.
 #'
-#' @param object a MetaboSet object or a data frame. If x is a MetaboSet 
-#' object, fData(x) is used. If x is a data frame, it is used as is.
+#' @param object a SummarizedExperiment object or a data frame. If x is a 
+#' SummarizedExperiment object, feature data of x is used. If x is a data 
+#' frame, it is used as is.
 #' @param x,p the column names of x-axis and p-values
 #' @param effect column name of effect size (should have negative and positive 
 #' values).
@@ -841,14 +853,14 @@ setMethod("volcano_plot", c(object = "data.frame"),
 #' lm_data <- dplyr::left_join(as.data.frame(rowData(example_set)), lm_results)
 #' # Traditional Manhattan plot from data frame
 #' manhattan_plot(lm_data,
-#'   x = "Mass",
+#'   x = "Average_Mz",
 #'   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
 #'   fdr_limit = 0.1
 #' )
-#' # Directed Manhattan plot from MetaboSet
+#' # Directed Manhattan plot from SummarizedExperiment
 #' with_results <- join_rowData(example_set, lm_results)
 #' manhattan_plot(with_results,
-#'   x = "Mass", effect = "GroupB_Estimate",
+#'   x = "Average_Mz", effect = "GroupB_Estimate",
 #'   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
 #'   fdr_limit = 0.1
 #' )
@@ -971,8 +983,8 @@ setMethod("manhattan_plot", c(object = "data.frame"),
 #' represents a feature. The plot has retention time on x-axis, m/z on y-axis 
 #' and the size of the points is scaled based on p-value
 #'
-#' @param object a MetaboSet object or a data frame. If x is a MetaboSet 
-#' object, fData(x) is used.
+#' @param object a SummarizedExperiment object or a data frame. If x is a 
+#' SummarizedExperiment object, rowData(x) is used.
 #' If x is a data frame, it is used as is.
 #' @param p_col the column name containing p-values. This is used to scale the 
 #' size of the points.
@@ -986,7 +998,7 @@ setMethod("manhattan_plot", c(object = "data.frame"),
 #' @param color_scale color scale as returned by a ggplot function. Defaults to 
 #' current continuous color scale.
 #' @param all_features logical, should all features be retained? Should be used 
-#' only if x is a MetaboSet object.
+#' only if x is a SummarizedExperiment object.
 #' @param ...  parameters passed to \code{\link[ggplot2]{geom_point}},
 #' such as shape and alpha values. New aesthetics can
 #' also be passed using \code{mapping = aes(...)}.
@@ -998,7 +1010,7 @@ setMethod("manhattan_plot", c(object = "data.frame"),
 #' lm_results <- perform_lm(example_set, formula_char = "Feature ~ Group")
 #' with_results <- join_rowData(example_set, lm_results)
 #'
-#' # Plot from the MetaboSet object
+#' # Plot from the SummarizedExperiment object
 #' # automatically facet by analytical mode in variable Split
 #' mz_rt_plot(with_results, p_col = "GroupB_P", color = "GroupB_Estimate")
 #'

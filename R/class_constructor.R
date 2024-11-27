@@ -279,8 +279,7 @@
 #' @param skip_checks logical: skip checking data integrity. Not recommended, 
 #' but sometimes useful when you just want to read the data in as is and fix 
 #' errors later. NOTE: Sample_ID and QC columns will not be constructed.
-#' The data integrity checks need to be passed when contstructing MetaboSet 
-#' objects.
+#' The data integrity checks are important for functioning of notame.
 #'
 #' @inherit construct_metabosets return examples
 #'
@@ -325,11 +324,11 @@ read_from_excel <- function(file, sheet = 1, id_column = NULL,
   exprs_ <- extracted$exprs_
   # Skip checks
   if (!skip_checks) {
-    pheno_data <- fix_pheno_data(x = pheno_data, id_prefix = id_prefix,
+    pheno_data <- .fix_pheno_data(x = pheno_data, id_prefix = id_prefix,
                                  id_column = id_column, clean = TRUE,
                                  log_messages = TRUE)
-    exprs_ <- fix_exprs(exprs_, log_messages = TRUE)
-    feature_data <- fix_feature_data(feature_data, name = name, 
+    exprs_ <- .fix_exprs(exprs_, log_messages = TRUE)
+    feature_data <- .fix_feature_data(feature_data, name = name, 
                                      split_by = split_by, clean = TRUE, log_messages = TRUE)
 
     .check_pheno_data(x = pheno_data, log_messages = TRUE)
@@ -541,14 +540,15 @@ construct_metabosets <- function(exprs, pheno_data, feature_data,
 
 #' Write results to Excel file
 #'
-#' Writes all the data in a MetaboSet object to an Excel spreadsheet.
+#' Writes all the data in a SummarizedExperiment or MetaboSet object to an 
+#' Excel spreadsheet.
 #' The format is similar to the one used to read data in, except for the fact 
 #' that EVERYTHING NEEDS TO BE WRITTEN AS TEXT. To fix numeric values in Excel,
 #' choose any cell with a number, press Ctrl + A, then go to the dropdown menu
 #' in upper left corner and choose "Convert to Number". This will fix the file,
 #' but can take quite a while.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param file path to the file to write
 #' @param ... Additional parameters passed to \code{openxlsx::write.xlsx}
 #'
@@ -561,6 +561,7 @@ construct_metabosets <- function(exprs, pheno_data, feature_data,
 #'
 #' @export
 write_to_excel <- function(object, file, ...) {
+  object <- check_object(object)
   # Bottom part consists of (from left to right):
   # - feature data with results
   # - abundance values
@@ -673,8 +674,9 @@ setMethod("combined_data", c(object = "MetaboSet"),
 #' @return Character, the name of the grouping variable.
 #'
 #' @examples
+#' ex_set <- as(example_set, "MetaboSet")
 #' # Get name of grouping variable
-#' group_col(example_set)
+#' group_col(ex_set)
 #'
 #' @export
 setGeneric("group_col", signature = "object",
@@ -692,8 +694,9 @@ setMethod("group_col", "MetaboSet", function(object) object@group_col)
 #' the specified variable.
 #'
 #' @examples
+#' ex_set <- as(example_set, "MetaboSet")
 #' # Set grouping variable
-#' group_col(example_set) <- "Group"
+#' group_col(ex_set) <- "Group"
 #'
 #' @export
 setGeneric("group_col<-", signature = "object",
@@ -716,8 +719,9 @@ setMethod("group_col<-", "MetaboSet",
 #' @return Character, name of time variable.
 #'
 #' @examples
+#' ex_set <- as(example_set, "MetaboSet")
 #' # Get name of time variable
-#' time_col(example_set)
+#' time_col(ex_set)
 #'
 #' @export
 setGeneric("time_col", signature = "object",
@@ -737,8 +741,9 @@ setMethod("time_col", "MetaboSet",
 #' specified variable.
 #'
 #' @examples
+#' ex_set <- as(example_set, "MetaboSet")
 #' # Set time variable
-#' time_col(example_set) <- "Time"
+#' time_col(ex_set) <- "Time"
 #'
 #' @export
 setGeneric("time_col<-", signature = "object",
@@ -762,8 +767,9 @@ setMethod("time_col<-", "MetaboSet",
 #' @return Character, the name of the subject variable.
 #'
 #' @examples
+#' ex_set <- as(example_set, "MetaboSet")
 #' # Get name of subject variable
-#' subject_col(example_set)
+#' subject_col(ex_set)
 #' @export
 setGeneric("subject_col", signature = "object",
            function(object) standardGeneric("subject_col"))
@@ -782,8 +788,9 @@ setMethod("subject_col", "MetaboSet",
 #' specified variable.
 #'
 #' @examples
+#' ex_set <- as(example_set, "MetaboSet")
 #' # Set subject variable
-#' subject_col(example_set) <- "Subject_ID"
+#' subject_col(ex_set) <- "Subject_ID"
 #' @export
 setGeneric("subject_col<-", signature = "object",
            function(object, value) standardGeneric("subject_col<-"))
@@ -802,12 +809,12 @@ setMethod("subject_col<-", "MetaboSet",
 
 
 #' Get and set the values in the flag column
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' 
 #' @return Character vector of feature flags.
 #'
 #' @examples
-#' # Get values in flag column of fData
+#' # Get values in flag column of rowData
 #' flag(example_set)
 #'
 #' @export
@@ -820,7 +827,7 @@ setMethod("flag", "MetaboSet",
           function(object) fData(object)$Flag)
 
 #' @rdname flag
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param value character vector, values for flag column
 #'
 #' @return For the endomorphism, an object with a modified flag column.
@@ -855,11 +862,12 @@ setMethod("flag<-", "MetaboSet",
 #' @param dframe a data frame with the new information
 #'
 #' @examples
+#' ex_set <- as(example_set, "MetaboSet")
 #' new_info <- data.frame(
-#'   Feature_ID = featureNames(example_set),
-#'   Feature_number = seq_len(nrow(example_set))
+#'   Feature_ID = featureNames(ex_set),
+#'   Feature_number = seq_len(nrow(ex_set))
 #' )
-#' with_new_info <- join_fData(example_set, new_info)
+#' with_new_info <- join_fData(ex_set, new_info)
 #' colnames(fData(with_new_info))
 #'
 #' @return A MetaboSet object with the new information added to fData(object).
@@ -889,11 +897,12 @@ setMethod("join_fData", c("MetaboSet", "data.frame"),
 #' @param dframe a data frame with the new information
 #'
 #' @examples
+#' ex_set <- as(example_set, "MetaboSet")
 #' new_info <- data.frame(
-#'   Sample_ID = sampleNames(example_set),
-#'   BMI = stats::runif(ncol(example_set), 22, 26)
+#'   Sample_ID = sampleNames(ex_set),
+#'   BMI = stats::runif(ncol(ex_set), 22, 26)
 #' )
-#' with_new_info <- join_pData(example_set, new_info)
+#' with_new_info <- join_pData(ex_set, new_info)
 #' colnames(pData(with_new_info))
 #'
 #' @return A MetaboSet object with the new information added to pData(object).
@@ -966,10 +975,13 @@ setAs("SummarizedExperiment", "MetaboSet", function(from) {
   row_data <- rowData(from)                # Extract row data (metadata for features)
   # Construct the MetaboSet object from these components
   # This assumes MetaboSet has a constructor or function that takes these parts
-  construct_metabosets(exprs = assay_data,
-                       pheno_data = as.data.frame(col_data),
-                       feature_data = as.data.frame(row_data),
-                       split_data = FALSE)
+  to <- construct_metabosets(exprs = assay_data,
+                             pheno_data = as.data.frame(col_data),
+                             feature_data = as.data.frame(row_data),
+                             split_data = FALSE)
+  
+  attr(to, "original_class") <- attr(from, "original_class")
+  to
 })
 
 setAs("MetaboSet", "SummarizedExperiment", function(from) {
@@ -982,32 +994,39 @@ setAs("MetaboSet", "SummarizedExperiment", function(from) {
   row_data <- S4Vectors::DataFrame(fData(from)) # Extract row data (metadata for features)
   mcols(row_data) <- S4Vectors::DataFrame(varMetadata(featureData(from))) 
   # Construct the MetaboSet object from these components
-  # This assumes MetaboSet has a constructor or function that takes these parts
-  SummarizedExperiment(assays = assay_data,
-                       colData = col_data,
-                       rowData = row_data)
+  to <- SummarizedExperiment(assays = assay_data,
+                             colData = col_data,
+                             rowData = row_data)
+  attr(to, "original_class") <- attr(from, "original_class")
+  to
 })
 
+#' @export
 check_object <- function(object, log_messages = FALSE, check_limits = TRUE, 
                          mz_limits = c(10, 2000), rt_limits = c(0, 20)) {
+  if (is(object, "MetaboSet")) {
+    attr(object, "original_class") <- "MetaboSet"
+  }
   object <- as(object, "SummarizedExperiment")
   .check_pheno_data(colData(object), log_messages = log_messages)
   .check_exprs(assay(object), log_messages = log_messages)
   .check_feature_data(rowData(object), check_limits = check_limits, 
-                     mz_limits = mz_limits, rt_limits = rt_limits,
-                     log_messages = log_messages)
+                      mz_limits = mz_limits, rt_limits = rt_limits,
+                      log_messages = log_messages)
+  object
 }
 
-
+#' @export
 fix_object <- function(object, id_prefix, id_column = NULL, split_by, name,
                        clean = TRUE, split_data = FALSE, log_messages = TRUE) {
   object <- as(object, "SummarizedExperiment")
-  pheno_data <- fix_pheno_data(colData(object), id_prefix = "",
-                               id_column = id_column, clean = clean, log_messages = log_messages)
-  feature_data <- fix_feature_data(rowData(object), split_by = split_by,
-                                   name = name, clean = clean,
-                                   log_messages = log_messages)
-  exprs <- fix_exprs(assay(object))
+  pheno_data <- .fix_pheno_data(colData(object), id_prefix = "",
+                                id_column = id_column, clean = clean,  
+                                log_messages = log_messages)
+  feature_data <- .fix_feature_data(rowData(object), split_by = split_by,
+                                    name = name, clean = clean,
+                                    log_messages = log_messages)
+  exprs <- .fix_exprs(assay(object))
   rownames(exprs) <- rownames(feature_data)
   colnames(exprs) <- rownames(pheno_data)
                 
@@ -1017,12 +1036,11 @@ fix_object <- function(object, id_prefix, id_column = NULL, split_by, name,
     parts <- unique(feature_data$Split)
     obj_list <- list()
     for (part in parts) {
-      fd_tmp <- S4Vectors::DataFrame(
-        data = feature_data[feature_data$Split == part, ])
+      fd_tmp <- S4Vectors::DataFrame(feature_data[feature_data$Split == part, ])
       ad_tmp <- exprs[fd_tmp$Feature_ID, ]
-      obj_list[[part]] <- SummarizedExperiment(assays = exprs,
+      obj_list[[part]] <- SummarizedExperiment(assays = ad_tmp,
                                                colData = pheno_data,
-                                               rowData = feature_data)
+                                               rowData = fd_tmp)
     }
     return(obj_list)
   } else {
@@ -1039,8 +1057,8 @@ fix_object <- function(object, id_prefix, id_column = NULL, split_by, name,
                        rowData = feature_data)
 }
 
-fix_pheno_data <- function(x, id_prefix = "", id_column = NULL, 
-                           log_messages = FALSE, clean = TRUE) {
+.fix_pheno_data <- function(x, id_prefix = "", id_column = NULL, 
+                            log_messages = FALSE, clean = TRUE) {
   # If QC column is not provided explicitly, attempt to create it
   if (!"QC" %in% colnames(x)) {
     qc_found <- apply(x, 1, function(y) {
@@ -1067,7 +1085,7 @@ fix_pheno_data <- function(x, id_prefix = "", id_column = NULL,
   x
 }
 
-fix_exprs <- function(exprs_, log_messages = FALSE) {
+.fix_exprs <- function(exprs_, log_messages = FALSE) {
   .log_text_if("Checking that feature abundances only contain numeric values",
                log_messages)
   # Check that all rows are full of numbers
@@ -1082,8 +1100,8 @@ fix_exprs <- function(exprs_, log_messages = FALSE) {
   exprs_
 }
 
-fix_feature_data <- function(name = NULL, split_by = NULL, feature_data, 
-                             clean = TRUE, log_messages = FALSE) {
+.fix_feature_data <- function(name = NULL, split_by = NULL, feature_data, 
+                              clean = TRUE, log_messages = FALSE) {
   if (!"Flag" %in% colnames(feature_data)) {
     message("Initializing with unflagged features.")
     feature_data$Flag <- NA
@@ -1137,8 +1155,6 @@ fix_feature_data <- function(name = NULL, split_by = NULL, feature_data,
   feature_data
 }
 
-################ New methods for existing generics ####################
-
 #' @describeIn MetaboSet Retrieve both sample information and features
 #' @export
 setMethod("combined_data", c(object = "SummarizedExperiment"), 
@@ -1165,10 +1181,10 @@ setMethod("flag<-", "SummarizedExperiment",
 
 #' Join new columns to feature data
 #'
-#' Join a new data frame of information to feature data of a MetaboSet object.
-#' The data frame needs to have a column "Feature_ID".
-#' This function is usually used internally by some of the functions in the 
-#' package, but can be useful.
+#' Join a new data frame of information to feature data of a 
+#' SummarizedExperiment object. The data frame needs to have a column 
+#' "Feature_ID". This function is usually used internally by some of the 
+#' functions in the package, but can be useful.
 #'
 #' @param object a MetaboSet object
 #' @param dframe a data frame with the new information
@@ -1181,31 +1197,33 @@ setMethod("flag<-", "SummarizedExperiment",
 #' with_new_info <- join_rowData(example_set, new_info)
 #' colnames(rowData(with_new_info))
 #'
-#' @return A MetaboSet object with the new information added to fData(object).
+#' @return A SummarizedExperiment object with the new information added to 
+#' rowData(object).
 #'
 #' @export
 setGeneric("join_rowData", signature = c("object", "dframe"),
            function(object, dframe) standardGeneric("join_rowData"))
 
-#' @describeIn MetaboSet join new information to feature data
+#' @describeIn join_rowData join new information to feature data
 #' @param dframe a data frame with the new information
 #' @export
 setMethod("join_rowData", c("SummarizedExperiment", "data.frame"),
   function(object, dframe) {
-    rowData(object) <- merge(rowData(object), dframe,
-                             by = "Feature_ID", sort = FALSE)
-    rownames(rowData(object)) <- rowData(object)$Feature_ID
+    rowData(object) <- merge(rowData(object), dframe, by = "Feature_ID", 
+                             all.x = TRUE, sort = FALSE)
+    rownames(object) <- rowData(object)$Feature_ID
     if (validObject(object)) {
       return(object)
     }
   }
 )
-
+  
 #' Join new columns to pheno data
 #'
-#' Join a new data frame of information to pheno data of a MetaboSet object.
+#' Join a new data frame of information to pheno data of a SummarizedExperiment 
+#' object.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment object
 #' @param dframe a data frame with the new information
 #'
 #' @examples
@@ -1214,62 +1232,23 @@ setMethod("join_rowData", c("SummarizedExperiment", "data.frame"),
 #'   BMI = stats::runif(ncol(example_set), 22, 26)
 #' )
 #' with_new_info <- join_colData(example_set, new_info)
-#' colnames(pData(with_new_info))
+#' colnames(colData(with_new_info))
 #'
-#' @return A MetaboSet object with the new information added to pData(object).
+#' @return A SummarizedExperiment object with the new information added to 
+#' colData(object).
 #'
 #' @export
 setGeneric("join_colData", signature = c("object", "dframe"),
            function(object, dframe) standardGeneric("join_colData"))
 
-#' @describeIn MetaboSet join new information to pheno data
+#' @describeIn join_colData join new information to pheno data
 #' @param dframe a data frame with the new information
 #' @export
 setMethod("join_colData", c("SummarizedExperiment", "data.frame"),
   function(object, dframe) {
-    colData(object) <- merge(colData(object), dframe, by = "Sample_ID")
+    colData(object) <- merge(colData(object), dframe, by = "Feature_ID",
+                             all.x = TRUE, sort = FALSE)
     rownames(colData(object)) <- colData(object)$Sample_ID
-    if (validObject(object)) {
-      return(object)
-    }
-  }
-)
-
-# FeatureNames also changing Feature_ID column in featureData
-setMethod("featureNames<-",
-  signature = signature(object = "SummarizedExperiment", value = "ANY"),
-  function(object, value) {
-    fd <- rowData(object)
-    rownames(fd) <- value
-    ad <- assay(object)
-    rownames(ad) <- value
-    rowData(object) <- fd
-    assay(object) <- ad
-    rowData(object)$Feature_ID <- value
-    if (validObject(object)) {
-      return(object)
-    }
-  }
-)
-
-
-setMethod("sampleNames<-",
-  signature = signature(object = "SummarizedExperiment", value = "ANY"),
-  function(object, value) {
-    pd <- phenoData(object)
-    sampleNames(pd) <- value
-    ad <- assayData(object)
-    sampleNames(ad) <- value
-    prd <- protocolData(object)
-    if (nrow(prd) == 0) {
-      prd <- pd[, integer(0)]
-    } else {
-      sampleNames(prd) <- value
-    }
-    object@phenoData <- pd
-    object@protocolData <- prd
-    object@assayData <- ad
-    pData(object)$Sample_ID <- value
     if (validObject(object)) {
       return(object)
     }

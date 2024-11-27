@@ -2,14 +2,14 @@
 #'
 #' An interface for the RUVs method in RUVSeq package.
 #'
-#' @param object a SummarizedExperiment object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param batch the column name for batch labels
 #' @param replicates list of numeric vectors, indexes of replicates
 #' @param k The number of factors of unwanted variation to be estimated from 
 #' the data.
 #' @param ... other parameters passed to RUVSeq::RUVs
 #'
-#' @return A MetaboSet object with the normalized data.
+#' @return A SummarizedExperiment or Metaboset object with the normalized data.
 #'
 #' @examples
 #' # Batch correction
@@ -27,8 +27,8 @@ ruvs_qc <- function(object, batch, replicates, k = 3, ...) {
          " Please install it.", call. = FALSE)
   }
   .add_citation("RUVSeq was used for batch correction:", citation("RUVSeq"))
+
   object <- check_object(object)
-  
   # Transform data to pseudo counts for RUVs
   assay(object)[assay(object) == 0] <- 1
   assay(object) <- round(assay(object))
@@ -45,6 +45,10 @@ ruvs_qc <- function(object, batch, replicates, k = 3, ...) {
   # Include results in object
   assay(object) <- ruv_results$normalizedCounts
   colData(object) <- cbind(colData(object), ruv_results$W)
+  
+  if (!is.null(attr(object, "original_class"))) {
+    object <- as(object, "MetaboSet")
+  }
   object
 }
 
@@ -54,8 +58,8 @@ ruvs_qc <- function(object, batch, replicates, k = 3, ...) {
 #' Computes Bhattacharyya distance between all pairs of batches after
 #' projecting the samples into PCA space with pcaMethods::pca. 
 #'
-#' @param object a MetaboSet object
-#' @param batch column name of pData giving the batch labels
+#' @param object a SummarizedExperiment or MetaboSet object
+#' @param batch column name of pheno data giving the batch labels
 #' @param all_features logical, should all features be used? If FALSE
 #' (the default), flagged features are removed before imputation.
 #' @param center logical, should the data be centered prior to PCA?
@@ -91,9 +95,10 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
                 citation("pcaMethods"))
   .add_citation("fpc package was used for Bhattacharyaa distance computation:",
                 citation("fpc"))
-  object <- check_object(object)
+                
   # Drop flagged features if not told otherwise
   object <- drop_flagged(object, all_features)
+  object <- check_object(object)
   # PCA to 2 dimenstions
   pca_res <- pcaMethods::pca(t(assay(object)), center = center, scale = scale, 
                              nPcs = nPcs, ...)
@@ -153,8 +158,8 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
 #' The repeatability ranges from 0 to 1. Higher repeatability depicts less
 #' variation between batches.
 #'
-#' @param object a MetaboSet object
-#' @param group column name of pData giving the group labels
+#' @param object a SummarizedExperiment or MetaboSet object
+#' @param group column name of pheno data giving the group labels
 #'
 #' @return A data frame with one row per feature with the repeatability measure.
 #'
@@ -171,6 +176,7 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
 #'
 #' @export
 perform_repeatability <- function(object, group) {
+  object <- check_object(object)
   group <- colData(object)[, group]
   features <- rownames(object)
   repeatability <- BiocParallel::bplapply(
@@ -189,11 +195,12 @@ perform_repeatability <- function(object, group) {
 #' Aligns features with m/z or retention time shift between batches using
 #' alignBatches from batchCorr package. See more details in the original paper.
 #'
-#' @param object_na a MetaboSet object with missing values as NA
-#' @param object_fill a similar MetaboSet object with imputed values
-#' (used to compute distances between features, can contain missing values as 
-#' well)
-#' @param batch character, column name of pData with batch labels
+#' @param object_na a SummarizedExperiment or MetaboSet object with missing 
+#' values as NA
+#' @param object_fill a similar SummarizedExperiment or MetaboSet object with 
+#' imputed values (used to compute distances between features, can contain 
+#' missing values as well)
+#' @param batch character, column name of pheno with batch labels
 #' @param mz,rt column names of m/z and retention time columns in fData
 #' @param NAhard proportion of NAs within batch for feature to be considered
 #' missing
@@ -202,20 +209,21 @@ perform_repeatability <- function(object, group) {
 #' @param plot_folder path to the location where the plots should be saved, if 
 #' NULL, no plots are saved
 #'
-#' @return A MetaboSet object with the aligned features.
+#' @return A SummarizedExperiment or MetaboSet object with the aligned features.
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
-#' rowData(example_set)[3, ]$Average_Mz <- 
-#'   rowData(example_set)[2, ]$Average_Mz + 0.001
+#' ex_set <- example_set
+#' rowData(ex_set)[3, ]$Average_Mz <- 
+#'   rowData(ex_set)[2, ]$Average_Mz + 0.001
 #' # Initialize objects
-#' example_set_fill <- example_set
-#' example_set_na <- example_set
+#' ex_set_fill <- ex_set
+#' ex_set_na <- ex_set
 #' # Introduce over 80% missing values in QC samples per batch of two features 
 #' # so they are considered "missing", with orthogonal batch presence
-#' assay(example_set_na)[2, c(1, 7, 13, 19)] <- NA
-#' assay(example_set_na)[3, c(26, 32, 38, 44)] <- NA
-#' batch_aligned <- align_batches(example_set_na, example_set_fill, 
+#' assay(ex_set_na)[2, c(1, 7, 13, 19)] <- NA
+#' assay(ex_set_na)[3, c(26, 32, 38, 44)] <- NA
+#' batch_aligned <- align_batches(ex_set_na, ex_set_fill, 
 #'   batch = "Batch", mz = "Average_Mz", rt = "Average_Rt_min", 
 #'   mzdiff = 0.002, rtdiff = 15, plot_folder = "./Figures")
 #' \dontshow{setwd(.old_wd)}
@@ -233,6 +241,9 @@ align_batches <- function(object_na, object_fill, batch, mz, rt,
   }
   .add_citation("batchCorr was used for batch correction:",
                 citation("batchCorr"))
+                
+  object_na <- check_object(object_na)
+  object_fill <- check_object(object_fill)
   # Set report
   if (!is.null(plot_folder)) {
     report <- TRUE
@@ -253,6 +264,10 @@ align_batches <- function(object_na, object_fill, batch, mz, rt,
                                      report = report, reportPath = plot_folder)
   # Attach aligned features
   assay(object_fill) <- t(aligned$PTalign)
+  
+  if (!is.null(attr(object_fill, "original_class"))) {
+    object_fill <- as(object_fill, "MetaboSet")
+  }
   object_fill
 }
 
@@ -262,9 +277,9 @@ align_batches <- function(object_na, object_fill, batch, mz, rt,
 #' Between-batch normalization by either reference samples or population median.
 #' Uses normalizeBatches function from the batchCorr package.
 #'
-#' @param object a MetaboSet object
-#' @param batch,group character, column names of pData with batch labels and 
-#' group labels
+#' @param object a SummarizedExperiment or MetaboSet object
+#' @param batch,group character, column names of pheno data with batch labels 
+#' and group labels
 #' @param ref_label the label of the reference group i.e. the group that is 
 #' constant through batches
 #' @param population Identifier of population samples in group column
@@ -273,7 +288,7 @@ align_batches <- function(object_na, object_fill, batch, mz, rt,
 #' example to tune the heuristic used for choosing between normalization by 
 #' reference samples or population median
 #'
-#' @return  A MetaboSet object the one supplied with normalized features
+#' @return  A SummarizedExperiment or MetaboSet object with normalized features
 #'
 #' @examples
 #' # Batch correction
@@ -295,6 +310,7 @@ normalize_batches <- function(object, batch, group, ref_label,
   }
   .add_citation("batchCorr was used for batch correction:",
                 citation("batchCorr"))
+  object <- check_object(object)
   # Perform batch correction
   norm_data <- batchCorr::normalizeBatches(peakTableCorr = t(assay(object)), 
                                            batches = colData(object)[, batch],
@@ -309,6 +325,11 @@ normalize_batches <- function(object, batch, group, ref_label,
                                     seq_len(ncol(ref_corrected)))
   ref_corrected$Feature_ID <- rownames(object)
   object <- join_rowData(object, ref_corrected)
+  
+  if (!is.null(attr(object, "original_class"))) {
+    object <- as(object, "MetaboSet")
+  }
+  object
 }
 
 #' Save batch correction plots
@@ -321,11 +342,11 @@ normalize_batches <- function(object, batch, group, ref_label,
 #' NOTE: if you change the shape variable, be sure to set a shape scale as well,
 #' the default scale only has 2 values, so it can only accomodate 2 shapes.
 #'
-#' @param orig,corrected MetaboSet objects before and after batch effect 
-#' correction
+#' @param orig,corrected SummarizedExperiment or MetaboSet objects before and 
+#' after batch effect correction
 #' @param file path to the PDF file where the plots will be saved
 #' @param width,height width and height of the plots in inches
-#' @param batch,color,shape column names of pData for batch labels,
+#' @param batch,color,shape column names of pheno data for batch labels,
 #' and column used for coloring and shaping points (by default batch and QC)
 #' @param color_scale,shape_scale scales for color and scale as returned by 
 #' ggplot functions.
@@ -350,6 +371,9 @@ save_batch_plots <- function(orig, corrected, file, width = 14, height = 10,
                              color_scale = getOption("notame.color_scale_dis"),
                              shape_scale = 
                              scale_shape_manual(values = c(15, 21))) {
+  orig <- check_object(orig)
+  corrected <- check_object(corrected)                             
+  
   data_orig <- combined_data(orig)
   data_corr <- combined_data(corrected)
   # Prepare data.frame for batch means with batch and injection order range
