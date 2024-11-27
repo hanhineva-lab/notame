@@ -5,15 +5,15 @@ library(notame)
 data("example_set")
 
 test_that("Changing feature names updates all occurrences", {
-  set <- example_set
-  featureNames(set) <- paste0(letters[1:20], 1:80)
+  set <- as(example_set, "MetaboSet")
+  rownames(set) <- paste0(letters[1:20], 1:80)
   expect_equal(featureNames(set), featureNames(assayData(set)))
   expect_equal(featureNames(set), featureNames(featureData(set)))
   expect_equal(featureNames(set), fData(set)$Feature_ID)
 })
 
 test_that("Changing feature names only works if valid names are given", {
-  set <- example_set
+  set <- as(example_set, "MetaboSet")
   expect_error(featureNames(set) <- NULL)
   # Numbers are not allowed
   expect_error(featureNames(set) <- 1:80)
@@ -34,7 +34,7 @@ test_that("Changing feature names only works if valid names are given", {
 })
 
 test_that("Changing sample names updates all occurrences", {
-  set <- example_set
+  set <- as(example_set, "MetaboSet")
   sampleNames(set) <- tolower(sampleNames(set))
   expect_equal(sampleNames(set), sampleNames(assayData(set)))
   expect_equal(sampleNames(set), sampleNames(protocolData(set)))
@@ -43,7 +43,7 @@ test_that("Changing sample names updates all occurrences", {
 })
 
 test_that("Changing sample names only works if valid names are given", {
-  set <- example_set
+  set <- as(example_set, "MetaboSet")
   names <- sampleNames(set)
   expect_error(sampleNames(set) <- NULL)
   # Number of new names should equal number of columns
