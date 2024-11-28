@@ -6,7 +6,6 @@ name: rworkflows
       - main
       - devel
       - RELEASE_**
-      - rworkflows # Branch to test rworkflows
   pull_request:
     branches:
       - master
