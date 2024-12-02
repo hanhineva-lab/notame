@@ -109,7 +109,7 @@
   merged_object
 }
 
-# Convert objects in ... to al list
+# Convert objects in ... to a list
 # OR if a list is given in the first place, preserve that list
 .to_list <- function(...) {
   # Combine the objects to a list
@@ -154,6 +154,7 @@
 #'
 #' @export
 merge_metabosets <- function(..., merge = c("features", "samples")) {
+  # CONSIDER what checks specifically are needed here?
   merge <- match.arg(merge)
   # Combine the objects to a list
   objects <- .to_list(...)
@@ -175,6 +176,7 @@ merge_metabosets <- function(..., merge = c("features", "samples")) {
   }
   if (!is.null(attr(merged, "original_class"))) {
     merged <- as(merged, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }
   merged
 }

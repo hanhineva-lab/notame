@@ -218,7 +218,8 @@ save_plot <- function(p, file, ...) {
 #' @export
 visualizations <- function(object, prefix, format = "pdf", perplexity = 30,
                            merge = FALSE, remove_singles = FALSE, group = NULL, time = NULL, id = NULL, color = NULL) {
-  object <- check_object(object)
+  object <- check_object(object, 
+                         pheno_cols = c(time, id, color))
   file_names <- ""
   if (sum(object$QC == "QC")) {
     .save_name(object, prefix, format, fun = plot_dist_density, 

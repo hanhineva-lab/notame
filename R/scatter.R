@@ -95,7 +95,8 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
                      text_base_size = 14, point_size = 2, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = color,
+                         pheno_factors = shape, check_matrix = TRUE)
 
   pca_results <- .pca_helper(object, pcs, center, scale, ...)
   pca_scores <- pca_results$pca_scores
@@ -167,7 +168,8 @@ plot_tsne <- function(object, all_features = FALSE, center = TRUE,
                       text_base_size = 14, point_size = 2, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = color,
+                         pheno_factors = shape, check_matrix = TRUE)
 
   # t-SNE
   tsne_scores <- .t_sne_helper(object, center, scale, 
@@ -322,7 +324,7 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
   
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, check_matrix = TRUE, feature_ID = TRUE)
 
   pca_res <- pcaMethods::pca(t(assay(object)), nPcs = max(pcs), 
                              center = center, scale = scale, ...)
@@ -390,7 +392,7 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
                             ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_num = fill, check_matrix = TRUE)
 
   pca_results <- .pca_helper(object, pcs, center, scale, ...)
   pca_scores <- pca_results$pca_scores
@@ -446,7 +448,7 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
                              ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_num = fill, check_matrix = TRUE)
 
   # t-SNE
   tsne_scores <- .t_sne_helper(object, center, scale,
@@ -544,7 +546,8 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
                             text_base_size = 14, line_width = 0.5, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = c(color, time, subject),
+                         check_matrix = TRUE)
 
   pca_results <- .pca_helper(object, pcs, center, scale, ...)
   pca_scores <- pca_results$pca_scores
@@ -618,7 +621,8 @@ plot_tsne_arrows <- function(object, all_features = FALSE, center = TRUE,
                              text_base_size = 14, line_width = 0.5, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = c(color, time, subject),
+                         check_matrix = TRUE)
 
   tsne_scores <- .t_sne_helper(object, center, scale, 
                                perplexity, pca_method, ...)
@@ -698,7 +702,7 @@ setGeneric("volcano_plot", signature = "object",
 
 #' @rdname volcano_plot
 #' @export
-setMethod("volcano_plot", c(object = "SummarizedExperiment"),
+setMethod("volcano_plot", c(object = "MetaboSet"),
   function(object, x, p, p_fdr = NULL, color = NULL,
            p_breaks = c(0.05, 0.01, 0.001, 1e-4), fdr_limit = 0.05,
            log2_x = FALSE, center_x_axis = TRUE, x_lim = NULL, 
@@ -706,7 +710,7 @@ setMethod("volcano_plot", c(object = "SummarizedExperiment"),
            color_scale = getOption("notame.color_scale_con"),
            title = "Volcano plot", subtitle = NULL,
            text_base_size = 14, label_text_size = 4, ...) {
-    .volcano_plotter(rowData(object), x, p, p_fdr, color, p_breaks, fdr_limit,
+    .volcano_plotter(fData(object), x, p, p_fdr, color, p_breaks, fdr_limit,
                      log2_x, center_x_axis, x_lim, label, label_limit,
                      color_scale, title, subtitle,
                      text_base_size, label_text_size, ...)
@@ -730,12 +734,30 @@ setMethod("volcano_plot", c(object = "data.frame"),
   }
 )
 
+#' @rdname volcano_plot
+#' @export
+setMethod("volcano_plot", c(object = "SummarizedExperiment"),
+  function(object, x, p, p_fdr = NULL, color = NULL,
+           p_breaks = c(0.05, 0.01, 0.001, 1e-4), fdr_limit = 0.05,
+           log2_x = FALSE, center_x_axis = TRUE, x_lim = NULL, 
+           label = NULL, label_limit = 0.05, 
+           color_scale = getOption("notame.color_scale_con"),
+           title = "Volcano plot", subtitle = NULL,
+           text_base_size = 14, label_text_size = 4, ...) {
+    .volcano_plotter(as.data.frame(rowData(object), optional = TRUE), x, p, 
+                     p_fdr, color, 
+                     p_breaks, fdr_limit, log2_x, center_x_axis, x_lim, label, 
+                     label_limit, color_scale, title, subtitle,
+                     text_base_size, label_text_size, ...)
+  }
+)
+
 
 .volcano_plotter <- function(data, x, p, p_fdr, color, p_breaks, fdr_limit, 
                             log2_x, center_x_axis, x_lim, label, label_limit,
                             color_scale, title, subtitle, text_base_size,
                             label_text_size, ...) {
-                              
+  .check_feature_data(data, feature_cols = c(x, p, p_fdr, color, label))
                               
   if (center_x_axis && !is.null(x_lim)) {
     warning("Manually setting x-axis limits overrides x-axis centering.")
@@ -878,14 +900,14 @@ setGeneric("manhattan_plot", signature = "object",
 
 #' @rdname manhattan_plot
 #' @export
-setMethod("manhattan_plot", c(object = "SummarizedExperiment"),
+setMethod("manhattan_plot", c(object = "MetaboSet"),
   function(object, x, p, effect = NULL, p_fdr = NULL, color = NULL,
            p_breaks = c(0.05, 0.01, 0.001, 1e-4), fdr_limit = 0.05,
            x_lim = NULL, y_lim = NULL,
            color_scale = getOption("notame.color_scale_con"),
            title = "Manhattan plot", subtitle = NULL, ...) {
-    .manhattan_plotter(as.data.frame(rowData(object)), x, p, effect, p_fdr, 
-                       color, p_breaks, fdr_limit, x_lim, y_lim, color_scale, 
+    .manhattan_plotter(rowData(object), x, p, effect, p_fdr, color, p_breaks, 
+                       fdr_limit, x_lim, y_lim, color_scale, 
                        title, subtitle, ...)
   }
 )
@@ -903,10 +925,28 @@ setMethod("manhattan_plot", c(object = "data.frame"),
   }
 )
 
+#' @rdname manhattan_plot
+#' @export
+setMethod("manhattan_plot", c(object = "SummarizedExperiment"),
+  function(object, x, p, effect = NULL, p_fdr = NULL, color = NULL,
+           p_breaks = c(0.05, 0.01, 0.001, 1e-4), fdr_limit = 0.05,
+           x_lim = NULL, y_lim = NULL,
+           color_scale = getOption("notame.color_scale_con"),
+           title = "Manhattan plot", subtitle = NULL, ...) {
+    .manhattan_plotter(as.data.frame(rowData(object), optional = TRUE), x, p, 
+                       effect, p_fdr, 
+                       color, p_breaks, fdr_limit, x_lim, y_lim, color_scale, 
+                       title, subtitle, ...)
+  }
+)
+
 
 .manhattan_plotter <- function(data, x, p, effect, p_fdr, color, p_breaks,
                               fdr_limit, x_lim, y_lim, color_scale,
                               title, subtitle, ...) {
+  
+  .check_feature_data(data, feature_cols = c(x, p, effect, p_fdr, color))
+  
   if (min(data[, p]) > max(p_breaks)) {
     warning("All the p-values are larger than the p-value breaks supplied.", 
             " Consider using larger p_breaks for plotting.")
@@ -1015,7 +1055,8 @@ setMethod("manhattan_plot", c(object = "data.frame"),
 #' mz_rt_plot(with_results, p_col = "GroupB_P", color = "GroupB_Estimate")
 #'
 #' # Plot the results from the results dataframe
-#' mz_rt_plot(with_results, p_col = "GroupB_P", color = "GroupB_Estimate")
+#' lm_data <- dplyr::left_join(as.data.frame(rowData(example_set)), lm_results)
+#' mz_rt_plot(lm_data, p_col = "GroupB_P", color = "GroupB_Estimate")
 #'
 #' @export
 setGeneric("mz_rt_plot", signature = "object",
@@ -1028,12 +1069,12 @@ setGeneric("mz_rt_plot", signature = "object",
 
 #' @rdname mz_rt_plot
 #' @export
-setMethod("mz_rt_plot", c(object = "SummarizedExperiment"),
+setMethod("mz_rt_plot", c(object = "MetaboSet"),
   function(object, p_col = NULL, p_limit = NULL, mz_col = NULL, rt_col = NULL,
            color = NULL, title = "m/z vs retention time", subtitle = NULL,
            color_scale = getOption("notame.color_scale_con"), 
            all_features = FALSE) {
-    .mz_rt_plotter(as.data.frame(rowData(drop_flagged(object, all_features))),
+    .mz_rt_plotter(fData(drop_flagged(object, all_features)),
                    p_col, p_limit, mz_col, rt_col, color, title, subtitle, 
                    color_scale, all_features)
   }
@@ -1050,9 +1091,24 @@ setMethod("mz_rt_plot", c(object = "data.frame"),
   }
 )
 
+setMethod("mz_rt_plot", c(object = "SummarizedExperiment"),
+  function(object, p_col = NULL, p_limit = NULL, mz_col = NULL, rt_col = NULL,
+           color = NULL, title = "m/z vs retention time", subtitle = NULL,
+           color_scale = getOption("notame.color_scale_con"), 
+           all_features = FALSE) {
+    data <- as.data.frame(rowData(drop_flagged(object, all_features)), 
+                          optional = TRUE)
+    .mz_rt_plotter(data, p_col, p_limit, mz_col, rt_col, color, title, 
+                   subtitle, color_scale, all_features)
+  }
+)
+
+
 
 .mz_rt_plotter <- function(x, p_col, p_limit, mz_col, rt_col, color, 
                           title, subtitle, color_scale, all_features) {
+  .check_feature_data(x, feature_cols = c(p_col, mz_col, rt_col, color),
+                      feature_split = TRUE)
   if (!is.null(p_limit) && !is.null(p_col)) {
     x <- x[which(x[, p_col] < p_limit), ]
     if (nrow(x) == 0) {

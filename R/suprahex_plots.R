@@ -39,7 +39,8 @@ plot_sample_suprahex <- function(object, all_features = FALSE,
   .add_citation("supraHex package was used for suprahexagonal maps:",
                 citation("supraHex"))
   object <- drop_flagged(object, all_features = all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = sample_labels, 
+                         check_matrix = TRUE)
   
   data <- scale(assay(object))
   colnames(data) <- colData(object)[, sample_labels]

@@ -40,7 +40,7 @@ plot_dendrogram <- function(object, all_features = FALSE,
   color <- color %||% NULL
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = color, check_matrix = TRUE)
   
   subtitle <- subtitle %||% paste("Distance method:", dist_method, 
                                   "Clustering method:", clust_method)
@@ -120,7 +120,7 @@ plot_sample_heatmap <- function(object, all_features = FALSE,
   }
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = group, check_matrix = TRUE)
 
   # Default settings
   subtitle <- subtitle %||% paste("Distance method:", dist_method, 
@@ -153,7 +153,7 @@ plot_sample_heatmap <- function(object, all_features = FALSE,
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = -0.05)) +
     coord_fixed()
   # Group bar
-  if (group_bar && !is.na(group)) {
+  if (group_bar && !is.null(group)) {
     pheno_data <- colData(object)
     pheno_data$Sample_ID <- factor(pheno_data$Sample_ID, levels = hc_order,
                                    ordered = TRUE)

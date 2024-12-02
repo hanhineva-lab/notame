@@ -94,12 +94,12 @@ test_that("Cohen's d data checking works", {
   ex <- example_set
   ex$Group <- c(1, 2)
   expect_error(cohens_d(ex, group = "Group", id = "Subject_ID", time = "Time"),
-               "should be a factor")
+               "column is not a factor")
 
   ex <- example_set
   ex$Time <- c(1, 2)
   expect_error(cohens_d(ex, group = "Group", id = "Subject_ID", time = "Time"),
-               "should be a factor")
+               "column is not a factor")
 
   ex <- example_set
   ex$Group <- factor(1)

@@ -38,8 +38,9 @@ fit_rf <- function(object, y, all_features = FALSE,
   .add_citation("randomForest package was used to fit random forest models:",
                 citation("randomForest"))
   
+  object <- check_object(object, pheno_cols = c(y, covariates), 
+                         check_matrix = TRUE)
   object <- drop_flagged(object, all_features = all_features)
-  object <- check_object(object)
 
   x <- combined_data(object)[, c(rownames(object), covariates)]
   rf <- randomForest::randomForest(x = x, y = colData(object)[, y], 
@@ -180,9 +181,10 @@ mixomics_pls <- function(object, y, ncomp, plot_scores = TRUE,
   }
   .add_citation("mixOmics package was used to fit PLS models:",
                 citation("mixOmics"))
-                
+  # CONSIDER making a pheno_con (numeric) (and rename pheno_factors to pheno_dis) can covariates be continous and/or discrete?
   object <- drop_flagged(object, all_features = all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = c(y, covariates), 
+                         check_matrix = TRUE)
 
   predictors <- .get_x(object, covariates)
   outcome <- colData(object)[y]
@@ -210,7 +212,8 @@ mixomics_pls_optimize <- function(object, y, ncomp, folds = 5, nrepeat = 50,
   
   .add_citation("mixOmics package was used to fit PLS models:",
                 citation("mixOmics"))
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = c(y, covariates), 
+                         check_matrix = TRUE)
   pls_res <- mixomics_pls(object = object, y = y, ncomp = ncomp, 
                           plot_scores = FALSE, all_features = all_features,
                           covariates = covariates, ...)
@@ -273,7 +276,8 @@ mixomics_spls_optimize <- function(object, y, ncomp, n_features =
   .add_citation("mixOmics package was used to fit PLS models:",
                 citation("mixOmics"))
   object <- drop_flagged(object, all_features = all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = c(y, covariates), 
+                         check_matrix = TRUE)
 
   predictors <- .get_x(object, covariates)
   outcome <- colData(object)[y]
@@ -380,7 +384,8 @@ mixomics_plsda <- function(object, y, ncomp, plot_scores = TRUE,
                 citation("mixOmics"))
                 
   object <- drop_flagged(object, all_features = all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = c(y, covariates), 
+                         check_matrix = TRUE)
 
 
   predictors <- .get_x(object, covariates)
@@ -412,7 +417,9 @@ mixomics_plsda_optimize <- function(object, y, ncomp, folds = 5, nrepeat = 50,
   }
   .add_citation("mixOmics package was used to fit PLS models:",
                 citation("mixOmics"))
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = c(y, covariates), 
+                         check_matrix = TRUE)
+
   plsda_res <- mixomics_plsda(object = object, y = y, ncomp = ncomp,
                               plot_scores = FALSE, all_features = all_features,
                               covariates = covariates, ...)
@@ -454,7 +461,8 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
   .add_citation("mixOmics package was used to fit PLS models:",
                 citation("mixOmics"))
   object <- drop_flagged(object, all_features = all_features)
-  object <- check_object(object)
+  object <- check_object(object,  pheno_cols = c(y, covariates), 
+                         check_matrix = TRUE)
 
   predictors <- .get_x(object, covariates)
   outcome <- colData(object)[, y]
@@ -564,9 +572,9 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
 #'
 #' # EN on multilevel variable with covariate and static covariate
 #' ex_set <- drop_qcs(example_set)
-#' example_set$Injection_order %<>% as.numeric()
-#' example_set$Group %<>% as.numeric()
-#' en_model <- muvr_analysis(drop_qcs(example_set), id = "Subject_ID", 
+#' ex_set$Injection_order %<>% as.numeric()
+#' ex_set$Group %<>% as.numeric()
+#' en_model <- muvr_analysis(ex_set, id = "Subject_ID", 
 #'  multi_level = TRUE, multi_level_var = "Time", 
 #'  covariates = "Injection_order", static_covariates = "Group", 
 #'  method = "EN", nRep = 2)
@@ -588,9 +596,12 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
   .add_citation(paste("MUVR2 package was used to fit multivariate models",
                       "with variable selection:"),
                 citation("MUVR2"))
-
+  # CONSIDER skip input check here
   object <- drop_flagged(object, all_features = all_features)
-  object <- check_object(object)
+  object <- check_object(object, 
+                         pheno_cols = c(y, id, covariates, static_covariates,
+                                        multi_level_var, covariates), 
+                         check_matrix = TRUE)
 
   # MUVR2 can only use numeric predictors
   classes <- vapply(colData(object)[, c(covariates, static_covariates)], 
@@ -729,11 +740,7 @@ perform_permanova <- function(object, group, all_features = FALSE,
                 citation("PERMANOVA"))
                 
   object <- drop_flagged(object, all_features = all_features)
-  object <- check_object(object)
-
-  if (!is.factor(colData(object)[, group])) {
-    stop("Group column is not a factor.")
-  }
+  object <- check_object(object, pheno_factors = group, check_matrix = TRUE)
 
   log_text("Starting PERMANOVA tests")
   data <- t(assay(object))

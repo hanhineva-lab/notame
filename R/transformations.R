@@ -22,6 +22,7 @@ mark_nas <- function(object, value) {
   assay(object) <- ex
   if (!is.null(attr(object, "original_class"))) {
     object <- as(object, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }
   object
 }
@@ -111,6 +112,7 @@ fix_MSMS <- function(object, ms_ms_spectrum_col = "MS_MS_spectrum",
                   
   if (!is.null(attr(object, "original_class"))) {
     object <- as(object, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }
   object
 }
@@ -134,6 +136,7 @@ drop_qcs <- function(object) {
   colData(object) <- droplevels(colData(object))
   if (!is.null(attr(object, "original_class"))) {
     object <- as(object, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }
   object
 }
@@ -158,16 +161,33 @@ drop_qcs <- function(object) {
 #' dim(noflags)
 #'
 #' @export
-drop_flagged <- function(object, all_features = FALSE) {
-  object <- check_object(object)
-  if (!all_features) {
-    object <- object[is.na(flag(object)), ]
+setGeneric("drop_flagged", signature = "object",
+           function(object, all_features = FALSE) 
+           standardGeneric("drop_flagged"))
+
+setMethod("drop_flagged", signature = c(object = "MetaboSet"),
+  function(object, all_features = FALSE) {
+    object <- check_object(object, feature_flag = TRUE)
+    if (!all_features) {
+      object <- object[is.na(flag(object)), ]
+    }
+    if (!is.null(attr(object, "original_class"))) {
+      object <- as(object, "MetaboSet")
+      attr(object, "original_class") <- NULL
+    }
+    object
   }
-  if (!is.null(attr(object, "original_class"))) {
-    object <- as(object, "MetaboSet")
+)
+
+setMethod("drop_flagged", signature = c(object = "SummarizedExperiment"),
+  function(object, all_features = FALSE) {
+    object <- check_object(object)
+    if (!all_features) {
+      object <- object[is.na(flag(object)), ]
+    }
+    object
   }
-  object
-}
+)
 
 #' Partially replace peak table with new values
 #'
@@ -251,8 +271,8 @@ impute_rf <- function(object, all_features = FALSE, ...) {
   log_text(paste("\nStarting random forest imputation at", Sys.time()))
   # Drop flagged features
   dropped <- drop_flagged(object, all_features)
-  dropped <- check_object(dropped)
-  object <- check_object(object)
+  dropped <- check_object(dropped, check_matrix = TRUE)
+  object <- check_object(object, check_matrix = TRUE)
 
   if (!requireNamespace("missForest", quietly = TRUE)) {
     stop("missForest package not found.")
@@ -273,6 +293,7 @@ impute_rf <- function(object, all_features = FALSE, ...) {
   
   if (!is.null(attr(object, "original_class"))) {
     object <- as(object, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }
   object
 }
@@ -317,7 +338,7 @@ impute_rf <- function(object, all_features = FALSE, ...) {
 #'
 #' @export
 impute_simple <- function(object, value, na_limit = 0) {
-  object <- check_object(object)
+  object <- check_object(object, check_matrix = TRUE)
   imp <- assay(object)
   nas <- apply(imp, 1, prop_na)
   imp <- imp[nas > na_limit, , drop = FALSE]
@@ -365,6 +386,7 @@ impute_simple <- function(object, value, na_limit = 0) {
   
   if (!is.null(attr(obj, "original_class"))) {
     object <- as(obj, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }
   obj
 }
@@ -382,7 +404,7 @@ impute_simple <- function(object, value, na_limit = 0) {
 #' normalized <- inverse_normalize(example_set)
 #' @export
 inverse_normalize <- function(object) {
-  object <- check_object(object)
+  object <- check_object(object, check_matrix = TRUE)
   assay(object) <- assay(object) %>%
     apply(1, function(x) {
       stats::qnorm((rank(x, na.last = "keep") - 0.5) / sum(!is.na(x)))
@@ -390,6 +412,7 @@ inverse_normalize <- function(object) {
     t()
   if (!is.null(attr(object, "original_class"))) {
     object <- as(object, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }
   object
 }
@@ -412,7 +435,7 @@ inverse_normalize <- function(object) {
 #'
 #' @export
 flag_report <- function(object) {
-  object <- check_object(object)
+  object <- check_object(object, feature_split = TRUE)
   splits <- sort(unique(rowData(object)$Split))
   report <- data.frame()
   flag(object)[is.na(flag(object))] <- "Kept"
@@ -628,10 +651,10 @@ pqn_normalization <- function(object, ref = c("qc", "all"),
   ref <- match.arg(ref)
   method <- match.arg(method)
   # Use only good-quality features for calculating reference spectra
-  ref_data <- drop_flagged(object, all_features)
-  ref_data <- assay(check_object(ref_data))
+  object <- check_object(object, pheno_QC = TRUE, check_matrix = TRUE)
+  ref_data <- assay(drop_flagged(object, all_features))
   
-  object <- check_object(object)
+  
   # Select reference samples
   switch(ref, qc = reference <- ref_data[, object$QC == "QC"],
          all = reference <- ref_data)
@@ -655,6 +678,7 @@ pqn_normalization <- function(object, ref = c("qc", "all"),
   
   if (!is.null(attr(object, "original_class"))) {
     object <- as(object, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }
   object
 }

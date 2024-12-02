@@ -119,7 +119,6 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
   assay(object) <- corrected
   # Recompute quality metrics
   object <- assess_quality(object)
-  object <- as(object, "SummarizedExperiment")
   
   log_text(paste("Drift correction performed at", Sys.time()))
   return(list(object = object, predicted = dc_data$predicted))
@@ -199,11 +198,9 @@ inspect_dc <- function(orig, dc, check_quality,
                        condition = "RSD_r < 0 & D_ratio_r < 0") {
   if (is.null(quality(orig))) {
     orig <- assess_quality(orig)
-    orig <- as(orig, "SummarizedExperiment")
   }
   if (is.null(quality(dc))) {
     dc <- assess_quality(dc)
-    dc <- as(dc, "SummarizedExperiment")
   }
 
   orig_data <- assay(orig)
@@ -219,8 +216,8 @@ inspect_dc <- function(orig, dc, check_quality,
   inspected <- do.call(.comb, inspected)
 
   assay(dc) <- inspected$data
+  debugonce(.erase_quality)
   dc <- assess_quality(dc)
-  dc <- as(dc, "SummarizedExperiment")
   dc <- join_rowData(dc, inspected$dc_notes)
 
   log_text(paste("Drift correction results inspected at", Sys.time()))
@@ -278,16 +275,15 @@ inspect_dc <- function(orig, dc, check_quality,
 #'   file = "drift_plots.pdf"
 #' )
 #' \dontshow{setwd(.old_wd)}
-#' @export
+#' @noRd
 save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
                           width = 16, height = 8, color = "QC", shape = color, 
                           color_scale = getOption("notame.color_scale_dis"),
                           shape_scale = scale_shape_manual(values = c(15, 16))){
-
   # Create a helper function for plotting
   dc_plot_helper <- function(data, fname, title = NULL) {
-    p <- ggplot(mapping = aes(x = .data[["Injection_order"]], 
-                              y = .data[[fname]])) +
+    p <- ggplot(data = data, mapping = aes(x = .data[["Injection_order"]], 
+                y = .data[[fname]])) +
       theme_bw() +
       theme(panel.grid = element_blank()) +
       color_scale +
@@ -326,7 +322,7 @@ save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
 
   grDevices::pdf(file, width = width, height = height)
 
-  for (fname in Biobase::featureNames(dc)) {
+  for (fname in rownames(dc)) {
     p2 <- dc_plot_helper(data = dc_data, fname = fname, title = "After")
 
     if (log_transform) {
@@ -412,10 +408,11 @@ correct_drift <- function(object, log_transform = TRUE, spar = NULL,
                           check_quality = FALSE, 
                           condition = "RSD_r < 0 & D_ratio_r < 0", 
                           plotting = FALSE, file = NULL, width = 16, 
-                          height = 8, color = "QC", shape = NULL, 
+                          height = 8, color = "QC", shape = color, 
                           color_scale = getOption("notame.color_scale_dis"),
                           shape_scale = scale_shape_manual(values = c(15, 16))){
-  object <- check_object(object)
+  object <- check_object(object, pheno_injection = TRUE, pheno_QC = TRUE, 
+                         check_matrix = TRUE)
   # Fit cubic spline and correct
   corrected_list <- dc_cubic_spline(object, log_transform = log_transform, 
                                     spar = spar, spar_lower = spar_lower,
@@ -434,6 +431,10 @@ correct_drift <- function(object, log_transform = TRUE, spar = NULL,
                   log_transform = log_transform, width = width, height = height,
                   color = color, shape = shape, color_scale = color_scale,
                   shape_scale = shape_scale)
+  }
+  if (!is.null(attr(inspected, "original_class"))) {
+    inspected <- as(inspected, "MetaboSet")
+    attr(inspected, "original_class") <- NULL
   }
   # Return the final version
   inspected

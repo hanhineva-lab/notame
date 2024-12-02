@@ -74,29 +74,84 @@
 }
 
 ## Helper function for checking integrity of sample data
-.check_pheno_data <- function(x, log_messages = FALSE) {
+.check_pheno_data <- function(x, pheno_ID = FALSE, pheno_cols = NULL, 
+                              pheno_factors = NULL,
+                              pheno_nums = NULL, pheno_injection = FALSE, 
+                              pheno_QC = FALSE, pheno_chars = NULL,
+                              log_messages = FALSE) {
   .log_text_if("\nChecking sample information", log_messages)
-  # Check that Injection order is included
-  if (!"Injection_order" %in% colnames(x)) {
-    stop("'Injection_order' not found for the samples.")
+
+  if (pheno_injection) {
+    # Check that Injection order is included
+    if (!"Injection_order" %in% colnames(x)) {
+      stop("'Injection_order' not found for the samples.")
+    }
+    # Check that injection order can be numeric
+    if (!is.numeric(x$Injection_order) && !.looks_numeric(x$Injection_order)) {
+      stop("'Injection_order' is not numeric and cannot be converted to numeric")
+    }
+    # No NAs allowed in Injection order
+    if (any(is.na(x$Injection_order))) {
+      stop("Missing values in Injection_order")
+    }
+    # Injection order should be unique
+    if (length(unique(x$Injection_order)) != nrow(x)) {
+      stop("Injection_order is not unique")
+    }
   }
-  # Check that injection order can be numeric
-  if (!is.numeric(x$Injection_order) && !.looks_numeric(x$Injection_order)) {
-    stop("'Injection_order' is not numeric and cannot be converted to numeric")
+  if (pheno_ID) {                 
+    if (!identical(x$Sample_ID, rownames(x))) {
+      stop("Sample_ID does not match rownames in pheno data")
+    }
+  } 
+  # Check that batch is included
+  if (!is.null(pheno_factors)) {
+    lapply(pheno_factors, function(pheno_factor) {
+      if(!pheno_factor %in% colnames(x)) {
+        stop(pheno_factor, " is not a column in pheno data", call. = FALSE)
+      }
+      if (!is.factor(x[, pheno_factor])) {
+        stop(pheno_factor, " column is not a factor", call. = FALSE)
+      }
+      if (length(levels(x[, pheno_factor])) < 2) {
+        stop("Column ", pheno_factor, " should have at least two levels!")
+      }
+    })
   }
-  # No NAs allowed in Injection order
-  if (any(is.na(x$Injection_order))) {
-    stop("Missing values in Injection_order")
+
+  if (!is.null(pheno_nums)) {
+    lapply(pheno_nums, function(pheno_num) {
+      if(!pheno_num %in% colnames(x)) {
+        stop(pheno_num, " is not a column in pheno data", call. = FALSE)
+      }
+      if (!is.numeric(x[, pheno_num])) {
+        stop(pheno_num, " column is not numeric", call. = FALSE)
+      }
+    })
   }
-  # Injection order should be unique
-  if (length(unique(x$Injection_order)) != nrow(x)) {
-    stop("Injection_order is not unique")
+  
+  if (pheno_QC) {
+    if (any(is.na(x[, "QC"]))) {
+      stop("QC column should not contain NAs")
+    }
   }
-  if (any(is.na(x[, "QC"]))) {
-    stop("QC column should not contain NAs")
+  if (!is.null(pheno_chars)) {
+    lapply(pheno_chars, function(pheno_char) {
+      if(!pheno_char %in% colnames(x)) {
+        stop(pheno_char, " is not a column in pheno data", call. = FALSE)
+      }
+      if (!is.character(x[, pheno_char])) {
+        stop(pheno_char, " column is not a character", call. = FALSE)
+      }
+    })
   }
-  if (!identical(x$Sample_ID, rownames(x))) {
-    stop("Sample_ID does not match rownames in pheno data")
+  
+  if (!is.null(pheno_cols)) {
+    lapply(pheno_cols, function(pheno_col) {
+      if(!pheno_col %in% colnames(x)) {
+        stop(pheno_col, " is not a column in pheno data", call. = FALSE)
+      }
+    })
   }
 }
 
@@ -138,50 +193,66 @@
 }
 
 
-.check_feature_data <- function(feature_data, check_limits = FALSE, 
-                               mz_limits = c(10, 2000), rt_limits = c(0, 20),
-                               log_messages = FALSE) {
+.check_feature_data <- function(feature_data, feature_ID = FALSE, 
+                                check_limits = FALSE,
+                                feature_split = FALSE,
+                                feature_flag = FALSE,
+                                mz_limits = c(10, 2000), rt_limits = c(0, 20), feature_cols = NULL, log_messages = FALSE) {
   .log_text_if("\nChecking feature information", log_messages)
   .log_text_if("Checking that feature IDs are unique and not stored as numbers",
                log_messages)
-  fid <- feature_data$Feature_ID
-  if (any(duplicated(fid))) {
-    stop("Feature_ID values are not unique")
+  if (feature_ID){
+    fid <- feature_data$Feature_ID
+    if (any(duplicated(fid))) {
+      stop("Feature_ID values are not unique")
+    }
+    if (any(is.na(fid))) {
+      stop("Missing values in Feature IDs")
+    }
+    fid_num <- withCallingHandlers(
+      expr = as.numeric(fid), 
+      warning = function(w) tryInvokeRestart("muffleWarning"))
+    if (any(!is.na(fid_num))) {
+      stop("Numbers are not allowed as feature IDs.", call. = FALSE)
+    }
+    fid_chr <- withCallingHandlers(
+      expr = as.character(fid),
+      warning = function(w) tryInvokeRestart("muffleWarning"))
+    if (any(grepl("^[[:digit:]]", fid_chr))) {
+      stop("Feature IDs can not start with numbers.", call. = FALSE)
+    }
+    if (!identical(feature_data$Feature_ID, rownames(feature_data))) {
+      stop("Feature_ID does not match rownames in feature data")
+    }
   }
-  if (any(is.na(fid))) {
-    stop("Missing values in Feature IDs")
+  if (feature_flag) {
+    if (!"Flag" %in% colnames(feature_data)) {
+      stop("Flag column not found in feature data")
+    }
   }
-  fid_num <- withCallingHandlers(
-    expr = as.numeric(fid), 
-    warning = function(w) tryInvokeRestart("muffleWarning"))
-  if (any(!is.na(fid_num))) {
-    stop("Numbers are not allowed as feature IDs.", call. = FALSE)
+  if (feature_split) {
+    if (!"Split" %in% colnames(feature_data)) {
+      stop("Split column not found in feature data")
+    }
   }
-  fid_chr <- withCallingHandlers(
-    expr = as.character(fid),
-    warning = function(w) tryInvokeRestart("muffleWarning"))
-  if (any(grepl("^[[:digit:]]", fid_chr))) {
-    stop("Feature IDs can not start with numbers.", call. = FALSE)
-  }
-  if (!"Flag" %in% colnames(feature_data)) {
-    stop("Flag column not found in fData")
-  }
-  if (!"Split" %in% colnames(feature_data)) {
-    stop("Split column not found in fData")
-  }
-
+  
   if (check_limits) {
     .log_text_if("Checking that m/z and retention time values are reasonable.",
                  log_messages)
-    mz <- feature_data[, .find_mz_rt_cols(feature_data)$mz_col]
-    rt <- feature_data[, .find_mz_rt_cols(feature_data)$rt_col]
+    mz <- feature_data[, .find_mz_rt_cols(feature_data, log_messages)$mz_col]
+    rt <- feature_data[, .find_mz_rt_cols(feature_data, log_messages)$rt_col]
     if (!(all(mz > mz_limits[1]) && all(mz < mz_limits[2])) ||
         !(all(rt > rt_limits[1]) && all(rt < rt_limits[2]))) {
       stop("Values in m/z or retention time columns are outside limits.")
     }
   }
-  if (!identical(feature_data$Feature_ID, rownames(feature_data))) {
-    stop("Feature_ID does not match rownames in feature data")
+  
+  if (!is.null(feature_cols)) {
+    lapply(feature_cols, function(feature_col) {
+      if(!feature_col %in% colnames(feature_data)) {
+        stop(feature_col, " is not a column in feature data", call. = FALSE)
+      }
+    })
   }
 }
 
@@ -335,6 +406,7 @@ read_from_excel <- function(file, sheet = 1, id_column = NULL,
     .check_exprs(exprs_, log_messages = TRUE)
     .check_feature_data(feature_data, 
                        check_limits = FALSE,
+                       feature_split = FALSE,
                        mz_limits = mz_limits, 
                        rt_limits = rt_limits, 
                        log_messages = TRUE)
@@ -349,7 +421,7 @@ read_from_excel <- function(file, sheet = 1, id_column = NULL,
 }
 
 # Helper function to search for mass and retention time column names
-.find_mz_rt_cols <- function(feature_data) {
+.find_mz_rt_cols <- function(feature_data, log_messages = FALSE) {
   # Find mass and retention time columns
   mz_tags <- c("mass", "m.?z$", "molecular.?weight")
   rt_tags <- c("retention.?time", "^rt$", "(?=.*rt)(?=.*min)")
@@ -378,8 +450,9 @@ read_from_excel <- function(file, sheet = 1, id_column = NULL,
     stop(paste0("No retention time column found - should match one of:\n",
                 paste(rt_tags, collapse = ", "), " (not case-sensitive)"))
   }
-  log_text(paste0("Identified m/z column ", mz_col,
-                  " and retention time column ", rt_col))
+  .log_text_if(paste0("Identified m/z column ", mz_col,
+                      " and retention time column ", rt_col),
+               log_messages)
                   
   return(list(mz_col = mz_col, rt_col = rt_col))
 }
@@ -453,7 +526,7 @@ setValidity(
     } else {
       x <- .check_pheno_data(pData(object))
       x <- .check_exprs(exprs(object))
-      x <- .check_feature_data(fData(object), check_limits = FALSE)
+      x <- .check_feature_data(fData(object), feature_ID = TRUE)
       TRUE
     }
   }
@@ -1002,17 +1075,37 @@ setAs("MetaboSet", "SummarizedExperiment", function(from) {
 })
 
 #' @export
-check_object <- function(object, log_messages = FALSE, check_limits = TRUE, 
+check_object <- function(object, all = FALSE, pheno_ID = FALSE, 
+                         pheno_cols = NULL, pheno_factors = NULL, 
+                         pheno_num = NULL, pheno_chars = NULL, 
+                         pheno_injection = FALSE, pheno_QC = FALSE,
+                         check_matrix = FALSE, feature_ID = FALSE,
+                         feature_cols = NULL, feature_flag = FALSE,
+                         log_messages = FALSE, 
+                         check_limits = TRUE, feature_split = FALSE,
                          mz_limits = c(10, 2000), rt_limits = c(0, 20)) {
+                      
   if (is(object, "MetaboSet")) {
     attr(object, "original_class") <- "MetaboSet"
   }
+  
   object <- as(object, "SummarizedExperiment")
-  .check_pheno_data(colData(object), log_messages = log_messages)
-  .check_exprs(assay(object), log_messages = log_messages)
-  .check_feature_data(rowData(object), check_limits = check_limits, 
-                      mz_limits = mz_limits, rt_limits = rt_limits,
+
+  .check_pheno_data(colData(object), pheno_cols = pheno_cols, pheno_factors = 
+                    pheno_factors, pheno_num = pheno_num,
+                    pheno_injection = pheno_injection, pheno_QC = pheno_QC,
+                    pheno_chars = pheno_chars, 
+                    log_messages = log_messages)
+
+  if (check_matrix) {
+    .check_exprs(assay(object), log_messages = log_messages)
+  }
+
+  .check_feature_data(rowData(object), feature_ID = feature_ID, 
+                      check_limits = check_limits, 
+                      feature_split = feature_split, feature_flag = feature_flag, mz_limits = mz_limits, rt_limits = rt_limits, feature_cols = feature_cols,
                       log_messages = log_messages)
+
   object
 }
 
@@ -1246,12 +1339,10 @@ setGeneric("join_colData", signature = c("object", "dframe"),
 #' @export
 setMethod("join_colData", c("SummarizedExperiment", "data.frame"),
   function(object, dframe) {
-    colData(object) <- merge(colData(object), dframe, by = "Feature_ID",
+    colData(object) <- merge(colData(object), dframe, by = "Sample_ID",
                              all.x = TRUE, sort = FALSE)
     rownames(colData(object)) <- colData(object)$Sample_ID
-    if (validObject(object)) {
-      return(object)
-    }
+    object
   }
 )
 

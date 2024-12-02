@@ -40,10 +40,11 @@ cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
                              corr_thresh = 0.9, d_thresh = 0.8, 
                              plotting = TRUE, min_size_plotting = 3, 
                              prefix = NULL) {
+  # CONSIDER dealing with mz and rt_col
   # Drop flagged compounds before clustering
   orig <- check_object(object)
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, check_limits = TRUE, check_matrix = TRUE)
 
   if (is.null(mz_col) || is.null(rt_col)) {
     cols <- .find_mz_rt_cols(rowData(object))
@@ -97,6 +98,7 @@ cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
                                             "Cluster_features")])
   if (!is.null(attr(clustered, "original_class"))) {
     clustered <- as(clustered, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }                                          
   clustered
 }
@@ -184,6 +186,7 @@ compress_clusters <- function(object) {
   log_text(paste("Clusters compressed, left with", nrow(object), "features"))
   if (!is.null(attr(object, "original_class"))) {
     object <- as(object, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }
   object
 }

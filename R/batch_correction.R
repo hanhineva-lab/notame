@@ -14,21 +14,20 @@
 #' @examples
 #' # Batch correction
 #' replicates <- list(which(example_set$QC == "QC"))
-#' batch_corrected <- ruvs_qc(example_set, 
-#'   batch = "Batch", replicates = replicates)
+#' batch_corrected <- ruvs_qc(example_set, replicates = replicates)
 #' # Evaluate batch correction
 #' pca_bhattacharyya_dist(example_set, batch = "Batch")
 #' pca_bhattacharyya_dist(batch_corrected, batch = "Batch")
 #'
 #' @export
-ruvs_qc <- function(object, batch, replicates, k = 3, ...) {
+ruvs_qc <- function(object, replicates, k = 3, ...) {
   if (!requireNamespace("RUVSeq", quietly = TRUE)) {
     stop("Bioconductor package RUVSeq needed for this function to work.",
          " Please install it.", call. = FALSE)
   }
   .add_citation("RUVSeq was used for batch correction:", citation("RUVSeq"))
 
-  object <- check_object(object)
+  object <- check_object(object, check_matrix = TRUE)
   # Transform data to pseudo counts for RUVs
   assay(object)[assay(object) == 0] <- 1
   assay(object) <- round(assay(object))
@@ -48,6 +47,7 @@ ruvs_qc <- function(object, batch, replicates, k = 3, ...) {
   
   if (!is.null(attr(object, "original_class"))) {
     object <- as(object, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }
   object
 }
@@ -74,8 +74,7 @@ ruvs_qc <- function(object, batch, replicates, k = 3, ...) {
 #' @examples
 #' # Batch correction
 #' replicates <- list(which(example_set$QC == "QC"))
-#' batch_corrected <- ruvs_qc(example_set, 
-#'   batch = "Batch", replicates = replicates)
+#' batch_corrected <- ruvs_qc(example_set, replicates = replicates)
 #' # Evaluate batch correction
 #' pca_bhattacharyya_dist(example_set, batch = "Batch")
 #' pca_bhattacharyya_dist(batch_corrected, batch = "Batch")
@@ -97,8 +96,8 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
                 citation("fpc"))
                 
   # Drop flagged features if not told otherwise
+  object <- check_object(object, pheno_factors = batch)
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
   # PCA to 2 dimenstions
   pca_res <- pcaMethods::pca(t(assay(object)), center = center, scale = scale, 
                              nPcs = nPcs, ...)
@@ -166,8 +165,7 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
 #' @examples
 #' # Batch correction
 #' replicates <- list(which(example_set$QC == "QC"))
-#' batch_corrected <- ruvs_qc(example_set, 
-#'   batch = "Batch", replicates = replicates)
+#' batch_corrected <- ruvs_qc(example_set, replicates = replicates)
 #' # Evaluate batch correction
 #' rep_orig <- perform_repeatability(example_set, group = "Group")
 #' mean(rep_orig$Repeatability, na.rm = TRUE)
@@ -176,7 +174,7 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
 #'
 #' @export
 perform_repeatability <- function(object, group) {
-  object <- check_object(object)
+  object <- check_object(object, pheno_factors = group, check_matrix = TRUE)
   group <- colData(object)[, group]
   features <- rownames(object)
   repeatability <- BiocParallel::bplapply(
@@ -234,6 +232,7 @@ perform_repeatability <- function(object, group) {
 align_batches <- function(object_na, object_fill, batch, mz, rt,
                           NAhard = 0.8, mzdiff = 0.002, rtdiff = 15, 
                           plot_folder = NULL) {
+  # CONSIDER It's a bit stupid to check_limits here, it's needed as an input check but also includes identifying mz_rt cols (which is only relevant for some other functions). If mz and rt arguments are not one of those automatically identified by .find_mz_rt_cols, this will throw an error even if the columns exist in feature data. We could completely skip mz and rt, arguments and enforce the ones automatically checked by .find_mz_rt_cols, for reading data from excel/MS-DIAL, at the expense of interoperability
   if (!requireNamespace("batchCorr", quietly = TRUE)) {
     stop("Package \"batchCorr\" needed for this function to work.",
          " Please install it from https://gitlab.com/CarlBrunius/batchCorr.",
@@ -242,8 +241,9 @@ align_batches <- function(object_na, object_fill, batch, mz, rt,
   .add_citation("batchCorr was used for batch correction:",
                 citation("batchCorr"))
                 
-  object_na <- check_object(object_na)
-  object_fill <- check_object(object_fill)
+  object_na <- check_object(object_na, pheno_factors = batch,
+                            check_matrix = TRUE, check_limits = TRUE)
+  object_fill <- check_object(object_fill, check_matrix = TRUE)
   # Set report
   if (!is.null(plot_folder)) {
     report <- TRUE
@@ -267,6 +267,7 @@ align_batches <- function(object_na, object_fill, batch, mz, rt,
   
   if (!is.null(attr(object_fill, "original_class"))) {
     object_fill <- as(object_fill, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }
   object_fill
 }
@@ -310,7 +311,8 @@ normalize_batches <- function(object, batch, group, ref_label,
   }
   .add_citation("batchCorr was used for batch correction:",
                 citation("batchCorr"))
-  object <- check_object(object)
+  object <- check_object(object, pheno_factors = list(batch, group),
+                         check_matrix = TRUE)
   # Perform batch correction
   norm_data <- batchCorr::normalizeBatches(peakTableCorr = t(assay(object)), 
                                            batches = colData(object)[, batch],
@@ -328,6 +330,7 @@ normalize_batches <- function(object, batch, group, ref_label,
   
   if (!is.null(attr(object, "original_class"))) {
     object <- as(object, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }
   object
 }
@@ -371,8 +374,8 @@ save_batch_plots <- function(orig, corrected, file, width = 14, height = 10,
                              color_scale = getOption("notame.color_scale_dis"),
                              shape_scale = 
                              scale_shape_manual(values = c(15, 21))) {
-  orig <- check_object(orig)
-  corrected <- check_object(corrected)                             
+  orig <- check_object(orig, check_matrix = TRUE)
+  corrected <- check_object(corrected, check_matrix = TRUE)
   
   data_orig <- combined_data(orig)
   data_corr <- combined_data(corrected)

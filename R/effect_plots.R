@@ -140,26 +140,20 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
                                     file_path = NULL, format = "emf",
                                     x = NULL, id = NULL,
                                     title = "Feature_ID",
-                                    subtitle = NULL, color = NA,
+                                    subtitle = NULL, color = NULL,
                                     color_scale =
                                     getOption("notame.color_scale_dis"),
                                     facet = NULL, text_base_size = 14,
                                     line_width = 0.3, mean_line_width = 1.2,
                                     title_line_length = 40, theme =
                                     theme_bw(base_size = text_base_size), ...) {
-  if (is.na(x)) {
-    stop("The time column is missing")
-  }
-  if (is.na(id)) {
-    stop("The subject column is missing")
-  }
-  
+
   subject_line_fun <- function(object, fname) {
     data <- combined_data(object)
 
     p <- ggplot(data, aes(x = .data[[x]], y = .data[[fname]]))
 
-    if (is.na(color)) {
+    if (is.null(color)) {
       p <- p +
         geom_line(aes(group = .data[[id]]), color = "grey20",
                   alpha = 0.35, size = line_width) +
@@ -192,7 +186,9 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
     p
   }
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = color, pheno_factors = x, 
+                         pheno_chars = c(id), check_matrix = TRUE,
+                         feature_cols = c(title, subtitle))
   if (save) {
     .save_feature_plots(object, file_path, format, title, subtitle,
                         text_base_size, subject_line_fun, ...)
@@ -258,8 +254,8 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
 #' @export
 save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
                                 file_path = NULL, format = "emf",
-                                x = group_col(object), 
-                                color = group_col(object),
+                                x = NULL, 
+                                color = NULL,
                                 title = "Feature_ID", subtitle = NULL,
                                 color_scale =
                                 getOption("notame.color_scale_dis"),
@@ -267,6 +263,7 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
                                 line_width = 0.5, point_size = 3,
                                 title_line_length = 40, theme =
                                 theme_bw(base_size = text_base_size), ...) {
+
     boxplot_fun <- function(object, fname) {
     data <- combined_data(object)
     dodge_amount <- box_width + 0.05
@@ -290,7 +287,8 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
     p
   }
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = color, pheno_factors = c(x),
+                         check_matrix = TRUE, feature_cols = c(title, subtitle))
   
   if (save) {
     .save_feature_plots(object, file_path, format, title, subtitle,
@@ -391,7 +389,8 @@ save_beeswarm_plots <- function(object, all_features = FALSE, save = TRUE,
     p
   }
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = color, pheno_factors = x,
+                         check_matrix = TRUE, feature_cols = c(title, subtitle))
 
   if (save) {
     .save_feature_plots(object, file_path, format, title, subtitle,
@@ -479,7 +478,10 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
     p
   }
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = c(color, x), 
+                         pheno_factors = shape, check_matrix = TRUE,
+                         feature_cols = c(title, subtitle))
+
 
   if (save) {
     .save_feature_plots(object, file_path, format, title, subtitle,
@@ -553,8 +555,8 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
 #' @export
 save_group_lineplots <- function(object, all_features = FALSE, save = TRUE,
                                  file_path = NULL, format = "emf",
-                                 x = time_col(object), 
-                                 group = group_col(object), 
+                                 x = NULL, 
+                                 group = NULL, 
                                  title = "Feature_ID", subtitle = NULL,
                                  fun.data = "mean_cl_boot", fun = NULL,
                                  fun.min = NULL, fun.max = NULL,
@@ -565,12 +567,6 @@ save_group_lineplots <- function(object, all_features = FALSE, save = TRUE,
                                  point_size = 4, title_line_length = 40,
                                  theme = theme_bw(base_size = text_base_size),
                                  ...) {
-  if (is.na(group)) {
-    stop("The group column is missing")
-  }
-  if (is.na(x)) {
-    stop("The time column is missing")
-  }
 
   line_fun <- function(object, fname) {
     data <- combined_data(object)
@@ -604,7 +600,8 @@ save_group_lineplots <- function(object, all_features = FALSE, save = TRUE,
     p
   }
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = x,  pheno_factors = group,
+                         check_matrix = TRUE, feature_cols = c(title, subtitle))
 
   if (save) {
     .save_feature_plots(object, file_path, format, title, 

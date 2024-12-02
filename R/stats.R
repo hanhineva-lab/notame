@@ -4,7 +4,7 @@
   result_row <- result_row_template
   for (fname in names(funs)) {
     tmp <- tapply(f_levels, groups, funs[[fname]])
-    if (is.na(grouping_cols[1])) {
+    if (is.null(grouping_cols[1])) {
       result_row[fname] <- tmp[1]
     } else {
       result_row[paste(group_names, fname, sep = "_")] <- tmp
@@ -27,22 +27,23 @@
 #'
 #' @examples
 #' # Group by "Group"
-#' sum_stats <- summary_statistics(example_set)
+#' sum_stats <- summary_statistics(example_set, grouping_cols = "Group")
 #' # Group by Group and Time
 #' sum_stats <- summary_statistics(example_set, 
 #'   grouping_cols = c("Group", "Time"))
 #' # No Grouping
-#' sum_stats <- summary_statistics(example_set, grouping_cols = NA)
+#' sum_stats <- summary_statistics(example_set)
 #'
 #' @return A data frame with the summary statistics.
 #'
 #' @export
-summary_statistics <- function(object, grouping_cols = NA) {
-  object <- check_object(object)
+summary_statistics <- function(object, grouping_cols = NULL) {
+  object <- check_object(object, pheno_cols = c(grouping_cols), 
+                         check_matrix = TRUE)
   data <- combined_data(object)
   features <- rownames(object)
   # Get sample grouping and group names for saving results accordingly
-  if (is.na(grouping_cols)[1]) {
+  if (is.null(grouping_cols)[1]) {
     groups <- rep(1, nrow(data))
     group_names <- ""
   } else {
@@ -72,7 +73,7 @@ summary_statistics <- function(object, grouping_cols = NA) {
                max = finite_max)
   # Initialize named vector for the results
   result_row_template <- rep(0, times = length(group_names) * length(funs))
-  if (!is.na(grouping_cols[1])) {
+  if (!is.null(grouping_cols[1])) {
     var_names <- expand.grid(names(funs), group_names)
     names(result_row_template) <- paste(var_names$Var2, var_names$Var1, 
                                         sep = "_")
@@ -279,20 +280,11 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
 #' @export
 cohens_d <- function(object, group = NULL,
                      id = NULL, time = NULL) {
-  object <- check_object(object)
+  object <- check_object(object, pheno_factors = c(group, time), 
+                         pheno_cols = id, check_matrix = TRUE, 
+                         feature_ID = TRUE)
   res <- NULL
-  # Check that both group and time are factors and have at least two levels
-  for (column in c(group, time)) {
-    if (is.null(column)) {
-      next
-    }
-    if (!is.factor(colData(object)[, column])) {
-      stop("Column ", column, " should be a factor!")
-    }
-    if (length(levels(colData(object)[, column])) < 2) {
-      stop("Column ", column, " should have at least two levels!")
-    }
-  }
+
   group_combos <- utils::combn(levels(colData(object)[, group]), 2)
 
   if (is.null(time)) {
@@ -347,7 +339,8 @@ cohens_d <- function(object, group = NULL,
 #'
 #' @export
 fold_change <- function(object, group = group_col(object)) {
-  object <- check_object(object)
+  # CONSIDER check for when two grouping cols are supplied. This would be fixed by the length = 1 shit in mia for such functions.
+  object <- check_object(object, pheno_cols = group)
   log_text("Starting to compute fold changes.")
 
   data <- combined_data(object)
@@ -468,7 +461,7 @@ fold_change <- function(object, group = group_col(object)) {
 #' @examples
 #' # Correlations between all features
 #' correlations <- perform_correlation_tests(example_set, 
-#'   x = rownames(example_set))
+#'   x = rownames(example_set), id = "Subject_ID")
 #'
 #' # Spearman Correlations between features and sample information variables
 #' # Drop QCs and convert time to numeric
@@ -495,14 +488,14 @@ perform_correlation_tests <- function(object, x, y = x, id = NULL,
                                       ...) {
   log_text("Starting correlation tests.")
 
-  object <- check_object(object)
+  object <- check_object(object, pheno_factors = id, check_matrix = TRUE)
   data1 <- combined_data(object)
 
   if (!is.null(object2)) {
     if (ncol(object) != ncol(object2)) {
       stop("The objects have different numbers of samples")
     }
-    object <- check_object(object)
+    object2 <- check_object(object2, pheno_factors = id, check_matrix = TRUE)
     data2 <- combined_data(object2)
   } else {
     data2 <- data1
@@ -598,25 +591,26 @@ perform_correlation_tests <- function(object, x, y = x, id = NULL,
 #'
 #' @examples
 #' # Drop QC samples before computing AUCs
-#' aucs <- perform_auc(drop_qcs(example_set), time = "Time", subject = "Subject_ID", group = "Group")
+#' aucs <- perform_auc(drop_qcs(example_set), time = "Time", 
+#'                     subject = "Subject_ID", group = "Group")
 #' # t-test with the AUCs
 #' t_test_results <- perform_t_test(aucs, formula_char = "Feature ~ Group")
 #'
 #' @seealso \code{\link[PK]{auc}}
 #'
 #' @export
-perform_auc <- function(object, time = time_col(object), 
-                        subject = subject_col(object),
-                        group = group_col(object)) {
+perform_auc <- function(object, time, subject, group) {
   if (!requireNamespace("PK", quietly = TRUE)) {
     stop("Package \"PK\" needed for this function to work. Please install it.",
          call. = FALSE)
   }
+  # This needs an input check for the existence of the specific columns, leave parameters without a value so that an error is thrown immediately?
   .add_citation("PK package was used to compute AUC:", citation("PK"))
 
   log_text("Starting AUC computation")
   
-  object <- check_object(object)
+  object <- check_object(object, pheno_factors = c(time, group),
+                         pheno_chars = subject, check_matrix = TRUE)
   data <- combined_data(object)
 
   # Create new pheno data, only one row per subject and group
@@ -694,7 +688,7 @@ perform_auc <- function(object, time = time_col(object),
 
 # Helper function for running a variety of simple statistical tests
 .perform_test <- function(object, formula_char, result_fun, all_features, 
-                         fdr = TRUE, packages = NULL, ...) {
+                          fdr = TRUE, packages = NULL, ...) {
   data <- combined_data(object)
   features <- rownames(object)
 
@@ -753,7 +747,11 @@ perform_auc <- function(object, time = time_col(object),
 #' @export
 perform_lm <- function(object, formula_char, all_features = FALSE, ...) {
   log_text("Starting linear regression.")
-  object <- check_object(object)
+  # THINK more about logic here (and elsewhere with formula_char). Do we need to split by other shits, too? Yes, you may be able to do it with regular expressions in the same split argument. You could still add that if LHS is not "Feature", error.
+  formula_cols <- unlist(strsplit(formula_char, " ~ "))[2]
+  formula_cols <- unlist(strsplit(formula_cols, split = " *\\+ *| *\\* *| *:"))
+
+  object <- check_object(object, pheno_cols = formula_cols, check_matrix = TRUE)
 
   lm_fun <- function(feature, formula, data) {
     # Try to fit the linear model

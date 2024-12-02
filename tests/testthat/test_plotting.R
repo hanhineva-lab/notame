@@ -48,7 +48,8 @@ test_that("Giving invalid file format throws error", {
 
 test_that("Subject line plots are saved without title", {
   test_plot_saving_helper(save_subject_line_plots, title = NULL, 
-                          func_args = c(x = "Time", id = "Subject_ID"))
+                          func_args = c(x = "Time", id = "Subject_ID", 
+                                        color = "Group"))
 })
 
 test_that("Subject line plot naming works", {

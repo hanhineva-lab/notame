@@ -56,7 +56,7 @@ plot_dist_density <- function(object, all_features = FALSE,
   }
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_QC = TRUE, check_matrix = TRUE)
 
   assay <- pcaMethods::prep(t(assay(object)), center = center, scale = scale)
 
@@ -96,7 +96,8 @@ plot_dist_density <- function(object, all_features = FALSE,
 plot_injection_lm <- function(object, all_features = FALSE) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_injection = TRUE, pheno_QC = TRUE,
+                         check_matrix = TRUE)
 
   # Apply linear model to QC samples and biological samples separately
   lm_all <- perform_lm(object, "Feature ~ Injection_order")
@@ -189,7 +190,7 @@ plot_p_histogram <- function(p_values, hline = TRUE, combine = TRUE,
 plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE) {
   # Drop flagged features
   object <- drop_flagged(object, all_features = all_features)
-  object <- check_object(object)
+  object <- check_object(object, feature_flag = TRUE)
   if (plot_flags) {
     # Plot bar plot of flags
     flags <- flag(object)
@@ -257,9 +258,11 @@ plot_sample_boxplots <- function(
                                             time_col(object)))),
     title = "Boxplot of samples", subtitle = NULL,
     fill_scale = getOption("notame.fill_scale_dis"), zoom_boxplot = TRUE) {
+  # FINISH MetaboSet compatibility
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object)
+  object <- check_object(object, pheno_cols = c(order_by, fill_by),
+                         check_matrix = TRUE)
 
   data <- combined_data(object)
 

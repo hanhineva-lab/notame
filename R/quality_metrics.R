@@ -26,9 +26,7 @@ quality <- function(object) {
     return(NULL)
   }
   rowData(object)[c("RSD", "RSD_r", "D_ratio", "D_ratio_r")] <- NULL
-  if (!is.null(attr(object, "original_class"))) {
-    object <- as(object, "MetaboSet")
-  }
+
   object
 }
 
@@ -49,39 +47,66 @@ quality <- function(object) {
 #' rowData(ex_set)
 #'
 #' @export
-assess_quality <- function(object) {
-  object <- check_object(object)
-  # Remove old quality metrics
-  if (!is.null(quality(object))) {
-    object <- .erase_quality(object)
-    object <- as(object, "SummarizedExperiment")
-  }
+setGeneric("assess_quality", signature = "object",
+           function(object) standardGeneric("assess_quality"))
 
-  qc_data <- assay(object)[, object$QC == "QC"]
-  sample_data <- assay(object)[, object$QC != "QC"]
-  features <- rownames(sample_data)
-  
-  quality_metrics <- BiocParallel::bplapply(features, function(feature) {
-    data.frame(
-      Feature_ID = feature,
-      RSD = finite_sd(qc_data[feature, ]) / abs(finite_mean(qc_data[feature,])),
-      RSD_r = finite_mad(qc_data[feature, ]) /
-        abs(finite_median(qc_data[feature, ])),
-      D_ratio = finite_sd(qc_data[feature, ]) /
-        finite_sd(sample_data[feature, ]),
-      D_ratio_r = finite_mad(qc_data[feature, ]) /
-        finite_mad(sample_data[feature, ]),
-      row.names = feature, stringsAsFactors = FALSE)
-  })
-      
+setMethod("assess_quality", signature = c(object = "MetaboSet"),
+  function(object) {
+    object <- check_object(object, pheno_QC = TRUE, check_matrix = TRUE)
+    # Remove old quality metrics
+    if (!is.null(quality(object))) {
+      object <- .erase_quality(object)
+      #object <- as(object, "SummarizedExperiment")
+    }
+
+    qc_data <- assay(object)[, object$QC == "QC"]
+    sample_data <- assay(object)[, object$QC != "QC"]
+    features <- rownames(sample_data)
+    
+    quality_metrics <- BiocParallel::bplapply(features, function(feature) {
+      data.frame(
+        Feature_ID = feature,
+        RSD = finite_sd(qc_data[feature, ]) / abs(finite_mean(qc_data[feature,])),
+        RSD_r = finite_mad(qc_data[feature, ]) /
+          abs(finite_median(qc_data[feature, ])),
+        D_ratio = finite_sd(qc_data[feature, ]) /
+          finite_sd(sample_data[feature, ]),
+        D_ratio_r = finite_mad(qc_data[feature, ]) /
+          finite_mad(sample_data[feature, ]),
+        row.names = feature, stringsAsFactors = FALSE)
+    })
   quality_metrics <- do.call(rbind, quality_metrics)
   object <- join_rowData(object, quality_metrics)
-  
-  if (!is.null(attr(object, "original_class"))) {
-    object <- as(object, "MetaboSet")
-  }
-  object
-}
+})
+
+setMethod("assess_quality", signature = c(object = "SummarizedExperiment"),
+  function(object) {
+    object <- check_object(object, pheno_QC = TRUE, check_matrix = TRUE)
+    # Remove old quality metrics
+    if (!is.null(quality(object))) {
+      object <- .erase_quality(object)
+      #object <- as(object, "SummarizedExperiment")
+    }
+
+    qc_data <- assay(object)[, object$QC == "QC"]
+    sample_data <- assay(object)[, object$QC != "QC"]
+    features <- rownames(sample_data)
+    
+    quality_metrics <- BiocParallel::bplapply(features, function(feature) {
+      data.frame(
+        Feature_ID = feature,
+        RSD = finite_sd(qc_data[feature, ]) / abs(finite_mean(qc_data[feature,])),
+        RSD_r = finite_mad(qc_data[feature, ]) /
+          abs(finite_median(qc_data[feature, ])),
+        D_ratio = finite_sd(qc_data[feature, ]) /
+          finite_sd(sample_data[feature, ]),
+        D_ratio_r = finite_mad(qc_data[feature, ]) /
+          finite_mad(sample_data[feature, ]),
+        row.names = feature, stringsAsFactors = FALSE)
+    })
+    quality_metrics <- do.call(rbind, quality_metrics)
+    object <- join_rowData(object, quality_metrics)
+})
   
 #' Flag low-quality features
 #'
@@ -141,7 +166,7 @@ flag_quality <- function(object, condition =
   if (is.null(quality(object))) {
     object <- assess_quality(object)
   }
-  object <- check_object(object)
+  object <- check_object(object, feature_ID = TRUE)
   .add_citation("Quality metrics were computed as per guidelines in:", paste(
     "Broadhurst, David et al. Guidelines and considerations for the use of",
     "system suitability and quality control samples in mass spectrometry",
@@ -163,6 +188,7 @@ flag_quality <- function(object, condition =
   log_text(paste0("\n", percentage, " of features flagged for low quality"))
   if (!is.null(attr(object, "original_class"))) {
     object <- as(object, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }
   object
 }
@@ -196,7 +222,9 @@ flag_quality <- function(object, condition =
 #' @export
 flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
                            group = NULL) {
-  object <- check_object(object)
+  object <- check_object(object, pheno_ID = TRUE, pheno_QC = TRUE, 
+                         pheno_factors = group, check_matrix = TRUE,
+                         feature_ID = TRUE)
   found_qc <- apply(assay(object[, object$QC == "QC"]), 1, prop_found)
   bad_qc <- names(which(found_qc < qc_limit))
 
@@ -244,6 +272,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
   object <- join_rowData(object, proportions)
   if (!is.null(attr(object, "original_class"))) {
     object <- as(object, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }
   object
 }
@@ -297,7 +326,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' @export
 flag_contaminants <- function(object, blank_col, blank_label, 
                               flag_thresh = 0.05, flag_label = "Contaminant") {
-  object <- check_object(object)
+  object <- check_object(object, pheno_QC = TRUE, pheno_cols = blank_col)
   blanks <- object[, colData(object)[, blank_col] == blank_label]
   samples <- object[, object$QC != "QC" &
                     colData(object)[, blank_col] != blank_label]
@@ -320,6 +349,7 @@ flag_contaminants <- function(object, blank_col, blank_label,
   object <- join_rowData(object, blank_ratio)
   if (!is.null(attr(object, "original_class"))) {
     object <- as(object, "MetaboSet")
+    attr(object, "original_class") <- NULL
   }
   object
 }
