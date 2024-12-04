@@ -7,6 +7,8 @@
 #' @param replicates list of numeric vectors, indexes of replicates
 #' @param k The number of factors of unwanted variation to be estimated from 
 #' the data.
+#' @param assay.type name of the assay to be transformed
+#' @param name name of the resultant assay
 #' @param ... other parameters passed to RUVSeq::RUVs
 #'
 #' @return A SummarizedExperiment or Metaboset object with the normalized data.
@@ -14,22 +16,27 @@
 #' @examples
 #' # Batch correction
 #' replicates <- list(which(example_set$QC == "QC"))
+#' ex_set <- ruvs_qc(example_set, replicates = replicates, name = "bcorrected")
 #' batch_corrected <- ruvs_qc(example_set, replicates = replicates)
 #' # Evaluate batch correction
 #' pca_bhattacharyya_dist(example_set, batch = "Batch")
 #' pca_bhattacharyya_dist(batch_corrected, batch = "Batch")
 #'
 #' @export
-ruvs_qc <- function(object, replicates, k = 3, ...) {
+ruvs_qc <- function(object, replicates, k = 3, 
+                    assay.type = NULL, name = NULL, ...) {
   if (!requireNamespace("RUVSeq", quietly = TRUE)) {
     stop("Bioconductor package RUVSeq needed for this function to work.",
          " Please install it.", call. = FALSE)
   }
-  .add_citation("RUVSeq was used for batch correction:", citation("RUVSeq"))
-
-  object <- check_object(object, check_matrix = TRUE)
+  
+  .add_citation("RUVSeq was used for batch correction:", citation("RUVSeq"))    
+  
+  from_to <- .get_from_to_names(object, assay.type, name)
+  object <- check_object(object, assay.type = from_to[[1]])
+  
   # Transform data to pseudo counts for RUVs
-  assay(object)[assay(object) == 0] <- 1
+  assay(object, from_to[[1]])[assay(object, from_to[[1]]) == 0] <- 1
   assay(object) <- round(assay(object))
   # Pad each replicate vector with -1 and transform to matrix
   max_len <- max(vapply(replicates, length, integer(1)))
@@ -42,7 +49,7 @@ ruvs_qc <- function(object, replicates, k = 3, ...) {
   ruv_results <- RUVSeq::RUVs(x = assay(object), cIdx = rownames(object),
                               k = k, scIdx = scIdx, ...)
   # Include results in object
-  assay(object) <- ruv_results$normalizedCounts
+  assay(object, from_to[[2]]) <- ruv_results$normalizedCounts
   colData(object) <- cbind(colData(object), ruv_results$W)
   
   if (!is.null(attr(object, "original_class"))) {
@@ -81,7 +88,7 @@ ruvs_qc <- function(object, replicates, k = 3, ...) {
 #'
 #' @export
 pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE, 
-                                   center = TRUE, scale = "uv", nPcs = 3, ...){ 
+                                   center = TRUE, scale = "uv", nPcs = 3, assay.type = NULL, ...){ 
   if (!requireNamespace("fpc", quietly = TRUE)) {
     stop("Package \"fpc\" needed for this function to work. Please install it.",
          call. = FALSE)
@@ -94,13 +101,13 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
                 citation("pcaMethods"))
   .add_citation("fpc package was used for Bhattacharyaa distance computation:",
                 citation("fpc"))
-                
+  from <- .get_from_name(object, assay.type)
   # Drop flagged features if not told otherwise
-  object <- check_object(object, pheno_factors = batch)
+  object <- check_object(object, pheno_factors = batch, assay.type = from)
   object <- drop_flagged(object, all_features)
   # PCA to 2 dimenstions
-  pca_res <- pcaMethods::pca(t(assay(object)), center = center, scale = scale, 
-                             nPcs = nPcs, ...)
+  pca_res <- pcaMethods::pca(t(assay(object, from)), center = center, 
+                             scale = scale, nPcs = nPcs, ...)
   pca_scores <- pcaMethods::scores(pca_res)
   # Split to batches
   batches <- list()
@@ -173,8 +180,9 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
 #' mean(rep_corr$Repeatability, na.rm = TRUE)
 #'
 #' @export
-perform_repeatability <- function(object, group) {
-  object <- check_object(object, pheno_factors = group, check_matrix = TRUE)
+perform_repeatability <- function(object, group, assay.type = NULL) {
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, pheno_factors = group, assay.type = from)
   group <- colData(object)[, group]
   features <- rownames(object)
   repeatability <- BiocParallel::bplapply(
@@ -208,6 +216,7 @@ perform_repeatability <- function(object, group) {
 #' NULL, no plots are saved
 #'
 #' @return A SummarizedExperiment or MetaboSet object with the aligned features.
+#' NOTE returns an object with a single assay
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
@@ -223,7 +232,7 @@ perform_repeatability <- function(object, group) {
 #' assay(ex_set_na)[3, c(26, 32, 38, 44)] <- NA
 #' batch_aligned <- align_batches(ex_set_na, ex_set_fill, 
 #'   batch = "Batch", mz = "Average_Mz", rt = "Average_Rt_min", 
-#'   mzdiff = 0.002, rtdiff = 15, plot_folder = "./Figures")
+#'   mzdiff = 0.1, rtdiff = 15, plot_folder = "./Figures", assay.type1 = "ses")
 #' \dontshow{setwd(.old_wd)}
 #'
 #' @seealso \code{\link[batchCorr]{alignBatches}}
@@ -231,8 +240,10 @@ perform_repeatability <- function(object, group) {
 #' @export
 align_batches <- function(object_na, object_fill, batch, mz, rt,
                           NAhard = 0.8, mzdiff = 0.002, rtdiff = 15, 
-                          plot_folder = NULL) {
+                          plot_folder = NULL, assay.type1 = NULL,
+                          assay.type2 = NULL, name = NULL) {
   # CONSIDER It's a bit stupid to check_limits here, it's needed as an input check but also includes identifying mz_rt cols (which is only relevant for some other functions). If mz and rt arguments are not one of those automatically identified by .find_mz_rt_cols, this will throw an error even if the columns exist in feature data. We could completely skip mz and rt, arguments and enforce the ones automatically checked by .find_mz_rt_cols, for reading data from excel/MS-DIAL, at the expense of interoperability
+  # As of now, the user can't specify two assays from the same object
   if (!requireNamespace("batchCorr", quietly = TRUE)) {
     stop("Package \"batchCorr\" needed for this function to work.",
          " Please install it from https://gitlab.com/CarlBrunius/batchCorr.",
@@ -240,10 +251,13 @@ align_batches <- function(object_na, object_fill, batch, mz, rt,
   }
   .add_citation("batchCorr was used for batch correction:",
                 citation("batchCorr"))
-                
+  
+  from_to <- .get_from_to_names(object_na, assay.type1, name)
+  fill_from <- .get_from_name(object_fill, assay.type2)
+
   object_na <- check_object(object_na, pheno_factors = batch,
-                            check_matrix = TRUE, check_limits = TRUE)
-  object_fill <- check_object(object_fill, check_matrix = TRUE)
+                            assay.type = from_to[[1]], check_limits = TRUE)
+  object_fill <- check_object(object_fill, assay.type = from_to[[1]])
   # Set report
   if (!is.null(plot_folder)) {
     report <- TRUE
@@ -263,7 +277,7 @@ align_batches <- function(object_na, object_fill, batch, mz, rt,
                                      mzdiff = mzdiff, rtdiff = rtdiff, 
                                      report = report, reportPath = plot_folder)
   # Attach aligned features
-  assay(object_fill) <- t(aligned$PTalign)
+  assay(object_fill, from_to[[2]]) <- t(aligned$PTalign)
   
   if (!is.null(attr(object_fill, "original_class"))) {
     object_fill <- as(object_fill, "MetaboSet")
@@ -303,7 +317,8 @@ align_batches <- function(object_na, object_fill, batch, mz, rt,
 #'
 #' @export
 normalize_batches <- function(object, batch, group, ref_label, 
-                              population = "all", ...) {
+                              population = "all", assay.type = NULL, 
+                              name = NULL, ...) {
   if (!requireNamespace("batchCorr", quietly = TRUE)) {
     stop("Package \'batchCorr\' needed for this function to work.", 
          " Please install it.",
@@ -311,17 +326,19 @@ normalize_batches <- function(object, batch, group, ref_label,
   }
   .add_citation("batchCorr was used for batch correction:",
                 citation("batchCorr"))
+  from_to <- .get_from_to_names(object, assay.type, name)
   object <- check_object(object, pheno_factors = list(batch, group),
-                         check_matrix = TRUE)
+                         assay.type = from_to[[1]])
   # Perform batch correction
-  norm_data <- batchCorr::normalizeBatches(peakTableCorr = t(assay(object)), 
-                                           batches = colData(object)[, batch],
-                                           sampleGroup = 
-                                           colData(object)[, group], 
-                                           refGroup = ref_label,
-                                           population = population, ...)
+  norm_data <- batchCorr::normalizeBatches(
+    peakTableCorr = t(assay(object, from_to[[1]])), 
+    batches = colData(object)[, batch],
+    sampleGroup = colData(object)[, group], 
+    refGroup = ref_label,
+    population = population, ...)
+    
   # Include corrected abundances and correction information in object
-  assay(object) <- t(norm_data$peakTable)
+  assay(object, from_to[[2]]) <- t(norm_data$peakTable)
   ref_corrected <- as.data.frame(t(norm_data$refCorrected))
   colnames(ref_corrected) <- paste0("Ref_corrected_",
                                     seq_len(ncol(ref_corrected)))
@@ -373,12 +390,18 @@ save_batch_plots <- function(orig, corrected, file, width = 14, height = 10,
                              batch = "Batch", color = "Batch", shape = "QC",
                              color_scale = getOption("notame.color_scale_dis"),
                              shape_scale = 
-                             scale_shape_manual(values = c(15, 21))) {
-  orig <- check_object(orig, check_matrix = TRUE)
-  corrected <- check_object(corrected, check_matrix = TRUE)
+                             scale_shape_manual(values = c(15, 21)),
+                             assay.type1 = NULL, assay.type2 = NULL) {
+  # As of now, the user can't specify two assays from the same object
+  from1 <- .get_from_name(orig, assay.type1)
+  from2 <- .get_from_name(orig, assay.type2)
+  orig <- check_object(orig, pheno_factors = c(batch, shape),
+                       pheno_cols = color, assay.type = from1)
+  corrected <- check_object(corrected, pheno_factors = c(batch, shape),
+                            pheno_cols = color, assay.type = from2)
   
-  data_orig <- combined_data(orig)
-  data_corr <- combined_data(corrected)
+  data_orig <- combined_data(orig, from1)
+  data_corr <- combined_data(corrected, from2)
   # Prepare data.frame for batch means with batch and injection order range
   batch_injections <- data_orig %>%
     dplyr::group_by(!!dplyr::sym(batch)) %>%

@@ -210,6 +210,7 @@ merge_metabosets <- function(..., merge = c("features", "samples")) {
 #'
 #' @export
 merge_objects <- function(..., merge = c("features", "samples")) {
+  # CONSIDER perhaps simply necessitate same assay.type names?
   merge <- match.arg(merge)
   # Combine the objects to a list
   objects <- .to_list(...)

@@ -1,14 +1,15 @@
 # ------- HELPER FUNCTIONS ----------------
 
 # Helper function for computing PCA
-.pca_helper <- function(object, pcs, center, scale, ...) {
+.pca_helper <- function(object, pcs, center, scale, assay.type, ...) {
   if (!requireNamespace("pcaMethods", quietly = TRUE)) {
     stop("Package \'pcaMethods\' needed for this function to work.",
          " Please install it.", call. = FALSE)
   }
   .add_citation("PCA was performed using pcaMethods package:",
                 citation("pcaMethods"))
-  res_pca <- pcaMethods::pca(t(assay(object)), nPcs = max(pcs), scale = scale, 
+  res_pca <- pcaMethods::pca(t(assay(object, assay.type)),
+                             nPcs = max(pcs), scale = scale, 
                              center = center, ...)
   pca_scores <- as.data.frame(pcaMethods::scores(res_pca))[, pcs]
   r2 <- summary(res_pca)["R2", pcs]
@@ -18,7 +19,8 @@
 }
 
 # Helper function for computing t-SNE
-.t_sne_helper <- function(object, center, scale, perplexity, pca_method, ...) {
+.t_sne_helper <- function(object, center, scale, perplexity, 
+                          pca_method, assay.type, ...) {
   if (!requireNamespace("pcaMethods", quietly = TRUE)) {
     stop("Package \'pcaMethods\' needed for this function to work.",
          " Please install it.", call. = FALSE)
@@ -28,10 +30,13 @@
          " Please install it.", call. = FALSE)
   }
   .add_citation("Rtsne package was used for t-SNE figures:", citation("Rtsne"))
-  prepd <- pcaMethods::prep(t(assay(object)), center = center, scale = scale)
+
+  prepd <- pcaMethods::prep(t(assay(object, assay.type)), 
+                            center = center, scale = scale)
 
   if (sum(is.na(prepd)) > 0) {
-    res_pca <- pcaMethods::pca(t(assay(object)), method = pca_method, 
+    res_pca <- pcaMethods::pca(t(assay(object, assay.type)), 
+                               method = pca_method, 
                                nPcs = min(nrow(object), ncol(object), 50),
                                scale = "none", center = FALSE)
     pca_scores <- pcaMethods::scores(res_pca)
@@ -92,13 +97,15 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
                      title = "PCA", subtitle = NULL, color_scale = NA,
                      shape_scale = getOption("notame.shape_scale"), 
                      fill_scale = getOption("notame.fill_scale_dis"),
-                     text_base_size = 14, point_size = 2, ...) {
+                     text_base_size = 14, point_size = 2,
+                     assay.type = NULL, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object, pheno_cols = color,
-                         pheno_factors = shape, check_matrix = TRUE)
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, pheno_cols = color, pheno_factors = shape, 
+                         assay.type = from)
 
-  pca_results <- .pca_helper(object, pcs, center, scale, ...)
+  pca_results <- .pca_helper(object, pcs, center, scale, assay.type = from, ...)
   pca_scores <- pca_results$pca_scores
   pc_names <- colnames(pca_scores)
   pca_scores[color] <- colData(object)[, color]
@@ -165,15 +172,17 @@ plot_tsne <- function(object, all_features = FALSE, center = TRUE,
                       color_scale = NA,
                       shape_scale = getOption("notame.shape_scale"), 
                       fill_scale = getOption("notame.fill_scale_dis"),
-                      text_base_size = 14, point_size = 2, ...) {
+                      text_base_size = 14, point_size = 2, 
+                      assay.type = NULL, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
   object <- check_object(object, pheno_cols = color,
-                         pheno_factors = shape, check_matrix = TRUE)
+                         pheno_factors = shape, assay.type = from)
 
   # t-SNE
-  tsne_scores <- .t_sne_helper(object, center, scale, 
-                               perplexity, pca_method, ...)
+  tsne_scores <- .t_sne_helper(object, center, scale, perplexity, 
+                               pca_method, from, ...)
   # Add columns for plotting
   tsne_scores[color] <- colData(object)[, color]
   tsne_scores[shape] <- colData(object)[, shape]
@@ -313,7 +322,7 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
                               n_features = c(10, 10),
                               title = "PCA loadings", subtitle = NULL,
                               text_base_size = 14, point_size = 2,
-                              label_text_size = 4, ...) {
+                              label_text_size = 4, assay.type = NULL, ...) {
   if (!requireNamespace("pcaMethods", quietly = TRUE)) {
     stop("Package \"pcaMethods\" needed for this function to work.", 
          " Please install it.", call. = FALSE)
@@ -324,9 +333,10 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
   
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object, check_matrix = TRUE, feature_ID = TRUE)
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, assay.type = from, feature_ID = TRUE)
 
-  pca_res <- pcaMethods::pca(t(assay(object)), nPcs = max(pcs), 
+  pca_res <- pcaMethods::pca(t(assay(object, from)), nPcs = max(pcs), 
                              center = center, scale = scale, ...)
 
   loads <- as.data.frame(pcaMethods::loadings(pca_res))[, pcs]
@@ -389,12 +399,13 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
                             fill = "Injection_order", summary_fun = "mean",
                             bins = 10, title = "PCA", subtitle = NULL,
                             fill_scale = getOption("notame.fill_scale_con"),
-                            ...) {
+                            assay.type = NULL, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object, pheno_num = fill, check_matrix = TRUE)
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, pheno_nums = fill, assay.type = from)
 
-  pca_results <- .pca_helper(object, pcs, center, scale, ...)
+  pca_results <- .pca_helper(object, pcs, center, scale, assay.type = from, ...)
   pca_scores <- pca_results$pca_scores
   pc_names <- colnames(pca_scores)
   pca_scores[fill] <- colData(object)[, fill]
@@ -445,14 +456,14 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
                              summary_fun = "mean", bins = 10, title = "t-SNE",
                              subtitle = paste("Perplexity:", perplexity),
                              fill_scale = getOption("notame.fill_scale_con"),
-                             ...) {
+                             assay.type = NULL, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object, pheno_num = fill, check_matrix = TRUE)
-
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, pheno_nums = fill, assay.type = from)
   # t-SNE
   tsne_scores <- .t_sne_helper(object, center, scale,
-                               perplexity, pca_method, ...)
+                               perplexity, pca_method, from, ...)
   # Add columns for plotting
   tsne_scores[fill] <- colData(object)[, fill]
 
@@ -543,13 +554,15 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
                             arrow_style = arrow(), title = "PCA changes",
                             subtitle = NULL, 
                             color_scale = getOption("notame.color_scale_dis"),
-                            text_base_size = 14, line_width = 0.5, ...) {
+                            text_base_size = 14, line_width = 0.5, 
+                            assay.type = NULL, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
   object <- check_object(object, pheno_cols = c(color, time, subject),
-                         check_matrix = TRUE)
+                         assay.type = from)
 
-  pca_results <- .pca_helper(object, pcs, center, scale, ...)
+  pca_results <- .pca_helper(object, pcs, center, scale, assay.type = from, ...)
   pca_scores <- pca_results$pca_scores
   pc_names <- colnames(pca_scores)
   pca_scores[color] <- colData(object)[, color]
@@ -618,14 +631,16 @@ plot_tsne_arrows <- function(object, all_features = FALSE, center = TRUE,
                              title = "t-SNE changes",
                              subtitle = paste("Perplexity:", perplexity),
                              color_scale = getOption("notame.color_scale_dis"),
-                             text_base_size = 14, line_width = 0.5, ...) {
+                             text_base_size = 14, line_width = 0.5,
+                             assay.type = NULL, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
   object <- check_object(object, pheno_cols = c(color, time, subject),
-                         check_matrix = TRUE)
+                         assay.type = from)
 
   tsne_scores <- .t_sne_helper(object, center, scale, 
-                               perplexity, pca_method, ...)
+                               perplexity, pca_method, from, ...)
   tsne_scores[color] <- colData(object)[, color]
   tsne_scores[time] <- colData(object)[, time]
   tsne_scores[subject] <- colData(object)[, subject]

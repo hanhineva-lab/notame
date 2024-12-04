@@ -146,7 +146,8 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
                                     facet = NULL, text_base_size = 14,
                                     line_width = 0.3, mean_line_width = 1.2,
                                     title_line_length = 40, theme =
-                                    theme_bw(base_size = text_base_size), ...) {
+                                    theme_bw(base_size = text_base_size),
+                                    assay.type = NULL, ...) {
 
   subject_line_fun <- function(object, fname) {
     data <- combined_data(object)
@@ -185,10 +186,14 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
            y = "Abundance")
     p
   }
+  
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
   object <- check_object(object, pheno_cols = color, pheno_factors = x, 
-                         pheno_chars = c(id), check_matrix = TRUE,
+                         pheno_chars = c(id), assay.type = from, 
                          feature_cols = c(title, subtitle))
+  assays(object) <- assays(object)[from]
+  
   if (save) {
     .save_feature_plots(object, file_path, format, title, subtitle,
                         text_base_size, subject_line_fun, ...)
@@ -262,7 +267,8 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
                                 text_base_size = 14, box_width = 0.8,
                                 line_width = 0.5, point_size = 3,
                                 title_line_length = 40, theme =
-                                theme_bw(base_size = text_base_size), ...) {
+                                theme_bw(base_size = text_base_size), 
+                                assay.type = NULL, ...) {
 
     boxplot_fun <- function(object, fname) {
     data <- combined_data(object)
@@ -286,9 +292,12 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
     }
     p
   }
+  
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
   object <- check_object(object, pheno_cols = color, pheno_factors = c(x),
-                         check_matrix = TRUE, feature_cols = c(title, subtitle))
+                         assay.type = from, feature_cols = c(title, subtitle))
+  assays(object) <- assays(object)[from]
   
   if (save) {
     .save_feature_plots(object, file_path, format, title, subtitle,
@@ -361,7 +370,8 @@ save_beeswarm_plots <- function(object, all_features = FALSE, save = TRUE,
                                 getOption("notame.color_scale_dis"),
                                 text_base_size = 14, cex = 2, size = 2,
                                 title_line_length = 40, theme =
-                                theme_bw(base_size = text_base_size),...) {
+                                theme_bw(base_size = text_base_size),
+                                assay.type = NULL, ...) {
                                   
   beeswarm_fun <- function(object, fname) {
     data <- combined_data(object)
@@ -388,9 +398,12 @@ save_beeswarm_plots <- function(object, all_features = FALSE, save = TRUE,
     }
     p
   }
+  
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
   object <- check_object(object, pheno_cols = color, pheno_factors = x,
-                         check_matrix = TRUE, feature_cols = c(title, subtitle))
+                         assay.type = from, feature_cols = c(title, subtitle))
+  assays(object) <- assays(object)[from]
 
   if (save) {
     .save_feature_plots(object, file_path, format, title, subtitle,
@@ -461,7 +474,8 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
                                shape_scale = getOption("notame.shape_scale"),
                                text_base_size = 14, point_size = 2,
                                title_line_length = 40, theme =
-                               theme_bw(base_size = text_base_size), ...) {
+                               theme_bw(base_size = text_base_size),
+                               assay.type = NULL, ...) {
   scatter_fun <- function(object, fname) {
     data <- combined_data(object)
     p <- .scatter_plot(data = data, x = x, y = fname, color = color,
@@ -478,9 +492,12 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
     p
   }
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
   object <- check_object(object, pheno_cols = c(color, x), 
-                         pheno_factors = shape, check_matrix = TRUE,
-                         feature_cols = c(title, subtitle))
+                         pheno_factors = shape,
+                         feature_cols = c(title, subtitle),
+                         assay.type = from)
+  assays(object) <- assays(object)[from]
 
 
   if (save) {
@@ -566,7 +583,7 @@ save_group_lineplots <- function(object, all_features = FALSE, save = TRUE,
                                  text_base_size = 14, line_width = 0.5,
                                  point_size = 4, title_line_length = 40,
                                  theme = theme_bw(base_size = text_base_size),
-                                 ...) {
+                                 assay.type = NULL, ...) {
 
   line_fun <- function(object, fname) {
     data <- combined_data(object)
@@ -599,9 +616,13 @@ save_group_lineplots <- function(object, all_features = FALSE, save = TRUE,
     }
     p
   }
+  
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
   object <- check_object(object, pheno_cols = x,  pheno_factors = group,
-                         check_matrix = TRUE, feature_cols = c(title, subtitle))
+                         feature_cols = c(title, subtitle),
+                         assay.type = from)
+  assays(object) <- assays(object)[from]
 
   if (save) {
     .save_feature_plots(object, file_path, format, title, 

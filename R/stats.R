@@ -37,10 +37,12 @@
 #' @return A data frame with the summary statistics.
 #'
 #' @export
-summary_statistics <- function(object, grouping_cols = NULL) {
+summary_statistics <- function(object, grouping_cols = NULL,
+                               assay.type = NULL) {
+  from <- .get_from_name(object, assay.type)
   object <- check_object(object, pheno_cols = c(grouping_cols), 
-                         check_matrix = TRUE)
-  data <- combined_data(object)
+                         assay.type = from)
+  data <- combined_data(object, from)
   features <- rownames(object)
   # Get sample grouping and group names for saving results accordingly
   if (is.null(grouping_cols)[1]) {
@@ -152,8 +154,8 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
     stringsAsFactors = FALSE)
 }
 
-.help_cohens_d <- function(object, group, id, time) {
-  data <- combined_data(object)
+.help_cohens_d <- function(object, group, id, time, assay.type) {
+  data <- combined_data(object, assay.type)
   features <- rownames(object)
   group_levels <- levels(data[, group])
   time_levels <- NULL
@@ -207,7 +209,8 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
 }
 
 
-.help_cohens_d_time <- function(res, group_combos, object, group, id, time) {
+.help_cohens_d_time <- function(res, group_combos, object, group,
+                                id, time, assay.type) {
   count_obs_geq_than <- function(x, n) {
     sum(x >= n)
   }
@@ -246,11 +249,11 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
                 " will be counted using common subjects in time points!")
       }
       if (is.null(res)) {
-        res <- .help_cohens_d(object_split, group, id, time)
+        res <- .help_cohens_d(object_split, group, id, time, assay.type)
       } else {
         res <- dplyr::full_join(res,
-                                .help_cohens_d(object_split, group, id, time),
-                                by = "Feature_ID")
+          .help_cohens_d(object_split, group, id, time, assay.type),
+          by = "Feature_ID")
       }  
     }
   }
@@ -278,11 +281,11 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
 #' )
 #'
 #' @export
-cohens_d <- function(object, group = NULL,
-                     id = NULL, time = NULL) {
+cohens_d <- function(object, group = NULL, id = NULL,
+                     time = NULL, assay.type = NULL) {
+  from <- .get_from_name(object, assay.type)
   object <- check_object(object, pheno_factors = c(group, time), 
-                         pheno_cols = id, check_matrix = TRUE, 
-                         feature_ID = TRUE)
+                         pheno_cols = id, assay.type = from, feature_ID = TRUE)
   res <- NULL
 
   group_combos <- utils::combn(levels(colData(object)[, group]), 2)
@@ -295,15 +298,15 @@ cohens_d <- function(object, group = NULL,
       colData(object_split) <- droplevels(colData(object_split))
 
       if (is.null(res)) {
-        res <- .help_cohens_d(object_split, group, id, time)
+        res <- .help_cohens_d(object_split, group, id, time, from)
       } else {
         res <- dplyr::full_join(res,
-                                .help_cohens_d(object_split, group, id, time),
-                                by = "Feature_ID")
+          .help_cohens_d(object_split, group, id, time, from),
+          by = "Feature_ID")
       }
     }
   } else {
-    res <- .help_cohens_d_time(res, group_combos, object, group, id, time)
+    res <- .help_cohens_d_time(res, group_combos, object, group, id, time, from)
   }
   rownames(res) <- res$Feature_ID
   res
@@ -338,12 +341,11 @@ cohens_d <- function(object, group = NULL,
 #' fc <- fold_change(example_set, group = "Time")
 #'
 #' @export
-fold_change <- function(object, group = group_col(object)) {
-  # CONSIDER check for when two grouping cols are supplied. This would be fixed by the length = 1 shit in mia for such functions.
-  object <- check_object(object, pheno_cols = group)
+fold_change <- function(object, group = group_col(object), assay.type = NULL) {
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, pheno_cols = group, assay.type = from)
   log_text("Starting to compute fold changes.")
-
-  data <- combined_data(object)
+  data <- combined_data(object, from)
   groups <- utils::combn(levels(data[, group]), 2)
   features <- rownames(object)
   # Calculate fold changes between groupings
@@ -485,18 +487,21 @@ fold_change <- function(object, group = group_col(object)) {
 perform_correlation_tests <- function(object, x, y = x, id = NULL, 
                                       object2 = NULL, fdr = TRUE, 
                                       all_pairs = TRUE, duplicates = FALSE,
+                                      assay.type1 = NULL, assay.type2 = NULL,
                                       ...) {
   log_text("Starting correlation tests.")
-
-  object <- check_object(object, pheno_factors = id, check_matrix = TRUE)
-  data1 <- combined_data(object)
+  
+  from1 <- .get_from_name(object, assay.type1)
+  object <- check_object(object, pheno_cols = id, assay.type = from1)
+  data1 <- combined_data(object, from1)
 
   if (!is.null(object2)) {
     if (ncol(object) != ncol(object2)) {
       stop("The objects have different numbers of samples")
     }
-    object2 <- check_object(object2, pheno_factors = id, check_matrix = TRUE)
-    data2 <- combined_data(object2)
+    from2 <- .get_from_name(object2, assay.type2)
+    object2 <- check_object(object2, pheno_factors = id, assay.type = from2)
+    data2 <- combined_data(object2, from2)
   } else {
     data2 <- data1
   }
@@ -599,19 +604,19 @@ perform_correlation_tests <- function(object, x, y = x, id = NULL,
 #' @seealso \code{\link[PK]{auc}}
 #'
 #' @export
-perform_auc <- function(object, time, subject, group) {
+perform_auc <- function(object, time, subject, group, assay.type = NULL) {
   if (!requireNamespace("PK", quietly = TRUE)) {
     stop("Package \"PK\" needed for this function to work. Please install it.",
          call. = FALSE)
   }
-  # This needs an input check for the existence of the specific columns, leave parameters without a value so that an error is thrown immediately?
   .add_citation("PK package was used to compute AUC:", citation("PK"))
 
   log_text("Starting AUC computation")
   
+  from <- .get_from_name(object, assay.type)
   object <- check_object(object, pheno_factors = c(time, group),
-                         pheno_chars = subject, check_matrix = TRUE)
-  data <- combined_data(object)
+                         pheno_chars = subject, assay.type = from)
+  data <- combined_data(object, from)
 
   # Create new pheno data, only one row per subject and group
   pheno_data <- data[, c(subject, group)] %>%
@@ -688,8 +693,8 @@ perform_auc <- function(object, time, subject, group) {
 
 # Helper function for running a variety of simple statistical tests
 .perform_test <- function(object, formula_char, result_fun, all_features, 
-                          fdr = TRUE, packages = NULL, ...) {
-  data <- combined_data(object)
+                          fdr = TRUE, packages = NULL, assay.type, ...) {
+  data <- combined_data(object, assay.type)
   features <- rownames(object)
 
   results_df <- BiocParallel::bplapply(features, .help_perform_test, data,
@@ -745,13 +750,15 @@ perform_auc <- function(object, time, subject, group) {
 #' @seealso \code{\link[stats]{lm}}
 #'
 #' @export
-perform_lm <- function(object, formula_char, all_features = FALSE, ...) {
+perform_lm <- function(object, formula_char, all_features = FALSE, 
+                       assay.type = NULL, ...) {
   log_text("Starting linear regression.")
-  # THINK more about logic here (and elsewhere with formula_char). Do we need to split by other shits, too? Yes, you may be able to do it with regular expressions in the same split argument. You could still add that if LHS is not "Feature", error.
+  # THINK more about logic here (and elsewhere with formula_char). Do we need to split by other operators too? Yes, you may be able to do it with regular expressions in the same split argument. You could still add that if LHS is not "Feature", error.
   formula_cols <- unlist(strsplit(formula_char, " ~ "))[2]
   formula_cols <- unlist(strsplit(formula_cols, split = " *\\+ *| *\\* *| *:"))
-
-  object <- check_object(object, pheno_cols = formula_cols, check_matrix = TRUE)
+  
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, pheno_cols = formula_cols, assay.type = from)
 
   lm_fun <- function(feature, formula, data) {
     # Try to fit the linear model
@@ -787,7 +794,8 @@ perform_lm <- function(object, formula_char, all_features = FALSE, ...) {
     result_row
   }
 
-  results_df <- .perform_test(object, formula_char, lm_fun, all_features)
+  results_df <- .perform_test(object, formula_char, lm_fun, 
+                              all_features, assay.type = from)
 
   # Set a good column order
   variables <- gsub("_P$", "", 
@@ -835,8 +843,10 @@ perform_lm <- function(object, formula_char, all_features = FALSE, ...) {
 #'
 #' @export
 perform_lm_anova <- function(object, formula_char, all_features = FALSE,
-                             lm_args = NULL, anova_args = NULL) {
-  object <- check_object(object)
+                             lm_args = NULL, anova_args = NULL,
+                             assay.type = NULL) {
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, assay.type = from)
   log_text("Starting ANOVA tests")
 
   anova_fun <- function(feature, formula, data) {
@@ -867,7 +877,8 @@ perform_lm_anova <- function(object, formula_char, all_features = FALSE,
     result_row
   }
 
-  results_df <- .perform_test(object, formula_char, anova_fun, all_features)
+  results_df <- .perform_test(object, formula_char, anova_fun, 
+                              all_features, assay.type = from)
 
   log_text("ANOVA tests performed")
 
@@ -905,8 +916,10 @@ perform_lm_anova <- function(object, formula_char, all_features = FALSE,
 #' @seealso \code{\link[stats]{glm}}
 #'
 #' @export
-perform_logistic <- function(object, formula_char, all_features = FALSE, ...) {
-  object <- check_object(object)
+perform_logistic <- function(object, formula_char, all_features = FALSE, 
+                             assay.type = NULL, ...) {
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, assay.type = from)
   log_text("Starting logistic regression")
 
   logistic_fun <- function(feature, formula, data) {
@@ -942,7 +955,8 @@ perform_logistic <- function(object, formula_char, all_features = FALSE, ...) {
     result_row
   }
 
-  results_df <- .perform_test(object, formula_char, logistic_fun, all_features)
+  results_df <- .perform_test(object, formula_char, logistic_fun,
+                              all_features, assay.type = from)
 
   # Set a good column order
   variables <- gsub("_P$", "", 
@@ -1092,7 +1106,7 @@ perform_logistic <- function(object, formula_char, all_features = FALSE, ...) {
 #' @export
 perform_lmer <- function(object, formula_char, all_features = FALSE,
                          ci_method = c("Wald", "profile", "boot"),
-                         test_random = FALSE, ...) {
+                         test_random = FALSE, assay.type = NULL, ...) {
   log_text("Starting fitting linear mixed models.")
 
   if (!requireNamespace("lmerTest", quietly = TRUE)) {
@@ -1113,10 +1127,11 @@ perform_lmer <- function(object, formula_char, all_features = FALSE,
   # Check that ci_method is one of the accepted choices
   ci_method <- match.arg(ci_method)
   
-  object <- check_object(object)
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, assay.type = from)
   results_df <- .perform_test(object, formula_char, .help_lmer, all_features,
                               packages = "lmerTest", ci_method = ci_method,
-                              test_random = test_random)
+                              test_random = test_random, assay.type = from)
 
   # Set a good column order
   fixed_effects <- 
@@ -1173,16 +1188,18 @@ perform_lmer <- function(object, formula_char, all_features = FALSE,
 #'
 #' @export
 perform_homoscedasticity_tests <- function(object, formula_char, 
-                                           all_features = FALSE) {
+                                           all_features = FALSE, 
+                                           assay.type = NULL) {
   if (!requireNamespace("car", quietly = TRUE)) {
     stop("Package \'car\' needed for this function to work. Please install it.",
          call. = FALSE)
   }
   .add_citation("car package was used for Levene's test of homoscedasticity:",
                 citation("car"))
-
   log_text("Starting homoscedasticity tests.")
-  object <- check_object(object)
+  
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, assay.type = from)
 
   homosced_fun <- function(feature, formula, data) {
     result_row <- NULL
@@ -1202,7 +1219,8 @@ perform_homoscedasticity_tests <- function(object, formula_char,
     result_row
   }
 
-  results_df <- .perform_test(object, formula_char, homosced_fun, all_features)
+  results_df <- .perform_test(object, formula_char, homosced_fun, all_features,
+                              assay.type = from)
 
   log_text("Homoscedasticity tests performed.")
 
@@ -1234,9 +1252,11 @@ perform_homoscedasticity_tests <- function(object, formula_char,
 #' perform_kruskal_wallis(example_set, formula_char = "Feature ~ Group")
 #'
 #' @export
-perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE) {
+perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE,
+                                   assay.type = NULL) {
   log_text("Starting Kruskal-Wallis tests.")
-  object <- check_object(object)
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, assay.type = from)
 
   kruskal_fun <- function(feature, formula, data) {
     result_row <- NULL
@@ -1252,7 +1272,8 @@ perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE) {
     result_row
   }
 
-  results_df <- .perform_test(object, formula_char, kruskal_fun, all_features)
+  results_df <- .perform_test(object, formula_char, kruskal_fun, all_features,
+                              assay.type = from)
 
   log_text("Kruskal-Wallis tests performed.")
 
@@ -1288,10 +1309,11 @@ perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE) {
 #' perform_oneway_anova(example_set, formula_char = "Feature ~ Group")
 #'
 #' @export
-perform_oneway_anova <- function(object, formula_char, 
-                                 all_features = FALSE, ...) {
+perform_oneway_anova <- function(object, formula_char, all_features = FALSE,
+                                 assay.type = NULL, ...) {
   log_text("Starting ANOVA tests.")
-  object <- check_object(object)
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, assay.type = from)
 
   anova_fun <- function(feature, formula, data) {
     result_row <- NULL
@@ -1307,7 +1329,8 @@ perform_oneway_anova <- function(object, formula_char,
     result_row
   }
 
-  results_df <- .perform_test(object, formula_char, anova_fun, all_features)
+  results_df <- .perform_test(object, formula_char, anova_fun, all_features,
+                              assay.type = from)
 
   log_text("ANOVA performed.")
 
@@ -1349,16 +1372,17 @@ perform_oneway_anova <- function(object, formula_char,
 #' @seealso \code{\link[stats]{t.test}}
 #'
 #' @export
-perform_t_test <- function(object, formula_char,
-                           is_paired = FALSE, id = NULL, 
-                           all_features = FALSE, ...) {
+perform_t_test <- function(object, formula_char, is_paired = FALSE, id = NULL, 
+                           all_features = FALSE, assay.type = NULL, ...) {
   message("The functionality of this function has changed.", 
           " It now encompasses pairwise and paired t-tests.")
   message("Remember that t.test returns difference between group means",
           " in different order than lm.\n",
           "This function mimics this behavior, so the effect size is",
           " mean of first level minus mean of second level.")
-  object <- check_object(object)
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, assay.type = from)
+  assays(object) <- assays(object)[from]
   
   group <- unlist(strsplit(formula_char, " ~ "))[2]
 
@@ -1562,10 +1586,12 @@ perform_t_test <- function(object, formula_char,
 #' @seealso \code{\link[stats]{wilcox.test}}
 #'
 #' @export
-perform_non_parametric <- function(object, formula_char, 
-                                   is_paired = FALSE, id = NULL,
-                                   all_features = FALSE, ...) {
-  object <- check_object(object)
+perform_non_parametric <- function(object, formula_char, is_paired = FALSE, 
+                                   id = NULL, all_features = FALSE, 
+                                   assay.type = NULL, ...) {
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, assay.type = from)
+  assays(object) <- assays(object)[from]
   group <- unlist(strsplit(formula_char, " ~ "))[2]
 
   if (!is.factor(colData(object)[, group])) {

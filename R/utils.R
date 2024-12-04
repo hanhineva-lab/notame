@@ -362,3 +362,40 @@ prop_found <- function(x) {
 .all_unique <- function(x) {
   !any(duplicated(x))
 }
+
+.get_from_to_names <- function(object, assay.type, name) {
+  object <- as(object, "SummarizedExperiment")
+  # Input behavior (from)
+  # If assay.type is not supplied and there is only one assay in the objcet, choose the first assay
+  if (is.null(assay.type) && length(assays(object)) == 1) {
+    assay.type <- 1
+  } else if (is.null(assay.type)) {
+    stop("When using multiple assays, specify assay.type", call. = FALSE)
+  } else if (!assay.type %in% names(assays(object)) & assay.type != 1) {
+    stop(assay.type, " was specified but not found in assays", call. = FALSE)
+  }
+  # Output behavior (to)
+  if (is.null(name) && length(assays(object)) == 1) {
+    name <- 1
+  } else if (is.null(name)) {
+    stop("When using multiple assays, specify name of new assay", call. = FALSE)
+  } else if (name == assay.type & assay.type != 1) {
+    stop("'name' must be different from `assay.type`.", call. = FALSE)
+  }
+  list(assay.type, name)
+}
+
+.get_from_name <- function(object, assay.type) {
+  object <- as(object, "SummarizedExperiment") # CONSIDER logic or set methods
+  # Input behavior (from)
+  if (is.null(assay.type) && length(assays(object)) == 1) {
+    assay.type <- 1
+  } else if (is.null(assay.type)) {
+    stop("When using multiple assays, specify assay.type", call. = FALSE)
+  } else if (!assay.type %in% names(assays(object)) &&
+             length(assays(object)) != 1) {
+    stop(assay.type, " was specified but not found in assays", call. = FALSE)
+  }
+  assay.type
+}
+

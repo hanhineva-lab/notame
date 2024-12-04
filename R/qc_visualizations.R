@@ -49,16 +49,18 @@ plot_dist_density <- function(object, all_features = FALSE,
                               fill_scale = getOption("notame.fill_scale_dis"),
                               title = paste("Density plot of", dist_method,
                                             "distances between samples"),
-                              subtitle = NULL) {
+                              subtitle = NULL, assay.type = NULL) {
   if (!requireNamespace("pcaMethods", quietly = TRUE)) {
     stop("Package \'pcaMethods\' needed for this function to work.", 
          " Please install it.", call. = FALSE)
   }
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object, pheno_QC = TRUE, check_matrix = TRUE)
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, pheno_QC = TRUE, assay.type = from)
 
-  assay <- pcaMethods::prep(t(assay(object)), center = center, scale = scale)
+  assay <- pcaMethods::prep(t(assay(object, from)), 
+                            center = center, scale = scale)
 
   qc_data <- assay[object$QC == "QC", ]
   sample_data <- assay[!object$QC == "QC", ]
@@ -93,17 +95,20 @@ plot_dist_density <- function(object, all_features = FALSE,
 #' plot_injection_lm(example_set)
 #'
 #' @export
-plot_injection_lm <- function(object, all_features = FALSE) {
+plot_injection_lm <- function(object, all_features = FALSE, assay.type = NULL) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
   object <- check_object(object, pheno_injection = TRUE, pheno_QC = TRUE,
-                         check_matrix = TRUE)
+                         assay.type = from)
 
   # Apply linear model to QC samples and biological samples separately
-  lm_all <- perform_lm(object, "Feature ~ Injection_order")
+  lm_all <- perform_lm(object, "Feature ~ Injection_order", assay.type = from)
   lm_sample <- perform_lm(object[, object$QC != "QC"], 
-                          "Feature ~ Injection_order")
-  lm_qc <- perform_lm(object[, object$QC == "QC"], "Feature ~ Injection_order")
+                          "Feature ~ Injection_order",
+                          assay.type = from)
+  lm_qc <- perform_lm(object[, object$QC == "QC"], "Feature ~ Injection_order",
+                      assay.type = from)
 
   # Only interested in the p_values
   p_values <- list("All samples" = lm_all$Injection_order_P,
@@ -257,14 +262,15 @@ plot_sample_boxplots <- function(
     fill_by = as.character(stats::na.omit(c(group_col(object),
                                             time_col(object)))),
     title = "Boxplot of samples", subtitle = NULL,
-    fill_scale = getOption("notame.fill_scale_dis"), zoom_boxplot = TRUE) {
-  # FINISH MetaboSet compatibility
+    fill_scale = getOption("notame.fill_scale_dis"), zoom_boxplot = TRUE,
+    assay.type = NULL) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
   object <- check_object(object, pheno_cols = c(order_by, fill_by),
-                         check_matrix = TRUE)
+                         assay.type = from)
 
-  data <- combined_data(object)
+  data <- combined_data(object, from)
 
   if (length(order_by) == 1) {
     data$order_by <- data[, order_by]

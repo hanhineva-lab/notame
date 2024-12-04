@@ -39,12 +39,13 @@ cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
                              all_features = FALSE, rt_window = 1 / 60,
                              corr_thresh = 0.9, d_thresh = 0.8, 
                              plotting = TRUE, min_size_plotting = 3, 
-                             prefix = NULL) {
+                             prefix = NULL, assay.type = NULL) {
   # CONSIDER dealing with mz and rt_col
   # Drop flagged compounds before clustering
+  from <- .get_from_name(object, assay.type)
   orig <- check_object(object)
   object <- drop_flagged(object, all_features)
-  object <- check_object(object, check_limits = TRUE, check_matrix = TRUE)
+  object <- check_object(object, check_limits = TRUE, assay.type = from)
 
   if (is.null(mz_col) || is.null(rt_col)) {
     cols <- .find_mz_rt_cols(rowData(object))

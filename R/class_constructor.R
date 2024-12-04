@@ -573,15 +573,16 @@ construct_metabosets <- function(exprs, pheno_data, feature_data,
                                  group_col = NA_character_, 
                                  time_col = NA_character_,
                                  subject_col = NA_character_,
-                                 split_data = TRUE) {
+                                 split_data = TRUE, log_messages = TRUE) {
   if (!"Flag" %in% colnames(feature_data)) {
     message("Initializing the object(s) with unflagged features.")
     feature_data$Flag <- NA
   }
   .check_feature_data(feature_data, log_messages = TRUE)
   .check_exprs(exprs, log_messages = TRUE)
-  log_text(paste0("Setting row and column names of exprs", 
-                  " based on feature and pheno data"))
+  .log_text_if(paste0("Setting row and column names of exprs", 
+                      " based on feature and pheno data"),
+               log_messages)
   rownames(exprs) <- rownames(feature_data)
   colnames(exprs) <- rownames(pheno_data)
   feature_data <- Biobase::AnnotatedDataFrame(as.data.frame(feature_data))
@@ -731,7 +732,7 @@ setMethod("show", c(object = "MetaboSet"),
 #'
 #' @export
 setGeneric("combined_data", signature = "object",
-           function(object) standardGeneric("combined_data"))
+           function(object, ...) standardGeneric("combined_data"))
 
 #' @describeIn MetaboSet Retrieve both sample information and features
 #' @export
@@ -1051,7 +1052,7 @@ setAs("SummarizedExperiment", "MetaboSet", function(from) {
   to <- construct_metabosets(exprs = assay_data,
                              pheno_data = as.data.frame(col_data),
                              feature_data = as.data.frame(row_data),
-                             split_data = FALSE)
+                             split_data = FALSE, log_messages = FALSE)
   
   attr(to, "original_class") <- attr(from, "original_class")
   to
@@ -1077,9 +1078,9 @@ setAs("MetaboSet", "SummarizedExperiment", function(from) {
 #' @export
 check_object <- function(object, all = FALSE, pheno_ID = FALSE, 
                          pheno_cols = NULL, pheno_factors = NULL, 
-                         pheno_num = NULL, pheno_chars = NULL, 
+                         pheno_nums = NULL, pheno_chars = NULL, 
                          pheno_injection = FALSE, pheno_QC = FALSE,
-                         check_matrix = FALSE, feature_ID = FALSE,
+                         assay.type = NULL, feature_ID = FALSE,
                          feature_cols = NULL, feature_flag = FALSE,
                          log_messages = FALSE, 
                          check_limits = TRUE, feature_split = FALSE,
@@ -1092,15 +1093,15 @@ check_object <- function(object, all = FALSE, pheno_ID = FALSE,
   object <- as(object, "SummarizedExperiment")
 
   .check_pheno_data(colData(object), pheno_cols = pheno_cols, pheno_factors = 
-                    pheno_factors, pheno_num = pheno_num,
+                    pheno_factors, pheno_nums = pheno_nums,
                     pheno_injection = pheno_injection, pheno_QC = pheno_QC,
                     pheno_chars = pheno_chars, 
                     log_messages = log_messages)
-
-  if (check_matrix) {
-    .check_exprs(assay(object), log_messages = log_messages)
+  
+  if (!is.null(assay.type)) {
+  .check_exprs(assay(object, assay.type), log_messages = log_messages)
   }
-
+    
   .check_feature_data(rowData(object), feature_ID = feature_ID, 
                       check_limits = check_limits, 
                       feature_split = feature_split, feature_flag = feature_flag, mz_limits = mz_limits, rt_limits = rt_limits, feature_cols = feature_cols,
@@ -1251,8 +1252,9 @@ fix_object <- function(object, id_prefix, id_column = NULL, split_by, name,
 #' @describeIn MetaboSet Retrieve both sample information and features
 #' @export
 setMethod("combined_data", c(object = "SummarizedExperiment"), 
-  function(object) {
-    cbind(as.data.frame(colData(object)), t(assay(object)))
+  function(object, assay.type = NULL) {
+    from <- .get_from_name(object, assay.type)
+    cbind(as.data.frame(colData(object)), t(assay(object, from)))
   }
 )
 

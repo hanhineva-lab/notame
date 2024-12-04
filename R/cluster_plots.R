@@ -31,7 +31,8 @@ plot_dendrogram <- function(object, all_features = FALSE,
                             center = TRUE, scale = "uv", 
                             title = "Dendrogram of hierarchical clustering",
                             subtitle = NULL, 
-                            color_scale = getOption("notame.color_scale_dis")) {
+                            color_scale = getOption("notame.color_scale_dis"),
+                            assay.type = NULL) {
   if (!requireNamespace("pcaMethods", quietly = TRUE)) {
     stop("Package \'pcaMethods\' needed for this function to work.", 
          " Please install it.", call. = FALSE)
@@ -40,15 +41,16 @@ plot_dendrogram <- function(object, all_features = FALSE,
   color <- color %||% NULL
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object, pheno_cols = color, check_matrix = TRUE)
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, pheno_cols = color, assay.type = from)
   
   subtitle <- subtitle %||% paste("Distance method:", dist_method, 
                                   "Clustering method:", clust_method)
+  # change name to matrix
+  assay <- pcaMethods::prep(assay(object, from), center = center, 
+                            scale = scale)
 
-  assay(object) <- pcaMethods::prep(assay(object), center = center, 
-                                    scale = scale)
-
-  d_data <- stats::dist(t(assay(object)), method = dist_method) %>%
+  d_data <- stats::dist(t(assay), method = dist_method) %>%
     stats::hclust(method = clust_method) %>%
     stats::as.dendrogram() %>%
     ggdendro::dendro_data()
@@ -113,20 +115,23 @@ plot_sample_heatmap <- function(object, all_features = FALSE,
                                 subtitle = NULL, fill_scale_con =
                                 getOption("notame.fill_scale_con"),
                                 fill_scale_dis =
-                                getOption("notame.fill_scale_dis")) {
+                                getOption("notame.fill_scale_dis"),
+                                assay.type = NULL) {
   if (!requireNamespace("pcaMethods", quietly = TRUE)) {
     stop("Package \'pcaMethods\' needed for this function to work.",
          " Please install it.", call. = FALSE)
   }
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  object <- check_object(object, pheno_cols = group, check_matrix = TRUE)
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, pheno_cols = group, assay.type = from)
 
   # Default settings
   subtitle <- subtitle %||% paste("Distance method:", dist_method, 
                                   "Clustering method:", clust_method)
 
-  assay <- pcaMethods::prep(t(assay(object)), center = center, scale = scale)
+  assay <- pcaMethods::prep(t(assay(object, from)), center = center,
+                            scale = scale)
 
   # Distances
   distances <- stats::dist(assay, method = dist_method)

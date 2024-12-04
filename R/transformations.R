@@ -15,11 +15,12 @@
 #' nas_marked <- mark_nas(example_set, value = 0)
 #'
 #' @export
-mark_nas <- function(object, value) {
-  object <- check_object(object)
-  ex <- assay(object)
+mark_nas <- function(object, value, assay.type = NULL, name = NULL) {
+  from_to <- .get_from_to_names(object, assay.type, name)
+  object <- check_object(object, assay.type = from_to[[1]])
+  ex <- assay(object, from_to[[1]])
   ex[ex == value] <- NA
-  assay(object) <- ex
+  assay(object, from_to[[2]]) <- ex
   if (!is.null(attr(object, "original_class"))) {
     object <- as(object, "MetaboSet")
     attr(object, "original_class") <- NULL
@@ -70,7 +71,7 @@ mark_nas <- function(object, value) {
 #' @export
 fix_MSMS <- function(object, ms_ms_spectrum_col = "MS_MS_spectrum",
                      peak_num = 10, min_abund = 5, deci_num = 3) {
-  object <- check_object(object)
+  object <- check_object(object, feature_cols = ms_ms_spectrum_col)
   spec <- rowData(object)[, ms_ms_spectrum_col]
   to_metab <- NULL
 
@@ -218,7 +219,7 @@ setMethod("drop_flagged", signature = c(object = "SummarizedExperiment"),
 #' assay(merged)
 #'
 #' @noRd
-merge_assay <- function(object, y) {
+merge_assay <- function(object, y, assay.type = NULL, name = NULL) {
   # Colnames and rownames should be found in the object
   if (!all(colnames(y) %in% colnames(assay(object))) || is.null(colnames(y))) {
     stop("Column names of y do not match column names of assay(object).")
@@ -226,10 +227,10 @@ merge_assay <- function(object, y) {
   if (!all(rownames(y) %in% rownames(assay(object))) || is.null(rownames(y))) {
     stop("Row names of y do not match row names of assay(object).")
   }
-
-  assay_tmp <- assay(object)
+  from_to <- .get_from_to_names(object, assay.type, name)
+  assay_tmp <- assay(object, from_to[[1]])
   assay_tmp[rownames(y), colnames(y)] <- y
-  assay(object) <- assay_tmp
+  assay(object, from_to[[2]]) <- assay_tmp
   object
 }
 
@@ -260,7 +261,8 @@ merge_assay <- function(object, y) {
 #' and the parameters
 #'
 #' @export
-impute_rf <- function(object, all_features = FALSE, ...) {
+impute_rf <- function(object, all_features = FALSE, assay.type = NULL, 
+                      name = NULL, ...) {
   if (!requireNamespace("missForest", quietly = TRUE)) {
     stop("Package \'missForest\' needed for this function to work.",
          " Please install it.", call. = FALSE)
@@ -271,15 +273,16 @@ impute_rf <- function(object, all_features = FALSE, ...) {
   log_text(paste("\nStarting random forest imputation at", Sys.time()))
   # Drop flagged features
   dropped <- drop_flagged(object, all_features)
-  dropped <- check_object(dropped, check_matrix = TRUE)
-  object <- check_object(object, check_matrix = TRUE)
+  from_to <- .get_from_to_names(object, assay.type, name)
+  dropped <- check_object(dropped, assay.type = from_to[[1]])
+  object <- check_object(object, assay.type = from_to[[1]])
 
   if (!requireNamespace("missForest", quietly = TRUE)) {
     stop("missForest package not found.")
   }
 
   # Impute missing values
-  mf <- missForest::missForest(xmis = t(assay(dropped)), ...)
+  mf <- missForest::missForest(xmis = t(assay(dropped, from_to[[1]])), ...)
   imputed <- t(mf$ximp)
   # Log imputation error
   log_text(paste0("Out-of-bag error in random forest imputation: ",
@@ -288,7 +291,8 @@ impute_rf <- function(object, all_features = FALSE, ...) {
   rownames(imputed) <- rownames(assay(dropped))
   colnames(imputed) <- colnames(assay(dropped))
   # Attach imputed abundances to object
-  object <- merge_assay(object, imputed)
+  object <- merge_assay(object, imputed, assay.type = from_to[[1]], 
+                        name = from_to[[2]])
   log_text(paste("Random forest imputation finished at", Sys.time(), "\n"))
   
   if (!is.null(attr(object, "original_class"))) {
@@ -337,9 +341,11 @@ impute_rf <- function(object, all_features = FALSE, ...) {
 #' imputed <- impute_simple(missing, value = "min")
 #'
 #' @export
-impute_simple <- function(object, value, na_limit = 0) {
-  object <- check_object(object, check_matrix = TRUE)
-  imp <- assay(object)
+impute_simple <- function(object, value, na_limit = 0, assay.type = NULL,
+                          name = NULL) {
+  from_to <- .get_from_to_names(object, assay.type, name)
+  object <- check_object(object, assay.type = from_to[[1]])
+  imp <- assay(object, from_to[[1]])
   nas <- apply(imp, 1, prop_na)
   imp <- imp[nas > na_limit, , drop = FALSE]
   if (nrow(imp) == 0) {
@@ -382,7 +388,8 @@ impute_simple <- function(object, value, na_limit = 0) {
          " 'half_min', 'small_random'.")
   }
 
-  obj <- merge_assay(object, imp)
+  obj <- merge_assay(object, imp, assay.type = from_to[[1]],
+                     name = from_to[[2]])
   
   if (!is.null(attr(obj, "original_class"))) {
     object <- as(obj, "MetaboSet")
@@ -403,9 +410,10 @@ impute_simple <- function(object, value, na_limit = 0) {
 #' @examples
 #' normalized <- inverse_normalize(example_set)
 #' @export
-inverse_normalize <- function(object) {
-  object <- check_object(object, check_matrix = TRUE)
-  assay(object) <- assay(object) %>%
+inverse_normalize <- function(object, assay.type = NULL, name = NULL) {
+  from_to <- .get_from_to_names(object, assay.type, name)
+  object <- check_object(object, assay.type = from_to[[1]])
+  assay(object, from_to[[2]]) <- assay(object, from_to[[1]]) %>%
     apply(1, function(x) {
       stats::qnorm((rank(x, na.last = "keep") - 0.5) / sum(!is.na(x)))
     }) %>%
@@ -646,13 +654,15 @@ setMethod("exponential", c(object = "SummarizedExperiment"),
 #' @export
 pqn_normalization <- function(object, ref = c("qc", "all"),
                               method = c("median", "mean"), 
-                              all_features = FALSE) {
+                              all_features = FALSE, assay.type = NULL,
+                              name = NULL) {
   log_text("Starting PQN normalization")
   ref <- match.arg(ref)
   method <- match.arg(method)
   # Use only good-quality features for calculating reference spectra
-  object <- check_object(object, pheno_QC = TRUE, check_matrix = TRUE)
-  ref_data <- assay(drop_flagged(object, all_features))
+  from_to <- .get_from_to_names(object, assay.type, name)
+  object <- check_object(object, pheno_QC = TRUE, assay.type = from_to[[1]])
+  ref_data <- assay(drop_flagged(object, all_features), from_to[[1]])
   
   
   # Select reference samples
@@ -670,11 +680,11 @@ pqn_normalization <- function(object, ref = c("qc", "all"),
   quotients <- ref_data / reference_spectrum
   quotient_md <- apply(quotients, 2, finite_median)
   # Do the normalization
-  data <- assay(object)
+  data <- assay(object, from_to[[1]])
   pqn_data <- t(t(data) / quotient_md)
   colnames(pqn_data) <- colnames(data)
   rownames(pqn_data) <- rownames(data)
-  assay(object) <- pqn_data
+  assay(object, from_to[[2]]) <- pqn_data
   
   if (!is.null(attr(object, "original_class"))) {
     object <- as(object, "MetaboSet")

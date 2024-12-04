@@ -31,18 +31,18 @@ plot_sample_suprahex <- function(object, all_features = FALSE,
                                  sample_labels = "Sample_ID", grid_xdim = NULL,
                                  grid_ydim = NULL, title.xy = c(0.35, 1), 
                                  title.rotate = 0, height = 7, fontsize = 10,
-                                 colormap = "jet", ...) {
+                                 colormap = "jet", assay.type = NULL, ...) {
   if (!requireNamespace("supraHex", quietly = TRUE)) {
     stop("Package \'supraHex\' needed for this function to work.",
          " Please install it.", call. = FALSE)
   }
   .add_citation("supraHex package was used for suprahexagonal maps:",
                 citation("supraHex"))
+  from <- .get_from_name(object, assay.type)
   object <- drop_flagged(object, all_features = all_features)
-  object <- check_object(object, pheno_cols = sample_labels, 
-                         check_matrix = TRUE)
+  object <- check_object(object, pheno_cols = sample_labels, assay.type = from)
   
-  data <- scale(assay(object))
+  data <- scale(assay(object, from))
   colnames(data) <- colData(object)[, sample_labels]
 
   s_map <- supraHex::sPipeline(data = data, ...)

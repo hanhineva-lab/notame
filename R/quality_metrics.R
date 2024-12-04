@@ -48,15 +48,14 @@ quality <- function(object) {
 #'
 #' @export
 setGeneric("assess_quality", signature = "object",
-           function(object) standardGeneric("assess_quality"))
+           function(object, ...) standardGeneric("assess_quality"))
 
 setMethod("assess_quality", signature = c(object = "MetaboSet"),
   function(object) {
-    object <- check_object(object, pheno_QC = TRUE, check_matrix = TRUE)
+    object <- check_object(object, pheno_QC = TRUE, assay.type = 1)
     # Remove old quality metrics
     if (!is.null(quality(object))) {
       object <- .erase_quality(object)
-      #object <- as(object, "SummarizedExperiment")
     }
 
     qc_data <- assay(object)[, object$QC == "QC"]
@@ -80,12 +79,12 @@ setMethod("assess_quality", signature = c(object = "MetaboSet"),
 })
 
 setMethod("assess_quality", signature = c(object = "SummarizedExperiment"),
-  function(object) {
-    object <- check_object(object, pheno_QC = TRUE, check_matrix = TRUE)
+  function(object, assay.type = NULL) {
+    from <- .get_from_name(object, assay.type)
+    object <- check_object(object, pheno_QC = TRUE, assay.type = from)
     # Remove old quality metrics
     if (!is.null(quality(object))) {
       object <- .erase_quality(object)
-      #object <- as(object, "SummarizedExperiment")
     }
 
     qc_data <- assay(object)[, object$QC == "QC"]
@@ -160,11 +159,11 @@ setMethod("assess_quality", signature = c(object = "SummarizedExperiment"),
 #' rowData(ex_set)
 #'
 #' @export
-flag_quality <- function(object, condition = 
-  "(RSD_r < 0.2 & D_ratio_r < 0.4) | 
-  (RSD < 0.1 & RSD_r < 0.1 & D_ratio < 0.1)") {
+flag_quality <- function(object, assay.type = NULL, 
+  condition = "(RSD_r < 0.2 & D_ratio_r < 0.4) | 
+              (RSD < 0.1 & RSD_r < 0.1 & D_ratio < 0.1)") {
   if (is.null(quality(object))) {
-    object <- assess_quality(object)
+    object <- assess_quality(object, assay.type)
   }
   object <- check_object(object, feature_ID = TRUE)
   .add_citation("Quality metrics were computed as per guidelines in:", paste(
@@ -221,11 +220,12 @@ flag_quality <- function(object, condition =
 #'
 #' @export
 flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
-                           group = NULL) {
+                           group = NULL, assay.type = NULL) {
+  from <- .get_from_name(object, assay.type)
   object <- check_object(object, pheno_ID = TRUE, pheno_QC = TRUE, 
-                         pheno_factors = group, check_matrix = TRUE,
+                         pheno_factors = group, assay.type = from, 
                          feature_ID = TRUE)
-  found_qc <- apply(assay(object[, object$QC == "QC"]), 1, prop_found)
+  found_qc <- apply(assay(object[, object$QC == "QC"], from), 1, prop_found)
   bad_qc <- names(which(found_qc < qc_limit))
 
   found_qc_df <- data.frame(Feature_ID = names(found_qc),
@@ -325,14 +325,18 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' 
 #' @export
 flag_contaminants <- function(object, blank_col, blank_label, 
-                              flag_thresh = 0.05, flag_label = "Contaminant") {
-  object <- check_object(object, pheno_QC = TRUE, pheno_cols = blank_col)
+                              flag_thresh = 0.05, flag_label = "Contaminant",
+                              assay.type = NULL) {
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, pheno_QC = TRUE, pheno_cols = blank_col, 
+                         assay.type = from)
+  
   blanks <- object[, colData(object)[, blank_col] == blank_label]
   samples <- object[, object$QC != "QC" &
                     colData(object)[, blank_col] != blank_label]
 
-  blank_median <- apply(assay(blanks), 1, finite_median)
-  sample_median <- apply(assay(samples), 1, finite_median)
+  blank_median <- apply(assay(blanks, from), 1, finite_median)
+  sample_median <- apply(assay(samples, from), 1, finite_median)
   blank_flag <- blank_median / sample_median > flag_thresh
 
   idx <- is.na(flag(object)) & !is.na(blank_flag)

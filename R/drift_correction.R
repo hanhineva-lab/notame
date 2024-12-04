@@ -78,29 +78,24 @@
 #'
 #' @noRd
 dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
-                            spar_lower = 0.5, spar_upper = 1.5) {
+                            spar_lower = 0.5, spar_upper = 1.5, assay.type = NULL, name = NULL) {
   # Start log
   log_text(paste("\nStarting drift correction at", Sys.time()))
   # Zero values do not behave correctly
-  if (sum(assay(object) == 0, na.rm = TRUE)) {
+  full_data <- assay(object, assay.type)
+  if (sum(full_data == 0, na.rm = TRUE)) {
     log_text(paste0("Zero values in feature abundances detected.",
                     " Zeroes will be replaced with 1.1."))
-    assay(object)[assay(object) == 0] <- 1.1
+    full_data[full_data == 0] <- 1.1
   }
   # Extract data and injection order for QC samples and the full dataset
   features <- rownames(object)
-  qc <- object[, object$QC == "QC"]
-  qc_order <- qc$Injection_order
-  qc_data <- assay(qc)
+  qc_data <- full_data[, object$QC == "QC"]
+  qc_order <- object[, object$QC == "QC"]$Injection_order
   full_order <- object$Injection_order
-  full_data <- assay(object)
+  
   # log-transform before fiting the cubic spline
   if (log_transform) {
-    if (sum(assay(object) == 1, na.rm = TRUE)) {
-      log_text(paste0("Values of 1 in feature abundances detected.", 
-                     " 1s will be replaced with 1.1."))
-      assay(object)[assay(object) == 1] <- 1.1
-    }
     qc_data <- log(qc_data)
     full_data <- log(full_data)
   }
@@ -116,9 +111,9 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
   if (log_transform) {
     corrected <- exp(corrected)
   }
-  assay(object) <- corrected
+  assay(object, name) <- corrected
   # Recompute quality metrics
-  object <- assess_quality(object)
+  object <- assess_quality(object, assay.type = name)
   
   log_text(paste("Drift correction performed at", Sys.time()))
   return(list(object = object, predicted = dc_data$predicted))
@@ -194,30 +189,30 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
 #' )
 #'
 #' @noRd
-inspect_dc <- function(orig, dc, check_quality, 
-                       condition = "RSD_r < 0 & D_ratio_r < 0") {
+inspect_dc <- function(orig, dc, check_quality,
+                       condition = "RSD_r < 0 & D_ratio_r < 0",
+                       from = NULL, to = NULL) {
   if (is.null(quality(orig))) {
-    orig <- assess_quality(orig)
+    orig <- assess_quality(orig, assay.type = from)
   }
   if (is.null(quality(dc))) {
-    dc <- assess_quality(dc)
+    dc <- assess_quality(dc, assay.type = to)
   }
 
-  orig_data <- assay(orig)
-  dc_data <- assay(dc)
+  orig_data <- assay(orig, from)
+  dc_data <- assay(dc, to)
   features <- rownames(orig)
   qdiff <- quality(dc)[2:5] - quality(orig)[2:5]
 
   log_text(paste("Inspecting drift correction results", Sys.time()))
 
   inspected <- BiocParallel::bplapply(features, .help_inspect_dc, orig_data,
-                                      dc_data,  qdiff, check_quality, condition)
+                                      dc_data, qdiff, check_quality, condition)
   
   inspected <- do.call(.comb, inspected)
 
-  assay(dc) <- inspected$data
-  debugonce(.erase_quality)
-  dc <- assess_quality(dc)
+  assay(dc, to) <- inspected$data
+  dc <- assess_quality(dc, assay.type = to)
   dc <- join_rowData(dc, inspected$dc_notes)
 
   log_text(paste("Drift correction results inspected at", Sys.time()))
@@ -279,7 +274,8 @@ inspect_dc <- function(orig, dc, check_quality,
 save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
                           width = 16, height = 8, color = "QC", shape = color, 
                           color_scale = getOption("notame.color_scale_dis"),
-                          shape_scale = scale_shape_manual(values = c(15, 16))){
+                          shape_scale = scale_shape_manual(values = c(15, 16)),
+                          from, to){
   # Create a helper function for plotting
   dc_plot_helper <- function(data, fname, title = NULL) {
     p <- ggplot(data = data, mapping = aes(x = .data[["Injection_order"]], 
@@ -313,6 +309,11 @@ save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
                                             shape = .data[[shape]]))
   }
 
+  # CONSIDER here, we need a way to do log on combined data or do log on the object (which would remake log an assay.type parameter, which can be set to NULL by default for sure). I think it's clearer to just take out object with single assay. Else there will be sitatutions like combined_data(log(orig, assay.type = from), name = "log") and then you have to explicitly pick the log assay anygays.
+  
+  assays(orig) <- assays(orig)[from]
+  assays(dc) <- assays(dc)[to]
+  
   orig_data_log <- combined_data(log(orig))
   dc_data_log <- combined_data(log(dc))
   orig_data <- combined_data(orig)
@@ -410,17 +411,22 @@ correct_drift <- function(object, log_transform = TRUE, spar = NULL,
                           plotting = FALSE, file = NULL, width = 16, 
                           height = 8, color = "QC", shape = color, 
                           color_scale = getOption("notame.color_scale_dis"),
-                          shape_scale = scale_shape_manual(values = c(15, 16))){
+                          shape_scale = scale_shape_manual(values = c(15, 16)),
+                          assay.type = NULL, name = NULL) {
+  from_to <- .get_from_to_names(object, assay.type, name)
   object <- check_object(object, pheno_injection = TRUE, pheno_QC = TRUE, 
-                         check_matrix = TRUE)
+                         assay.type = from_to[[1]])
+                         
   # Fit cubic spline and correct
   corrected_list <- dc_cubic_spline(object, log_transform = log_transform, 
                                     spar = spar, spar_lower = spar_lower,
-                                    spar_upper = spar_upper)
+                                    spar_upper = spar_upper, 
+                                    assay.type = from_to[[1]],
+                                    name = from_to[[2]])
   corrected <- corrected_list$object
   # Only keep corrected versions of features with increased quality
   inspected <- inspect_dc(orig = object, dc = corrected, 
-                          check_quality = check_quality, condition = condition)
+                          check_quality = check_quality, condition = condition, from = from_to[[1]], to = from_to[[2]])
   # Optionally save before and after plots
   if (plotting) {
     if (is.null(file)) {
@@ -430,7 +436,8 @@ correct_drift <- function(object, log_transform = TRUE, spar = NULL,
                   predicted = corrected_list$predicted, file = file,
                   log_transform = log_transform, width = width, height = height,
                   color = color, shape = shape, color_scale = color_scale,
-                  shape_scale = shape_scale)
+                  shape_scale = shape_scale, from = from_to[[1]], 
+                  to = from_to[[2]])
   }
   if (!is.null(attr(inspected, "original_class"))) {
     inspected <- as(inspected, "MetaboSet")

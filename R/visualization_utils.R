@@ -217,9 +217,12 @@ save_plot <- function(p, file, ...) {
 #'
 #' @export
 visualizations <- function(object, prefix, format = "pdf", perplexity = 30,
-                           merge = FALSE, remove_singles = FALSE, group = NULL, time = NULL, id = NULL, color = NULL) {
-  object <- check_object(object, 
-                         pheno_cols = c(time, id, color))
+                           merge = FALSE, remove_singles = FALSE, group = NULL, time = NULL, id = NULL, color = NULL,
+                           assay.type = NULL) {
+  from <- .get_from_name(object, assay.type)
+  object <- check_object(object, pheno_cols = c(time, id, color),
+                         assay.type = from)
+  assays(object) <- assays(object)[from]
   file_names <- ""
   if (sum(object$QC == "QC")) {
     .save_name(object, prefix, format, fun = plot_dist_density, 
