@@ -78,7 +78,8 @@
 #'
 #' @noRd
 dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
-                            spar_lower = 0.5, spar_upper = 1.5, assay.type = NULL, name = NULL) {
+                            spar_lower = 0.5, spar_upper = 1.5, 
+                            assay.type = NULL, name = NULL) {
   # Start log
   log_text(paste("\nStarting drift correction at", Sys.time()))
   # Zero values do not behave correctly
@@ -239,7 +240,8 @@ inspect_dc <- function(orig, dc, check_quality,
 #' samples.
 #'
 #' @param orig a SummarizedExperiment object, before drift correction
-#' @param dc a SummarizedExperiment object, after drift correction as returned #' by correct_drift
+#' @param dc a SummarizedExperiment object, after drift correction as returned 
+#' by correct_drift
 #' @param predicted a matrix of predicted values, as returned by dc_cubic_spline
 #' @param file path to the PDF file where the plots should be saved
 #' @param log_transform logical, was the drift correction done on log-
@@ -308,9 +310,6 @@ save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
       geom_point(data = data, mapping = aes(color = .data[[color]], 
                                             shape = .data[[shape]]))
   }
-
-  # CONSIDER here, we need a way to do log on combined data or do log on the object (which would remake log an assay.type parameter, which can be set to NULL by default for sure). I think it's clearer to just take out object with single assay. Else there will be sitatutions like combined_data(log(orig, assay.type = from), name = "log") and then you have to explicitly pick the log assay anygays.
-  
   assays(orig) <- assays(orig)[from]
   assays(dc) <- assays(dc)[to]
   
@@ -369,6 +368,8 @@ save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
 #' @param shape character, name of the column used for shape
 #' @param color_scale,shape_scale the color and shape scales as returned by a 
 #' ggplot function
+#' @param assay.type character, assay to be used in case of multiple assays
+#' @param name character, name of the resultant assay in case of multiple assays
 #'
 #' @return A SummarizedExperiment or MetaboSet object as the one supplied, with 
 #' drift corrected features.
@@ -414,7 +415,7 @@ correct_drift <- function(object, log_transform = TRUE, spar = NULL,
                           shape_scale = scale_shape_manual(values = c(15, 16)),
                           assay.type = NULL, name = NULL) {
   from_to <- .get_from_to_names(object, assay.type, name)
-  object <- check_object(object, pheno_injection = TRUE, pheno_QC = TRUE, 
+  object <- .check_object(object, pheno_injection = TRUE, pheno_QC = TRUE, 
                          assay.type = from_to[[1]])
                          
   # Fit cubic spline and correct
@@ -426,7 +427,8 @@ correct_drift <- function(object, log_transform = TRUE, spar = NULL,
   corrected <- corrected_list$object
   # Only keep corrected versions of features with increased quality
   inspected <- inspect_dc(orig = object, dc = corrected, 
-                          check_quality = check_quality, condition = condition, from = from_to[[1]], to = from_to[[2]])
+                          check_quality = check_quality, condition = condition, 
+                          from = from_to[[1]], to = from_to[[2]])
   # Optionally save before and after plots
   if (plotting) {
     if (is.null(file)) {

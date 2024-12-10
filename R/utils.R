@@ -111,7 +111,6 @@
 #' \item \code{\link{save_subject_line_plots}} save line plots with mean
 #' \item \code{\link{save_group_lineplots}} save line plots with errorbars by 
 #' group
-#' \item \code{\link{save_dc_plots}} save drift correction plots
 #' \item \code{\link{save_batch_plots}} save batch correction plots
 #' }
 #'
@@ -184,7 +183,11 @@ utils::globalVariables(c('i', '.'))
 #' @param libname,pkgname default parameters
 #' @noRd
 .onLoad <- function(libname, pkgname) {
-  message("NOTE This is a development version. There is active development with breaking changes until the package has been approved in Bioconductor. Yet, everything in the main branch is to our knowledge working as it should. The original notame package this development is based on can be installed using `devtools::install_github('antonvsdata/notame@v0.3.1')`")
+  message("NOTE This is a development version. There is active development with 
+  breaking changes until the package has been approved in Bioconductor. Yet, 
+  everything in the main branch is to our knowledge working as it should. The 
+  original notame package this development is based on can be installed using 
+  `devtools::install_github('antonvsdata/notame@v0.3.1')`")
   op <- options()
   op_notame <- list(
     notame.citations = list(
@@ -366,7 +369,8 @@ prop_found <- function(x) {
 .get_from_to_names <- function(object, assay.type, name) {
   object <- as(object, "SummarizedExperiment")
   # Input behavior (from)
-  # If assay.type is not supplied and there is only one assay in the objcet, choose the first assay
+  # If assay.type is not supplied and there is only one assay in the objcet, 
+  # choose the first assay
   if (is.null(assay.type) && length(assays(object)) == 1) {
     assay.type <- 1
   } else if (is.null(assay.type)) {
@@ -386,16 +390,14 @@ prop_found <- function(x) {
 }
 
 .get_from_name <- function(object, assay.type) {
-  object <- as(object, "SummarizedExperiment") # CONSIDER logic or set methods
+  object <- as(object, "SummarizedExperiment")
   # Input behavior (from)
   if (is.null(assay.type) && length(assays(object)) == 1) {
     assay.type <- 1
   } else if (is.null(assay.type)) {
     stop("When using multiple assays, specify assay.type", call. = FALSE)
-  } else if (!assay.type %in% names(assays(object)) &&
-             length(assays(object)) != 1) {
+  } else if (!assay.type %in% names(assays(object)) & assay.type != 1) {
     stop(assay.type, " was specified but not found in assays", call. = FALSE)
   }
   assay.type
 }
-

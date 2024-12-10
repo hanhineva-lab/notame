@@ -16,6 +16,7 @@
 #' @param covariates character, column names of pheno data
 #' to use as covariates in the model, in addition to molecular features
 #' @param importance Should importance of features be assessed?
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other parameters passed to \code{randomForest::randomForest}
 #'
 #' @return An object of class randomForest.
@@ -39,7 +40,7 @@ fit_rf <- function(object, y, all_features = FALSE,
   .add_citation("randomForest package was used to fit random forest models:",
                 citation("randomForest"))
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = c(y, covariates),
+  object <- .check_object(object, pheno_cols = c(y, covariates),
                          assay.type = from)
   object <- drop_flagged(object, all_features = all_features)
 
@@ -155,6 +156,7 @@ importance_rf <- function(rf) {
 #' @param covariates character, column names of pheno datato use as covariates 
 #' in the model, in addition to molecular features
 #' @param n_features the number of features to try for each component
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... any parameters passed to \code{mixOmics::pls} or 
 #' \code{mixOmics::spls}
 #'
@@ -187,7 +189,7 @@ mixomics_pls <- function(object, y, ncomp, plot_scores = TRUE,
 
   object <- drop_flagged(object, all_features = all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = c(y, covariates), 
+  object <- .check_object(object, pheno_cols = c(y, covariates), 
                          assay.type = from)
 
   predictors <- .get_x(object, covariates, from)
@@ -217,7 +219,7 @@ mixomics_pls_optimize <- function(object, y, ncomp, folds = 5, nrepeat = 50,
   .add_citation("mixOmics package was used to fit PLS models:",
                 citation("mixOmics"))
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = c(y, covariates), 
+  object <- .check_object(object, pheno_cols = c(y, covariates), 
                          assay.type = from)
   pls_res <- mixomics_pls(object = object, y = y, ncomp = ncomp, 
                           plot_scores = FALSE, all_features = all_features,
@@ -282,7 +284,7 @@ mixomics_spls_optimize <- function(object, y, ncomp, n_features =
                 citation("mixOmics"))
   object <- drop_flagged(object, all_features = all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = c(y, covariates), 
+  object <- .check_object(object, pheno_cols = c(y, covariates), 
                          assay.type = from)
 
   predictors <- .get_x(object, covariates, from)
@@ -358,6 +360,7 @@ mixomics_spls_optimize <- function(object, y, ncomp, n_features =
 #' if FALSE, flagged features are left out
 #' @param covariates character, column names of pheno data to use as covariates 
 #' in the model, in addition to molecular features
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... any parameters passed to \code{mixOmics::plsda}
 #'
 #' @return An object of class "mixo_plsda".
@@ -391,7 +394,7 @@ mixomics_plsda <- function(object, y, ncomp, plot_scores = TRUE,
                 citation("mixOmics"))
   object <- drop_flagged(object, all_features = all_features)
   from <- .get_from_name(object, assay.type)  
-  object <- check_object(object, pheno_cols = c(y, covariates), 
+  object <- .check_object(object, pheno_cols = c(y, covariates), 
                          assay.type = from)
 
   predictors <- .get_x(object, covariates, from)
@@ -417,7 +420,6 @@ mixomics_plsda <- function(object, y, ncomp, plot_scores = TRUE,
 mixomics_plsda_optimize <- function(object, y, ncomp, folds = 5, nrepeat = 50,
                                     plot_scores = TRUE, all_features = FALSE,
                                     covariates = NULL, assay.type = NULL, ...) {
-  # We don't need to drop_flagged in these as mixomics_pls already does
   if (!requireNamespace("mixOmics", quietly = TRUE)) {
     stop("Package \"mixOmics\" needed for this function to work.", 
          " Please install it.", call. = FALSE)
@@ -426,7 +428,7 @@ mixomics_plsda_optimize <- function(object, y, ncomp, folds = 5, nrepeat = 50,
                 citation("mixOmics"))
   object <- drop_flagged(object, all_features = all_features)
   from <- .get_from_name(object, assay.type)  
-  object <- check_object(object, pheno_cols = c(y, covariates), 
+  object <- .check_object(object, pheno_cols = c(y, covariates), 
                          assay.type = from)
 
   plsda_res <- mixomics_plsda(object = object, y = y, ncomp = ncomp,
@@ -472,7 +474,7 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
                 citation("mixOmics"))
   object <- drop_flagged(object, all_features = all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object,  pheno_cols = c(y, covariates), 
+  object <- .check_object(object,  pheno_cols = c(y, covariates), 
                          assay.type = from)
 
   predictors <- .get_x(object, covariates, from)
@@ -542,6 +544,7 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
 #' @param varRatio Ratio of variables to include in subsequent inner loop 
 #' iteration, parameter of MUVR
 #' @param method Multivariate method. Supports 'PLS', 'RF' and 'EN'
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other parameters to MUVR2::MUVR2 or MUVR2::MUVR2_EN 
 #' and MUVR2::getVar (when method == "EN")
 #'
@@ -610,7 +613,7 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
                 citation("MUVR2"))
   object <- drop_flagged(object, all_features = all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, 
+  object <- .check_object(object, 
                          pheno_cols = c(y, id, covariates, static_covariates,
                                         multi_level_var, covariates), 
                          assay.type = from)
@@ -731,6 +734,7 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
 #' @param coef Coefficient to calculate continuous distances in 
 #' \code{DistContinuous}.
 #' By default uses Pythagorean distances.
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other parameters to \code{\link[PERMANOVA]{PERMANOVA}}
 #'
 #' @return A PERMANOVA object.
@@ -753,7 +757,7 @@ perform_permanova <- function(object, group, all_features = FALSE,
                 
   object <- drop_flagged(object, all_features = all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_factors = group,
+  object <- .check_object(object, pheno_factors = group,
                          assay.type = from)
 
   log_text("Starting PERMANOVA tests")

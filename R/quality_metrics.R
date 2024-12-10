@@ -11,7 +11,7 @@
 #'
 #' @export
 quality <- function(object) {
-  object <- check_object(object)
+  object <- .check_object(object)
   if (!all(c("RSD", "RSD_r", "D_ratio", "D_ratio_r") %in%
       colnames(rowData(object)))) {
     return(NULL)
@@ -38,6 +38,7 @@ quality <- function(object) {
 #' 2018). The quality metrics are described in Details section of 
 #' \code{flag_quality}
 #' @param object a SummarizedExperiment or MetaboSet object
+#' @param ... additional arguments passed to methods
 #'
 #' @return A SummarizedExperiment or MetaboSet object with quality metrics in 
 #' feature data.
@@ -50,9 +51,11 @@ quality <- function(object) {
 setGeneric("assess_quality", signature = "object",
            function(object, ...) standardGeneric("assess_quality"))
 
+#' @rdname assess_quality
+#' @export
 setMethod("assess_quality", signature = c(object = "MetaboSet"),
   function(object) {
-    object <- check_object(object, pheno_QC = TRUE, assay.type = 1)
+    object <- .check_object(object, pheno_QC = TRUE, assay.type = 1)
     # Remove old quality metrics
     if (!is.null(quality(object))) {
       object <- .erase_quality(object)
@@ -65,7 +68,8 @@ setMethod("assess_quality", signature = c(object = "MetaboSet"),
     quality_metrics <- BiocParallel::bplapply(features, function(feature) {
       data.frame(
         Feature_ID = feature,
-        RSD = finite_sd(qc_data[feature, ]) / abs(finite_mean(qc_data[feature,])),
+        RSD = finite_sd(qc_data[feature, ]) / 
+        abs(finite_mean(qc_data[feature,])),
         RSD_r = finite_mad(qc_data[feature, ]) /
           abs(finite_median(qc_data[feature, ])),
         D_ratio = finite_sd(qc_data[feature, ]) /
@@ -78,10 +82,13 @@ setMethod("assess_quality", signature = c(object = "MetaboSet"),
   object <- join_rowData(object, quality_metrics)
 })
 
+#' @rdname assess_quality
+#' @param assay.type character, assay to be used in case of multiple assays
+#' @export
 setMethod("assess_quality", signature = c(object = "SummarizedExperiment"),
   function(object, assay.type = NULL) {
     from <- .get_from_name(object, assay.type)
-    object <- check_object(object, pheno_QC = TRUE, assay.type = from)
+    object <- .check_object(object, pheno_QC = TRUE, assay.type = from)
     # Remove old quality metrics
     if (!is.null(quality(object))) {
       object <- .erase_quality(object)
@@ -94,7 +101,8 @@ setMethod("assess_quality", signature = c(object = "SummarizedExperiment"),
     quality_metrics <- BiocParallel::bplapply(features, function(feature) {
       data.frame(
         Feature_ID = feature,
-        RSD = finite_sd(qc_data[feature, ]) / abs(finite_mean(qc_data[feature,])),
+        RSD = finite_sd(qc_data[feature, ]) / 
+        abs(finite_mean(qc_data[feature,])),
         RSD_r = finite_mad(qc_data[feature, ]) /
           abs(finite_median(qc_data[feature, ])),
         D_ratio = finite_sd(qc_data[feature, ]) /
@@ -116,6 +124,7 @@ setMethod("assess_quality", signature = c(object = "SummarizedExperiment"),
 #'
 #' @param object a SummarizedExperiment or MetaboSet object
 #' @param condition character, condition for keeping the features, see Details
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @details The quality metrics measure two things: internal spread of the QCs,
 #' and spread of the QCs compared to the spread of the biological samples.
@@ -144,12 +153,11 @@ setMethod("assess_quality", signature = c(object = "SummarizedExperiment"),
 #' assays applied in untargeted clinical metabolomic studies.
 #' Metabolomics : Official journal of the Metabolomic Society vol. 14,6 (2018): 
 #' 72. doi:10.1007/s11306-018-1367-3
-#'
+#'  
 #' @usage flag_quality
-#' flag_quality(object, condition =
+#' flag_quality(object, assay.type = NULL, condition =
 #'   "(RSD_r < 0.2 & D_ratio_r < 0.4) | 
 #'   (RSD < 0.1 & RSD_r < 0.1 & D_ratio < 0.1)")
-#'
 #' @examples
 #' ex_set <- flag_quality(example_set)
 #' rowData(ex_set)
@@ -159,13 +167,13 @@ setMethod("assess_quality", signature = c(object = "SummarizedExperiment"),
 #' rowData(ex_set)
 #'
 #' @export
-flag_quality <- function(object, assay.type = NULL, 
-  condition = "(RSD_r < 0.2 & D_ratio_r < 0.4) | 
-              (RSD < 0.1 & RSD_r < 0.1 & D_ratio < 0.1)") {
+flag_quality <- function(object, assay.type = NULL, condition = 
+  "(RSD_r < 0.2 & D_ratio_r < 0.4) | 
+  (RSD < 0.1 & RSD_r < 0.1 & D_ratio < 0.1)") {
   if (is.null(quality(object))) {
     object <- assess_quality(object, assay.type)
   }
-  object <- check_object(object, feature_ID = TRUE)
+  object <- .check_object(object, feature_ID = TRUE)
   .add_citation("Quality metrics were computed as per guidelines in:", paste(
     "Broadhurst, David et al. Guidelines and considerations for the use of",
     "system suitability and quality control samples in mass spectrometry",
@@ -210,7 +218,7 @@ flag_quality <- function(object, assay.type = NULL,
 #' @param group_limit the detection rate limit for study groups
 #' @param group the columns name in sample information to use as the grouping 
 #' variable
-#'
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @return A SummarizedExperiment or MetaboSet object with the features flagged.
 #'
 #' @examples
@@ -222,7 +230,7 @@ flag_quality <- function(object, assay.type = NULL,
 flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
                            group = NULL, assay.type = NULL) {
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_ID = TRUE, pheno_QC = TRUE, 
+  object <- .check_object(object, pheno_ID = TRUE, pheno_QC = TRUE, 
                          pheno_factors = group, assay.type = from, 
                          feature_ID = TRUE)
   found_qc <- apply(assay(object[, object$QC == "QC"], from), 1, prop_found)
@@ -294,7 +302,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' @param flag_label character, the label used when flagging contaminants. Can 
 #' be changed if sample processing contaminants and carryover contaminants are 
 #' flagged separately.
-#'
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @return A SummarizedExperiment or MetaboSet object with contaminant features 
 #' flagged.
 #'
@@ -328,7 +336,7 @@ flag_contaminants <- function(object, blank_col, blank_label,
                               flag_thresh = 0.05, flag_label = "Contaminant",
                               assay.type = NULL) {
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_QC = TRUE, pheno_cols = blank_col, 
+  object <- .check_object(object, pheno_QC = TRUE, pheno_cols = blank_col, 
                          assay.type = from)
   
   blanks <- object[, colData(object)[, blank_col] == blank_label]

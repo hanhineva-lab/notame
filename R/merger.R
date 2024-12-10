@@ -154,10 +154,13 @@
 #'
 #' @export
 merge_metabosets <- function(..., merge = c("features", "samples")) {
-  # CONSIDER what checks specifically are needed here?
   merge <- match.arg(merge)
   # Combine the objects to a list
   objects <- .to_list(...)
+  # Convert to SE
+  objects <- lapply(objects, function(object) {
+    object <- .check_object(object)
+  })
   # Choose merging function
   if (merge == "features") {
     merge_fun <- .merge_mode_helper
@@ -167,7 +170,6 @@ merge_metabosets <- function(..., merge = c("features", "samples")) {
   # Merge objects together one by one
   merged <- NULL
   for (object in objects) {
-    object <- check_object(object)
     if (is.null(merged)) {
       merged <- object
     } else {
@@ -189,6 +191,9 @@ merge_metabosets <- function(..., merge = c("features", "samples")) {
 #' @param ... SummarizedExperiment objects or a list of objects
 #' @param merge what to merge? features is used for combining analytical modes,
 #' samples is used for batches
+#' @param assay.type character, assay to be used in case of multiple assays. 
+#' The same assay needs to be present in all objects to be merged, and the 
+#' resultant object contains this single assay.
 #'
 #' @return A merged SummarizedExperiment object.
 #'
@@ -209,8 +214,8 @@ merge_metabosets <- function(..., merge = c("features", "samples")) {
 #' merged <- merge_objects(batch1, batch2, merge = "samples")
 #'
 #' @export
-merge_objects <- function(..., merge = c("features", "samples")) {
-  # CONSIDER perhaps simply necessitate same assay.type names?
+merge_objects <- function(..., merge = c("features", "samples"),
+                          assay.type = NULL) {
   merge <- match.arg(merge)
   # Combine the objects to a list
   objects <- .to_list(...)
@@ -218,6 +223,19 @@ merge_objects <- function(..., merge = c("features", "samples")) {
   if (!all(vapply(objects, class, character(1)) == "SummarizedExperiment")) {
     stop("The arguments should only contain SummarizedExperiment objects")
   }
+  # Check assay.type and prepare objects for merge
+  from_list <- lapply(objects, .get_from_name, assay.type)
+  if (!length(unique(from_list)) == 1) {
+    stop("The same assay must be present in all objects or alternatively,
+          use objects with a single assay")
+  } else {
+    from <- unlist(unique(from_list))
+  }
+  objects <- lapply(objects, function(object) {
+    assays(object) <- assays(object)[from]
+    object
+  })
+
   # Choose merging function
   if (merge == "features") {
     merge_fun <- .merge_mode_helper

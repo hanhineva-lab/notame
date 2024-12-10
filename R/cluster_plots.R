@@ -16,6 +16,7 @@
 #' @param title The plot title
 #' @param subtitle The plot subtitle
 #' @param color_scale the color scale as returned by a ggplot function.
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A ggplot object.
 #'
@@ -26,8 +27,8 @@
 #'
 #' @export
 plot_dendrogram <- function(object, all_features = FALSE, 
-                            color = NULL, 
-                            dist_method = "euclidean", clust_method = "ward.D2",
+                            color, dist_method = "euclidean",
+                            clust_method = "ward.D2",
                             center = TRUE, scale = "uv", 
                             title = "Dendrogram of hierarchical clustering",
                             subtitle = NULL, 
@@ -37,12 +38,10 @@ plot_dendrogram <- function(object, all_features = FALSE,
     stop("Package \'pcaMethods\' needed for this function to work.", 
          " Please install it.", call. = FALSE)
   }
-  
-  color <- color %||% NULL
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = color, assay.type = from)
+  object <- .check_object(object, pheno_cols = color, assay.type = from)
   
   subtitle <- subtitle %||% paste("Distance method:", dist_method, 
                                   "Clustering method:", clust_method)
@@ -96,6 +95,7 @@ plot_dendrogram <- function(object, all_features = FALSE,
 #' ggplot function
 #' @param fill_scale_dis Discrete fill scale for the group bar as returned by a 
 #' ggplot function
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A ggplot object. If \code{group_bar} is \code{TRUE}, the plot will 
 #' consist of multiple parts and is harder to modify.
@@ -124,7 +124,7 @@ plot_sample_heatmap <- function(object, all_features = FALSE,
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = group, assay.type = from)
+  object <- .check_object(object, pheno_cols = group, assay.type = from)
 
   # Default settings
   subtitle <- subtitle %||% paste("Distance method:", dist_method, 

@@ -24,6 +24,7 @@
 #' @param min_size_plotting the minimum number of features a cluster needs to 
 #' have to be plotted
 #' @param prefix the prefix to the files to be plotted
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return a SummarizedExperiment or MetaboSet object, with median peak area 
 #' (MPA), the cluster ID, the features in the cluster, and cluster size added 
@@ -40,12 +41,12 @@ cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
                              corr_thresh = 0.9, d_thresh = 0.8, 
                              plotting = TRUE, min_size_plotting = 3, 
                              prefix = NULL, assay.type = NULL) {
-  # CONSIDER dealing with mz and rt_col
   # Drop flagged compounds before clustering
   from <- .get_from_name(object, assay.type)
-  orig <- check_object(object)
+  orig <- .check_object(object)
   object <- drop_flagged(object, all_features)
-  object <- check_object(object, check_limits = TRUE, assay.type = from)
+  object <- .check_object(object, check_limits = TRUE, assay.type = from,
+                         feature_cols = c(mz_col, rt_col))
 
   if (is.null(mz_col) || is.null(rt_col)) {
     cols <- .find_mz_rt_cols(rowData(object))
@@ -53,7 +54,7 @@ cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
   mz_col <- mz_col %||% cols$mz_col
   rt_col <- rt_col %||% cols$rt_col
 
-  data <- as.data.frame(t(assay(object)))
+  data <- as.data.frame(t(assay(object, from)))
   features <- as.data.frame(rowData(object))
   # Start log
   log_text(paste("\nStarting feature clustering at", Sys.time()))
@@ -83,7 +84,7 @@ cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
                  "clusters of 2 or more features, clustering finished at",
                  Sys.time()))
   # Compute median peak area and assing cluster ID
-  features$MPA <- apply(assay(object), 1, finite_median)
+  features$MPA <- apply(assay(object, from), 1, finite_median)
   features <- assign_cluster_id(data, clusters, features, "Feature_ID")
 
   if (plotting) {
@@ -169,7 +170,7 @@ assign_cluster_id <- function(data, clusters, features, name_col) {
 #'
 #' @export
 compress_clusters <- function(object) {
-  object <- check_object(object)
+  object <- .check_object(object)
   cluster_names <- rowData(object)$Cluster_ID
   if (is.null(cluster_names)) {
     stop("No 'Cluster_ID' found in rowData(object), ",

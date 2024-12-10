@@ -22,8 +22,8 @@
 #'
 #' @param object a SummarizedExperiment or MetaboSet object
 #' @param grouping_cols character vector, the columns by which grouping should 
-#' be done. Use \code{NA}
-#' to compute statistics without grouping.
+#' be done. Use \code{NA} to compute statistics without grouping.
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @examples
 #' # Group by "Group"
@@ -40,7 +40,7 @@
 summary_statistics <- function(object, grouping_cols = NULL,
                                assay.type = NULL) {
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = c(grouping_cols), 
+  object <- .check_object(object, pheno_cols = c(grouping_cols), 
                          assay.type = from)
   data <- combined_data(object, from)
   features <- rownames(object)
@@ -271,6 +271,7 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
 #' @param id character, name of the subject ID column
 #' @param group character, name of the group column
 #' @param time character, name of the time column
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A data frame with Cohen's d for each feature.
 #'
@@ -281,10 +282,10 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
 #' )
 #'
 #' @export
-cohens_d <- function(object, group = NULL, id = NULL,
+cohens_d <- function(object, group, id = NULL,
                      time = NULL, assay.type = NULL) {
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_factors = c(group, time), 
+  object <- .check_object(object, pheno_factors = c(group, time), 
                          pheno_cols = id, assay.type = from, feature_ID = TRUE)
   res <- NULL
 
@@ -331,6 +332,7 @@ cohens_d <- function(object, group = NULL, id = NULL,
 #'
 #' @param object a SummarizedExperiment or MetaboSet object
 #' @param group character, name of the group column
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A data frame with fold changes for each feature.
 #'
@@ -341,9 +343,9 @@ cohens_d <- function(object, group = NULL, id = NULL,
 #' fc <- fold_change(example_set, group = "Time")
 #'
 #' @export
-fold_change <- function(object, group = group_col(object), assay.type = NULL) {
+fold_change <- function(object, group, assay.type = NULL) {
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = group, assay.type = from)
+  object <- .check_object(object, pheno_cols = group, assay.type = from)
   log_text("Starting to compute fold changes.")
   data <- combined_data(object, from)
   groups <- utils::combn(levels(data[, group]), 2)
@@ -455,6 +457,10 @@ fold_change <- function(object, group = group_col(object), assay.type = NULL) {
 #' the order of the variables '(which is x and which is y) is changed. Can be 
 #' useful for e.g. plotting a heatmap of the results, see examples of
 #' \code{\link{plot_effect_heatmap}}
+#' @param assay.type1 character, assay of object(1) to be used in case of 
+#' multiple assays
+#' @param assay.type2 character, assay of object2 to be used in case of 
+#' multiple assays
 #' @param ... other parameters passed to \code{\link{cor.test}}, such as method
 #'
 #' @return A data frame with the results of correlation tests: the pair of 
@@ -492,7 +498,7 @@ perform_correlation_tests <- function(object, x, y = x, id = NULL,
   log_text("Starting correlation tests.")
   
   from1 <- .get_from_name(object, assay.type1)
-  object <- check_object(object, pheno_cols = id, assay.type = from1)
+  object <- .check_object(object, pheno_cols = id, assay.type = from1)
   data1 <- combined_data(object, from1)
 
   if (!is.null(object2)) {
@@ -500,7 +506,7 @@ perform_correlation_tests <- function(object, x, y = x, id = NULL,
       stop("The objects have different numbers of samples")
     }
     from2 <- .get_from_name(object2, assay.type2)
-    object2 <- check_object(object2, pheno_factors = id, assay.type = from2)
+    object2 <- .check_object(object2, pheno_factors = id, assay.type = from2)
     data2 <- combined_data(object2, from2)
   } else {
     data2 <- data1
@@ -591,6 +597,7 @@ perform_correlation_tests <- function(object, x, y = x, id = NULL,
 #' @param object a SummarizedExperiment or MetaboSet object
 #' @param time,subject,group column names of pheno data holding time, 
 #' subject and group labels
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A pseudo SummarizedExperiment or MetaboSet object with the AUCs.
 #'
@@ -614,7 +621,7 @@ perform_auc <- function(object, time, subject, group, assay.type = NULL) {
   log_text("Starting AUC computation")
   
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_factors = c(time, group),
+  object <- .check_object(object, pheno_factors = c(time, group),
                          pheno_chars = subject, assay.type = from)
   data <- combined_data(object, from)
 
@@ -730,6 +737,7 @@ perform_auc <- function(object, time, subject, group, assay.type = NULL) {
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional parameters passed to lm
 #'
 #' @return A data frame with one row per feature, with all the
@@ -753,12 +761,9 @@ perform_auc <- function(object, time, subject, group, assay.type = NULL) {
 perform_lm <- function(object, formula_char, all_features = FALSE, 
                        assay.type = NULL, ...) {
   log_text("Starting linear regression.")
-  # THINK more about logic here (and elsewhere with formula_char). Do we need to split by other operators too? Yes, you may be able to do it with regular expressions in the same split argument. You could still add that if LHS is not "Feature", error.
-  formula_cols <- unlist(strsplit(formula_char, " ~ "))[2]
-  formula_cols <- unlist(strsplit(formula_cols, split = " *\\+ *| *\\* *| *:"))
   
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = formula_cols, assay.type = from)
+  object <- .check_object(object, assay.type = from)
 
   lm_fun <- function(feature, formula, data) {
     # Try to fit the linear model
@@ -823,6 +828,7 @@ perform_lm <- function(object, formula_char, all_features = FALSE,
 #' @param lm_args list of arguments to lm, list names should be parameter names
 #' @param anova_args list of arguments to anova, list names should be parameter 
 #' names
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A data frame with one row per feature, with all the
 #' relevant statistics of the linear model as columns.
@@ -846,7 +852,7 @@ perform_lm_anova <- function(object, formula_char, all_features = FALSE,
                              lm_args = NULL, anova_args = NULL,
                              assay.type = NULL) {
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, assay.type = from)
+  object <- .check_object(object, assay.type = from)
   log_text("Starting ANOVA tests")
 
   anova_fun <- function(feature, formula, data) {
@@ -895,6 +901,7 @@ perform_lm_anova <- function(object, formula_char, all_features = FALSE,
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional parameters passed to glm
 #'
 #' @return A data frame with one row per feature, with all the
@@ -919,7 +926,7 @@ perform_lm_anova <- function(object, formula_char, all_features = FALSE,
 perform_logistic <- function(object, formula_char, all_features = FALSE, 
                              assay.type = NULL, ...) {
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, assay.type = from)
+  object <- .check_object(object, assay.type = from)
   log_text("Starting logistic regression")
 
   logistic_fun <- function(feature, formula, data) {
@@ -1081,6 +1088,7 @@ perform_logistic <- function(object, formula_char, all_features = FALSE,
 #' documentation of confint below
 #' @param test_random logical, whether tests for the significance of the random 
 #' effects should be performed
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional parameters passed to lmer
 #'
 #' @return A data frame with one row per feature, with all the
@@ -1128,7 +1136,7 @@ perform_lmer <- function(object, formula_char, all_features = FALSE,
   ci_method <- match.arg(ci_method)
   
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, assay.type = from)
+  object <- .check_object(object, assay.type = from)
   results_df <- .perform_test(object, formula_char, .help_lmer, all_features,
                               packages = "lmerTest", ci_method = ci_method,
                               test_random = test_random, assay.type = from)
@@ -1168,8 +1176,8 @@ perform_lmer <- function(object, formula_char, all_features = FALSE,
 #' @param object a SummarizedExperiment or MetaboSet object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
-#' Defaults to "Feature ~ group_col(object)
 #' @param all_features should all features be included in FDR correction?
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @details The model is fit on combined_data(object). Thus, column names
 #' in pheno data can be specified. To make the formulas flexible, the word 
@@ -1199,7 +1207,7 @@ perform_homoscedasticity_tests <- function(object, formula_char,
   log_text("Starting homoscedasticity tests.")
   
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, assay.type = from)
+  object <- .check_object(object, assay.type = from)
 
   homosced_fun <- function(feature, formula, data) {
     result_row <- NULL
@@ -1234,8 +1242,8 @@ perform_homoscedasticity_tests <- function(object, formula_char,
 #' @param object a SummarizedExperiment or MetaboSet object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
-#' Defaults to "Feature ~ group_col(object)
 #' @param all_features should all features be included in FDR correction?
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @details The model is fit on combined_data(object). Thus, column names
 #' in pheno data can be specified. To make the formulas flexible, the word 
@@ -1256,7 +1264,7 @@ perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE,
                                    assay.type = NULL) {
   log_text("Starting Kruskal-Wallis tests.")
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, assay.type = from)
+  object <- .check_object(object, assay.type = from)
 
   kruskal_fun <- function(feature, formula, data) {
     result_row <- NULL
@@ -1292,6 +1300,7 @@ perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE,
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details).
 #' @param all_features should all features be included in FDR correction?
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other parameters to \code{\link{oneway.test}}
 #'
 #' @details The model is fit on combined_data(object). Thus, column names
@@ -1313,7 +1322,7 @@ perform_oneway_anova <- function(object, formula_char, all_features = FALSE,
                                  assay.type = NULL, ...) {
   log_text("Starting ANOVA tests.")
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, assay.type = from)
+  object <- .check_object(object, assay.type = from)
 
   anova_fun <- function(feature, formula, data) {
     result_row <- NULL
@@ -1350,6 +1359,7 @@ perform_oneway_anova <- function(object, formula_char, all_features = FALSE,
 #' @param id character, name of the subject identification column for paired 
 #' version
 #' @param all_features should all features be included in FDR correction?
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other parameters passed to stats::t.test
 #'
 #' @details P-values of each comparison are corrected separately from each 
@@ -1381,7 +1391,7 @@ perform_t_test <- function(object, formula_char, is_paired = FALSE, id = NULL,
           "This function mimics this behavior, so the effect size is",
           " mean of first level minus mean of second level.")
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, assay.type = from)
+  object <- .check_object(object, assay.type = from)
   assays(object) <- assays(object)[from]
   
   group <- unlist(strsplit(formula_char, " ~ "))[2]
@@ -1557,6 +1567,7 @@ perform_t_test <- function(object, formula_char, is_paired = FALSE, id = NULL,
 #' @param id character, name of the subject identification column for paired 
 #' version
 #' @param all_features should all features be included in FDR correction?
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other parameters passed to test stats::wilcox.test
 #'
 #' @details P-values of each comparison are corrected separately from each 
@@ -1581,7 +1592,7 @@ perform_t_test <- function(object, formula_char, is_paired = FALSE, id = NULL,
 #'   id = "Subject_ID")
 #' # Only two groups
 #' mann_whitney_results <- perform_non_parametric(drop_qcs(example_set), 
-#'   formula_char = "Feature ~ Group", is_paired = FALSE)
+#'   formula_char = "Feature ~ Group")
 #'
 #' @seealso \code{\link[stats]{wilcox.test}}
 #'
@@ -1590,12 +1601,12 @@ perform_non_parametric <- function(object, formula_char, is_paired = FALSE,
                                    id = NULL, all_features = FALSE, 
                                    assay.type = NULL, ...) {
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, assay.type = from)
+  object <- .check_object(object, assay.type = from)
   assays(object) <- assays(object)[from]
   group <- unlist(strsplit(formula_char, " ~ "))[2]
 
   if (!is.factor(colData(object)[, group])) {
-    stop("Group column should be a factor")
+    stop("Grouping column should be a factor")
   }
 
   results_df <- .setup_simple_test(object, group = group, 

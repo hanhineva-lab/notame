@@ -12,6 +12,7 @@
 #' @param height a numeric value specifying the height of device
 #' @param fontsize the fontsize for sample labels
 #' @param colormap colormap for the hexagons
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other parameters for supraHex::sPipeline
 #'
 #' @return None, the function is invoked for its plotting side effect.
@@ -40,7 +41,7 @@ plot_sample_suprahex <- function(object, all_features = FALSE,
                 citation("supraHex"))
   from <- .get_from_name(object, assay.type)
   object <- drop_flagged(object, all_features = all_features)
-  object <- check_object(object, pheno_cols = sample_labels, assay.type = from)
+  object <- .check_object(object, pheno_cols = sample_labels, assay.type = from)
   
   data <- scale(assay(object, from))
   colnames(data) <- colData(object)[, sample_labels]

@@ -7,6 +7,8 @@
 #'
 #' @param object a SummarizedExperiment or MetaboSet object
 #' @param value the value to be converted to NA
+#' @param assay.type character, assay to be used in case of multiple assays
+#' @param name character, name of the resultant assay in case of multiple assays
 #'
 #' @return SummarizedExperiment or MetaboSet object as the one supplied, with 
 #' missing values correctly set to NA.
@@ -17,7 +19,7 @@
 #' @export
 mark_nas <- function(object, value, assay.type = NULL, name = NULL) {
   from_to <- .get_from_to_names(object, assay.type, name)
-  object <- check_object(object, assay.type = from_to[[1]])
+  object <- .check_object(object, assay.type = from_to[[1]])
   ex <- assay(object, from_to[[1]])
   ex[ex == value] <- NA
   assay(object, from_to[[2]]) <- ex
@@ -71,7 +73,7 @@ mark_nas <- function(object, value, assay.type = NULL, name = NULL) {
 #' @export
 fix_MSMS <- function(object, ms_ms_spectrum_col = "MS_MS_spectrum",
                      peak_num = 10, min_abund = 5, deci_num = 3) {
-  object <- check_object(object, feature_cols = ms_ms_spectrum_col)
+  object <- .check_object(object, feature_cols = ms_ms_spectrum_col)
   spec <- rowData(object)[, ms_ms_spectrum_col]
   to_metab <- NULL
 
@@ -132,7 +134,7 @@ fix_MSMS <- function(object, ms_ms_spectrum_col = "MS_MS_spectrum",
 #'
 #' @export
 drop_qcs <- function(object) {
-  object <- check_object(object)
+  object <- .check_object(object)
   object <- object[, object$QC != "QC"]
   colData(object) <- droplevels(colData(object))
   if (!is.null(attr(object, "original_class"))) {
@@ -166,9 +168,11 @@ setGeneric("drop_flagged", signature = "object",
            function(object, all_features = FALSE) 
            standardGeneric("drop_flagged"))
 
+#' @rdname drop_flagged
+#' @export
 setMethod("drop_flagged", signature = c(object = "MetaboSet"),
   function(object, all_features = FALSE) {
-    object <- check_object(object, feature_flag = TRUE)
+    object <- .check_object(object, feature_flag = TRUE)
     if (!all_features) {
       object <- object[is.na(flag(object)), ]
     }
@@ -180,9 +184,11 @@ setMethod("drop_flagged", signature = c(object = "MetaboSet"),
   }
 )
 
+#' @rdname drop_flagged
+#' @export
 setMethod("drop_flagged", signature = c(object = "SummarizedExperiment"),
   function(object, all_features = FALSE) {
-    object <- check_object(object)
+    object <- .check_object(object)
     if (!all_features) {
       object <- object[is.na(flag(object)), ]
     }
@@ -247,6 +253,8 @@ merge_assay <- function(object, y, assay.type = NULL, name = NULL) {
 #' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before imputation.
+#' @param assay.type character, assay to be used in case of multiple assays
+#' @param name character, name of the resultant assay in case of multiple assays
 #' @param ... passed to MissForest function
 #'
 #' @return An object as the one supplied, with missing 
@@ -274,8 +282,8 @@ impute_rf <- function(object, all_features = FALSE, assay.type = NULL,
   # Drop flagged features
   dropped <- drop_flagged(object, all_features)
   from_to <- .get_from_to_names(object, assay.type, name)
-  dropped <- check_object(dropped, assay.type = from_to[[1]])
-  object <- check_object(object, assay.type = from_to[[1]])
+  dropped <- .check_object(dropped, assay.type = from_to[[1]])
+  object <- .check_object(object, assay.type = from_to[[1]])
 
   if (!requireNamespace("missForest", quietly = TRUE)) {
     stop("missForest package not found.")
@@ -333,6 +341,8 @@ impute_rf <- function(object, all_features = FALSE, assay.type = NULL,
 #' @param na_limit only impute features with the proportion of NAs over this 
 #' limit. For example, if \code{na_limit = 0.5}, only features with at least 
 #' half of the values missing are imputed.
+#' @param assay.type character, assay to be used in case of multiple assays
+#' @param name character, name of the resultant assay in case of multiple assays
 #'
 #' @return A SummarizedExperiment or Metaboset object with imputed peak table.
 #'
@@ -344,7 +354,7 @@ impute_rf <- function(object, all_features = FALSE, assay.type = NULL,
 impute_simple <- function(object, value, na_limit = 0, assay.type = NULL,
                           name = NULL) {
   from_to <- .get_from_to_names(object, assay.type, name)
-  object <- check_object(object, assay.type = from_to[[1]])
+  object <- .check_object(object, assay.type = from_to[[1]])
   imp <- assay(object, from_to[[1]])
   nas <- apply(imp, 1, prop_na)
   imp <- imp[nas > na_limit, , drop = FALSE]
@@ -404,7 +414,8 @@ impute_simple <- function(object, value, na_limit = 0, assay.type = NULL,
 #' a normal distribution.
 #'
 #' @param object a SummarizedExperiment or MetaboSet object
-#'
+#' @param assay.type character, assay to be used in case of multiple assays
+#' @param name character, name of the resultant assay in case of multiple assays
 #' @return An object as the one supplied, with normalized features.
 #'
 #' @examples
@@ -412,7 +423,7 @@ impute_simple <- function(object, value, na_limit = 0, assay.type = NULL,
 #' @export
 inverse_normalize <- function(object, assay.type = NULL, name = NULL) {
   from_to <- .get_from_to_names(object, assay.type, name)
-  object <- check_object(object, assay.type = from_to[[1]])
+  object <- .check_object(object, assay.type = from_to[[1]])
   assay(object, from_to[[2]]) <- assay(object, from_to[[1]]) %>%
     apply(1, function(x) {
       stats::qnorm((rank(x, na.last = "keep") - 0.5) / sum(!is.na(x)))
@@ -443,7 +454,7 @@ inverse_normalize <- function(object, assay.type = NULL, name = NULL) {
 #'
 #' @export
 flag_report <- function(object) {
-  object <- check_object(object, feature_split = TRUE)
+  object <- .check_object(object, feature_split = TRUE)
   splits <- sort(unique(rowData(object)$Split))
   report <- data.frame()
   flag(object)[is.na(flag(object))] <- "Kept"
@@ -504,9 +515,6 @@ setMethod("log10", "MetaboSet",
     x
   }
 )
-
-# scale
-setGeneric("scale")
 
 #' Scale exprs data
 #'
@@ -597,9 +605,6 @@ setMethod("log10", "SummarizedExperiment",
   }
 )
 
-# scale
-setGeneric("scale")
-
 #' Scale assay data
 #'
 #' Applies the base R function scale to transposed assay matrix. See ?scale for 
@@ -644,6 +649,8 @@ setMethod("exponential", c(object = "SummarizedExperiment"),
 #' sample.
 #' @param all_features logical, should all features be used for calculating the 
 #' reference sample?
+#' @param assay.type character, assay to be used in case of multiple assays
+#' @param name character, name of the resultant assay in case of multiple assays
 #'
 #' @return A SummarizedExperiment or MetaboSet object with altered feature 
 #' abundances.
@@ -661,7 +668,7 @@ pqn_normalization <- function(object, ref = c("qc", "all"),
   method <- match.arg(method)
   # Use only good-quality features for calculating reference spectra
   from_to <- .get_from_to_names(object, assay.type, name)
-  object <- check_object(object, pheno_QC = TRUE, assay.type = from_to[[1]])
+  object <- .check_object(object, pheno_QC = TRUE, assay.type = from_to[[1]])
   ref_data <- assay(drop_flagged(object, all_features), from_to[[1]])
   
   

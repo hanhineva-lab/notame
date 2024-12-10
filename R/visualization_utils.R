@@ -147,7 +147,7 @@ save_plot <- function(p, file, ...) {
 #' @param id character, name of pheno data column containing subject identifiers
 #' @param color character, name of pheno data column used for coloring sample
 #' labels for dendrograms
-
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @return None, the function is invoked for its plot-saving side effect.
 #'
 #' @details If \code{merge} is \code{TRUE} and \code{format} is \code{pdf},
@@ -217,11 +217,12 @@ save_plot <- function(p, file, ...) {
 #'
 #' @export
 visualizations <- function(object, prefix, format = "pdf", perplexity = 30,
-                           merge = FALSE, remove_singles = FALSE, group = NULL, time = NULL, id = NULL, color = NULL,
+                           merge = FALSE, remove_singles = FALSE, group = NULL, 
+                           time = NULL, id = NULL, color = NULL,
                            assay.type = NULL) {
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = c(time, id, color),
-                         assay.type = from)
+  object <- .check_object(object, pheno_QC = TRUE,
+                         pheno_cols = c(time, id, color), assay.type = from)
   assays(object) <- assays(object)[from]
   file_names <- ""
   if (sum(object$QC == "QC")) {

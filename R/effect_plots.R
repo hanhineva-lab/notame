@@ -116,6 +116,7 @@
 #' @param title_line_length integer, maximum length of the title line in 
 #' characters, passed to stringr::str_wrap
 #' @param theme a ggplot theme to be added to the plot
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other arguments to graphic device functions, like width and height
 #'
 #' @return By default, the function is invoked for its plot-saving side effect. 
@@ -138,8 +139,7 @@
 #' @export
 save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
                                     file_path = NULL, format = "emf",
-                                    x = NULL, id = NULL,
-                                    title = "Feature_ID",
+                                    x, id, title = "Feature_ID",
                                     subtitle = NULL, color = NULL,
                                     color_scale =
                                     getOption("notame.color_scale_dis"),
@@ -150,6 +150,7 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
                                     assay.type = NULL, ...) {
 
   subject_line_fun <- function(object, fname) {
+    
     data <- combined_data(object)
 
     p <- ggplot(data, aes(x = .data[[x]], y = .data[[fname]]))
@@ -189,7 +190,7 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
   
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = color, pheno_factors = x, 
+  object <- .check_object(object, pheno_cols = color, pheno_factors = x, 
                          pheno_chars = c(id), assay.type = from, 
                          feature_cols = c(title, subtitle))
   assays(object) <- assays(object)[from]
@@ -229,6 +230,7 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
 #' @param title_line_length integer, maximum length of the title line in 
 #' characters, passed to stringr::str_wrap
 #' @param theme a ggplot theme to be added to the plot
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other arguments to graphic device functions, like width and height
 #'
 #' @return By default, the function is invoked for its plot-saving side effect. 
@@ -259,9 +261,7 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
 #' @export
 save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
                                 file_path = NULL, format = "emf",
-                                x = NULL, 
-                                color = NULL,
-                                title = "Feature_ID", subtitle = NULL,
+                                x, color, title = "Feature_ID", subtitle = NULL,
                                 color_scale =
                                 getOption("notame.color_scale_dis"),
                                 text_base_size = 14, box_width = 0.8,
@@ -295,7 +295,7 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
   
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = color, pheno_factors = c(x),
+  object <- .check_object(object, pheno_cols = color, pheno_factors = c(x),
                          assay.type = from, feature_cols = c(title, subtitle))
   assays(object) <- assays(object)[from]
   
@@ -334,6 +334,7 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
 #' @param title_line_length integer, maximum length of the title line in 
 #' characters, passed to stringr::str_wrap
 #' @param theme a ggplot theme to be added to the plot
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other arguments to graphic device functions, like width and height
 #'
 #' @return By default, the function is invoked for its plot-saving side effect. 
@@ -358,21 +359,22 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
 #' )
 #' 
 #' # Plot one feature
-#' save_beeswarm_plots(drop_qcs(example_set)[1, ], save = FALSE, x = "Group", color = "Group")
+#' save_beeswarm_plots(drop_qcs(example_set)[1, ], save = FALSE, x = "Group", 
+#' color = "Group")
 #' \dontshow{setwd(.old_wd)}
 #'
 #' @export
 save_beeswarm_plots <- function(object, all_features = FALSE, save = TRUE,
                                 file_path = NULL, format = "emf",
-                                x = group_col(object), add_boxplots = FALSE,
+                                x, add_boxplots = FALSE,
                                 title = "Feature_ID", subtitle = NULL,
-                                color = group_col(object), color_scale =
+                                color, color_scale =
                                 getOption("notame.color_scale_dis"),
                                 text_base_size = 14, cex = 2, size = 2,
                                 title_line_length = 40, theme =
                                 theme_bw(base_size = text_base_size),
                                 assay.type = NULL, ...) {
-                                  
+  
   beeswarm_fun <- function(object, fname) {
     data <- combined_data(object)
     p <- ggplot(data, aes(x = .data[[x]], y = .data[[fname]],
@@ -398,13 +400,12 @@ save_beeswarm_plots <- function(object, all_features = FALSE, save = TRUE,
     }
     p
   }
-  
+
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = color, pheno_factors = x,
+  object <- .check_object(object, pheno_cols = color, pheno_factors = x,
                          assay.type = from, feature_cols = c(title, subtitle))
   assays(object) <- assays(object)[from]
-
   if (save) {
     .save_feature_plots(object, file_path, format, title, subtitle,
                         text_base_size, beeswarm_fun, ...)
@@ -443,6 +444,7 @@ save_beeswarm_plots <- function(object, all_features = FALSE, save = TRUE,
 #' @param title_line_length integer, maximum length of the title line in 
 #' characters, passed to stringr::str_wrap
 #' @param theme a ggplot theme to be added to the plot
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other arguments to graphic device functions, like width and height
 #'
 #' @return By default, the function is invoked for its plot-saving side effect. 
@@ -462,7 +464,7 @@ save_beeswarm_plots <- function(object, all_features = FALSE, save = TRUE,
 #'   format = "pdf"
 #' )
 #' # Plot one feature
-#' save_scatter_plots(example_set[1, ], save = FALSE, color = "Group")
+#' save_scatter_plots(example_set[1, ], save = FALSE)
 #' \dontshow{setwd(.old_wd)}
 #'
 #' @export
@@ -493,7 +495,7 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
   }
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = c(color, x), 
+  object <- .check_object(object, pheno_cols = c(color, x), 
                          pheno_factors = shape,
                          feature_cols = c(title, subtitle),
                          assay.type = from)
@@ -545,6 +547,7 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
 #' @param title_line_length integer, maximum length of the title line in 
 #' characters, passed to stringr::str_wrap
 #' @param theme a ggplot theme to be added to the plot
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other arguments to graphic device functions, like width and height
 #'
 #' @return By default, the function is invoked for its plot-saving side effect. 
@@ -572,11 +575,9 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
 #' @export
 save_group_lineplots <- function(object, all_features = FALSE, save = TRUE,
                                  file_path = NULL, format = "emf",
-                                 x = NULL, 
-                                 group = NULL, 
-                                 title = "Feature_ID", subtitle = NULL,
-                                 fun.data = "mean_cl_boot", fun = NULL,
-                                 fun.min = NULL, fun.max = NULL,
+                                 x, group, title = "Feature_ID",
+                                 subtitle = NULL, fun.data = "mean_cl_boot", 
+                                 fun = NULL, fun.min = NULL, fun.max = NULL,
                                  position_dodge_amount = 0.2,
                                  color_scale =
                                  getOption("notame.color_scale_dis"),
@@ -619,7 +620,7 @@ save_group_lineplots <- function(object, all_features = FALSE, save = TRUE,
   
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = x,  pheno_factors = group,
+  object <- .check_object(object, pheno_cols = x,  pheno_factors = group,
                          feature_cols = c(title, subtitle),
                          assay.type = from)
   assays(object) <- assays(object)[from]

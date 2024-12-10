@@ -31,6 +31,7 @@
 #' a ggplot function
 #' @param title the plot title
 #' @param subtitle the plot subtitle
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A ggplot object.
 #'
@@ -57,7 +58,7 @@ plot_dist_density <- function(object, all_features = FALSE,
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_QC = TRUE, assay.type = from)
+  object <- .check_object(object, pheno_QC = TRUE, assay.type = from)
 
   assay <- pcaMethods::prep(t(assay(object, from)), 
                             center = center, scale = scale)
@@ -86,6 +87,7 @@ plot_dist_density <- function(object, all_features = FALSE,
 #' @param object A SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? 
 #' If FALSE (the default), flagged features are removed before visualization.
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A ggplot object.
 #'
@@ -99,7 +101,7 @@ plot_injection_lm <- function(object, all_features = FALSE, assay.type = NULL) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_injection = TRUE, pheno_QC = TRUE,
+  object <- .check_object(object, pheno_injection = TRUE, pheno_QC = TRUE,
                          assay.type = from)
 
   # Apply linear model to QC samples and biological samples separately
@@ -185,6 +187,8 @@ plot_p_histogram <- function(p_values, hline = TRUE, combine = TRUE,
 #' default), flagged features are removed before visualization.
 #' @param plot_flags logical, should the distribution of flags be added as a 
 #' barplot?
+#' @param assay.type character, assay to be used in case of multiple assays and 
+#' no quality metrics are present in feature data
 #'
 #' @return A ggplot object.
 #'
@@ -192,10 +196,12 @@ plot_p_histogram <- function(p_values, hline = TRUE, combine = TRUE,
 #' plot_quality(example_set)
 #'
 #' @export
-plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE) {
+plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE,
+                         assay.type = NULL) {
   # Drop flagged features
   object <- drop_flagged(object, all_features = all_features)
-  object <- check_object(object, feature_flag = TRUE)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, feature_flag = TRUE)
   if (plot_flags) {
     # Plot bar plot of flags
     flags <- flag(object)
@@ -210,11 +216,9 @@ plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE) {
       labs(x = "Flag")
   }
 
-
-
   if (is.null(quality(object))) {
     message("\n", "Quality metrics not found, computing them now")
-    object <- assess_quality(object)
+    object <- assess_quality(object, assay.type = from)
   }
 
   # Distribution of quality metrics
@@ -248,6 +252,7 @@ plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE) {
 #' ggplot function
 #' @param zoom_boxplot logical, whether outliers should be left outside the 
 #' plot and only the boxplots shown. Defaults to TRUE.
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A ggplot object.
 #'
@@ -255,19 +260,16 @@ plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE) {
 #' plot_sample_boxplots(example_set, order_by = "Group", fill_by = "Group")
 #'
 #' @export
-plot_sample_boxplots <- function(
-    object, all_features = FALSE,
-    order_by = as.character(stats::na.omit(c(group_col(object),
-                                             time_col(object)))),
-    fill_by = as.character(stats::na.omit(c(group_col(object),
-                                            time_col(object)))),
-    title = "Boxplot of samples", subtitle = NULL,
-    fill_scale = getOption("notame.fill_scale_dis"), zoom_boxplot = TRUE,
-    assay.type = NULL) {
+plot_sample_boxplots <- function(object, all_features = FALSE, order_by, 
+                                 fill_by, title = "Boxplot of samples", 
+                                 subtitle = NULL,
+                                 fill_scale = 
+                                 getOption("notame.fill_scale_dis"), 
+                                 zoom_boxplot = TRUE,  assay.type = NULL) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = c(order_by, fill_by),
+  object <- .check_object(object, pheno_cols = c(order_by, fill_by),
                          assay.type = from)
 
   data <- combined_data(object, from)

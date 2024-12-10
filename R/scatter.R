@@ -80,6 +80,7 @@
 #' If a continuous variable is used as color, density curve will be colorless.
 #' @param text_base_size numeric, base size for text
 #' @param point_size numeric, size of the points
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional arguments passed to pcaMethods::pca
 #'
 #' @return A ggplot object. If \code{density} is \code{TRUE}, the plot will 
@@ -92,7 +93,7 @@
 #'
 #' @export
 plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE, 
-                     center = TRUE, scale = "uv", color = group_col(object),
+                     center = TRUE, scale = "uv", color = NULL,
                      shape = color, label = NULL, density = FALSE, 
                      title = "PCA", subtitle = NULL, color_scale = NA,
                      shape_scale = getOption("notame.shape_scale"), 
@@ -102,7 +103,7 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = color, pheno_factors = shape, 
+  object <- .check_object(object, pheno_cols = color, pheno_factors = shape, 
                          assay.type = from)
 
   pca_results <- .pca_helper(object, pcs, center, scale, assay.type = from, ...)
@@ -153,6 +154,7 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' If a continuous variable is used as color, density curve will be colorless.
 #' @param text_base_size numeric, base size for text
 #' @param point_size numeric, size of the points
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional arguments passed to \code{Rtsne::Rtsne}
 #'
 #' @return A ggplot object. If \code{density} is \code{TRUE}, the plot will 
@@ -166,7 +168,7 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' @export
 plot_tsne <- function(object, all_features = FALSE, center = TRUE, 
                       scale = "uv", perplexity = 30, pca_method = "nipals",
-                      color = group_col(object), shape = color, label = NULL,
+                      color = NULL, shape = color, label = NULL,
                       density = FALSE, title = "t-SNE",
                       subtitle = paste("Perplexity:", perplexity), 
                       color_scale = NA,
@@ -177,7 +179,7 @@ plot_tsne <- function(object, all_features = FALSE, center = TRUE,
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = color,
+  object <- .check_object(object, pheno_cols = color,
                          pheno_factors = shape, assay.type = from)
 
   # t-SNE
@@ -307,6 +309,7 @@ plot_tsne <- function(object, all_features = FALSE, center = TRUE,
 #' @param text_base_size numeric, base size for text
 #' @param point_size numeric, size of the points
 #' @param label_text_size numeric, size of the labels
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional arguments passed to pcaMethods::pca
 #'
 #' @return A ggplot object.
@@ -334,7 +337,7 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, assay.type = from, feature_ID = TRUE)
+  object <- .check_object(object, assay.type = from, feature_ID = TRUE)
 
   pca_res <- pcaMethods::pca(t(assay(object, from)), nPcs = max(pcs), 
                              center = center, scale = scale, ...)
@@ -384,6 +387,7 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' @param bins the number of bins in x and y axes
 #' @param title,subtitle the titles of the plot
 #' @param fill_scale the fill scale as returned by a ggplot function
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional arguments passed to pcaMethods::pca
 #'
 #' @return A ggplot object.
@@ -403,7 +407,7 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_nums = fill, assay.type = from)
+  object <- .check_object(object, pheno_nums = fill, assay.type = from)
 
   pca_results <- .pca_helper(object, pcs, center, scale, assay.type = from, ...)
   pca_scores <- pca_results$pca_scores
@@ -439,6 +443,7 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' @param bins the number of bins in x and y axes
 #' @param title,subtitle the titles of the plot
 #' @param fill_scale the fill scale as returned by a ggplot function
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional arguments passed to Rtsne::Rtsne
 #'
 #' @return
@@ -460,7 +465,7 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_nums = fill, assay.type = from)
+  object <- .check_object(object, pheno_nums = fill, assay.type = from)
   # t-SNE
   tsne_scores <- .t_sne_helper(object, center, scale,
                                perplexity, pca_method, from, ...)
@@ -532,6 +537,7 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
 #' @param color_scale the color scale as returned by a ggplot function
 #' @param text_base_size the base size of the text
 #' @param line_width the width of the arrows
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional arguments passed to pcaMethods::pca
 #'
 #' @return A ggplot object.
@@ -549,8 +555,7 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
 #' @export
 plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE, 
                             center = TRUE, scale = "uv",
-                            color = group_col(object), time = time_col(object),
-                            subject = subject_col(object), alpha = 0.6,
+                            color, time, subject, alpha = 0.6,
                             arrow_style = arrow(), title = "PCA changes",
                             subtitle = NULL, 
                             color_scale = getOption("notame.color_scale_dis"),
@@ -559,7 +564,7 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = c(color, time, subject),
+  object <- .check_object(object, pheno_cols = c(color, time, subject),
                          assay.type = from)
 
   pca_results <- .pca_helper(object, pcs, center, scale, assay.type = from, ...)
@@ -605,6 +610,7 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' @param color_scale the color scale as returned by a ggplot function
 #' @param text_base_size the base size of the text
 #' @param line_width the width of the arrows
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional arguments passed to \code{Rtsne::Rtsne}
 #'
 #' @return A ggplot object. If \code{density} is \code{TRUE}, the plot will 
@@ -623,10 +629,7 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' @export
 plot_tsne_arrows <- function(object, all_features = FALSE, center = TRUE, 
                              scale = "uv", perplexity = 30, 
-                             pca_method = "nipals",
-                             color = NULL,
-                             time = NULL, 
-                             subject = NULL,
+                             pca_method = "nipals", color, time, subject,
                              alpha = 0.6, arrow_style = arrow(), 
                              title = "t-SNE changes",
                              subtitle = paste("Perplexity:", perplexity),
@@ -636,7 +639,7 @@ plot_tsne_arrows <- function(object, all_features = FALSE, center = TRUE,
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- check_object(object, pheno_cols = c(color, time, subject),
+  object <- .check_object(object, pheno_cols = c(color, time, subject),
                          assay.type = from)
 
   tsne_scores <- .t_sne_helper(object, center, scale, 
@@ -1105,7 +1108,8 @@ setMethod("mz_rt_plot", c(object = "data.frame"),
                    title, subtitle, color_scale)
   }
 )
-
+#' @rdname mz_rt_plot
+#' @export
 setMethod("mz_rt_plot", c(object = "SummarizedExperiment"),
   function(object, p_col = NULL, p_limit = NULL, mz_col = NULL, rt_col = NULL,
            color = NULL, title = "m/z vs retention time", subtitle = NULL,
