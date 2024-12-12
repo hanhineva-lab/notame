@@ -16,11 +16,12 @@ plot_pca_loadings(
   text_base_size = 14,
   point_size = 2,
   label_text_size = 4,
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{pcs}{numeric vector of length 2, the principal components to plot}
 
@@ -43,6 +44,8 @@ for each principal component}
 \item{point_size}{numeric, size of the points}
 
 \item{label_text_size}{numeric, size of the labels}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{...}{additional arguments passed to pcaMethods::pca}
 }

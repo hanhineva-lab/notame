@@ -508,8 +508,14 @@ perform_correlation_tests <- function(object, x, y = x, id = NULL,
     from2 <- .get_from_name(object2, assay.type2)
     object2 <- .check_object(object2, pheno_factors = id, assay.type = from2)
     data2 <- combined_data(object2, from2)
+    log_text("Performing correlation tests for two objects")
   } else {
-    data2 <- data1
+    if (!is.null(assay.type2)) {
+      stop("When using a single object, assay.type2 is not considered.")
+    } else {
+      data2 <- data1
+      log_text("Performing correlation tests for single object")
+    }
   }
 
   # Checks for repeated measures correlation

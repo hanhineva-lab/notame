@@ -17,13 +17,15 @@ correct_drift(
   width = 16,
   height = 8,
   color = "QC",
-  shape = NULL,
+  shape = color,
   color_scale = getOption("notame.color_scale_dis"),
-  shape_scale = scale_shape_manual(values = c(15, 16))
+  shape_scale = scale_shape_manual(values = c(15, 16)),
+  assay.type = NULL,
+  name = NULL
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{log_transform}{logical, should drift correction be done on 
 log-transformed values? See Details}
@@ -51,10 +53,14 @@ works adequately, see Details}
 
 \item{color_scale, shape_scale}{the color and shape scales as returned by a 
 ggplot function}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
+
+\item{name}{character, name of the resultant assay in case of multiple assays}
 }
 \value{
-A MetaboSet object as the one supplied, with drift corrected 
-features.
+A SummarizedExperiment or MetaboSet object as the one supplied, with 
+drift corrected features.
 }
 \description{
 A wrapper function for applying cubic spline drift correction and saving

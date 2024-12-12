@@ -4,16 +4,24 @@
 \alias{plot_quality}
 \title{Plot quality metrics}
 \usage{
-plot_quality(object, all_features = FALSE, plot_flags = TRUE)
+plot_quality(
+  object,
+  all_features = FALSE,
+  plot_flags = TRUE,
+  assay.type = NULL
+)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{all_features}{logical, should all features be used? If FALSE (the 
 default), flagged features are removed before visualization.}
 
 \item{plot_flags}{logical, should the distribution of flags be added as a 
 barplot?}
+
+\item{assay.type}{character, assay to be used in case of multiple assays and 
+no quality metrics are present in feature data}
 }
 \value{
 A ggplot object.

@@ -14,6 +14,7 @@ mixomics_plsda(
   plot_scores = TRUE,
   all_features = FALSE,
   covariates = NULL,
+  assay.type = NULL,
   ...
 )
 
@@ -26,6 +27,7 @@ mixomics_plsda_optimize(
   plot_scores = TRUE,
   all_features = FALSE,
   covariates = NULL,
+  assay.type = NULL,
   ...
 )
 
@@ -40,11 +42,12 @@ mixomics_splsda_optimize(
   plot_scores = TRUE,
   all_features = FALSE,
   covariates = NULL,
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{y}{character, column name of the grouping variable to predict}
 
@@ -57,9 +60,10 @@ ellipses}
 \item{all_features}{logical, should all features be included in the model? 
 if FALSE, flagged features are left out}
 
-\item{covariates}{character, column names of pData to use as covariates in 
-the model, in addition to
-molecular features}
+\item{covariates}{character, column names of pheno data to use as covariates 
+in the model, in addition to molecular features}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{...}{any parameters passed to \code{mixOmics::plsda}}
 

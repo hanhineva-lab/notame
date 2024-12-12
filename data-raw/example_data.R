@@ -14,6 +14,7 @@ for (mode in modes) {
     Average_Rt_min = stats::runif(n_features, 0.5, 8),
     Column = strsplit(mode, "_")[[1]][1], 
     Ion_mode = strsplit(mode, "_")[[1]][2],
+    Flag = NA_character_,
     stringsAsFactors = FALSE)
   
   # Create Feature ID
@@ -48,10 +49,11 @@ HILIC_neg_Datafile <- paste0("HILIC_neg_", seq_len(n_samples))
 HILIC_pos_Datafile <- paste0("HILIC_pos_", seq_len(n_samples))
 RP_neg_Datafile <- paste0("RP_neg_", seq_len(n_samples))
 RP_pos_Datafile <- paste0("RP_pos_", seq_len(n_samples))
-pheno_data <- data.frame(Injection_order = seq_len(n_samples),
-                         Sample_ID = paste0("Demo_", seq_len(n_samples)),
+pheno_data <- data.frame(Sample_ID = paste0("Demo_", seq_len(n_samples)),
+                         Injection_order = seq_len(n_samples),
                          Subject_ID = subject_ids, Group = factor(group), 
-                         QC = factor(qc), Time = factor(time), Batch = batch,
+                         QC = factor(qc), Time = factor(time), 
+                         Batch = factor(batch),
                          HILIC_neg_Datafile, HILIC_pos_Datafile,
                          RP_neg_Datafile, RP_pos_Datafile)
 
@@ -131,7 +133,7 @@ assay_data <- cbind(assay_data_b1, assay_data_b2)
 assay_data <- abs(assay_data)
 
 # Set random indexes to zero (for missing values)
-n_missing <- 500
+n_missing <- 300
 row_zeros <- sample(seq_len(nrow(assay_data)), n_missing, replace = TRUE)
 col_zeros <- sample(seq_len(ncol(assay_data)), n_missing, replace = TRUE)
 for (i in seq_len(n_missing)) {

@@ -95,7 +95,7 @@ clustering, since \code{hclust} can't deal with missing values.
 \examples{
 # Compute correlations between variables
 correlations <- perform_correlation_tests(example_set,
-  x = featureNames(example_set),
+  x = rownames(example_set),
   duplicates = TRUE
 )
 

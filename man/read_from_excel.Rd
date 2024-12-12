@@ -51,8 +51,7 @@ in between these}
 \item{skip_checks}{logical: skip checking data integrity. Not recommended, 
 but sometimes useful when you just want to read the data in as is and fix 
 errors later. NOTE: Sample_ID and QC columns will not be constructed.
-The data integrity checks need to be passed when contstructing MetaboSet 
-objects.}
+The data integrity checks are important for functioning of notame.}
 }
 \value{
 A list of three data frames:

@@ -4,19 +4,24 @@
 \alias{mark_nas}
 \title{Mark specified values as missing}
 \usage{
-mark_nas(object, value)
+mark_nas(object, value, assay.type = NULL, name = NULL)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{value}{the value to be converted to NA}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
+
+\item{name}{character, name of the resultant assay in case of multiple assays}
 }
 \value{
-MetaboSet object as the one supplied, with missing values correctly 
-set to NA.
+SummarizedExperiment or MetaboSet object as the one supplied, with 
+missing values correctly set to NA.
 }
 \description{
-Replaces all values in the exprs part that equal the specified value with NA.
+Replaces all values in the peak table that equal the specified value 
+with NA.
 For example, vendor software might use 0 or 1 to signal a missing value,
 which is not understood by R.
 }

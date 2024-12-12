@@ -204,3 +204,32 @@ test_that("PQN normalization works with flagged features", {
   pqn_mset <- pqn_normalization(flagged_mset)
   expect_equal(pqn_data, assay(pqn_mset))
 })
+
+test_that("Assay control works for transformations (with drift correction)", {
+  ex_set <- example_set[1:10, ]
+  # New assays can be added to objects with one assay
+  corrected <- correct_drift(ex_set, name = "corrected")
+  # Assay not found with a single unnamed assay
+  expect_error(correct_drift(ex_set, assay.type = "original"))
+  # From and to can't have identical names
+  names(assays(ex_set)) <- "original"
+  expect_error(correct_drift(ex_set, 
+    assay.type = "original", name = "original"))
+  # Assay not found with multiple assays
+  assay(ex_set, "alternative") <- assay(ex_set)
+  expect_error(correct_drift(ex_set, 
+    assay.type = "nope", name = "corrected"))
+  # Only one name can be supplied to assay.type
+  expect_error(correct_drift(ex_set,
+    assay.type = c("original", "lel"), name = "corrected"))
+  # Only one name can be supplied to transformed assay
+  expect_error(correct_drift(ex_set,
+    assay.type = "original", name = c("A", "B")))
+  # MetaboSet works
+  ms_set <- as(ex_set, "MetaboSet")
+  ms_corrected <- correct_drift(ms_set)
+  # assay.type throws error with MetaboSet
+  expect_error(correct_drift(ms_set, assay.type = "nope", name = "corrected"))
+  # # name throws error with MetaboSet
+  # expect_error(correct_drift(ms_set, assay.type = "nope", name = "corrected"))
+})

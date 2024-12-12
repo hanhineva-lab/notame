@@ -7,18 +7,19 @@
 plot_dendrogram(
   object,
   all_features = FALSE,
-  color = group_col(object),
+  color,
   dist_method = "euclidean",
   clust_method = "ward.D2",
   center = TRUE,
   scale = "uv",
   title = "Dendrogram of hierarchical clustering",
   subtitle = NULL,
-  color_scale = getOption("notame.color_scale_dis")
+  color_scale = getOption("notame.color_scale_dis"),
+  assay.type = NULL
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{all_features}{logical, should all features be used? If FALSE (the 
 default), flagged features are removed before visualization.}
@@ -40,6 +41,8 @@ for unit variance}
 \item{subtitle}{The plot subtitle}
 
 \item{color_scale}{the color scale as returned by a ggplot function.}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
 A ggplot object.
@@ -49,7 +52,7 @@ Draws a dendrogram of a hierarchical clustering applied to the samples of an
 experiment.
 }
 \examples{
-plot_dendrogram(example_set)
+plot_dendrogram(example_set, color = "Group")
 
 }
 \seealso{

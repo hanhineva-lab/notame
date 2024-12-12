@@ -10,7 +10,7 @@ plot_pca(
   all_features = FALSE,
   center = TRUE,
   scale = "uv",
-  color = group_col(object),
+  color = NULL,
   shape = color,
   label = NULL,
   density = FALSE,
@@ -21,11 +21,12 @@ plot_pca(
   fill_scale = getOption("notame.fill_scale_dis"),
   text_base_size = 14,
   point_size = 2,
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{pcs}{numeric vector of length 2, the principal components to plot}
 
@@ -63,6 +64,8 @@ If a continuous variable is used as color, density curve will be colorless.}
 \item{text_base_size}{numeric, base size for text}
 
 \item{point_size}{numeric, size of the points}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{...}{additional arguments passed to pcaMethods::pca}
 }

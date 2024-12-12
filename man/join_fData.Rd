@@ -21,11 +21,12 @@ This function is usually used internally by some of the functions in the
 package, but can be useful.
 }
 \examples{
+ex_set <- as(example_set, "MetaboSet")
 new_info <- data.frame(
-  Feature_ID = featureNames(example_set),
-  Feature_number = seq_len(nrow(example_set))
+  Feature_ID = featureNames(ex_set),
+  Feature_number = seq_len(nrow(ex_set))
 )
-with_new_info <- join_fData(example_set, new_info)
+with_new_info <- join_fData(ex_set, new_info)
 colnames(fData(with_new_info))
 
 }

@@ -10,11 +10,12 @@ perform_t_test(
   is_paired = FALSE,
   id = NULL,
   all_features = FALSE,
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{formula_char}{character, the formula to be used in the linear model 
 (see Details)}
@@ -25,6 +26,8 @@ perform_t_test(
 version}
 
 \item{all_features}{should all features be included in FDR correction?}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{...}{other parameters passed to stats::t.test}
 }

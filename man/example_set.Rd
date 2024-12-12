@@ -9,15 +9,15 @@
 \alias{rp_pos_sample}
 \title{Toy data set}
 \format{
-An object of class \code{MetaboSet} with 80 rows and 50 columns.
+An object of class \code{SummarizedExperiment} with 80 rows and 50 columns.
 
-An object of class \code{MetaboSet} with 20 rows and 50 columns.
+An object of class \code{SummarizedExperiment} with 20 rows and 50 columns.
 
-An object of class \code{MetaboSet} with 20 rows and 50 columns.
+An object of class \code{SummarizedExperiment} with 20 rows and 50 columns.
 
-An object of class \code{MetaboSet} with 20 rows and 50 columns.
+An object of class \code{SummarizedExperiment} with 20 rows and 50 columns.
 
-An object of class \code{MetaboSet} with 20 rows and 50 columns.
+An object of class \code{SummarizedExperiment} with 20 rows and 50 columns.
 }
 \usage{
 example_set

@@ -1102,13 +1102,13 @@ setAs("MetaboSet", "SummarizedExperiment", function(from) {
 # data. Also converts a MetaboSet object to a SummarizedExperiment 
 # object until for conciseness, until MetaboSet is deprecated.
 .check_object <- function(object, pheno_injection = FALSE, pheno_ID = FALSE, 
-                         pheno_QC = FALSE, pheno_factors = NULL,
-                         pheno_nums = NULL, pheno_chars = NULL,
-                         pheno_cols = NULL, assay.type = NULL,
-                         feature_ID = FALSE, check_limits = FALSE, 
-                         feature_split = FALSE, feature_flag = FALSE,
-                         feature_cols = NULL, mz_limits = c(10, 2000), 
-                         rt_limits = c(0, 20)) {
+                          pheno_QC = FALSE, pheno_factors = NULL,
+                          pheno_nums = NULL, pheno_chars = NULL,
+                          pheno_cols = NULL, assay.type = NULL,
+                          feature_ID = FALSE, check_limits = FALSE, 
+                          feature_split = FALSE, feature_flag = FALSE,
+                          feature_cols = NULL, mz_limits = c(10, 2000), 
+                          rt_limits = c(0, 20)) {
                       
   if (is(object, "MetaboSet")) {
     attr(object, "original_class") <- "MetaboSet"
@@ -1177,7 +1177,7 @@ setAs("MetaboSet", "SummarizedExperiment", function(from) {
 #' @examples
 #' ex_set <- example_set
 #' rowData(ex_set)$Flag <- NULL
-# 'Flag' column is created in feature data and pheno data columns are reordered
+# 'Flag' column is created in feature data
 #' fixed <- fix_object(ex_set)
 #' 
 #' @export
@@ -1260,7 +1260,7 @@ fix_object <- function(object, id_prefix = "ID_", id_column = NULL,
     x <- as.data.frame(dplyr::select(x, "Sample_ID", dplyr::everything()))
     rownames(x) <- x$Sample_ID
     
-    if (!identical(as.data.frame(pre_clean), x)) {
+    if (!isTRUE(all.equal(as.data.frame(pre_clean), x))) {
       log_text("Pheno data was cleaned")
     }
   }
@@ -1312,11 +1312,14 @@ fix_object <- function(object, id_prefix = "ID_", id_column = NULL,
         tidyr::unite("Split", split_by, remove = FALSE)
     }
   }
-  # Create feature ID if necessary
-  if (!"Feature_ID" %in% colnames(feature_data)) {
-    log_text("Feature_ID column not found, creating feature IDs")
-    feature_data <- .name_features(feature_data = feature_data)
-  }
+  # Create Feature ID if necessary
+  feature_data <-
+    tryCatch({
+      .check_feature_data(feature_data, feature_ID = TRUE)
+      feature_data
+    }, error = function(e) {
+    .name_features(feature_data = feature_data)
+  })
   
   if (clean) {
     # Reorganise columns and change classes
@@ -1331,7 +1334,7 @@ fix_object <- function(object, id_prefix = "ID_", id_column = NULL,
       # Remove duplicate underscores
       gsub("_{2,}", "_", .)
     rownames(feature_data) <- feature_data$Feature_ID
-    if (!identical(as.data.frame(pre_clean), feature_data)) {
+    if (!isTRUE(all.equal(as.data.frame(pre_clean), feature_data))) {
       log_text("Feature data was cleaned")
     }
   }

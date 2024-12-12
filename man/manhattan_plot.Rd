@@ -4,6 +4,7 @@
 \alias{manhattan_plot}
 \alias{manhattan_plot,MetaboSet-method}
 \alias{manhattan_plot,data.frame-method}
+\alias{manhattan_plot,SummarizedExperiment-method}
 \title{Manhattan plot}
 \usage{
 manhattan_plot(
@@ -56,10 +57,28 @@ manhattan_plot(
   subtitle = NULL,
   ...
 )
+
+\S4method{manhattan_plot}{SummarizedExperiment}(
+  object,
+  x,
+  p,
+  effect = NULL,
+  p_fdr = NULL,
+  color = NULL,
+  p_breaks = c(0.05, 0.01, 0.001, 1e-04),
+  fdr_limit = 0.05,
+  x_lim = NULL,
+  y_lim = NULL,
+  color_scale = getOption("notame.color_scale_con"),
+  title = "Manhattan plot",
+  subtitle = NULL,
+  ...
+)
 }
 \arguments{
-\item{object}{a MetaboSet object or a data frame. If x is a MetaboSet 
-object, fData(x) is used. If x is a data frame, it is used as is.}
+\item{object}{a SummarizedExperiment object or a data frame. If x is a 
+SummarizedExperiment object, feature data of x is used. If x is a data 
+frame, it is used as is.}
 
 \item{x, p}{the column names of x-axis and p-values}
 
@@ -100,17 +119,17 @@ line. This results in a so-called directed Manhattan plot.
 # naturally, this looks messy as there are not enough p-values
 lm_results <- perform_lm(drop_qcs(example_set), 
   formula_char = "Feature ~ Group")
-lm_data <- dplyr::left_join(fData(example_set), lm_results)
+lm_data <- dplyr::left_join(as.data.frame(rowData(example_set)), lm_results)
 # Traditional Manhattan plot from data frame
 manhattan_plot(lm_data,
-  x = "Mass",
+  x = "Average_Mz",
   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
   fdr_limit = 0.1
 )
-# Directed Manhattan plot from MetaboSet
-with_results <- join_fData(example_set, lm_results)
+# Directed Manhattan plot from SummarizedExperiment
+with_results <- join_rowData(example_set, lm_results)
 manhattan_plot(with_results,
-  x = "Mass", effect = "GroupB_Estimate",
+  x = "Average_Mz", effect = "GroupB_Estimate",
   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
   fdr_limit = 0.1
 )

@@ -18,7 +18,7 @@ test_that("Column conversion works", {
   expect_equal(converted_classes, expected_classes)
 })
 
-test_that("pheno data fixing works", {
+test_that("Pheno data fixing works", {
   # Check if conversion to numeric works
   df <- data.frame(Injection_order = c(1:2, "3", 4:9))
   expect_warning(
@@ -68,6 +68,23 @@ test_that("Pheno data checking works", {
                "'Injection_order' is not numeric")
 })
 
+test_that("Creating Feature_ID works", {
+  # Automatic naming of features works
+  df <- data.frame(Feature_ID = 1:5)
+  mode <- "HILIC_pos"
+  expect_error(.fix_feature_data(feature_data = df, name = mode),
+               "No mass to charge ratio column found - should match ...")
+  mz <- as.numeric(seq_len(nrow(df)))
+  df$Average_Mz <- mz
+  expect_error(.fix_feature_data(feature_data = df, name = mode),
+               "No retention time column found - should match ...")
+  rt <- seq_len(nrow(df))   
+  df$Average_Rt_min <- rt
+  df <- .fix_feature_data(feature_data = df, name = mode)
+  
+  expect_equal(df$Feature_ID,  paste0(mode, "_", mz, "a", rt))
+})
+
 test_that("Feature data checking works", {
   df <- data.frame(Feature_ID = 1:5)
   expect_error(.check_feature_data(df, feature_ID = TRUE),
@@ -82,7 +99,6 @@ test_that("Feature data checking works", {
   expect_error(.check_feature_data(df, feature_ID = TRUE),
                "Missing values in Feature IDs")
 })
-
 
 test_that("Easy example data is read correctly", {
   # Pheno data
@@ -146,8 +162,6 @@ test_that("Data is split correctly", {
   pd$QC[qc_idx] <- "QC"
   pd$QC <- factor(pd$QC)
 
-
-
   # Feature data
   fd <- data.frame(
     Feature_ID = "",
@@ -200,6 +214,24 @@ test_that("Splitting data works as expected", {
     corner_column = "X",
     split_by = split_by
   ))
+  
+  # Check that colData is intact
+  se <- example_set
+  se <- fix_object(se)  
+  se_modes <- fix_object(se, split_data = TRUE)
+  expect_true(all(unlist(lapply(se_modes, function(se_mode) {
+    identical(colData(se_mode), colData(se))
+  }))))
+  
+  # All returned objects should be MetaboSet objects
+  ms <- as(example_set, "MetaboSet")
+  ms_modes <- fix_object(ms, split_data = TRUE)
+  expect_true(
+    all(unlist(lapply(ms_modes, function(se_mode) is(se_mode, "MetaboSet")))))
+
+  # Splitting into modes shouldn't work without "Split" column
+  fData(ms)$Split <- NULL
+  expect_error(fix_object(ms, split_data = TRUE))
 })
 
 test_that("Creating dummy injection order works as expected", {
@@ -220,6 +252,11 @@ test_that("Creating dummy injection order works as expected", {
   sampleNames(modes$rp_pos)[22] <- "ID_999"
 
   expect_warning(merged <- merge_metabosets(modes),
+    regexp = "Sample IDs are not identical|Unequal amount of samples"
+  )
+  
+  se_modes <- lapply(modes, function(mode) as(mode, "SummarizedExperiment"))
+  expect_warning(merged <- merge_objects(se_modes),
     regexp = "Sample IDs are not identical|Unequal amount of samples"
   )
   # Dummy injection

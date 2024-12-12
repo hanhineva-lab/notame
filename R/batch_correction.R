@@ -381,9 +381,10 @@ normalize_batches <- function(object, batch, group, ref_label,
 #' @param color_scale,shape_scale scales for color and scale as returned by 
 #' ggplot functions.
 #' @param assay.type1 character, assay of orig to be used in case of 
-#' multiple assays
+#' multiple assays.
 #' @param assay.type2 character, assay of corrected to be used in case of
-#' multiple assays
+#' multiple assays. If corrected is not supplied, this argument selects
+#' another assay from orig.
 #' @return None, the function is invoked for its plot-saving side effect.
 #'
 #' @examples
@@ -399,21 +400,32 @@ normalize_batches <- function(object, batch, group, ref_label,
 #' )
 #' \dontshow{setwd(.old_wd)}
 #' @export
-save_batch_plots <- function(orig, corrected, file, width = 14, height = 10,
-                             batch = "Batch", color = "Batch", shape = "QC",
+save_batch_plots <- function(orig, corrected, file, width = 14, 
+                             height = 10, batch = "Batch", color = "Batch", 
+                             shape = "QC",
                              color_scale = getOption("notame.color_scale_dis"),
                              shape_scale = 
                              scale_shape_manual(values = c(15, 21)),
                              assay.type1 = NULL, assay.type2 = NULL) {
-  from1 <- .get_from_name(orig, assay.type1)
-  from2 <- .get_from_name(orig, assay.type2)
-  orig <- .check_object(orig, pheno_factors = c(batch, shape),
-                       pheno_cols = color, assay.type = from1)
-  corrected <- .check_object(corrected, pheno_factors = c(batch, shape),
-                            pheno_cols = color, assay.type = from2)
+                               
+  if (missing(corrected) && is(orig, "SummarizedExperiment")) {
+    from1 <- .get_from_name(orig, assay.type1)
+    from2 <- .get_from_name(orig, assay.type2)
+    orig <- .check_object(orig, pheno_factors = c(batch, shape),
+                          pheno_cols = color)
+    data_orig <- combined_data(orig, from1)
+    data_corr <-  combined_data(orig, from2)
+  } else {
+    from1 <- .get_from_name(orig, assay.type1)
+    from2 <- .get_from_name(corrected, assay.type2)
+    orig <- .check_object(orig, pheno_factors = c(batch, shape),
+                          pheno_cols = color)
+    corrected <- .check_object(corrected, pheno_factors = c(batch, shape),
+                               pheno_cols = color)
+    data_orig <- combined_data(orig, from1)
+    data_corr <- combined_data(corrected, from2)
+  }
   
-  data_orig <- combined_data(orig, from1)
-  data_corr <- combined_data(corrected, from2)
   # Prepare data.frame for batch means with batch and injection order range
   batch_injections <- data_orig %>%
     dplyr::group_by(!!dplyr::sym(batch)) %>%

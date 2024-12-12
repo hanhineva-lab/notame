@@ -10,11 +10,12 @@ perform_non_parametric(
   is_paired = FALSE,
   id = NULL,
   all_features = FALSE,
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{formula_char}{character, the formula to be used in the tests}
 
@@ -24,6 +25,8 @@ perform_non_parametric(
 version}
 
 \item{all_features}{should all features be included in FDR correction?}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{...}{other parameters passed to test stats::wilcox.test}
 }
@@ -37,7 +40,7 @@ Whitney U test, use \code{is_paired} for Wilcoxon signed rank tests.
 \details{
 P-values of each comparison are corrected separately from each 
 other. The model is fit on combined_data(object). Thus, column names
-in pData(object) can be specified. To make the formulas flexible, the word 
+in pheno data can be specified. To make the formulas flexible, the word 
 "Feature" must be used to signal the role of the features in the formula. 
 "Feature" will be replaced by the actual features during model fitting. 
 For example, if testing for equality of means in study groups, use 
@@ -55,7 +58,7 @@ wilcoxon_signed_results <- perform_non_parametric(example_set,
   id = "Subject_ID")
 # Only two groups
 mann_whitney_results <- perform_non_parametric(drop_qcs(example_set), 
-  formula_char = "Feature ~ Group", is_paired = FALSE)
+  formula_char = "Feature ~ Group")
 
 }
 \seealso{

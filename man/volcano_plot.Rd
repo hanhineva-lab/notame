@@ -4,6 +4,7 @@
 \alias{volcano_plot}
 \alias{volcano_plot,MetaboSet-method}
 \alias{volcano_plot,data.frame-method}
+\alias{volcano_plot,SummarizedExperiment-method}
 \title{Volcano plot}
 \usage{
 volcano_plot(
@@ -68,10 +69,32 @@ volcano_plot(
   label_text_size = 4,
   ...
 )
+
+\S4method{volcano_plot}{SummarizedExperiment}(
+  object,
+  x,
+  p,
+  p_fdr = NULL,
+  color = NULL,
+  p_breaks = c(0.05, 0.01, 0.001, 1e-04),
+  fdr_limit = 0.05,
+  log2_x = FALSE,
+  center_x_axis = TRUE,
+  x_lim = NULL,
+  label = NULL,
+  label_limit = 0.05,
+  color_scale = getOption("notame.color_scale_con"),
+  title = "Volcano plot",
+  subtitle = NULL,
+  text_base_size = 14,
+  label_text_size = 4,
+  ...
+)
 }
 \arguments{
-\item{object}{a MetaboSet object or a data frame. If x is a MetaboSet 
-object, fData(x) is used. If x is a data frame, it is used as is.}
+\item{object}{a SummarizedExperiment object or a data frame. If x is a 
+SummarizedExperiment object, feature data of x is used. If x is a data 
+frame, it is used as is.}
 
 \item{x, p}{the column names of effect size (x-axis) and p-values}
 

@@ -7,7 +7,7 @@
 quality(object)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 }
 \value{
 A data frame with quality metrics for each feature.
@@ -16,7 +16,7 @@ A data frame with quality metrics for each feature.
 Extract quality information of features
 }
 \examples{
-example_set <- assess_quality(example_set)
-quality(example_set)
+ex_set <- assess_quality(example_set)
+quality(ex_set)
 
 }

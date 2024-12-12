@@ -5,17 +5,19 @@
 \title{Flag low-quality features}
 \usage{
 flag_quality
-flag_quality(object, condition =
+flag_quality(object, assay.type = NULL, condition =
   "(RSD_r < 0.2 & D_ratio_r < 0.4) | 
   (RSD < 0.1 & RSD_r < 0.1 & D_ratio < 0.1)")
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{condition}{character, condition for keeping the features, see Details}
 }
 \value{
-a MetaboSet object with the features flagged.
+a SummarizedExperiment or MetaboSet object with the features flagged.
 }
 \description{
 Flags low-quality features using the quality metrics defined in (Broadhurst 
@@ -46,11 +48,11 @@ conditions:
 }
 \examples{
 ex_set <- flag_quality(example_set)
-fData(ex_set)
+rowData(ex_set)
 # Custom condition
 ex_set <- flag_quality(example_set, 
   condition = "RSD_r < 0.3 & D_ratio_r < 0.6")
-fData(ex_set)
+rowData(ex_set)
 
 }
 \references{

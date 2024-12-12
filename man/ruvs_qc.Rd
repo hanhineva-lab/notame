@@ -4,22 +4,26 @@
 \alias{ruvs_qc}
 \title{Remove Unwanted Variation (RUV) between batches}
 \usage{
-ruvs_qc(object, batch, replicates, k = 3, ...)
+ruvs_qc(object, replicates, k = 3, assay.type = NULL, name = NULL, ...)
 }
 \arguments{
-\item{object}{a MetaboSet object}
-
-\item{batch}{the column name for batch labels}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{replicates}{list of numeric vectors, indexes of replicates}
 
 \item{k}{The number of factors of unwanted variation to be estimated from 
 the data.}
 
-\item{...}{other parameters passed to RUVSeq::RUVs}
+\item{assay.type}{character, assay to be used in case of multiple assays}
+
+\item{name}{character, name of the resultant assay in case of multiple assays}
+
+\item{...}{other parameters passed to RUVSeq::RUVs
+assay.type \code{Character scalar}. Specifies which assay to use for 
+NMF ordination.}
 }
 \value{
-A MetaboSet object with the normalized data.
+A SummarizedExperiment or Metaboset object with the normalized data.
 }
 \description{
 An interface for the RUVs method in RUVSeq package.
@@ -27,10 +31,10 @@ An interface for the RUVs method in RUVSeq package.
 \examples{
 # Batch correction
 replicates <- list(which(example_set$QC == "QC"))
-batch_corrected <- ruvs_qc(example_set, 
-  batch = "Batch", replicates = replicates)
+ex_set <- ruvs_qc(example_set, replicates = replicates, name = "bcorrected")
+batch_corrected <- ruvs_qc(example_set, replicates = replicates)
 # Evaluate batch correction
 pca_bhattacharyya_dist(example_set, batch = "Batch")
-pca_bhattacharyya_dist(example_set, batch = "Batch")
+pca_bhattacharyya_dist(batch_corrected, batch = "Batch")
 
 }

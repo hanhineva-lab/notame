@@ -18,11 +18,12 @@ A MetaboSet object with the new information added to pData(object).
 Join a new data frame of information to pheno data of a MetaboSet object.
 }
 \examples{
+ex_set <- as(example_set, "MetaboSet")
 new_info <- data.frame(
-  Sample_ID = sampleNames(example_set),
-  BMI = stats::runif(ncol(example_set), 22, 26)
+  Sample_ID = sampleNames(ex_set),
+  BMI = stats::runif(ncol(ex_set), 22, 26)
 )
-with_new_info <- join_pData(example_set, new_info)
+with_new_info <- join_pData(ex_set, new_info)
 colnames(pData(with_new_info))
 
 }

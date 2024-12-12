@@ -96,3 +96,42 @@ test_that("Group lineplot naming works", {
   test_plot_saving_helper(save_group_lineplots, title = "Feature_ID",
                           func_args = c(x = "Time", group = "Group"))
 })
+
+test_that("Batch plots work with and without multiple assays", {
+  path <- paste0(tempdir(), "\\test\\batch_plots.pdf")
+  ex_set <- example_set
+  names(assays(ex_set)) <- c("original")
+
+  replicates <- list(which(ex_set$QC == "QC"))
+  batch_corrected <- normalize_batches(ex_set, 
+    batch = "Batch", group = "QC", ref_label = "QC", name = "bcorrected")
+  # Assay not found with one object with a single assay
+  expect_error(save_batch_plots(
+    orig = ex_set[1:10], file = path, assay.type1 = c("original"),
+    assay.type2 = "asjf"))
+  
+  # Don't require assay.type if object has only one assay for consistence
+  save_batch_plots(
+    orig = ex_set[1, ], batch_corrected, file = path, 
+    assay.type2 = "bcorrected")
+  
+  # Assay not found with two objects, assay.type must be character
+  ex_set <- normalize_batches(ex_set, 
+    batch = "Batch", group = "QC", ref_label = "QC", name = "bcorrected")
+  expect_error(save_batch_plots(
+    orig = ex_set[1:10], corrected = batch_corrected[1:10],
+    file = path, assay.type1 = 1))
+      
+  # MetaboSet works
+  ms_set <- as(ex_set, "MetaboSet")
+  ms_batch_corrected <- as(batch_corrected, "MetaboSet")
+  save_batch_plots(
+    orig = ms_set[1:10], corrected = ms_batch_corrected[1:10],
+    file = path)
+
+  # assay.type throws error with MetaboSet
+  expect_error(save_batch_plots(
+    orig = ms_set[1:10], corrected = ms_batch_corrected[1:10],
+    file = path, assay.type1 = "nope"))
+})
+

@@ -3,14 +3,20 @@
 \name{flag}
 \alias{flag}
 \alias{flag<-}
+\alias{flag,SummarizedExperiment-method}
+\alias{flag<-,SummarizedExperiment-method}
 \title{Get and set the values in the flag column}
 \usage{
 flag(object)
 
 flag(object) <- value
+
+\S4method{flag}{SummarizedExperiment}(object)
+
+\S4method{flag}{SummarizedExperiment}(object) <- value
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{value}{character vector, values for flag column}
 }
@@ -23,7 +29,7 @@ For the endomorphism, an object with a modified flag column.
 Get and set the values in the flag column
 }
 \examples{
-# Get values in flag column of fData
+# Get values in flag column of rowData
 flag(example_set)
 
 # Flag a suspicious feature manually

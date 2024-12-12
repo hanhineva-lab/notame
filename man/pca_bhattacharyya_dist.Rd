@@ -11,13 +11,14 @@ pca_bhattacharyya_dist(
   center = TRUE,
   scale = "uv",
   nPcs = 3,
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
-\item{batch}{column name of pData giving the batch labels}
+\item{batch}{column name of pheno data giving the batch labels}
 
 \item{all_features}{logical, should all features be used? If FALSE
 (the default), flagged features are removed before imputation.}
@@ -29,6 +30,8 @@ pca_bhattacharyya_dist(
 variance}
 
 \item{nPcs}{the number of principal components to use}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{...}{other parameters to pcaMethods::pca}
 }
@@ -42,8 +45,7 @@ projecting the samples into PCA space with pcaMethods::pca.
 \examples{
 # Batch correction
 replicates <- list(which(example_set$QC == "QC"))
-batch_corrected <- ruvs_qc(example_set, 
-  batch = "Batch", replicates = replicates)
+batch_corrected <- ruvs_qc(example_set, replicates = replicates)
 # Evaluate batch correction
 pca_bhattacharyya_dist(example_set, batch = "Batch")
 pca_bhattacharyya_dist(batch_corrected, batch = "Batch")

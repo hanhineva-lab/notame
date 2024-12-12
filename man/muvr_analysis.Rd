@@ -18,25 +18,27 @@ muvr_analysis(
   nInner = nOuter - 1,
   varRatio = 0.75,
   method = c("PLS", "RF"),
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
-\item{y}{character, column name in pData of the target variable to predict}
+\item{y}{character, column name in pheno data of the target variable}
 
-\item{id}{character, column name in pData of the subject ID variable in case 
-of repeated measurements}
+\item{id}{character, column name in pheno data of the subject ID variable in 
+case of repeated measurements}
 
 \item{multi_level}{logical, whether multi-level modeling should be applied, 
 see Details}
 
-\item{multi_level_var}{character, column name in pData of the variable for 
-splitting the data in multi-level modeling}
+\item{multi_level_var}{character, column name in pheno data of the variable 
+for splitting the data in multi-level modeling}
 
-\item{covariates, static_covariates}{character, column names of pData to use 
-as covariates in the model, in addition to molecular features. 
+\item{covariates, static_covariates}{character, column names of 
+pheno data to use as covariates in the model, in addition to molecular 
+features. 
 \code{static_covariates} are ignored for non-multi-level models.
 For multi-level models, the change in \code{covariates} is computed, while
 \code{static_covariates} are taken from the first time point.}
@@ -54,6 +56,8 @@ if FALSE, flagged features are left out}
 iteration, parameter of MUVR}
 
 \item{method}{Multivariate method. Supports 'PLS', 'RF' and 'EN'}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{...}{other parameters to MUVR2::MUVR2 or MUVR2::MUVR2_EN 
 and MUVR2::getVar (when method == "EN")}
@@ -102,9 +106,9 @@ rf_model_ <- muvr_analysis(drop_qcs(example_set),
 
 # EN on multilevel variable with covariate and static covariate
 ex_set <- drop_qcs(example_set)
-example_set$Injection_order \%<>\% as.numeric()
-example_set$Group \%<>\% as.numeric()
-en_model <- muvr_analysis(drop_qcs(example_set), id = "Subject_ID", 
+ex_set$Injection_order \%<>\% as.numeric()
+ex_set$Group \%<>\% as.numeric()
+en_model <- muvr_analysis(ex_set, id = "Subject_ID", 
  multi_level = TRUE, multi_level_var = "Time", 
  covariates = "Injection_order", static_covariates = "Group", 
  method = "EN", nRep = 2)

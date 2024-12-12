@@ -4,14 +4,15 @@
 \alias{summary_statistics}
 \title{Summary statistics}
 \usage{
-summary_statistics(object, grouping_cols = NA)
+summary_statistics(object, grouping_cols = NULL, assay.type = NULL)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{grouping_cols}{character vector, the columns by which grouping should 
-be done. Use \code{NA}
-to compute statistics without grouping.}
+be done. Use \code{NA} to compute statistics without grouping.}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
 A data frame with the summary statistics.
@@ -24,11 +25,11 @@ as well as 25% and 75% quantiles (Q25 & Q75).
 }
 \examples{
 # Group by "Group"
-sum_stats <- summary_statistics(example_set)
+sum_stats <- summary_statistics(example_set, grouping_cols = "Group")
 # Group by Group and Time
 sum_stats <- summary_statistics(example_set, 
   grouping_cols = c("Group", "Time"))
 # No Grouping
-sum_stats <- summary_statistics(example_set, grouping_cols = NA)
+sum_stats <- summary_statistics(example_set)
 
 }

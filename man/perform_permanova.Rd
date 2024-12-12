@@ -10,11 +10,12 @@ perform_permanova(
   all_features = FALSE,
   transform = "Standardize columns",
   coef = "Pythagorean",
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{group}{character, name of the column to compare}
 
@@ -26,6 +27,8 @@ uses "Standardize columns".}
 \item{coef}{Coefficient to calculate continuous distances in 
 \code{DistContinuous}.
 By default uses Pythagorean distances.}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{...}{other parameters to \code{\link[PERMANOVA]{PERMANOVA}}}
 }

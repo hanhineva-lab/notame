@@ -11,9 +11,9 @@ plot_tsne_arrows(
   scale = "uv",
   perplexity = 30,
   pca_method = "nipals",
-  color = group_col(object),
-  time = time_col(object),
-  subject = subject_col(object),
+  color,
+  time,
+  subject,
   alpha = 0.6,
   arrow_style = arrow(),
   title = "t-SNE changes",
@@ -21,11 +21,12 @@ plot_tsne_arrows(
   color_scale = getOption("notame.color_scale_dis"),
   text_base_size = 14,
   line_width = 0.5,
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{all_features}{logical, should all features be used? If FALSE (the 
 default), flagged features are removed before visualization.}
@@ -60,6 +61,8 @@ modified, see \code{?arrow}}
 
 \item{line_width}{the width of the arrows}
 
+\item{assay.type}{character, assay to be used in case of multiple assays}
+
 \item{...}{additional arguments passed to \code{Rtsne::Rtsne}}
 }
 \value{
@@ -74,10 +77,12 @@ using the nipals method of \code{pcaMethods::pca}, the method can be changed
 to "ppca" if nipals fails.
 }
 \examples{
-plot_tsne_arrows(drop_qcs(example_set), perplexity = 10)
+plot_tsne_arrows(drop_qcs(example_set), perplexity = 10, color = "Group", 
+  time = "Time", subject = "Subject_ID")
 # If the sample size is large, plot groups separately
-plot_tsne_arrows(drop_qcs(example_set), perplexity = 10) +
-  facet_wrap(~Group)
+plot_tsne_arrows(drop_qcs(example_set), perplexity = 10, color = "Group", 
+  time = "Time", subject = "Subject_ID") +
+    facet_wrap(~Group)
 
 }
 \seealso{
