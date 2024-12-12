@@ -4,6 +4,7 @@
 \alias{mz_rt_plot}
 \alias{mz_rt_plot,MetaboSet-method}
 \alias{mz_rt_plot,data.frame-method}
+\alias{mz_rt_plot,SummarizedExperiment-method}
 \title{Plot m/z vs retention time plot (cloud plot)}
 \usage{
 mz_rt_plot(
@@ -43,10 +44,23 @@ mz_rt_plot(
   subtitle = NULL,
   color_scale = getOption("notame.color_scale_con")
 )
+
+\S4method{mz_rt_plot}{SummarizedExperiment}(
+  object,
+  p_col = NULL,
+  p_limit = NULL,
+  mz_col = NULL,
+  rt_col = NULL,
+  color = NULL,
+  title = "m/z vs retention time",
+  subtitle = NULL,
+  color_scale = getOption("notame.color_scale_con"),
+  all_features = FALSE
+)
 }
 \arguments{
-\item{object}{a MetaboSet object or a data frame. If x is a MetaboSet 
-object, fData(x) is used.
+\item{object}{a SummarizedExperiment object or a data frame. If x is a 
+SummarizedExperiment object, rowData(x) is used.
 If x is a data frame, it is used as is.}
 
 \item{p_col}{the column name containing p-values. This is used to scale the 
@@ -72,7 +86,7 @@ such as shape and alpha values. New aesthetics can
 also be passed using \code{mapping = aes(...)}.}
 
 \item{all_features}{logical, should all features be retained? Should be used 
-only if x is a MetaboSet object.}
+only if x is a SummarizedExperiment object.}
 }
 \value{
 A ggplot object.
@@ -85,13 +99,14 @@ and the size of the points is scaled based on p-value
 \examples{
 # Compute results from a linear model
 lm_results <- perform_lm(example_set, formula_char = "Feature ~ Group")
-with_results <- join_fData(example_set, lm_results)
+with_results <- join_rowData(example_set, lm_results)
 
-# Plot from the MetaboSet object
+# Plot from the SummarizedExperiment object
 # automatically facet by analytical mode in variable Split
 mz_rt_plot(with_results, p_col = "GroupB_P", color = "GroupB_Estimate")
 
 # Plot the results from the results dataframe
-mz_rt_plot(with_results, p_col = "GroupB_P", color = "GroupB_Estimate")
+lm_data <- dplyr::left_join(as.data.frame(rowData(example_set)), lm_results)
+mz_rt_plot(lm_data, p_col = "GroupB_P", color = "GroupB_Estimate")
 
 }

@@ -4,13 +4,22 @@
 \alias{normalize_batches}
 \title{Normalize between batches}
 \usage{
-normalize_batches(object, batch, group, ref_label, population = "all", ...)
+normalize_batches(
+  object,
+  batch,
+  group,
+  ref_label,
+  population = "all",
+  assay.type = NULL,
+  name = NULL,
+  ...
+)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
-\item{batch, group}{character, column names of pData with batch labels and 
-group labels}
+\item{batch, group}{character, column names of pheno data with batch labels 
+and group labels}
 
 \item{ref_label}{the label of the reference group i.e. the group that is 
 constant through batches}
@@ -18,12 +27,16 @@ constant through batches}
 \item{population}{Identifier of population samples in group column
 (all (default) or any type of samples present in group)}
 
+\item{assay.type}{character, assay to be used in case of multiple assays}
+
+\item{name}{character, name of the resultant assay in case of multiple assays}
+
 \item{...}{additional parameters passed to batchCorr::normalizeBatches, for 
 example to tune the heuristic used for choosing between normalization by 
 reference samples or population median}
 }
 \value{
-A MetaboSet object the one supplied with normalized features
+A SummarizedExperiment or MetaboSet object with normalized features
 }
 \description{
 Between-batch normalization by either reference samples or population median.
@@ -35,7 +48,7 @@ batch_normalized <- normalize_batches(example_set,
   batch = "Batch", group = "QC", ref_label = "QC")
 # Evaluate batch correction
 pca_bhattacharyya_dist(example_set, batch = "Batch")
-pca_bhattacharyya_dist(example_set, batch = "Batch")
+pca_bhattacharyya_dist(batch_normalized, batch = "Batch")
 
 }
 \seealso{

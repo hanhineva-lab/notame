@@ -4,15 +4,23 @@
 \alias{perform_logistic}
 \title{Logistic regression}
 \usage{
-perform_logistic(object, formula_char, all_features = FALSE, ...)
+perform_logistic(
+  object,
+  formula_char,
+  all_features = FALSE,
+  assay.type = NULL,
+  ...
+)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{formula_char}{character, the formula to be used in the linear model 
 (see Details)}
 
 \item{all_features}{should all features be included in FDR correction?}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{...}{additional parameters passed to glm}
 }
@@ -26,7 +34,7 @@ relevant statistics.
 }
 \details{
 The logistic regression model is fit on combined_data(object). 
-Thus, column names in pData(object) can be specified. To make the formulas 
+Thus, column names in pheno data can be specified. To make the formulas 
 flexible, the word "Feature" must be used to signal the role of the features 
 in the formula. "Feature" will be replaced by the actual Feature IDs during 
 model fitting, see the example.

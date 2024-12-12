@@ -116,7 +116,6 @@ against a set variable
 \item \code{\link{save_subject_line_plots}} save line plots with mean
 \item \code{\link{save_group_lineplots}} save line plots with errorbars by 
 group
-\item \code{\link{save_dc_plots}} save drift correction plots
 \item \code{\link{save_batch_plots}} save batch correction plots
 }
 

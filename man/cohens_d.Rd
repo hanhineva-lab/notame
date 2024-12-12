@@ -4,16 +4,18 @@
 \alias{cohens_d}
 \title{Cohen's D}
 \usage{
-cohens_d(object, group = group_col(object), id = NULL, time = NULL)
+cohens_d(object, group, id = NULL, time = NULL, assay.type = NULL)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{group}{character, name of the group column}
 
 \item{id}{character, name of the subject ID column}
 
 \item{time}{character, name of the time column}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
 A data frame with Cohen's d for each feature.
@@ -24,9 +26,9 @@ change between two time points is computed for each subject,
 and Cohen's d is computed from the changes.
 }
 \examples{
-d_results <- cohens_d(drop_qcs(example_set))
+d_results <- cohens_d(drop_qcs(example_set), group = "Group")
 d_results_time <- cohens_d(drop_qcs(example_set),
-  time = "Time", id = "Subject_ID"
+  group = "Group", time = "Time", id = "Subject_ID"
 )
 
 }

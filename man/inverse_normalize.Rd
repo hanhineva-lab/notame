@@ -4,13 +4,17 @@
 \alias{inverse_normalize}
 \title{Inverse-rank normalization}
 \usage{
-inverse_normalize(object)
+inverse_normalize(object, assay.type = NULL, name = NULL)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
+
+\item{name}{character, name of the resultant assay in case of multiple assays}
 }
 \value{
-A MetaboSet object as the one supplied, with normalized features.
+An object as the one supplied, with normalized features.
 }
 \description{
 Applies inverse rank normalization to all features to approximate

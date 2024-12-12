@@ -4,16 +4,22 @@
 \alias{perform_homoscedasticity_tests}
 \title{Test homoscedasticity}
 \usage{
-perform_homoscedasticity_tests(object, formula_char, all_features = FALSE)
+perform_homoscedasticity_tests(
+  object,
+  formula_char,
+  all_features = FALSE,
+  assay.type = NULL
+)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{formula_char}{character, the formula to be used in the linear model 
-(see Details)
-Defaults to "Feature ~ group_col(object)}
+(see Details)}
 
 \item{all_features}{should all features be included in FDR correction?}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
 A data frame with the results.
@@ -24,7 +30,7 @@ variances.
 }
 \details{
 The model is fit on combined_data(object). Thus, column names
-in pData(object) can be specified. To make the formulas flexible, the word 
+in pheno data can be specified. To make the formulas flexible, the word 
 "Feature" must be used to signal the role of the features in the formula. 
 "Feature" will be replaced by the actual Feature IDs during model fitting. 
 For example, if testing for equality of variances in study groups, use 

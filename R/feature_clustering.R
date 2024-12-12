@@ -8,10 +8,10 @@
 #' peak area (median abundance). This is a wrapper around numerous functions 
 #' that are based on the MATLAB code by David Broadhurst.
 #'
-#' @param object a MetaboSet object
-#' @param mz_col the column name in fData(object) that holds mass-to-charge 
+#' @param object a SummarizedExperiment or MetaboSet object
+#' @param mz_col the column name in feature data that holds mass-to-charge 
 #' ratios
-#' @param rt_col the column name in fData(object) that holds retention times
+#' @param rt_col the column name in feature data that holds retention times
 #' @param all_features logical, should all features be included in the 
 #' clustering? If FALSE, as the default, flagged features are not included in 
 #' clustering
@@ -24,33 +24,38 @@
 #' @param min_size_plotting the minimum number of features a cluster needs to 
 #' have to be plotted
 #' @param prefix the prefix to the files to be plotted
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
-#' @return a MetaboSet object, with median peak area (MPA), the cluster ID, the 
-#' features in the cluster, and cluster size added to fData.
+#' @return a SummarizedExperiment or MetaboSet object, with median peak area 
+#' (MPA), the cluster ID, the features in the cluster, and cluster size added 
+#' to feature data.
 #'
 #' @examples
 #' # The parameters are really weird because example data is imaginary
 #' clustered <- cluster_features(example_set, rt_window = 1, corr_thresh = 0.5, 
-#' d_thresh = 0.6)
+#'   d_thresh = 0.6)
 #'
 #' @export
 cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
                              all_features = FALSE, rt_window = 1 / 60,
                              corr_thresh = 0.9, d_thresh = 0.8, 
-                             plotting = FALSE, min_size_plotting = 3, 
-                             prefix = NULL) {
+                             plotting = TRUE, min_size_plotting = 3, 
+                             prefix = NULL, assay.type = NULL) {
   # Drop flagged compounds before clustering
-  orig <- object
+  from <- .get_from_name(object, assay.type)
+  orig <- .check_object(object)
   object <- drop_flagged(object, all_features)
+  object <- .check_object(object, check_limits = TRUE, assay.type = from,
+                         feature_cols = c(mz_col, rt_col))
 
   if (is.null(mz_col) || is.null(rt_col)) {
-    cols <- .find_mz_rt_cols(fData(object))
+    cols <- .find_mz_rt_cols(rowData(object))
   }
   mz_col <- mz_col %||% cols$mz_col
   rt_col <- rt_col %||% cols$rt_col
 
-  data <- as.data.frame(t(exprs(object)))
-  features <- fData(object)
+  data <- as.data.frame(t(assay(object, from)))
+  features <- as.data.frame(rowData(object))
   # Start log
   log_text(paste("\nStarting feature clustering at", Sys.time()))
 
@@ -79,7 +84,7 @@ cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
                  "clusters of 2 or more features, clustering finished at",
                  Sys.time()))
   # Compute median peak area and assing cluster ID
-  features$MPA <- apply(exprs(object), 1, finite_median)
+  features$MPA <- apply(assay(object, from), 1, finite_median)
   features <- assign_cluster_id(data, clusters, features, "Feature_ID")
 
   if (plotting) {
@@ -90,10 +95,13 @@ cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
     log_text(paste("Saved cluster plots to:", prefix))
   }
   # Add cluster IDs to the ORIGINAL object (flagged features still there)
-  clustered <- join_fData(orig, features[c("Feature_ID", "MPA",
+  clustered <- join_rowData(orig, features[c("Feature_ID", "MPA",
                                             "Cluster_ID", "Cluster_size",
                                             "Cluster_features")])
-                                            
+  if (!is.null(attr(clustered, "original_class"))) {
+    clustered <- as(clustered, "MetaboSet")
+    attr(object, "original_class") <- NULL
+  }                                          
   clustered
 }
 
@@ -104,7 +112,7 @@ cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
 #'
 #' @param data data frame of the original LC-MS data
 #' @param clusters a list of clusters as returned by find_clusters
-#' @param features data frame with feature information, fData(object)
+#' @param features data frame with feature information, feature data
 #' @param name_col character, name of the column in features that contains 
 #' feature names
 #'
@@ -146,11 +154,12 @@ assign_cluster_id <- function(data, clusters, features, name_col) {
 #'
 #' This function compresses clusters found by cluster_features, keeping only 
 #' the feature with the highest median peak area. The features that were 
-#' discarded are recorded in the fData part, under Cluster_features.
+#' discarded are recorded in feature data, under Cluster_features.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #'
-#' @return A MetaboSet object with only one feature per cluster.
+#' @return A SummarizedExperiment or MetaboSet object with only one feature per 
+#' cluster.
 #'
 #' @examples
 #' clustered <- cluster_features(example_set, 
@@ -159,11 +168,12 @@ assign_cluster_id <- function(data, clusters, features, name_col) {
 #'
 #' @seealso \code{\link{cluster_features}}
 #'
-#' @noRd
+#' @export
 compress_clusters <- function(object) {
-  cluster_names <- fData(object)$Cluster_ID
+  object <- .check_object(object)
+  cluster_names <- rowData(object)$Cluster_ID
   if (is.null(cluster_names)) {
-    stop("No 'Cluster_ID' found in fData(object), ",
+    stop("No 'Cluster_ID' found in rowData(object), ",
          "please run cluster_features first!")
   }
   # Get only "real" clusters
@@ -172,10 +182,14 @@ compress_clusters <- function(object) {
     unique()
   alone_features <- cluster_names[!grepl("^Cluster_", cluster_names)]
   # This ensures the order of the features stays the same
-  idx <- fData(object)$Feature_ID %in% c(clusters, alone_features)
+  idx <- rowData(object)$Feature_ID %in% c(clusters, alone_features)
 
   object <- object[idx, ]
   log_text(paste("Clusters compressed, left with", nrow(object), "features"))
+  if (!is.null(attr(object, "original_class"))) {
+    object <- as(object, "MetaboSet")
+    attr(object, "original_class") <- NULL
+  }
   object
 }
 
@@ -231,7 +245,7 @@ pull_clusters <- function(data, features, name_col) {
 #'
 #' @param data data frame with the abundances of features, with features as 
 #' columns
-#' @param features data frame with feature information, fData(object)
+#' @param features data frame with feature information, feature data
 #' @param corr_thresh numeric, the threshold of correlation to use in linking 
 #' features
 #' @param rt_window numeric, the retention time window to use in linking 
@@ -246,7 +260,7 @@ pull_clusters <- function(data, features, name_col) {
 #' @examples 
 #' \dontshow{.old_wd <- setwd(tempdir())}
 #' data <- combined_data(example_set)
-#' features <- fData(example_set)
+#' features <- rowData(example_set)
 #' features$MPA <- sapply(data[, features[, "Feature_ID"]], finite_median)
 #' conn <- find_connections(data = data, features = features,
 #'   corr_thresh = 0.4, rt_window = 2,
@@ -509,7 +523,7 @@ find_clusters <- function(connections, d_thresh = 0.8) {
 #'
 #' @param data data frame with the abundances of features, with features as 
 #' columns
-#' @param features data frame with feature information, fData(object)
+#' @param features data frame with feature information, feature data
 #' @param clusters a list of clusters as returned by find_clusters
 #' @param min_size the minimum number of features a cluster needs to have to be 
 #' plotted

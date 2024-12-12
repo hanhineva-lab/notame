@@ -4,21 +4,26 @@
 \alias{impute_rf}
 \title{Impute missing values using random forest}
 \usage{
-impute_rf(object, all_features = FALSE, ...)
+impute_rf(object, all_features = FALSE, assay.type = NULL, name = NULL, ...)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{all_features}{logical, should all features be used? If FALSE (the 
 default), flagged features are removed before imputation.}
 
+\item{assay.type}{character, assay to be used in case of multiple assays}
+
+\item{name}{character, name of the resultant assay in case of multiple assays}
+
 \item{...}{passed to MissForest function}
 }
 \value{
-A MetaboSet object as the one supplied, with missing values imputed.
+An object as the one supplied, with missing 
+values imputed.
 }
 \description{
-Impute the missing values in the exprs part of the object using a
+Impute the missing values in the peak table of the object using a
 random forest. The estimated error in the imputation is logged.
 It is recommended to set the seed number for reproducibility
 (it is called random forest for a reason).

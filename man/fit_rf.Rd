@@ -10,11 +10,12 @@ fit_rf(
   all_features = FALSE,
   covariates = NULL,
   importance = TRUE,
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{y}{character, column name of phenoData giving the dependent variable 
 of the model}
@@ -22,10 +23,12 @@ of the model}
 \item{all_features}{logical, should all features be included in the model? 
 if FALSE, flagged features are left out}
 
-\item{covariates}{character, column names of pData to use as covariates in 
-the model, in addition to molecular features}
+\item{covariates}{character, column names of pheno data
+to use as covariates in the model, in addition to molecular features}
 
 \item{importance}{Should importance of features be assessed?}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{...}{other parameters passed to \code{randomForest::randomForest}}
 }

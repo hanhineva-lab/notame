@@ -14,22 +14,31 @@ save_batch_plots(
   color = "Batch",
   shape = "QC",
   color_scale = getOption("notame.color_scale_dis"),
-  shape_scale = scale_shape_manual(values = c(15, 21))
+  shape_scale = scale_shape_manual(values = c(15, 21)),
+  assay.type1 = NULL,
+  assay.type2 = NULL
 )
 }
 \arguments{
-\item{orig, corrected}{MetaboSet objects before and after batch effect 
-correction}
+\item{orig, corrected}{SummarizedExperiment or MetaboSet objects before and 
+after batch effect correction}
 
 \item{file}{path to the PDF file where the plots will be saved}
 
 \item{width, height}{width and height of the plots in inches}
 
-\item{batch, color, shape}{column names of pData for batch labels,
+\item{batch, color, shape}{column names of pheno data for batch labels,
 and column used for coloring and shaping points (by default batch and QC)}
 
 \item{color_scale, shape_scale}{scales for color and scale as returned by 
 ggplot functions.}
+
+\item{assay.type1}{character, assay of orig to be used in case of 
+multiple assays.}
+
+\item{assay.type2}{character, assay of corrected to be used in case of
+multiple assays. If corrected is not supplied, this argument selects
+another assay from orig.}
 }
 \value{
 None, the function is invoked for its plot-saving side effect.
@@ -47,8 +56,8 @@ the default scale only has 2 values, so it can only accomodate 2 shapes.
 \dontshow{.old_wd <- setwd(tempdir())}
 # Batch correction
 replicates <- list(which(example_set$QC == "QC"))
-batch_corrected <- ruvs_qc(example_set, 
-  batch = "Batch", replicates = replicates)
+batch_corrected <- normalize_batches(example_set, 
+  batch = "Batch", group = "QC", ref_label = "QC")
 # Plots of each feature
 save_batch_plots(
   orig = example_set[1:10], corrected = batch_corrected[1:10],
