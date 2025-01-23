@@ -9,8 +9,6 @@
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param name character, name of the resultant assay in case of multiple assays
 #' @param ... other parameters passed to RUVSeq::RUVs
-#'assay.type \code{Character scalar}. Specifies which assay to use for 
-#' NMF ordination. 
 #' @return A SummarizedExperiment or Metaboset object with the normalized data.
 #'
 #' @examples
@@ -107,7 +105,7 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
   # Drop flagged features if not told otherwise
   object <- .check_object(object, pheno_factors = batch, assay.type = from)
   object <- drop_flagged(object, all_features)
-  # PCA to 2 dimenstions
+  # PCA to 2 dimensions
   pca_res <- pcaMethods::pca(t(assay(object, from)), center = center, 
                              scale = scale, nPcs = nPcs, ...)
   pca_scores <- pcaMethods::scores(pca_res)
@@ -224,7 +222,7 @@ perform_repeatability <- function(object, group, assay.type = NULL) {
 #' @param name character, name of the resultant assay in case of multiple assays
 #'
 #' @return A SummarizedExperiment or MetaboSet object with the aligned features.
-#' Note that this function returns the object with the imputed peak table, 
+#' Note that this function returns the object with the gap-filled peak table, 
 #' with the aligned peak table.  
 #'
 #' @examples
@@ -265,7 +263,7 @@ align_batches <- function(object_na, object_fill, batch, mz, rt,
   object_na <- .check_object(object_na, pheno_factors = batch,
                             assay.type = from_to[[1]],
                             feature_cols = c(mz, rt))
-  object_fill <- .check_object(object_fill, assay.type = from_to[[1]])
+  object_fill <- .check_object(object_fill, assay.type = fill_from)
   # Set report
   if (!is.null(plot_folder)) {
     report <- TRUE
@@ -422,7 +420,7 @@ save_batch_plots <- function(orig, corrected, file, width = 14,
                           pheno_cols = color)
     corrected <- .check_object(corrected, pheno_factors = c(batch, shape),
                                pheno_cols = color)
-    data_orig <- combined_data(orig, from1)
+    data_orig <- combined_data(orig, assay.type = from1)
     data_corr <- combined_data(corrected, from2)
   }
   
@@ -438,7 +436,7 @@ save_batch_plots <- function(orig, corrected, file, width = 14,
       dplyr::summarise_at(rownames(orig), finite_mean) %>%
       dplyr::left_join(batch_injections, ., by = batch)
   }
-
+  
   get_batch_means <- function(data) {
     batch_means <- batch_mean_helper(data) %>%
       dplyr::mutate(QC = "Sample")

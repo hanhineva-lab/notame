@@ -94,8 +94,8 @@ setMethod("assess_quality", signature = c(object = "SummarizedExperiment"),
       object <- .erase_quality(object)
     }
 
-    qc_data <- assay(object)[, object$QC == "QC"]
-    sample_data <- assay(object)[, object$QC != "QC"]
+    qc_data <- assay(object, from)[, object$QC == "QC"]
+    sample_data <- assay(object, from)[, object$QC != "QC"]
     features <- rownames(sample_data)
     
     quality_metrics <- BiocParallel::bplapply(features, function(feature) {
@@ -232,7 +232,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
   from <- .get_from_name(object, assay.type)
   object <- .check_object(object, pheno_ID = TRUE, pheno_QC = TRUE, 
                          pheno_factors = group, assay.type = from, 
-                         feature_ID = TRUE)
+                         feature_ID = TRUE, feature_flag = TRUE)
   found_qc <- apply(assay(object[, object$QC == "QC"], from), 1, prop_found)
   bad_qc <- names(which(found_qc < qc_limit))
 
@@ -245,8 +245,8 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 
   # Compute proportions found in each study group
   if (!is.null(group)) {
-    proportions <- combined_data(object)[, c("Sample_ID", group,
-                                             rownames(object))] %>%
+    proportions <- combined_data(object, from)[, c("Sample_ID", group,
+                                               rownames(object))] %>%
       tidyr::gather("Feature_ID", "Intensity", rownames(object)) %>%
       dplyr::group_by(.data$Feature_ID, !!as.name(group)) %>%
       dplyr::summarise(proportion_found = prop_found(.data$Intensity)) %>%

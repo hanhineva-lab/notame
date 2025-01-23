@@ -103,9 +103,9 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- .check_object(object, pheno_cols = color, pheno_factors = shape, 
-                         assay.type = from)
-
+  object <- .check_object(object, pheno_cols = c(color, shape), 
+                          assay.type = from)
+  
   pca_results <- .pca_helper(object, pcs, center, scale, assay.type = from, ...)
   pca_scores <- pca_results$pca_scores
   pc_names <- colnames(pca_scores)
@@ -179,8 +179,8 @@ plot_tsne <- function(object, all_features = FALSE, center = TRUE,
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
   from <- .get_from_name(object, assay.type)
-  object <- .check_object(object, pheno_cols = color,
-                         pheno_factors = shape, assay.type = from)
+  object <- .check_object(object, pheno_cols = c(color, shape),
+                          assay.type = from)
 
   # t-SNE
   tsne_scores <- .t_sne_helper(object, center, scale, perplexity, 

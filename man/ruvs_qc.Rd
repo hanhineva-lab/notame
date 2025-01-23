@@ -18,9 +18,7 @@ the data.}
 
 \item{name}{character, name of the resultant assay in case of multiple assays}
 
-\item{...}{other parameters passed to RUVSeq::RUVs
-assay.type \code{Character scalar}. Specifies which assay to use for 
-NMF ordination.}
+\item{...}{other parameters passed to RUVSeq::RUVs}
 }
 \value{
 A SummarizedExperiment or Metaboset object with the normalized data.

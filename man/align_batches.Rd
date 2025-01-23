@@ -50,7 +50,7 @@ multiple assays}
 }
 \value{
 A SummarizedExperiment or MetaboSet object with the aligned features.
-Note that this function returns the object with the imputed peak table, 
+Note that this function returns the object with the gap-filled peak table, 
 with the aligned peak table.
 }
 \description{

@@ -191,9 +191,10 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
                    paste(rev(time_levels), collapse = " - ")))
   }
   
-  ds <- dplyr::bind_rows(BiocParallel::bplapply(features, FUN = .calc_cohens_d,
-                                                group1 = group1, 
-                                                group2 = group2))
+  ds <- BiocParallel::bplapply(features, FUN = .calc_cohens_d,
+                               group1 = group1, group2 = group2)
+  
+  ds <-  do.call(rbind, ds)
 
   if (is.null(time_levels)) {
     colnames(ds)[2] <- 
@@ -712,7 +713,8 @@ perform_auc <- function(object, time, subject, group, assay.type = NULL) {
 
   results_df <- BiocParallel::bplapply(features, .help_perform_test, data,
                                        formula_char, result_fun, ...)
-  results_df <- do.call(rbind, results_df)
+                                       
+  results_df <- dplyr::bind_rows(results_df)
 
   if (nrow(results_df) == 0) {
     stop("All the tests failed.",
@@ -1433,7 +1435,7 @@ perform_t_test <- function(object, formula_char, is_paired = FALSE, id = NULL,
 }
 
 # Calculate pairwise and/or paired statistics
-.calc_simple_test <- function(feature, subset1, subset2, 
+.calc_simple_test <- function(feature, fname, subset1, subset2, 
                               pair, test, is_paired, ...) {
   result_row <- NULL
   tryCatch({
@@ -1450,18 +1452,17 @@ perform_t_test <- function(object, formula_char, is_paired = FALSE, id = NULL,
     }
     # Get a single-row data.frame with results
     conf_level <- attr(res$conf.int, "conf.level") * 100
-    result_row <- data.frame(Statistic = res$statistic,
+    result_row <- data.frame(Feature_ID = fname, Statistic = res$statistic,
                              Estimate = res$estimate[1], LCI = res$conf.int[1],
                              UCI = res$conf.int[2], P = res$p.value,
                              stringsAsFactors = FALSE)
     ci_idx <- grepl("CI", colnames(result_row))
     colnames(result_row)[ci_idx] <- paste0(colnames(result_row)[ci_idx],
                                            conf_level)
-    colnames(result_row) <- paste0(pair[1], "_vs_", pair[2], "_", 
-                                   test, "_", colnames(result_row))
+    colnames(result_row)[-1] <- paste0(pair[1], "_vs_", pair[2], "_", 
+                                   test, "_", colnames(result_row)[-1])
     result_row
-  },
-  error = function(e) e$message)
+  }, error = function(e) message(fname, ": ", e$message))
 } 
 
 # Sets up subsets, calls .calc_simple_test and processes results for simple
@@ -1506,25 +1507,18 @@ perform_t_test <- function(object, formula_char, is_paired = FALSE, id = NULL,
   }
   
   # Calculate paired or unpaired test for the subsets
-  results <- BiocParallel::bplapply(data[, features], .calc_simple_test, 
-                                    subset1, subset2, pair, test, 
-                                    is_paired, ...)
-  # Message errors and make boolean list for keeping features without errors
-  errors <- mapply(function(result, fname) {
-    if (length(result) != 5) {
-      message(fname, ": ", result)
-      TRUE
-    } else {FALSE}
-  }, results, names(results))
+  result_rows <- BiocParallel::bpmapply(
+    .calc_simple_test, data[, features], features, 
+     MoreArgs = list(subset1, subset2, pair, test, is_paired, ...),
+     SIMPLIFY = FALSE)
+                                          
+  results_df <- dplyr::bind_rows(result_rows)
   # Check that results actually contain results
-  if (sum(errors == TRUE) == length(results)) {
-    stop("All the tests failed.",
-         call. = FALSE)
+  if (nrow(results_df) == 0) {
+     stop("All the tests failed", call. = FALSE)
   }
-  # Keep features without errors
-  results_df <- data.frame(Feature_ID = features, 
-                           do.call(rbind, results[!errors]),
-                           check.names = FALSE)
+  rownames(results_df) <- results_df$Feature_ID
+  
   # Rows full of NA for features where the test failed
   results_df <- .fill_results(results_df, features)
   # FDR correction

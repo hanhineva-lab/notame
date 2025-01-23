@@ -46,10 +46,10 @@ plot_dendrogram <- function(object, all_features = FALSE,
   subtitle <- subtitle %||% paste("Distance method:", dist_method, 
                                   "Clustering method:", clust_method)
   # change name to matrix
-  assay <- pcaMethods::prep(assay(object, from), center = center, 
+  assay <- pcaMethods::prep(t(assay(object, from)), center = center, 
                             scale = scale)
 
-  d_data <- stats::dist(t(assay), method = dist_method) %>%
+  d_data <- stats::dist(assay, method = dist_method) %>%
     stats::hclust(method = clust_method) %>%
     stats::as.dendrogram() %>%
     ggdendro::dendro_data()

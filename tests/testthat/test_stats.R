@@ -604,8 +604,7 @@ test_that("Pairwise Mann-Whitney tests works", {
     suppressWarnings(perform_non_parametric(object,
                                             formula_char = "Feature ~ Time", 
                                             id = "Subject_ID",
-                                            is_paired = TRUE, 
-                                            conf.level = 0.5)),
+                                            is_paired = TRUE)),
     pwnp_res
   ))
 })

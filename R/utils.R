@@ -125,7 +125,7 @@
 #' variables, such as correlations
 #' }
 #' 
-#' MetaboSet utilities:
+#' Object utilities:
 #' \itemize{
 #' \item \code{\link{read_from_excel}} read formatted Excel files
 #' \item \code{\link{construct_metabosets}} construct MetaboSet objects
@@ -372,32 +372,37 @@ prop_found <- function(x) {
   # If assay.type is not supplied and there is only one assay in the objcet, 
   # choose the first assay
   if (is.null(assay.type) && length(assays(object)) == 1) {
-    assay.type <- 1
+    from <- 1
   } else if (is.null(assay.type)) {
     stop("When using multiple assays, specify assay.type", call. = FALSE)
   } else if (!assay.type %in% names(assays(object)) & assay.type != 1) {
     stop(assay.type, " was specified but not found in assays", call. = FALSE)
+  } else {
+    from <- assay.type
   }
   # Output behavior (to)
   if (is.null(name) && length(assays(object)) == 1) {
-    name <- 1
+    to <- 1
   } else if (is.null(name)) {
     stop("When using multiple assays, specify name of new assay", call. = FALSE)
-  } else if (name == assay.type & assay.type != 1) {
+  } else if (name == from & from != 1) {
     stop("'name' must be different from `assay.type`.", call. = FALSE)
+  } else {
+    to <- name
   }
-  list(assay.type, name)
+  list(from, to)
 }
 
 .get_from_name <- function(object, assay.type) {
   object <- as(object, "SummarizedExperiment")
   # Input behavior (from)
   if (is.null(assay.type) && length(assays(object)) == 1) {
-    assay.type <- 1
+    from <- 1
   } else if (is.null(assay.type)) {
     stop("When using multiple assays, specify assay.type", call. = FALSE)
   } else if (!assay.type %in% names(assays(object)) & assay.type != 1) {
     stop(assay.type, " was specified but not found in assays", call. = FALSE)
+  } else {
+    from <- assay.type
   }
-  assay.type
 }
