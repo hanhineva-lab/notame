@@ -655,3 +655,20 @@ test_that("Assay control works (with correlation tests)", {
   # Correlation works the samy was using one or two MetaboSet objects
   expect_identical(correlations_one, correlations_two)
 })
+
+test_that("Simple tests work in cases where alternative levels for confidence intervals are returned in case 95% confidence interval can't be computed", {
+  ex_set <- example_set
+  assay(ex_set)[1, ] <- stats::runif(ncol(ex_set), 3000, 3000)
+  res <- perform_non_parametric(drop_qcs(ex_set), 
+                                formula_char = "Feature ~ Time", 
+                                id = "Subject_ID",  is_paired = TRUE)
+  expect_true(any(grepl(c("UCI0"), colnames(res))))  
+  
+})
+
+test_that("Simple tests return all features despite errors for single features", {
+  ex_set <- example_set
+  assay(ex_set)[1, ex_set$Group == "A"] <- NA
+  res <- perform_t_test(drop_qcs(ex_set), formula_char = "Feature ~ Group")
+  expect_true(all(lapply(res[1, -1], function(col_value) is.na(col_value))))
+})
