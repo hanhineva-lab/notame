@@ -37,15 +37,15 @@ Data Processing and Data Analysis—Current Best Practices” special issue of t
 Metabolites journal (Klåvus et al. 2020) [@notame]. The main outcome is 
 identifying interesting features for laborious downstream steps relating to 
 biological context, such as metabolite identification and pathway analysis, 
-which fall outside the purview of *notame*. Bioconductor packages with 
-complementary functionality in Bioconductor include pmp, phenomis and qmtools; 
-*notame* brings partially overlapping and new functionality to the table. There 
-are also Bioconductor packages for preprocessing, metabolite identification and 
-pathway analysis, allowing for a fully programmatic workflow.
+which fall outside the purview of *notame*.
 
-The streamlined *notame* experience, Bioconductor's dependency management and 
-complementary Bioconductor functionality makes for a solid introduction to 
-quality, reproducible metabolomics research.
+Inclusion of *notame* in Bioconductor and SummarizedExperiment-support promotes 
+reproducible, end-to-end analyses. For example, the xcms package can be used 
+for preprocessing, outputting a SummarizedExperiment object using 
+xcms::quantify(). Then notame can be used for data pretreatment and feature 
+selection with complementary functionality in the pmp, phenomis and qmtools 
+packages. There are also SummarizedExperiment-supporting packages for 
+downstream steps, such as MetaboAnnotation for annotation. 
 
 # Installation
 To install *notame*, install BiocManager first, if it is not installed. 
