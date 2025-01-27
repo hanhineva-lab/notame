@@ -1,2 +1,10 @@
 Changes in version 0.99.0
-- Submitted to Bioconductor
+- submitted to Bioconductor
+- SummarizedExperiment-support
+- parallelization with BiocParallel
+- removed exports with replacement: perform_t_test() now covers functionality of removed perform_paired_t_test() and perform_pairwise_t_test(). Similarly, perform_non_parametric() now covers functionality of removed perform_wilcoxon_signed_rank() and perform_pairwise_non_parametric()
+- de-exported: low-level functionality for drift correction and feature clustering
+- removed deprecated exports: dobc(), merge_batches()
+- removed exports with external replacement: align_batches() and normalize_batches() will be available with SummarizedExperiment in the batchCorr package
+- removed functions for various reasons: install_dependencies(), merge_exprs(), plot_sample_suprahex(), prop_found(), prop_na()
+- renamed exports: clean_stats_results() renamed to summarize_results()
