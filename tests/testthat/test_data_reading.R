@@ -19,6 +19,15 @@ test_that("Column conversion works", {
 })
 
 test_that("Pheno data fixing works", {
+  # No action is taken if "Sample_ID is" supplied (unless there are na's in 
+  # only this specific case to not break functionality), safe default behavior # for all columns
+  df <- data.frame(Sample_ID = 1:5, QC = rep("QC", 5))
+  expect_no_error(.fix_pheno_data(df))
+  # User can specify which column should be used for "Sample_ID"
+  df <- data.frame(Sample_ID = 1:5, id = 6:10, QC = rep("QC", 5))
+  df <- .fix_pheno_data(df, id_column = "id")
+  expect_equal(df$Sample_ID, 6:10)
+
   # Check if conversion to numeric works
   df <- data.frame(Injection_order = c(1:2, "3", 4:9))
   expect_warning(
@@ -68,10 +77,14 @@ test_that("Pheno data checking works", {
                "'Injection_order' is not numeric")
 })
 
-test_that("Creating Feature_ID works", {
-  # Automatic naming of features works
-  df <- data.frame(Feature_ID = 1:5)
+test_that("Feature data fixing works", {
+  # No action is taken for "Feature_ID" if supplied, safe default behavior for 
+  # all columns
+  df <- data.frame(Feature_ID = 1:5, mz = "nope")
   mode <- "HILIC_pos"
+  expect_no_error(.fix_feature_data(feature_data = df, name = mode))
+  
+  df <- data.frame(Split = rep("HILIC_pos", 5))
   expect_error(.fix_feature_data(feature_data = df, name = mode),
                "No mass to charge ratio column found - should match ...")
   mz <- as.numeric(seq_len(nrow(df)))

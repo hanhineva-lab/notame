@@ -143,6 +143,9 @@
 #' \item \code{\link{join_pData}} join new columns to pheno data
 #' \item \code{\link{combined_data}} retrieve both sample information and 
 #' features
+#' \item \code{\link{merge_objects}} merge SummarizedExperiment objects 
+#' together
+#' \item \code{\link{fix_object}} fix object for functioning of notame
 #' }
 #' 
 #' Other utilities:

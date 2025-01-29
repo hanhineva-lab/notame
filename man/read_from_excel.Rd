@@ -48,10 +48,10 @@ these}
 \item{rt_limits}{numeric vector of two, all retention time values should be 
 in between these}
 
-\item{skip_checks}{logical: skip checking data integrity. Not recommended, 
-but sometimes useful when you just want to read the data in as is and fix 
-errors later. NOTE: Sample_ID and QC columns will not be constructed.
-The data integrity checks are important for functioning of notame.}
+\item{skip_checks}{logical: skip checking and fixing of data integrity. Not 
+recommended, but sometimes useful when you just want to read the data in as 
+is and fix errors later. The data integrity checks are important for 
+functioning of notame.}
 }
 \value{
 A list of three data frames:
@@ -75,20 +75,9 @@ This function separates the three parts from the file, and returns them in a
 list.
 }
 \details{
-Only specify one of \code{split_by} and \code{name}. The feature 
-data returned will contain a column named "Split", which is used to separate 
-features from different modes. Unless a column named "Feature_ID"
-is found in the file, a feature ID will be generated based on the value of 
-"Split", mass and retention time. The function will try to find columns for 
-mass and retention time by looking at a few common alternatives, and throw 
-an error if no matching column is found. Sample information needs to contain 
-a row called "Injection_order", and the values need to be unique. In 
-addition, a possible sample identifier row needs to be named "Sample_ID",
-or to be specified in \code{id_column}, and the values need to be unique, 
-with an exception of QC samples: if there are any "QC" identifiers, they 
-will be replaced with "QC_1", "QC_2" and so on.
-If a "Sample_ID" row is not found, it will be created using the 
-\code{id_prefix} and injection order.
+If skip_checks = FALSE, \code{\link{read_from_excel}} attempts to modify the 
+object as per \code{\link{fix_object}} and checks the object. If skip_checks 
+= TRUE, parameters for \code{\link{fix_object}} are ignored.
 }
 \examples{
 data <- read_from_excel(

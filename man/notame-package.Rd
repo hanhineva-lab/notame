@@ -130,7 +130,7 @@ Results visualizations (returned by default, save them using
 variables, such as correlations
 }
 
-MetaboSet utilities:
+Object utilities:
 \itemize{
 \item \code{\link{read_from_excel}} read formatted Excel files
 \item \code{\link{construct_metabosets}} construct MetaboSet objects
@@ -148,6 +148,9 @@ for subject identifiers
 \item \code{\link{join_pData}} join new columns to pheno data
 \item \code{\link{combined_data}} retrieve both sample information and 
 features
+\item \code{\link{merge_objects}} merge SummarizedExperiment objects 
+together
+\item \code{\link{fix_object}} fix object for functioning of notame
 }
 
 Other utilities:
