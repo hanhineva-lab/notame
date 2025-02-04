@@ -629,7 +629,7 @@ perform_auc <- function(object, time, subject, group, assay.type = NULL) {
   
   from <- .get_from_name(object, assay.type)
   object <- .check_object(object, pheno_factors = c(time, group),
-                         pheno_chars = subject, assay.type = from)
+                          pheno_chars = subject, assay.type = from)
   data <- combined_data(object, from)
 
   # Create new pheno data, only one row per subject and group
@@ -653,6 +653,10 @@ perform_auc <- function(object, time, subject, group, assay.type = NULL) {
     merge_objects()
 
   log_text("AUC computation finished")
+  
+  if (!is.null(attr(object, "original_class"))) {
+    new_object <- as(new_object, "MetaboSet")
+  }
   new_object
 }
 
