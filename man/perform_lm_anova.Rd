@@ -9,11 +9,12 @@ perform_lm_anova(
   formula_char,
   all_features = FALSE,
   lm_args = NULL,
-  anova_args = NULL
+  anova_args = NULL,
+  assay.type = NULL
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{formula_char}{character, the formula to be used in the linear model 
 (see Details)}
@@ -24,6 +25,8 @@ perform_lm_anova(
 
 \item{anova_args}{list of arguments to anova, list names should be parameter 
 names}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
 A data frame with one row per feature, with all the
@@ -35,7 +38,7 @@ Returns all relevant statistics.
 }
 \details{
 The linear model is fit on combined_data(object). Thus, column names
-in pData(object) can be specified. To make the formulas flexible, the word 
+in pheno data can be specified. To make the formulas flexible, the word 
 "Feature" must be used to signal the role of the features in the formula. 
 "Feature" will be replaced by the actual Feature IDs during model fitting, 
 see the example.

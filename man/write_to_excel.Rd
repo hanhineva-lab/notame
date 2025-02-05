@@ -7,7 +7,7 @@
 write_to_excel(object, file, ...)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{file}{path to the file to write}
 
@@ -17,7 +17,8 @@ write_to_excel(object, file, ...)
 None, the function is invoked for its side effect.
 }
 \description{
-Writes all the data in a MetaboSet object to an Excel spreadsheet.
+Writes all the data in a SummarizedExperiment or MetaboSet object to an 
+Excel spreadsheet.
 The format is similar to the one used to read data in, except for the fact 
 that EVERYTHING NEEDS TO BE WRITTEN AS TEXT. To fix numeric values in Excel,
 choose any cell with a number, press Ctrl + A, then go to the dropdown menu

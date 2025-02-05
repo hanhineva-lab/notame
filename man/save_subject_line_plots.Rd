@@ -10,11 +10,11 @@ save_subject_line_plots(
   save = TRUE,
   file_path = NULL,
   format = "emf",
-  x = time_col(object),
-  id = subject_col(object),
+  x,
+  id,
   title = "Feature_ID",
   subtitle = NULL,
-  color = NA,
+  color = NULL,
   color_scale = getOption("notame.color_scale_dis"),
   facet = NULL,
   text_base_size = 14,
@@ -22,11 +22,12 @@ save_subject_line_plots(
   mean_line_width = 1.2,
   title_line_length = 40,
   theme = theme_bw(base_size = text_base_size),
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{all_features}{logical, should all features be used?
 If FALSE (the default), flagged features are removed before visualization.}
@@ -42,8 +43,8 @@ paths for other formats}
 
 \item{id}{character, name of the column containing subject IDs}
 
-\item{title, subtitle}{column names from fData to use as plot title/filename 
-and subtitle.
+\item{title, subtitle}{column names from feature data to use as plot 
+title/filename and subtitle.
 Set to NULL for no title/subtitle, this creates running numbered filenames}
 
 \item{color}{character, the column name to color the lines by (optional)}
@@ -64,6 +65,8 @@ characters, passed to stringr::str_wrap}
 
 \item{theme}{a ggplot theme to be added to the plot}
 
+\item{assay.type}{character, assay to be used in case of multiple assays}
+
 \item{...}{other arguments to graphic device functions, like width and height}
 }
 \value{
@@ -77,13 +80,13 @@ A separate plot is drawn and saved for each feature.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
-save_subject_line_plots(drop_qcs(example_set)[1:10],
-  file_path = "./subject_line_plots.pdf",
-  format = "pdf"
-)
+save_subject_line_plots(drop_qcs(example_set)[1:10], x = "Time", 
+  id = "Subject_ID", file_path = "./subject_line_plots.pdf",
+  format = "emf", title = NULL)
 
 # Plot one feature
-save_subject_line_plots(drop_qcs(example_set[1, ]), save = FALSE)
+save_subject_line_plots(drop_qcs(example_set[1, ]), save = FALSE, x = "Time",
+  id = "Subject_ID")
 \dontshow{setwd(.old_wd)}
 
 }

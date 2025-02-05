@@ -12,15 +12,16 @@ plot_sample_heatmap(
   center = TRUE,
   scale = "uv",
   group_bar = TRUE,
-  group = group_col(object),
+  group = NULL,
   title = "Heatmap of distances between samples",
   subtitle = NULL,
   fill_scale_con = getOption("notame.fill_scale_con"),
-  fill_scale_dis = getOption("notame.fill_scale_dis")
+  fill_scale_dis = getOption("notame.fill_scale_dis"),
+  assay.type = NULL
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{all_features}{logical, should all features be used? If FALSE (the 
 default), flagged features are removed before visualization.}
@@ -49,6 +50,8 @@ ggplot function}
 
 \item{fill_scale_dis}{Discrete fill scale for the group bar as returned by a 
 ggplot function}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
 A ggplot object. If \code{group_bar} is \code{TRUE}, the plot will 
@@ -59,7 +62,7 @@ Draws a heatmap of the distances between the samples of an experiment,
 the samples are ordered by hierarchical clustering.
 }
 \examples{
-plot_sample_heatmap(example_set)
+plot_sample_heatmap(example_set, group = "Group")
 
 }
 \seealso{

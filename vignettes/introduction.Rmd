@@ -59,7 +59,11 @@ library(notame)
 ```
 
 # How it works
-MetaboSet objects are the primary data structure of this package.
+SummarizedExperiment is the primary data structure of this package, but 
+MetaboSet is still supported for old users' preference. One can use a single 
+peak table throughout the analysis as with MetaboSet and also use multiple peak 
+tables with SummarizedExperiment, using the assay.type and name arguments.
+
 The functionality of *notame* can be broadly divided into data pretreatment and 
 feature selection (Figure 1). Data pretreatment involves reducing unwanted
 variation and data preparation dependent on downstream methods. The many 
@@ -75,37 +79,40 @@ associated protocol article for more information [@notame].
 knitr::include_graphics("Overview.png")
 ```
 
-## MetaboSet
+## Input
 MetaboSet is built upon the ExpressionSet class from the Biobase package by 
 Bioconductor. In addition to basic ExpressionSet functionality, three slots and 
 functions of the same names extend the MetaboSet class: group_col(), time_col() 
 and subject_col(). They are used for accessing and setting names of columns 
 with corresponding functionality and as default arguments in many functions.
 
-Separate MetaboSet objects are created for each analytical mode using 
-read_from_excel() and construct_metabosets(). This includes checks and 
-preparation of the metadata to prepare the object for the analysis. To 
+Data can be read with read_from_excel, which includes checks and 
+preparation of the metadata to prepare the data for analysis. To 
 accommodate typical output from peak-picking software such as Agilent's 
 MassHunter or MS-DIAL, the output is transformed into a spreadsheet for 
 read_from_excel().
+
+Alternatively, data in R can be wrangled and passed to construct_metabosets or 
+the native SummarizedExperiment constructor. 
 
 ```{r, echo = FALSE}
 #| fig.cap = "Structure of spreadsheet for read_from_excel()."
 knitr::include_graphics("Data_input.png")
 ```
 
-There are a few obligatory fields, including "Injection_order" in sample 
-information, "Mass" or "Average mz" in feature data and "Retention time", 
-"RetentionTime", "Average rt(min)" or "rt" in feature information (not case 
-sensitive). There are further optional fields, including "Sample_ID" and "QC" 
-in sample data as well as "Feature_ID" in feature data, which are automatically 
-generated if unavailable. One or more fields in feature data can be used to 
-split the data into parts, usually LC column x ionization mode, supplied as 
-arguments to the `split_by` parameter. If the file only contains one mode, 
-specify the name of the mode, e.g. "HILIC_pos" to the `name` parameter. 
+There are a few obligatory fields for read_from_excel(), including 
+"Injection_order" in sample information, "Mass" or "Average mz" in feature data 
+and "Retention time", "RetentionTime", "Average rt(min)" or "rt" in feature 
+information (not case sensitive). There are further optional fields, including 
+"Sample_ID" and "QC" in sample data as well as "Feature_ID" in feature data, 
+which are automatically generated if unavailable. One or more fields in feature 
+data can be used to split the data into parts, usually LC column x ionization 
+mode, supplied as arguments to the `split_by` parameter. If the file only 
+contains one mode, specify the name of the mode, e.g. "HILIC_pos" to the `name` 
+parameter. 
 
 ## Data pretreatment
-Data pretreatment functions return modified MetaboSet objects and are largely 
+Data pretreatment functions return modified objects and are largely 
 based on pooled QC samples [@qcguidelines]. Data pretreatment is generally 
 performed separately for each mode. The visualizations used to monitor data 
 pretreatment are saved to file by default, but can also be returned. The 
@@ -124,13 +131,11 @@ visualizations which are saved to file by default but can be returned as a list.
 ## Utilities
 
 General utilities include combined_data() for representing the instance in a
-`data.frame` suitable for plotting, MakeSummarizedExperimentFromMetaboSet() 
-for conversion to capitalize on the interoperability of Bioconductor and 
-various functions for data wrangling. For keeping track of the analysis, 
-*notame* offers a logging system operated using init_log(), log_text() and 
-finish_log(). *notame* also keeps track of all the external packages used, 
-offering you references for each. To see and log a list of references, use 
-citations().
+`data.frame` suitable for plotting and various functions for data wrangling. 
+For keeping track of the analysis, *notame* offers a logging system operated 
+using init_log(), log_text() and finish_log(). *notame* also keeps track of all 
+the external packages used, offering you references for each. To see and log a 
+list of references, use citations().
 
 Parallellization is provided by the BiocParallel package. 
 BiocParallel defaults to a parallel backend which can be changed using 

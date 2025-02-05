@@ -8,11 +8,12 @@ flag_detection(
   object,
   qc_limit = 0.7,
   group_limit = 0.5,
-  group = group_col(object)
+  group = NULL,
+  assay.type = NULL
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{qc_limit}{the detection rate limit for QC samples}
 
@@ -20,9 +21,11 @@ flag_detection(
 
 \item{group}{the columns name in sample information to use as the grouping 
 variable}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
-A MetaboSet object with the features flagged.
+A SummarizedExperiment or MetaboSet object with the features flagged.
 }
 \description{
 Flags features with too high amount of missing values. There are two 
@@ -34,10 +37,11 @@ If the group limit is passed for AT LEAST ONE GROUP, then the feature is
 kept. Features with low detection rate in QCs are flagged as 
 "Low_qc_detection", while low detection rate in the study groups is flagged 
 as "Low_group_detection". The detection rates for all the groups are 
-recorded in \code{fData(object)}.
+recorded in feature data.
 }
 \examples{
-ex_set <- flag_detection(example_set)
-fData(ex_set)
+ex_set <- mark_nas(example_set, value = 0)
+ex_set <- flag_detection(ex_set, group = "Group")
+rowData(ex_set)
 
 }

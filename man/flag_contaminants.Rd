@@ -9,13 +9,14 @@ flag_contaminants(
   blank_col,
   blank_label,
   flag_thresh = 0.05,
-  flag_label = "Contaminant"
+  flag_label = "Contaminant",
+  assay.type = NULL
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
-\item{blank_col}{character, the column name in pData with blank labels}
+\item{blank_col}{character, the column name in pheno data with blank labels}
 
 \item{blank_label}{character, the label for blank samples in blank_col}
 
@@ -26,9 +27,12 @@ feature gets flagged.}
 \item{flag_label}{character, the label used when flagging contaminants. Can 
 be changed if sample processing contaminants and carryover contaminants are 
 flagged separately.}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
-A MetaboSet object with contaminant features flagged.
+A SummarizedExperiment or MetaboSet object with contaminant features 
+flagged.
 }
 \description{
 Flags contaminant features by comparing the median values of blanks and 
@@ -39,25 +43,24 @@ biological samples times a set ratio, the feature is flagged as contaminant.
 \examples{
 # Make a blank sample which has one (first) feature exceeding the threshold
 ## Abundance matrix
-med <- median(exprs(example_set)[1, example_set$QC != "QC"])
-exprs <- matrix(c(med * 0.05 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
+med <- median(assay(example_set)[1, example_set$QC != "QC"])
+assay <- matrix(c(med * 0.05 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
                   dimnames = list(NULL, "Demo_51"))
-exprs <- cbind(exprs(example_set), exprs)
+assay <- cbind(assay(example_set), assay)
 ## Sample metadata
-pheno_data <- pData(example_set)[1, ]
+pheno_data <- colData(example_set)[1, ]
 rownames(pheno_data) <- "Demo_51"
 pheno_data$Sample_ID <- "Demo_51"
 pheno_data$Injection_order <- 51
 pheno_data[c("Subject_ID", "Group", "QC", "Time")] <- "Blank"
-pheno_data <- rbind(pData(example_set), pheno_data)
+pheno_data <- rbind(colData(example_set), pheno_data)
 ## Feature metadata
-feature_data <- fData(example_set)
+feature_data <- rowData(example_set)
 
-# Construct MetaboSet object with blank sample
-ex_set <- construct_metabosets(exprs = exprs, 
-                               pheno_data = pheno_data,
-                               feature_data = feature_data,
-                               split_data = FALSE)
+# Construct SummarizedExperiment object with blank sample
+ex_set <- SummarizedExperiment(assays = assay, 
+                               colData = pheno_data,
+                               rowData = feature_data)
 # Flag contaminant(s)
 contaminants_flagged <- flag_contaminants(ex_set, blank_col = "QC", 
                                           blank_label = "Blank")

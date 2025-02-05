@@ -13,17 +13,21 @@ align_batches(
   NAhard = 0.8,
   mzdiff = 0.002,
   rtdiff = 15,
-  plot_folder = NULL
+  plot_folder = NULL,
+  assay.type1 = NULL,
+  assay.type2 = NULL,
+  name = NULL
 )
 }
 \arguments{
-\item{object_na}{a MetaboSet object with missing values as NA}
+\item{object_na}{a SummarizedExperiment or MetaboSet object with missing 
+values as NA}
 
-\item{object_fill}{a similar MetaboSet object with imputed values
-(used to compute distances between features, can contain missing values as 
-well)}
+\item{object_fill}{a similar SummarizedExperiment or MetaboSet object with 
+imputed values (used to compute distances between features, can contain 
+missing values as well)}
 
-\item{batch}{character, column name of pData with batch labels}
+\item{batch}{character, column name of pheno with batch labels}
 
 \item{mz, rt}{column names of m/z and retention time columns in fData}
 
@@ -35,9 +39,19 @@ features}
 
 \item{plot_folder}{path to the location where the plots should be saved, if 
 NULL, no plots are saved}
+
+\item{assay.type1}{character, assay of object_na to be used in case of 
+multiple assays}
+
+\item{assay.type2}{character, assay of object_fill to be used in case of
+multiple assays}
+
+\item{name}{character, name of the resultant assay in case of multiple assays}
 }
 \value{
-A MetaboSet object with the aligned features.
+A SummarizedExperiment or MetaboSet object with the aligned features.
+Note that this function returns the object with the gap-filled peak table, 
+with the aligned peak table.
 }
 \description{
 Aligns features with m/z or retention time shift between batches using
@@ -45,19 +59,19 @@ alignBatches from batchCorr package. See more details in the original paper.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
-fData(example_set)[3, ]$Average_Mz <- fData(example_set)[2, ]$Average_Mz + 
-0.001
+ex_set <- example_set
+rowData(ex_set)[3, ]$Average_Mz <- 
+  rowData(ex_set)[2, ]$Average_Mz + 0.001
 # Initialize objects
-example_set_fill <- example_set
-example_set_na <- example_set
+ex_set_fill <- ex_set
+ex_set_na <- ex_set
 # Introduce over 80\% missing values in QC samples per batch of two features 
 # so they are considered "missing", with orthogonal batch presence
-exprs(example_set_na)[2, c(1, 7, 13, 19)] <- NA
-exprs(example_set_na)[
-  3, c(26, 32, 38, 44)] <- NA
-batch_aligned <- align_batches(example_set_na, example_set_fill, 
+assay(ex_set_na)[2, c(1, 7, 13, 19)] <- NA
+assay(ex_set_na)[3, c(26, 32, 38, 44)] <- NA
+batch_aligned <- align_batches(ex_set_na, ex_set_fill, 
   batch = "Batch", mz = "Average_Mz", rt = "Average_Rt_min", 
-  mzdiff = 0.002, rtdiff = 15, plot_folder = "./Figures")
+  mzdiff = 0.1, rtdiff = 15, plot_folder = "./Figures")
 \dontshow{setwd(.old_wd)}
 
 }

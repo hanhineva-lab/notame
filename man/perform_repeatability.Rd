@@ -4,12 +4,14 @@
 \alias{perform_repeatability}
 \title{Compute repeatability measures}
 \usage{
-perform_repeatability(object, group)
+perform_repeatability(object, group, assay.type = NULL)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
-\item{group}{column name of pData giving the group labels}
+\item{group}{column name of pheno data giving the group labels}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
 A data frame with one row per feature with the repeatability measure.
@@ -23,8 +25,7 @@ variation between batches.
 \examples{
 # Batch correction
 replicates <- list(which(example_set$QC == "QC"))
-batch_corrected <- ruvs_qc(example_set, 
-  batch = "Batch", replicates = replicates)
+batch_corrected <- ruvs_qc(example_set, replicates = replicates)
 # Evaluate batch correction
 rep_orig <- perform_repeatability(example_set, group = "Group")
 mean(rep_orig$Repeatability, na.rm = TRUE)

@@ -10,8 +10,8 @@ save_group_lineplots(
   save = TRUE,
   file_path = NULL,
   format = "emf",
-  x = time_col(object),
-  group = group_col(object),
+  x,
+  group,
   title = "Feature_ID",
   subtitle = NULL,
   fun.data = "mean_cl_boot",
@@ -25,11 +25,12 @@ save_group_lineplots(
   point_size = 4,
   title_line_length = 40,
   theme = theme_bw(base_size = text_base_size),
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{all_features}{logical, should all features be used? 
 If FALSE (the default), flagged features are removed before visualization}
@@ -46,8 +47,8 @@ paths for other formats}
 \item{group}{character, name of the column containing group information, 
 used for coloring}
 
-\item{title, subtitle}{column names from fData to use as plot title/filename 
-and subtitle.
+\item{title, subtitle}{column names from feature data to use as plot 
+title/filename and subtitle.
 Set to NULL for no title/subtitle, this creates running numbered filenames}
 
 \item{fun.data}{passed to ggplot2::stat_summary and used for errorbars,
@@ -74,6 +75,8 @@ characters, passed to stringr::str_wrap}
 
 \item{theme}{a ggplot theme to be added to the plot}
 
+\item{assay.type}{character, assay to be used in case of multiple assays}
+
 \item{...}{other arguments to graphic device functions, like width and height}
 }
 \value{
@@ -89,14 +92,15 @@ A separate plot is drawn for each feature.
 \dontshow{.old_wd <- setwd(tempdir())}
 save_group_lineplots(drop_qcs(example_set)[1:10],
   file_path = "./group_line_plots.pdf",
-  format = "pdf"
+  format = "pdf", x = "Time", group = "Group"
 )
 save_group_lineplots(drop_qcs(example_set)[1:10],
   file_path = "./group_line_plots/",
-  format = "png"
+  format = "png", x = "Time", group = "Group"
 )
 # Plot one feature
-save_group_lineplots(drop_qcs(example_set[1, ]), save = FALSE)
+save_group_lineplots(drop_qcs(example_set[1, ]), save = FALSE, x = "Time",
+  group = "Group")
 \dontshow{setwd(.old_wd)}
 
 }

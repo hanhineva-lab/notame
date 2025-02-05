@@ -7,10 +7,11 @@
 drop_qcs(object)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 }
 \value{
-A MetaboSet object as the one supplied, without QC samples.
+A SummarizedExperiment or MetaboSet object as the one supplied, 
+without QC samples.
 }
 \description{
 Drop QC samples

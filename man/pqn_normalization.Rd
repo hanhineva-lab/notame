@@ -8,11 +8,13 @@ pqn_normalization(
   object,
   ref = c("qc", "all"),
   method = c("median", "mean"),
-  all_features = FALSE
+  all_features = FALSE,
+  assay.type = NULL,
+  name = NULL
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{ref}{character, the type of reference samples to use for normalization.}
 
@@ -21,15 +23,20 @@ sample.}
 
 \item{all_features}{logical, should all features be used for calculating the 
 reference sample?}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
+
+\item{name}{character, name of the resultant assay in case of multiple assays}
 }
 \value{
-A MetaboSet object with altered feature abundances.
+A SummarizedExperiment or MetaboSet object with altered feature 
+abundances.
 }
 \description{
-Apply probabilistic quotient normalization (PQN) to the exprs part of a 
-MetaboSet object. By default, reference is calculated from high-quality QC 
-samples and the median of the reference is used for normalization.
-Check parameters for more options.
+Apply probabilistic quotient normalization (PQN) to the peak table of a 
+SummarizedExperiment or MetaboSet object. By default, reference is 
+calculated from high-quality QC samples and the median of the reference is 
+used for normalization. Check parameters for more options.
 }
 \examples{
 pqn_set <- pqn_normalization(example_set)

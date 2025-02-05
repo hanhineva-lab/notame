@@ -4,6 +4,9 @@
 \alias{log,MetaboSet-method}
 \alias{log2,MetaboSet-method}
 \alias{log10,MetaboSet-method}
+\alias{log,SummarizedExperiment-method}
+\alias{log2,SummarizedExperiment-method}
+\alias{log10,SummarizedExperiment-method}
 \title{Logarithm}
 \usage{
 \S4method{log}{MetaboSet}(x, base = exp(1))
@@ -11,17 +14,29 @@
 \S4method{log2}{MetaboSet}(x)
 
 \S4method{log10}{MetaboSet}(x)
+
+\S4method{log}{SummarizedExperiment}(x, base = exp(1))
+
+\S4method{log2}{SummarizedExperiment}(x)
+
+\S4method{log10}{SummarizedExperiment}(x)
 }
 \arguments{
-\item{x}{a MetaboSet object}
+\item{x}{a SummarizedExperiment object}
 
 \item{base}{the base of the logarithm}
 }
 \value{
-A MetaboSet object with the assay transformed.
+A MetaboSet object with the exprs part transformed.
+
+A SummarizedExperiment object with the assay transformed.
 }
 \description{
-Log-transforms the exprs part of a MetaboSet object. Shortcuts for log2 and 
-log10 also implemented.
+Log-transforms the exprs part of a MetaboSet object. Shortcuts 
+for log2 and log10 also implemented.
+For more information, see \code{\link{log}}.
+
+Log-transforms the assay part of a SummarizedExperiment object. Shortcuts 
+for log2 and log10 also implemented.
 For more information, see \code{\link{log}}.
 }

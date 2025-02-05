@@ -3,7 +3,7 @@
 #' Draws a dendrogram of a hierarchical clustering applied to the samples of an 
 #' experiment.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param color character, name of the column used for coloring the sample 
@@ -16,44 +16,48 @@
 #' @param title The plot title
 #' @param subtitle The plot subtitle
 #' @param color_scale the color scale as returned by a ggplot function.
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A ggplot object.
 #'
 #' @examples
-#' plot_dendrogram(example_set)
+#' plot_dendrogram(example_set, color = "Group")
 #'
 #' @seealso \code{\link{dist}} \code{\link{hclust}}
 #'
 #' @export
 plot_dendrogram <- function(object, all_features = FALSE, 
-                            color = group_col(object), 
-                            dist_method = "euclidean", clust_method = "ward.D2",
+                            color, dist_method = "euclidean",
+                            clust_method = "ward.D2",
                             center = TRUE, scale = "uv", 
                             title = "Dendrogram of hierarchical clustering",
                             subtitle = NULL, 
-                            color_scale = getOption("notame.color_scale_dis")) {
+                            color_scale = getOption("notame.color_scale_dis"),
+                            assay.type = NULL) {
   if (!requireNamespace("pcaMethods", quietly = TRUE)) {
     stop("Package \'pcaMethods\' needed for this function to work.", 
          " Please install it.", call. = FALSE)
   }
-  color <- color %||% NULL
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_cols = color, assay.type = from)
   
   subtitle <- subtitle %||% paste("Distance method:", dist_method, 
                                   "Clustering method:", clust_method)
+  # change name to matrix
+  assay <- pcaMethods::prep(t(assay(object, from)), center = center, 
+                            scale = scale)
 
-  object <- pcaMethods::prep(object, center = center, scale = scale)
-
-  d_data <- stats::dist(t(exprs(object)), method = dist_method) %>%
+  d_data <- stats::dist(assay, method = dist_method) %>%
     stats::hclust(method = clust_method) %>%
     stats::as.dendrogram() %>%
     ggdendro::dendro_data()
 
   labels <- ggdendro::label(d_data) %>%
     dplyr::mutate(label = .data$label) %>%
-    dplyr::left_join(pData(object)[c("Sample_ID", color)], 
-                     by = c("label" = "Sample_ID"))
+    dplyr::left_join(colData(object)[c("Sample_ID", color)], 
+                     by = c("label" = "Sample_ID"), copy = TRUE)
   labels[, color] <- as.factor(labels[, color])
   p <- ggplot(ggdendro::segment(d_data)) +
     geom_segment(aes(x = .data$x, y = .data$y,
@@ -73,7 +77,7 @@ plot_dendrogram <- function(object, all_features = FALSE,
 #' Draws a heatmap of the distances between the samples of an experiment,
 #' the samples are ordered by hierarchical clustering.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param dist_method distance method used in clustering, see \code{\link{dist}}
@@ -91,12 +95,13 @@ plot_dendrogram <- function(object, all_features = FALSE,
 #' ggplot function
 #' @param fill_scale_dis Discrete fill scale for the group bar as returned by a 
 #' ggplot function
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A ggplot object. If \code{group_bar} is \code{TRUE}, the plot will 
 #' consist of multiple parts and is harder to modify.
 #'
 #' @examples
-#' plot_sample_heatmap(example_set)
+#' plot_sample_heatmap(example_set, group = "Group")
 #'
 #' @seealso \code{\link{dist}} \code{\link{hclust}}
 #'
@@ -105,27 +110,31 @@ plot_sample_heatmap <- function(object, all_features = FALSE,
                                 dist_method = "euclidean", 
                                 clust_method = "ward.D2",
                                 center = TRUE, scale = "uv",
-                                group_bar = TRUE, group = group_col(object),
+                                group_bar = TRUE, group = NULL,
                                 title = "Heatmap of distances between samples",
                                 subtitle = NULL, fill_scale_con =
                                 getOption("notame.fill_scale_con"),
                                 fill_scale_dis =
-                                getOption("notame.fill_scale_dis")) {
+                                getOption("notame.fill_scale_dis"),
+                                assay.type = NULL) {
   if (!requireNamespace("pcaMethods", quietly = TRUE)) {
     stop("Package \'pcaMethods\' needed for this function to work.",
          " Please install it.", call. = FALSE)
   }
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_cols = group, assay.type = from)
 
   # Default settings
   subtitle <- subtitle %||% paste("Distance method:", dist_method, 
                                   "Clustering method:", clust_method)
 
-  object <- pcaMethods::prep(object, center = center, scale = scale)
+  assay <- pcaMethods::prep(t(assay(object, from)), center = center,
+                            scale = scale)
 
   # Distances
-  distances <- stats::dist(t(exprs(object)), method = dist_method)
+  distances <- stats::dist(assay, method = dist_method)
   # Hierarchical clustering for ordering
   hc <- stats::hclust(distances, method = clust_method)
   hc_order <- hc$labels[hc$order]
@@ -149,8 +158,8 @@ plot_sample_heatmap <- function(object, all_features = FALSE,
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = -0.05)) +
     coord_fixed()
   # Group bar
-  if (group_bar && !is.na(group)) {
-    pheno_data <- pData(object)
+  if (group_bar && !is.null(group)) {
+    pheno_data <- colData(object)
     pheno_data$Sample_ID <- factor(pheno_data$Sample_ID, levels = hc_order,
                                    ordered = TRUE)
 

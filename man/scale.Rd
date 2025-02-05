@@ -2,19 +2,27 @@
 % Please edit documentation in R/transformations.R
 \name{scale,MetaboSet-method}
 \alias{scale,MetaboSet-method}
+\alias{scale,SummarizedExperiment-method}
 \title{Scale exprs data}
 \usage{
 \S4method{scale}{MetaboSet}(x, center = TRUE, scale = TRUE)
+
+\S4method{scale}{SummarizedExperiment}(x, center = TRUE, scale = TRUE)
 }
 \arguments{
-\item{x}{a MetaboSet object}
+\item{x}{a SummarizedExperiment object}
 
 \item{center, scale}{as in base scale function}
 }
 \value{
-A Metaboset object with modified assay.
+A Metaboset object with modified peak table.
+
+A SummarizedExperiment object with modified assay.
 }
 \description{
 Applies the base R function scale to transposed exprs matrix. See ?scale for 
+details.
+
+Applies the base R function scale to transposed assay matrix. See ?scale for 
 details.
 }

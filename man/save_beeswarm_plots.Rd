@@ -10,22 +10,23 @@ save_beeswarm_plots(
   save = TRUE,
   file_path = NULL,
   format = "emf",
-  x = group_col(object),
+  x,
   add_boxplots = FALSE,
   title = "Feature_ID",
   subtitle = NULL,
-  color = group_col(object),
+  color,
   color_scale = getOption("notame.color_scale_dis"),
   text_base_size = 14,
   cex = 2,
   size = 2,
   title_line_length = 40,
   theme = theme_bw(base_size = text_base_size),
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{all_features}{logical, should all features be used? If FALSE (the 
 default), flagged features are removed before visualization.}
@@ -41,8 +42,8 @@ paths for other formats}
 
 \item{add_boxplots}{logical, should boxplots be added to the figure?}
 
-\item{title, subtitle}{column names from fData to use as plot title/filename 
-and subtitle.
+\item{title, subtitle}{column names from feature data to use as plot 
+title/filename and subtitle.
 Set to NULL for no title/subtitle, this creates running numbered filenames}
 
 \item{color}{character, name of the column to be used for coloring}
@@ -60,6 +61,8 @@ characters, passed to stringr::str_wrap}
 
 \item{theme}{a ggplot theme to be added to the plot}
 
+\item{assay.type}{character, assay to be used in case of multiple assays}
+
 \item{...}{other arguments to graphic device functions, like width and height}
 }
 \value{
@@ -75,7 +78,7 @@ A separate plot is drawn and saved for each feature.
 # Default beeswarms by group
 save_beeswarm_plots(drop_qcs(example_set)[1:10],
   file_path = "./beeswarm_plots.pdf",
-  format = "pdf"
+  format = "pdf", x = "Group", color = "Group"
 )
 # x and color can be a different variable
 save_beeswarm_plots(drop_qcs(example_set)[1:10],
@@ -86,7 +89,8 @@ save_beeswarm_plots(drop_qcs(example_set)[1:10],
 )
 
 # Plot one feature
-save_beeswarm_plots(drop_qcs(example_set)[1, ], save = FALSE)
+save_beeswarm_plots(drop_qcs(example_set)[1, ], save = FALSE, x = "Group", 
+color = "Group")
 \dontshow{setwd(.old_wd)}
 
 }

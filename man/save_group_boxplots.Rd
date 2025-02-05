@@ -10,8 +10,8 @@ save_group_boxplots(
   save = TRUE,
   file_path = NULL,
   format = "emf",
-  x = group_col(object),
-  color = group_col(object),
+  x,
+  color,
   title = "Feature_ID",
   subtitle = NULL,
   color_scale = getOption("notame.color_scale_dis"),
@@ -21,11 +21,12 @@ save_group_boxplots(
   point_size = 3,
   title_line_length = 40,
   theme = theme_bw(base_size = text_base_size),
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{all_features}{logical, should all features be used? 
 If FALSE (the default), flagged features are removed before visualization.}
@@ -41,8 +42,8 @@ paths for other formats}
 
 \item{color}{character, name of the column to be used for coloring}
 
-\item{title, subtitle}{column names from fData to use as plot title/filename 
-and subtitle.
+\item{title, subtitle}{column names from feature data to use as plot 
+title/filename and subtitle.
 Set to NULL for no title/subtitle, this creates running numbered filenames}
 
 \item{color_scale}{the color scale as returned by a ggplot function}
@@ -60,6 +61,8 @@ characters, passed to stringr::str_wrap}
 
 \item{theme}{a ggplot theme to be added to the plot}
 
+\item{assay.type}{character, assay to be used in case of multiple assays}
+
 \item{...}{other arguments to graphic device functions, like width and height}
 }
 \value{
@@ -75,17 +78,18 @@ A separate plot is drawn and saved for each feature.
 # Default boxplots by group
 save_group_boxplots(drop_qcs(example_set)[1:10],
   file_path = "./group_boxplots.pdf",
-  format = "pdf", title = NULL
+  format = "pdf", x = "Group", color = "Group"
 )
 # x and color can be a different variable
 save_group_boxplots(drop_qcs(example_set)[1:10],
   file_path = "./time_boxplots/",
   format = "emf",
   x = "Time",
-  color = "Group", title = NULL
+  color = "Group"
 )
 # Plot one feature
-save_group_boxplots(drop_qcs(example_set)[1, ], save = FALSE)
+save_group_boxplots(drop_qcs(example_set)[1, ], save = FALSE, x = "Group", 
+                    color = "Group")
 \dontshow{setwd(.old_wd)}
 
 }

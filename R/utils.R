@@ -111,7 +111,6 @@
 #' \item \code{\link{save_subject_line_plots}} save line plots with mean
 #' \item \code{\link{save_group_lineplots}} save line plots with errorbars by 
 #' group
-#' \item \code{\link{save_dc_plots}} save drift correction plots
 #' \item \code{\link{save_batch_plots}} save batch correction plots
 #' }
 #'
@@ -126,7 +125,7 @@
 #' variables, such as correlations
 #' }
 #' 
-#' MetaboSet utilities:
+#' Object utilities:
 #' \itemize{
 #' \item \code{\link{read_from_excel}} read formatted Excel files
 #' \item \code{\link{construct_metabosets}} construct MetaboSet objects
@@ -144,6 +143,9 @@
 #' \item \code{\link{join_pData}} join new columns to pheno data
 #' \item \code{\link{combined_data}} retrieve both sample information and 
 #' features
+#' \item \code{\link{merge_objects}} merge SummarizedExperiment objects 
+#' together
+#' \item \code{\link{fix_object}} fix object for functioning of notame
 #' }
 #' 
 #' Other utilities:
@@ -169,11 +171,12 @@ NULL
 #' @importFrom utils citation
 #' @importFrom Biobase exprs exprs<- phenoData pData pData<- featureData fData 
 #' fData<- sampleNames sampleNames<- featureNames featureNames<- assayData 
-#' protocolData
+#' protocolData varMetadata
 #' @importFrom magrittr "%>%" "%<>%"
 #' @importClassesFrom Biobase ExpressionSet
 #' @import BiocGenerics
 #' @import methods
+#' @import SummarizedExperiment
 NULL
 
 utils::globalVariables(c('i', '.'))
@@ -183,7 +186,11 @@ utils::globalVariables(c('i', '.'))
 #' @param libname,pkgname default parameters
 #' @noRd
 .onLoad <- function(libname, pkgname) {
-  message("NOTE This is a development version. There is active development with breaking changes until the package has been approved in Bioconductor. Yet, everything in the main branch is to our knowledge working as it should. The original notame package this development is based on can be installed using `devtools::install_github('antonvsdata/notame@v0.3.1')`")
+  message("NOTE This is a development version. There is active development with 
+  breaking changes until the package has been approved in Bioconductor. Yet, 
+  everything in the main branch is to our knowledge working as it should. The 
+  original notame package this development is based on can be installed using 
+  `devtools::install_github('antonvsdata/notame@v0.3.1')`")
   op <- options()
   op_notame <- list(
     notame.citations = list(
@@ -232,7 +239,7 @@ utils::globalVariables(c('i', '.'))
 #' @examples
 #'
 #' citations()
-#' plot_tsne(example_set, perplexity = 10)
+#' plot_tsne(example_set, perplexity = 10, group = "Group", color = "Group")
 #' # Rtsne added to citations
 #' citations()
 #'
@@ -317,8 +324,8 @@ finite_quantile <- function(x, ...) {
 #' @return A numeric, the proportion of non-missing values in a vector.
 #'
 #' @examples
-#' example_set <- mark_nas(example_set, value = 0)
-#' prop_na(exprs(example_set))
+#' ex_set <- mark_nas(example_set, value = 0)
+#' prop_na(assay(ex_set))
 #' 
 #' @noRd
 prop_na <- function(x) {
@@ -332,8 +339,8 @@ prop_na <- function(x) {
 #' @return A numeric, the proportion of non-missing values in vector.
 #'
 #' @examples
-#' example_set <- mark_nas(example_set, value = 0)
-#' prop_found(exprs(example_set))
+#' ex_set <- mark_nas(example_set, value = 0)
+#' prop_found(assay(example_set))
 #'
 #' @noRd
 prop_found <- function(x) {
@@ -360,4 +367,45 @@ prop_found <- function(x) {
 
 .all_unique <- function(x) {
   !any(duplicated(x))
+}
+
+.get_from_to_names <- function(object, assay.type, name) {
+  object <- as(object, "SummarizedExperiment")
+  # Input behavior (from)
+  # If assay.type is not supplied and there is only one assay in the objcet, 
+  # choose the first assay
+  if (is.null(assay.type) && length(assays(object)) == 1) {
+    from <- 1
+  } else if (is.null(assay.type)) {
+    stop("When using multiple assays, specify assay.type", call. = FALSE)
+  } else if (!assay.type %in% names(assays(object)) & assay.type != 1) {
+    stop(assay.type, " was specified but not found in assays", call. = FALSE)
+  } else {
+    from <- assay.type
+  }
+  # Output behavior (to)
+  if (is.null(name) && length(assays(object)) == 1) {
+    to <- 1
+  } else if (is.null(name)) {
+    stop("When using multiple assays, specify name of new assay", call. = FALSE)
+  } else if (name == from & from != 1) {
+    stop("'name' must be different from `assay.type`.", call. = FALSE)
+  } else {
+    to <- name
+  }
+  list(from, to)
+}
+
+.get_from_name <- function(object, assay.type) {
+  object <- as(object, "SummarizedExperiment")
+  # Input behavior (from)
+  if (is.null(assay.type) && length(assays(object)) == 1) {
+    from <- 1
+  } else if (is.null(assay.type)) {
+    stop("When using multiple assays, specify assay.type", call. = FALSE)
+  } else if (!assay.type %in% names(assays(object)) & assay.type != 1) {
+    stop(assay.type, " was specified but not found in assays", call. = FALSE)
+  } else {
+    from <- assay.type
+  }
 }

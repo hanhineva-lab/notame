@@ -13,11 +13,13 @@ perform_correlation_tests(
   fdr = TRUE,
   all_pairs = TRUE,
   duplicates = FALSE,
+  assay.type1 = NULL,
+  assay.type2 = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{x}{character vector, names of variables to be correlated}
 
@@ -27,9 +29,9 @@ set of variables to be correlated against x}
 \item{id}{character, column name for subject IDs. If provided, the 
 correlation will be computed using the rmcorr package}
 
-\item{object2}{optional second MetaboSet object. If provided, x variables 
-will be taken from object and y variables will be taken from object2. Both 
-objects should have the same number of samples.}
+\item{object2}{optional second object. If provided, x 
+variables will be taken from object and y variables will be taken from 
+object2. Both objects should have the same number of samples.}
 
 \item{fdr}{logical, whether p-values from the correlation test should be 
 adjusted with FDR correction}
@@ -43,6 +45,12 @@ the same length.}
 the order of the variables '(which is x and which is y) is changed. Can be 
 useful for e.g. plotting a heatmap of the results, see examples of
 \code{\link{plot_effect_heatmap}}}
+
+\item{assay.type1}{character, assay of object(1) to be used in case of 
+multiple assays}
+
+\item{assay.type2}{character, assay of object2 to be used in case of 
+multiple assays}
 
 \item{...}{other parameters passed to \code{\link{cor.test}}, such as method}
 }
@@ -63,22 +71,22 @@ and each y variable are computed.
 \examples{
 # Correlations between all features
 correlations <- perform_correlation_tests(example_set, 
-  x = featureNames(example_set))
+  x = rownames(example_set), id = "Subject_ID")
 
 # Spearman Correlations between features and sample information variables
 # Drop QCs and convert time to numeric
 no_qc <- drop_qcs(example_set)
 no_qc$Time <- as.numeric(no_qc$Time)
 correlations <- perform_correlation_tests(no_qc,
-  x = featureNames(example_set),
+  x = rownames(example_set),
   y = c("Time", "Injection_order"), method = "spearman"
 )
 
-# Correlations between variables from two distinct MetaboSets
+# Correlations between variables from two distinct objects
 cross_object_cor <- perform_correlation_tests(hilic_neg_sample,
-  x = featureNames(hilic_neg_sample),
+  x = rownames(hilic_neg_sample),
   object2 = hilic_pos_sample,
-  y = featureNames(hilic_pos_sample),
+  y = rownames(hilic_pos_sample),
   all_pairs = FALSE
 )
 }

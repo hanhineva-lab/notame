@@ -4,12 +4,14 @@
 \alias{fold_change}
 \title{Fold change}
 \usage{
-fold_change(object, group = group_col(object))
+fold_change(object, group, assay.type = NULL)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{group}{character, name of the group column}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
 A data frame with fold changes for each feature.
@@ -19,7 +21,7 @@ Computes fold change between each group for each feature.
 }
 \examples{
 # Between groups
-fc <- fold_change(example_set)
+fc <- fold_change(example_set, group = "Group")
 # Between time points
 fc <- fold_change(example_set, group = "Time")
 

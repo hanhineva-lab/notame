@@ -10,9 +10,9 @@ plot_pca_arrows(
   all_features = FALSE,
   center = TRUE,
   scale = "uv",
-  color = group_col(object),
-  time = time_col(object),
-  subject = subject_col(object),
+  color,
+  time,
+  subject,
   alpha = 0.6,
   arrow_style = arrow(),
   title = "PCA changes",
@@ -20,11 +20,12 @@ plot_pca_arrows(
   color_scale = getOption("notame.color_scale_dis"),
   text_base_size = 14,
   line_width = 0.5,
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{pcs}{numeric vector of length 2, the principal components to plot}
 
@@ -57,6 +58,8 @@ modified, see \code{?arrow}}
 
 \item{line_width}{the width of the arrows}
 
+\item{assay.type}{character, assay to be used in case of multiple assays}
+
 \item{...}{additional arguments passed to pcaMethods::pca}
 }
 \value{
@@ -67,9 +70,11 @@ Plots changes in PCA space according to time. All the observations of a
 single subject are connected by an arrow ending at the last observation.
 }
 \examples{
-plot_pca_arrows(drop_qcs(example_set))
+plot_pca_arrows(drop_qcs(example_set), color = "Group", time = "Time",
+  subject = "Subject_ID")
 # If the sample size is large, plot groups separately
-plot_pca_arrows(drop_qcs(example_set)) +
+plot_pca_arrows(drop_qcs(example_set), color = "Group", 
+                time = "Time", subject = "Subject_ID") +
   facet_wrap(~Group)
 
 }

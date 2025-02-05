@@ -13,11 +13,12 @@ plot_dist_density(
   color_scale = getOption("notame.color_scale_dis"),
   fill_scale = getOption("notame.fill_scale_dis"),
   title = paste("Density plot of", dist_method, "distances between samples"),
-  subtitle = NULL
+  subtitle = NULL,
+  assay.type = NULL
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{all_features}{logical, should all features be used? 
 If FALSE (the default), flagged features are removed before visualization.}
@@ -38,6 +39,8 @@ a ggplot function}
 \item{title}{the plot title}
 
 \item{subtitle}{the plot subtitle}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
 A ggplot object.
