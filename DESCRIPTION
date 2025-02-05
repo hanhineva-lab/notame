@@ -42,7 +42,6 @@ Imports:
     tidyr,
     utils
 Suggests:
-    batchCorr,
     BiocStyle,
     car,
     fpc,
@@ -60,7 +59,6 @@ Suggests:
     rmcorr,
     Rtsne,
     RUVSeq,
-    supraHex,
     testthat
 URL: https://github.com/vsuksi/notame
 BugReports: https://github.com/vsuksi/notame/issues

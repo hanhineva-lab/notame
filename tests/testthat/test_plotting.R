@@ -103,8 +103,8 @@ test_that("Batch plots work with and without multiple assays", {
   names(assays(ex_set)) <- c("original")
 
   replicates <- list(which(ex_set$QC == "QC"))
-  batch_corrected <- normalize_batches(ex_set, 
-    batch = "Batch", group = "QC", ref_label = "QC", name = "bcorrected")
+  batch_corrected <- ruvs_qc(ex_set, 
+    replicates = replicates, name = "bcorrected")
   # Assay not found with one object with a single assay
   expect_error(save_batch_plots(
     orig = ex_set[1:10], file = path, assay.type1 = c("original"),
@@ -116,8 +116,8 @@ test_that("Batch plots work with and without multiple assays", {
     assay.type2 = "bcorrected")
   
   # Assay not found with two objects, assay.type must be character
-  ex_set <- normalize_batches(ex_set, 
-    batch = "Batch", group = "QC", ref_label = "QC", name = "bcorrected")
+  ex_set <- ruvs_qc(ex_set, 
+    replicates = replicates, name = "bcorrected")
   expect_error(save_batch_plots(
     orig = ex_set[1:10], corrected = batch_corrected[1:10],
     file = path, assay.type1 = 1))

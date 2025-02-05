@@ -25,8 +25,6 @@ dataset, returning modifed objects):
 \item \code{\link{flag_detection}} flag features with low detection rate
 \item \code{\link{flag_contaminants}} flag contaminants based on blanks
 \item \code{\link{correct_drift}} correct drift using cubic spline
-\item \code{\link{align_batches}} align features between batches
-\item \code{\link{normalize_batches}} normalize between batches
 \item \code{\link{ruvs_qc}} Remove Unwanted Variation (RUV) between batches
 \item \code{\link{pca_bhattacharyya_dist}} Bhattacharyya distance between 
 batches in PCA space
