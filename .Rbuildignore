@@ -7,3 +7,5 @@
 ^\.Rproj\.user$
 ^.*\.lintr$
 ^LICENSE\.md$
+.github
+^\.github$
