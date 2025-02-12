@@ -381,7 +381,7 @@
 #'
 #' @details
 #' If skip_checks = FALSE, \code{\link{read_from_excel}} attempts to modify the 
-#' object as per \code{\link{fix_object}} and checks the object. If skip_checks 
+#' data as per \code{\link{fix_object}} and checks the data. If skip_checks 
 #' = TRUE, parameters for \code{\link{fix_object}} are ignored.
 #' @export
 read_from_excel <- function(file, sheet = 1, id_column = NULL, 
