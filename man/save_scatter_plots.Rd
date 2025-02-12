@@ -77,6 +77,7 @@ A separate plot is drawn and saved for each feature.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
+data(example_set)
 # Against injection order, colored by group
 save_scatter_plots(
   object = example_set[1:10],

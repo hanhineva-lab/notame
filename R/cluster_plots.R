@@ -21,6 +21,7 @@
 #' @return A ggplot object.
 #'
 #' @examples
+#' data(example_set)
 #' plot_dendrogram(example_set, color = "Group")
 #'
 #' @seealso \code{\link{dist}} \code{\link{hclust}}
@@ -101,6 +102,7 @@ plot_dendrogram <- function(object, all_features = FALSE,
 #' consist of multiple parts and is harder to modify.
 #'
 #' @examples
+#' data(example_set)
 #' plot_sample_heatmap(example_set, group = "Group")
 #'
 #' @seealso \code{\link{dist}} \code{\link{hclust}}

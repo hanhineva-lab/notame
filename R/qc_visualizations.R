@@ -36,6 +36,7 @@
 #' @return A ggplot object.
 #'
 #' @examples
+#' data(example_set)
 #' plot_dist_density(example_set)
 #' # Drift correction tightens QCs together
 #' plot_dist_density(correct_drift(example_set))
@@ -94,6 +95,7 @@ plot_dist_density <- function(object, all_features = FALSE,
 #' @seealso \code{\link{plot_p_histogram}}
 #'
 #' @examples
+#' data(example_set)
 #' plot_injection_lm(example_set)
 #'
 #' @export
@@ -135,6 +137,7 @@ plot_injection_lm <- function(object, all_features = FALSE, assay.type = NULL) {
 #' @param x_label the x-axis label
 #'
 #' @examples 
+#' data(example_set)
 #' lm_sample <- perform_lm(drop_qcs(example_set), "Feature ~ Injection_order")
 #' p_values <- list("Biological samples" = lm_sample$Injection_order_P)
 #' plot_p_histogram(p_values)
@@ -193,6 +196,7 @@ plot_p_histogram <- function(p_values, hline = TRUE, combine = TRUE,
 #' @return A ggplot object.
 #'
 #' @examples
+#' data(example_set)
 #' plot_quality(example_set)
 #'
 #' @export
@@ -257,6 +261,7 @@ plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE,
 #' @return A ggplot object.
 #'
 #' @examples
+#' data(example_set)
 #' plot_sample_boxplots(example_set, order_by = "Group", fill_by = "Group")
 #'
 #' @export

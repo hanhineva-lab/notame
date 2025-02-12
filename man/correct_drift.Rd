@@ -93,6 +93,7 @@ and the original is retained.
 By default, the column used for color is also used for shape.
 }
 \examples{
+data(example_set)
 corrected <- correct_drift(example_set)
 
 }

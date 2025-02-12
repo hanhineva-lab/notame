@@ -12,9 +12,9 @@
 #' @return A SummarizedExperiment or Metaboset object with the normalized data.
 #'
 #' @examples
+#' data(example_set)
 #' # Batch correction
 #' replicates <- list(which(example_set$QC == "QC"))
-#' ex_set <- ruvs_qc(example_set, replicates = replicates, name = "bcorrected")
 #' batch_corrected <- ruvs_qc(example_set, replicates = replicates)
 #' # Evaluate batch correction
 #' pca_bhattacharyya_dist(example_set, batch = "Batch")
@@ -78,6 +78,7 @@ ruvs_qc <- function(object, replicates, k = 3,
 #' @return A matrix of Bhattacharyya distances between batches.
 #'
 #' @examples
+#' data(example_set)
 #' # Batch correction
 #' replicates <- list(which(example_set$QC == "QC"))
 #' batch_corrected <- ruvs_qc(example_set, replicates = replicates)
@@ -171,6 +172,7 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
 #' @return A data frame with one row per feature with the repeatability measure.
 #'
 #' @examples
+#' data(example_set)
 #' # Batch correction
 #' replicates <- list(which(example_set$QC == "QC"))
 #' batch_corrected <- ruvs_qc(example_set, replicates = replicates)
@@ -227,6 +229,7 @@ perform_repeatability <- function(object, group, assay.type = NULL) {
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
+#' data(example_set)
 #' ex_set <- example_set
 #' rowData(ex_set)[3, ]$Average_Mz <- 
 #'   rowData(ex_set)[2, ]$Average_Mz + 0.001
@@ -314,6 +317,7 @@ align_batches <- function(object_na, object_fill, batch, mz, rt,
 #' @return  A SummarizedExperiment or MetaboSet object with normalized features
 #'
 #' @examples
+#' data(example_set)
 #' # Batch correction
 #' batch_normalized <- normalize_batches(example_set,
 #'   batch = "Batch", group = "QC", ref_label = "QC")
@@ -387,6 +391,7 @@ normalize_batches <- function(object, batch, group, ref_label,
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
+#' data(example_set)
 #' # Batch correction
 #' replicates <- list(which(example_set$QC == "QC"))
 #' batch_corrected <- normalize_batches(example_set, 

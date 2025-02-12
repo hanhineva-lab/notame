@@ -75,6 +75,7 @@ A separate plot is drawn and saved for each feature.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
+data(example_set)
 # Default beeswarms by group
 save_beeswarm_plots(drop_qcs(example_set)[1:10],
   file_path = "./beeswarm_plots.pdf",

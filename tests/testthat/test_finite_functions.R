@@ -1,7 +1,5 @@
 context("Finite helper functions")
 
-library(notame)
-
 test_that("Work correctly for full vectors", {
   x <- 13:20
   expect_equal(finite_sd(x), sd(x))

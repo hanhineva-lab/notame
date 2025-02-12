@@ -24,6 +24,7 @@ by injection order alone. The expected uniform distribution is represented
 by a dashed red line.
 }
 \examples{
+data(example_set)
 plot_injection_lm(example_set)
 
 }

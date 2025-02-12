@@ -5,7 +5,8 @@
 #' 
 #' @return A data frame with quality metrics for each feature.
 #'
-#' @examples 
+#' @examples
+#' data(example_set)
 #' ex_set <- assess_quality(example_set)
 #' quality(ex_set)
 #'
@@ -44,6 +45,7 @@ quality <- function(object) {
 #' feature data.
 #' 
 #' @examples
+#' data(example_set)
 #' ex_set <- assess_quality(example_set)
 #' rowData(ex_set)
 #'
@@ -159,6 +161,7 @@ setMethod("assess_quality", signature = c(object = "SummarizedExperiment"),
 #'   "(RSD_r < 0.2 & D_ratio_r < 0.4) | 
 #'   (RSD < 0.1 & RSD_r < 0.1 & D_ratio < 0.1)")
 #' @examples
+#' data(example_set)
 #' ex_set <- flag_quality(example_set)
 #' rowData(ex_set)
 #' # Custom condition
@@ -222,6 +225,7 @@ flag_quality <- function(object, assay.type = NULL, condition =
 #' @return A SummarizedExperiment or MetaboSet object with the features flagged.
 #'
 #' @examples
+#' data(example_set)
 #' ex_set <- mark_nas(example_set, value = 0)
 #' ex_set <- flag_detection(ex_set, group = "Group")
 #' rowData(ex_set)
@@ -306,7 +310,8 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' @return A SummarizedExperiment or MetaboSet object with contaminant features 
 #' flagged.
 #'
-#' @examples 
+#' @examples
+#' data(example_set)
 #' # Make a blank sample which has one (first) feature exceeding the threshold
 #' ## Abundance matrix
 #' med <- median(assay(example_set)[1, example_set$QC != "QC"])

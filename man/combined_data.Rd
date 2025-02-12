@@ -24,6 +24,7 @@ one row per sample.
 Retrieve both sample information and features
 }
 \examples{
+data(example_set)
 combined_data(example_set)
 
 }

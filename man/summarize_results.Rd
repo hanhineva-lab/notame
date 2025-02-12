@@ -36,6 +36,7 @@ Uses regexp to remove unnecessary columns from statistics results data frame.
 Can also rename columns effectively.
 }
 \examples{
+data(example_set)
 # Simple manipulation to linear model results
 lm_results <- perform_lm(drop_qcs(example_set), 
   formula_char = "Feature ~ Group + Time")

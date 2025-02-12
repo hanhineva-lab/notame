@@ -47,6 +47,7 @@ conditions:
 \deqn{RSD < 0.1 \& RSD_r < 0.1 \& D_ratio < 0.1}
 }
 \examples{
+data(example_set)
 ex_set <- flag_quality(example_set)
 rowData(ex_set)
 # Custom condition

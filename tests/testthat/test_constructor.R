@@ -1,8 +1,6 @@
 context("Testing constructor class")
 
-library(notame)
-
-data("example_set")
+data(example_set, package = "notame")
 
 test_that("Changing feature names updates all occurrences", {
   set <- as(example_set, "MetaboSet")

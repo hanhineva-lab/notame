@@ -112,6 +112,7 @@ in time point order
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
+data(example_set)
 visualizations(example_set, prefix="figures/example_set", perplexity=5,
                group = "Group", color = "Group", time = "Time", 
                id = "Subject_ID")

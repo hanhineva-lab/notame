@@ -69,6 +69,7 @@ those variables are computed. Or provide two distinct sets of variables
 and each y variable are computed.
 }
 \examples{
+data(example_set)
 # Correlations between all features
 correlations <- perform_correlation_tests(example_set, 
   x = rownames(example_set), id = "Subject_ID")

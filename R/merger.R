@@ -143,11 +143,14 @@
 #'
 #' @examples
 #' # Merge analytical modes
-#' merged <- merge_metabosets(
-#'   hilic_neg_sample, hilic_pos_sample,
-#'   rp_neg_sample, rp_pos_sample
-#' )
+#' data(hilic_neg_sample, hilic_pos_sample, rp_neg_sample, rp_pos_sample)
+#' modes <- list(hilic_neg_sample, hilic_pos_sample, 
+#'               rp_neg_sample, rp_pos_sample)
+#' modes <- lapply(modes, function(mode) as(mode, "MetaboSet"))
+#' merged <- merge_metabosets(modes)
+#'
 #' # Merge batches
+#' data(example_set)
 #' batch1 <- example_set[, example_set$Batch == 1]
 #' batch2 <- example_set[, example_set$Batch == 2]
 #' merged <- merge_metabosets(batch1, batch2, merge = "samples")
@@ -204,6 +207,7 @@ merge_metabosets <- function(..., merge = c("features", "samples")) {
 #'
 #' @examples
 #' # Merge analytical modes
+#' data(hilic_neg_sample, hilic_pos_sample, rp_neg_sample, rp_pos_sample)
 #' merged <- merge_objects(
 #'   hilic_neg_sample, hilic_pos_sample,
 #'   rp_neg_sample, rp_pos_sample

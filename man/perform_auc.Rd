@@ -26,6 +26,7 @@ AUCs. This object can then be  used to compute results of e.g. t-tests of
 AUCs between groups.
 }
 \examples{
+data(example_set)
 # Drop QC samples before computing AUCs
 aucs <- perform_auc(drop_qcs(example_set), time = "Time", 
                     subject = "Subject_ID", group = "Group")

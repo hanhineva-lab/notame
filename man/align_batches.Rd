@@ -59,6 +59,7 @@ alignBatches from batchCorr package. See more details in the original paper.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
+data(example_set)
 ex_set <- example_set
 rowData(ex_set)[3, ]$Average_Mz <- 
   rowData(ex_set)[2, ]$Average_Mz + 0.001

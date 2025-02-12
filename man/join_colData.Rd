@@ -23,6 +23,7 @@ Join a new data frame of information to pheno data of a SummarizedExperiment
 object.
 }
 \examples{
+data(example_set)
 new_info <- data.frame(
   Sample_ID = colnames(example_set),
   BMI = stats::runif(ncol(example_set), 22, 26)

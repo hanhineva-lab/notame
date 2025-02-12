@@ -49,6 +49,7 @@ see the example. With bootstrap ("boot") confidence intervals, the results
 are reproducible if RNGseed is set for the BiocParallel backend.
 }
 \examples{
+data(example_set)
 # A simple example without QC samples
 # Features predicted by Group and Time as fixed effects with Subject ID as a 
 # random effect

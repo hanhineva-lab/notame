@@ -80,6 +80,7 @@ A separate plot is drawn and saved for each feature.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
+data(example_set)
 save_subject_line_plots(drop_qcs(example_set)[1:10], x = "Time", 
   id = "Subject_ID", file_path = "./subject_line_plots.pdf",
   format = "emf", title = NULL)

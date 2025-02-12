@@ -1,6 +1,6 @@
 context("Testing reading data")
 
-library(notame)
+data(example_set, package = "notame")
 
 test_that("Column conversion works", {
   set.seed(38)

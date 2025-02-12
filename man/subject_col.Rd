@@ -25,9 +25,11 @@ specified variable.
 Get and set the name of special column for subject identifiers
 }
 \examples{
+data(example_set)
 ex_set <- as(example_set, "MetaboSet")
 # Get name of subject variable
 subject_col(ex_set)
+data(example_set)
 ex_set <- as(example_set, "MetaboSet")
 # Set subject variable
 subject_col(ex_set) <- "Subject_ID"

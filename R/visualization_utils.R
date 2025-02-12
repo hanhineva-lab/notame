@@ -11,6 +11,7 @@
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
+#' data(example_set)
 #' lm_results <- perform_lm(drop_qcs(example_set), 
 #'   formula_char = "Feature ~ Group")
 #'
@@ -210,6 +211,7 @@ save_plot <- function(p, file, ...) {
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
+#' data(example_set)
 #' visualizations(example_set, prefix="figures/example_set", perplexity=5,
 #'                group = "Group", color = "Group", time = "Time", 
 #'                id = "Subject_ID")

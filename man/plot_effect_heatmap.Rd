@@ -93,6 +93,7 @@ All missing effects between variables are replaced by 0 before
 clustering, since \code{hclust} can't deal with missing values.
 }
 \examples{
+data(example_set)
 # Compute correlations between variables
 correlations <- perform_correlation_tests(example_set,
   x = rownames(example_set),

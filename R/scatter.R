@@ -87,6 +87,7 @@
 #' consist of multiple parts and is harder to modify.
 #'
 #' @examples
+#' data(example_set)
 #' plot_pca(example_set, color = "Injection_order", shape = "Group")
 #'
 #' @seealso \code{\link[pcaMethods]{pca}}
@@ -161,6 +162,7 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' consist of multiple parts and is harder to modify.
 #'
 #' @examples
+#' data(example_set)
 #' plot_tsne(example_set, color = "Time", shape = "Group", perplexity = 10)
 #'
 #' @seealso \code{\link[Rtsne]{Rtsne}}
@@ -315,6 +317,7 @@ plot_tsne <- function(object, all_features = FALSE, center = TRUE,
 #' @return A ggplot object.
 #'
 #' @examples
+#' data(example_set)
 #' plot_pca_loadings(example_set, n_features = c(2, 4))
 #'
 #' @seealso \code{\link[pcaMethods]{pca}}
@@ -393,6 +396,7 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' @return A ggplot object.
 #'
 #' @examples
+#' data(example_set)
 #' plot_pca_hexbin(example_set)
 #'
 #' @seealso \code{\link[pcaMethods]{pca}}
@@ -450,6 +454,7 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' A ggplot object.
 #'
 #' @examples
+#' data(example_set)
 #' plot_tsne_hexbin(example_set, perplexity = 10)
 #'
 #' @seealso \code{\link[Rtsne]{Rtsne}}
@@ -543,6 +548,7 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
 #' @return A ggplot object.
 #'
 #' @examples
+#' data(example_set)
 #' plot_pca_arrows(drop_qcs(example_set), color = "Group", time = "Time",
 #'   subject = "Subject_ID")
 #' # If the sample size is large, plot groups separately
@@ -617,6 +623,7 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' consist of multiple parts and is harder to modify.
 #'
 #' @examples
+#' data(example_set)
 #' plot_tsne_arrows(drop_qcs(example_set), perplexity = 10, color = "Group", 
 #'   time = "Time", subject = "Subject_ID")
 #' # If the sample size is large, plot groups separately
@@ -695,6 +702,7 @@ minus_log10 <- scales::trans_new("minus_log10",
 #' @return A ggplot object.
 #'
 #' @examples
+#' data(example_set)
 #' # naturally, this looks messy as there are not enough p-values
 #' lm_results <- perform_lm(drop_qcs(example_set), 
 #'   formula_char = "Feature ~ Group")
@@ -887,6 +895,7 @@ setMethod("volcano_plot", c(object = "SummarizedExperiment"),
 #' @return A ggplot object.
 #'
 #' @examples
+#' data(example_set)
 #' # naturally, this looks messy as there are not enough p-values
 #' lm_results <- perform_lm(drop_qcs(example_set), 
 #'   formula_char = "Feature ~ Group")
@@ -1064,6 +1073,7 @@ setMethod("manhattan_plot", c(object = "SummarizedExperiment"),
 #' @return A ggplot object.
 #'
 #' @examples
+#' data(example_set)
 #' # Compute results from a linear model
 #' lm_results <- perform_lm(example_set, formula_char = "Feature ~ Group")
 #' with_results <- join_rowData(example_set, lm_results)

@@ -20,8 +20,8 @@ authors have not supplied correct citation information for their package.
 The output is written to the current log file, if specified.
 }
 \examples{
-
 citations()
+data(example_set)
 plot_tsne(example_set, perplexity = 10, group = "Group", color = "Group")
 # Rtsne added to citations
 citations()

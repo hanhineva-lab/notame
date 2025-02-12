@@ -24,10 +24,12 @@ the specified variable.
 Get and set name of the special column for group labels
 }
 \examples{
+data(example_set)
 ex_set <- as(example_set, "MetaboSet")
 # Get name of grouping variable
 group_col(ex_set)
 
+data(example_set)
 ex_set <- as(example_set, "MetaboSet")
 # Set grouping variable
 group_col(ex_set) <- "Group"

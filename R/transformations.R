@@ -14,6 +14,7 @@
 #' missing values correctly set to NA.
 #'
 #' @examples
+#' data(example_set)
 #' nas_marked <- mark_nas(example_set, value = 0)
 #'
 #' @export
@@ -57,6 +58,7 @@ mark_nas <- function(object, value, assay.type = NULL, name = NULL) {
 #' publication-ready MS/MS peak information.
 #'
 #' @examples
+#' data(example_set)
 #' # Spectra before fixing
 #' ex_set <- example_set
 #' rowData(ex_set)$MS_MS_spectrum <- NA
@@ -128,6 +130,7 @@ fix_MSMS <- function(object, ms_ms_spectrum_col = "MS_MS_spectrum",
 #' without QC samples.
 #'
 #' @examples
+#' data(example_set)
 #' dim(example_set)
 #' noqc <- drop_qcs(example_set)
 #' dim(noqc)
@@ -158,6 +161,7 @@ drop_qcs <- function(object) {
 #' flagged features.
 #'
 #' @examples
+#' data(example_set)
 #' dim(example_set)
 #' flagged <- flag_quality(example_set)
 #' noflags <- drop_flagged(flagged)
@@ -210,6 +214,7 @@ setMethod("drop_flagged", signature = c(object = "SummarizedExperiment"),
 #' values.
 #'
 #' @examples
+#' data(example_set)
 #' ex_set <- example_set[1:5, 1:5]
 #' assay(ex_set)
 #' # Create a matrix of replacment values for rows 1, 3, 5 and columns 1, 3, 4
@@ -261,6 +266,7 @@ merge_assay <- function(object, y, assay.type = NULL, name = NULL) {
 #' values imputed.
 #'
 #' @examples
+#' data(example_set)
 #' missing <- mark_nas(example_set, 0)
 #' set.seed(38)
 #' imputed <- impute_rf(missing)
@@ -347,6 +353,7 @@ impute_rf <- function(object, all_features = FALSE, assay.type = NULL,
 #' @return A SummarizedExperiment or Metaboset object with imputed peak table.
 #'
 #' @examples
+#' data(example_set)
 #' missing <- mark_nas(example_set, 0)
 #' imputed <- impute_simple(missing, value = "min")
 #'
@@ -419,6 +426,7 @@ impute_simple <- function(object, value, na_limit = 0, assay.type = NULL,
 #' @return An object as the one supplied, with normalized features.
 #'
 #' @examples
+#' data(example_set)
 #' normalized <- inverse_normalize(example_set)
 #' @export
 inverse_normalize <- function(object, assay.type = NULL, name = NULL) {
@@ -446,6 +454,7 @@ inverse_normalize <- function(object, assay.type = NULL, name = NULL) {
 #' @return A data frame with the number of features at each stage of flagging.
 #'
 #' @examples
+#' data(example_set)
 #' flagged <- example_set %>%
 #'   mark_nas(0) %>%
 #'   flag_detection(group = "Group") %>%
@@ -547,6 +556,7 @@ setMethod("scale", "MetaboSet",
 #' @return An object with altered feature abundances.
 #'
 #' @examples 
+#' data(example_set)
 #' example_set <- mark_nas(example_set, value = 0)
 #' log_data <- log(example_set)
 #' orig_data <- exponential(log_data)
@@ -656,6 +666,7 @@ setMethod("exponential", c(object = "SummarizedExperiment"),
 #' abundances.
 #'
 #' @examples
+#' data(example_set)
 #' pqn_set <- pqn_normalization(example_set)
 #'
 #' @export

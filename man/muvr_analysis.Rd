@@ -89,6 +89,7 @@ results, notably MUVR2::plotMV, MUVR2::plotStability and MUVR2::plotVIRank.
 Many of these return different plots depending on the model specification.
 }
 \examples{
+data(example_set)
 # PLS simple
 rf_model <- muvr_analysis(drop_qcs(example_set), 
   y = "Group", nRep = 2, method = "PLS")

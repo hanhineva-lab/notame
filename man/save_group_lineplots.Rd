@@ -90,6 +90,7 @@ A separate plot is drawn for each feature.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
+data(example_set)
 save_group_lineplots(drop_qcs(example_set)[1:10],
   file_path = "./group_line_plots.pdf",
   format = "pdf", x = "Time", group = "Group"

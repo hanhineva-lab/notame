@@ -27,9 +27,9 @@ A SummarizedExperiment or Metaboset object with the normalized data.
 An interface for the RUVs method in RUVSeq package.
 }
 \examples{
+data(example_set)
 # Batch correction
 replicates <- list(which(example_set$QC == "QC"))
-ex_set <- ruvs_qc(example_set, replicates = replicates, name = "bcorrected")
 batch_corrected <- ruvs_qc(example_set, replicates = replicates)
 # Evaluate batch correction
 pca_bhattacharyya_dist(example_set, batch = "Batch")

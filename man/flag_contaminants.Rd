@@ -41,6 +41,7 @@ marked as blanks and are not QCs. If the median of blanks > the median of
 biological samples times a set ratio, the feature is flagged as contaminant.
 }
 \examples{
+data(example_set)
 # Make a blank sample which has one (first) feature exceeding the threshold
 ## Abundance matrix
 med <- median(assay(example_set)[1, example_set$QC != "QC"])

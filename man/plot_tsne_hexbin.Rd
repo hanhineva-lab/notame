@@ -63,6 +63,7 @@ of \code{pcaMethods::pca}, the  method can be changed to "ppca" if nipals
 fails.
 }
 \examples{
+data(example_set)
 plot_tsne_hexbin(example_set, perplexity = 10)
 
 }

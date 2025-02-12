@@ -72,6 +72,7 @@
 #' \code{\link{hclust}} for hierarchical clustering.
 #'
 #' @examples
+#' data(example_set)
 #' # Compute correlations between variables
 #' correlations <- perform_correlation_tests(example_set,
 #'   x = rownames(example_set),

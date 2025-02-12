@@ -16,6 +16,7 @@ A data frame with quality metrics for each feature.
 Extract quality information of features
 }
 \examples{
+data(example_set)
 ex_set <- assess_quality(example_set)
 quality(ex_set)
 

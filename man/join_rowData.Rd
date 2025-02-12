@@ -25,6 +25,7 @@ SummarizedExperiment object. The data frame needs to have a column
 functions in the package, but can be useful.
 }
 \examples{
+data(example_set)
 new_info <- data.frame(
   Feature_ID = rownames(example_set),
   Feature_number = seq_len(nrow(example_set))

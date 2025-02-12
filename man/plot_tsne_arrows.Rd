@@ -77,6 +77,7 @@ using the nipals method of \code{pcaMethods::pca}, the method can be changed
 to "ppca" if nipals fails.
 }
 \examples{
+data(example_set)
 plot_tsne_arrows(drop_qcs(example_set), perplexity = 10, color = "Group", 
   time = "Time", subject = "Subject_ID")
 # If the sample size is large, plot groups separately

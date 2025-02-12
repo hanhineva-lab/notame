@@ -44,6 +44,7 @@ in pheno data can be specified. To make the formulas flexible, the word
 see the example.
 }
 \examples{
+data(example_set)
 # A simple example without QC samples
 # Features predicted by Group and Time
 lm_anova_results <- perform_lm_anova(drop_qcs(example_set), 

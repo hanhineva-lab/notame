@@ -97,6 +97,7 @@ represents a feature. The plot has retention time on x-axis, m/z on y-axis
 and the size of the points is scaled based on p-value
 }
 \examples{
+data(example_set)
 # Compute results from a linear model
 lm_results <- perform_lm(example_set, formula_char = "Feature ~ Group")
 with_results <- join_rowData(example_set, lm_results)

@@ -75,6 +75,7 @@ A separate plot is drawn and saved for each feature.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
+data(example_set)
 # Default boxplots by group
 save_group_boxplots(drop_qcs(example_set)[1:10],
   file_path = "./group_boxplots.pdf",

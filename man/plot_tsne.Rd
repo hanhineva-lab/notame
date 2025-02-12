@@ -83,6 +83,7 @@ of \code{pcaMethods::pca}, the  method can be changed to "ppca" if nipals
 fails.
 }
 \examples{
+data(example_set)
 plot_tsne(example_set, color = "Time", shape = "Group", perplexity = 10)
 
 }

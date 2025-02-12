@@ -91,6 +91,7 @@ components and features}
 }
 }
 \examples{
+data(example_set)
 pls_res <- mixomics_pls(example_set, y = "Injection_order", ncomp = 3)
 pls_opt <- mixomics_pls_optimize(example_set, 
   y = "Injection_order", ncomp = 3)

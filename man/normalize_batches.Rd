@@ -43,6 +43,7 @@ Between-batch normalization by either reference samples or population median.
 Uses normalizeBatches function from the batchCorr package.
 }
 \examples{
+data(example_set)
 # Batch correction
 batch_normalized <- normalize_batches(example_set,
   batch = "Batch", group = "QC", ref_label = "QC")

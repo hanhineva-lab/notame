@@ -31,6 +31,7 @@
 #' to feature data.
 #'
 #' @examples
+#' data(example_set)
 #' # The parameters are really weird because example data is imaginary
 #' clustered <- cluster_features(example_set, rt_window = 1, corr_thresh = 0.5, 
 #'   d_thresh = 0.6)
@@ -162,6 +163,7 @@ assign_cluster_id <- function(data, clusters, features, name_col) {
 #' cluster.
 #'
 #' @examples
+#' data(example_set)
 #' clustered <- cluster_features(example_set, 
 #'   rt_window = 1, corr_thresh = 0.5, d_thresh = 0.6)
 #' compressed <- compress_clusters(clustered)
@@ -259,6 +261,7 @@ pull_clusters <- function(data, features, name_col) {
 #'
 #' @examples 
 #' \dontshow{.old_wd <- setwd(tempdir())}
+#' data(example_set)
 #' data <- combined_data(example_set)
 #' features <- rowData(example_set)
 #' features$MPA <- sapply(data[, features[, "Feature_ID"]], finite_median)

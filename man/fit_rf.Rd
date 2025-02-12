@@ -43,6 +43,7 @@ After fitting the random forest, use rf_importance as a shortcut for getting
 the feature importance in random forest prediction.
 }
 \examples{
+data(example_set)
 rf <- fit_rf(example_set, y = "Group")
 rf
 importance_rf(rf)
