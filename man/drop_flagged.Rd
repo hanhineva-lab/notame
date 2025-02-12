@@ -2,18 +2,25 @@
 % Please edit documentation in R/transformations.R
 \name{drop_flagged}
 \alias{drop_flagged}
+\alias{drop_flagged,MetaboSet-method}
+\alias{drop_flagged,SummarizedExperiment-method}
 \title{Drop flagged features}
 \usage{
 drop_flagged(object, all_features = FALSE)
+
+\S4method{drop_flagged}{MetaboSet}(object, all_features = FALSE)
+
+\S4method{drop_flagged}{SummarizedExperiment}(object, all_features = FALSE)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{all_features}{logical, should all features be retained? Mainly used by 
 internal functions}
 }
 \value{
-A MetaboSet object without the previously flagged features.
+A SummarizedExperiment or MetaboSet object without the previously 
+flagged features.
 }
 \description{
 Removes all features that have been flagged by quality control functions.

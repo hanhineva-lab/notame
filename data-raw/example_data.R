@@ -14,6 +14,7 @@ for (mode in modes) {
     Average_Rt_min = stats::runif(n_features, 0.5, 8),
     Column = strsplit(mode, "_")[[1]][1], 
     Ion_mode = strsplit(mode, "_")[[1]][2],
+    Flag = NA_character_,
     stringsAsFactors = FALSE)
   
   # Create Feature ID
@@ -48,10 +49,11 @@ HILIC_neg_Datafile <- paste0("HILIC_neg_", seq_len(n_samples))
 HILIC_pos_Datafile <- paste0("HILIC_pos_", seq_len(n_samples))
 RP_neg_Datafile <- paste0("RP_neg_", seq_len(n_samples))
 RP_pos_Datafile <- paste0("RP_pos_", seq_len(n_samples))
-pheno_data <- data.frame(Injection_order = seq_len(n_samples),
-                         Sample_ID = paste0("Demo_", seq_len(n_samples)),
+pheno_data <- data.frame(Sample_ID = paste0("Demo_", seq_len(n_samples)),
+                         Injection_order = seq_len(n_samples),
                          Subject_ID = subject_ids, Group = factor(group), 
-                         QC = factor(qc), Time = factor(time), Batch = batch,
+                         QC = factor(qc), Time = factor(time), 
+                         Batch = factor(batch),
                          HILIC_neg_Datafile, HILIC_pos_Datafile,
                          RP_neg_Datafile, RP_pos_Datafile)
 
@@ -131,7 +133,7 @@ assay_data <- cbind(assay_data_b1, assay_data_b2)
 assay_data <- abs(assay_data)
 
 # Set random indexes to zero (for missing values)
-n_missing <- 500
+n_missing <- 300
 row_zeros <- sample(seq_len(nrow(assay_data)), n_missing, replace = TRUE)
 col_zeros <- sample(seq_len(ncol(assay_data)), n_missing, replace = TRUE)
 for (i in seq_len(n_missing)) {
@@ -145,38 +147,30 @@ colnames(assay_data) <- rownames(pheno_data)
 feature_data <- bind_rows(feature_data_modes)
   
 # Construct objects, with all modes and separately
-example_set <- construct_metabosets(
-  exprs = assay_data, pheno_data = pheno_data, feature_data = feature_data,
-  group_col = "Group", time_col = "Time", subject_col = "Subject_ID",
-  split_data = FALSE)
+example_set <- SummarizedExperiment(assays = assay_data, 
+                                    colData = pheno_data,                     
+                                    rowData = feature_data)
+                                    
 
-hilic_neg_sample <- construct_metabosets(
-  exprs = assay_data[feature_data$Split == "HILIC_neg", ],
-  pheno_data = pheno_data, 
-  feature_data = feature_data[feature_data$Split == "HILIC_neg", ],
-  group_col = "Group", time_col = "Time", subject_col = "Subject_ID",
-  split_data = FALSE)
+hilic_neg_sample <- SummarizedExperiment(
+  assays = assay_data[feature_data$Split == "HILIC_neg", ],
+  colData = pheno_data, 
+  rowData = feature_data[feature_data$Split == "HILIC_neg", ])
 
-hilic_pos_sample <- construct_metabosets(
-  exprs = assay_data[feature_data$Split == "HILIC_pos", ],
-  pheno_data = pheno_data, 
-  feature_data = feature_data[feature_data$Split == "HILIC_pos", ],
-  group_col = "Group", time_col = "Time", subject_col = "Subject_ID", 
-  split_data = FALSE)
+hilic_pos_sample <- SummarizedExperiment(
+  assays = assay_data[feature_data$Split == "HILIC_pos", ],
+  colData = pheno_data, 
+  rowData = feature_data[feature_data$Split == "HILIC_pos", ])
   
-rp_neg_sample <- construct_metabosets(
-  exprs = assay_data[feature_data$Split == "RP_neg", ],
-  pheno_data = pheno_data, 
-  feature_data = feature_data[feature_data$Split == "RP_neg", ],
-  group_col = "Group", time_col = "Time", subject_col = "Subject_ID",
-  split_data = FALSE)
+rp_neg_sample <- SummarizedExperiment(
+  assays = assay_data[feature_data$Split == "RP_neg", ],
+  colData = pheno_data, 
+  rowData = feature_data[feature_data$Split == "RP_neg", ])
   
-rp_pos_sample <- construct_metabosets(
-  exprs = assay_data[feature_data$Split == "RP_pos", ],
-  pheno_data = pheno_data, 
-  feature_data = feature_data[feature_data$Split == "RP_pos", ],
-  group_col = "Group", time_col = "Time", subject_col = "Subject_ID",
-  split_data = FALSE)
+rp_pos_sample <- SummarizedExperiment(
+  assays = assay_data[feature_data$Split == "RP_pos", ],
+  colData = pheno_data, 
+  rowData = feature_data[feature_data$Split == "RP_pos", ])
 
 usethis::use_data(example_set, overwrite = TRUE)
 usethis::use_data(hilic_neg_sample, overwrite = TRUE)

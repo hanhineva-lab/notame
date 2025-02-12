@@ -4,7 +4,7 @@
   result_row <- result_row_template
   for (fname in names(funs)) {
     tmp <- tapply(f_levels, groups, funs[[fname]])
-    if (is.na(grouping_cols[1])) {
+    if (is.null(grouping_cols[1])) {
       result_row[fname] <- tmp[1]
     } else {
       result_row[paste(group_names, fname, sep = "_")] <- tmp
@@ -20,28 +20,32 @@
 #' median absolute deviation (mad), minimum (min), maximum (max)
 #' as well as 25% and 75% quantiles (Q25 & Q75).
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param grouping_cols character vector, the columns by which grouping should 
-#' be done. Use \code{NA}
-#' to compute statistics without grouping.
+#' be done. Use \code{NA} to compute statistics without grouping.
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @examples
 #' # Group by "Group"
-#' sum_stats <- summary_statistics(example_set)
+#' sum_stats <- summary_statistics(example_set, grouping_cols = "Group")
 #' # Group by Group and Time
 #' sum_stats <- summary_statistics(example_set, 
 #'   grouping_cols = c("Group", "Time"))
 #' # No Grouping
-#' sum_stats <- summary_statistics(example_set, grouping_cols = NA)
+#' sum_stats <- summary_statistics(example_set)
 #'
 #' @return A data frame with the summary statistics.
 #'
 #' @export
-summary_statistics <- function(object, grouping_cols = NA) {
-  data <- combined_data(object)
-  features <- Biobase::featureNames(object)
+summary_statistics <- function(object, grouping_cols = NULL,
+                               assay.type = NULL) {
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_cols = c(grouping_cols), 
+                         assay.type = from)
+  data <- combined_data(object, from)
+  features <- rownames(object)
   # Get sample grouping and group names for saving results accordingly
-  if (is.na(grouping_cols)[1]) {
+  if (is.null(grouping_cols)[1]) {
     groups <- rep(1, nrow(data))
     group_names <- ""
   } else {
@@ -71,7 +75,7 @@ summary_statistics <- function(object, grouping_cols = NA) {
                max = finite_max)
   # Initialize named vector for the results
   result_row_template <- rep(0, times = length(group_names) * length(funs))
-  if (!is.na(grouping_cols[1])) {
+  if (!is.null(grouping_cols[1])) {
     var_names <- expand.grid(names(funs), group_names)
     names(result_row_template) <- paste(var_names$Var2, var_names$Var1, 
                                         sep = "_")
@@ -150,9 +154,9 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
     stringsAsFactors = FALSE)
 }
 
-.help_cohens_d <- function(object, group, id, time) {
-  data <- combined_data(object)
-  features <- Biobase::featureNames(object)
+.help_cohens_d <- function(object, group, id, time, assay.type) {
+  data <- combined_data(object, assay.type)
+  features <- rownames(object)
   group_levels <- levels(data[, group])
   time_levels <- NULL
 
@@ -187,9 +191,10 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
                    paste(rev(time_levels), collapse = " - ")))
   }
   
-  ds <- dplyr::bind_rows(BiocParallel::bplapply(features, FUN = .calc_cohens_d,
-                                                group1 = group1, 
-                                                group2 = group2))
+  ds <- BiocParallel::bplapply(features, FUN = .calc_cohens_d,
+                               group1 = group1, group2 = group2)
+  
+  ds <-  do.call(rbind, ds)
 
   if (is.null(time_levels)) {
     colnames(ds)[2] <- 
@@ -205,23 +210,24 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
 }
 
 
-.help_cohens_d_time <- function(res, group_combos, object, group, id, time) {
+.help_cohens_d_time <- function(res, group_combos, object, group,
+                                id, time, assay.type) {
   count_obs_geq_than <- function(x, n) {
     sum(x >= n)
   }
   if (is.null(id)) {
     stop("Please specify id column.", call. = FALSE)
   }
-  time_combos <- utils::combn(levels(pData(object)[, time]), 2)
+  time_combos <- utils::combn(levels(colData(object)[, time]), 2)
   for (i in seq_len(ncol(group_combos))) {
     for (j in seq_len(ncol(time_combos))) {
       object_split <- object[, which(
-        pData(object)[, group] %in% group_combos[, i] &
-          pData(object)[, time] %in% time_combos[, j])]
-      pData(object_split) <- droplevels(pData(object_split))
+        colData(object)[, group] %in% group_combos[, i] &
+          colData(object)[, time] %in% time_combos[, j])]
+      colData(object_split) <- droplevels(colData(object_split))
       # Check data is valid for Cohen's D
-      group_table <- table(pData(object_split)[, c(id, group)])
-      time_table <- table(pData(object_split)[, c(id, time)])
+      group_table <- table(colData(object_split)[, c(id, group)])
+      time_table <- table(colData(object_split)[, c(id, time)])
       column <- paste0("Cohen_d_", group_combos[1, i], "_", group_combos[2, i],
                        "_", time_combos[2, j], "_minus_", time_combos[1, j])
       if (any(apply(group_table, 2, count_obs_geq_than, 2) < 2)) {
@@ -244,11 +250,11 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
                 " will be counted using common subjects in time points!")
       }
       if (is.null(res)) {
-        res <- .help_cohens_d(object_split, group, id, time)
+        res <- .help_cohens_d(object_split, group, id, time, assay.type)
       } else {
         res <- dplyr::full_join(res,
-                                .help_cohens_d(object_split, group, id, time),
-                                by = "Feature_ID")
+          .help_cohens_d(object_split, group, id, time, assay.type),
+          by = "Feature_ID")
       }  
     }
   }
@@ -262,53 +268,47 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
 #' change between two time points is computed for each subject,
 #' and Cohen's d is computed from the changes.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param id character, name of the subject ID column
 #' @param group character, name of the group column
 #' @param time character, name of the time column
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A data frame with Cohen's d for each feature.
 #'
 #' @examples
-#' d_results <- cohens_d(drop_qcs(example_set))
+#' d_results <- cohens_d(drop_qcs(example_set), group = "Group")
 #' d_results_time <- cohens_d(drop_qcs(example_set),
-#'   time = "Time", id = "Subject_ID"
+#'   group = "Group", time = "Time", id = "Subject_ID"
 #' )
 #'
 #' @export
-cohens_d <- function(object, group = group_col(object),
-                     id = NULL, time = NULL) {
+cohens_d <- function(object, group, id = NULL,
+                     time = NULL, assay.type = NULL) {
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_factors = c(group, time), 
+                         pheno_cols = id, assay.type = from, feature_ID = TRUE)
   res <- NULL
-  # Check that both group and time are factors and have at least two levels
-  for (column in c(group, time)) {
-    if (is.null(column)) {
-      next
-    }
-    if (!is.factor(pData(object)[, column])) {
-      stop("Column ", column, " should be a factor!")
-    }
-    if (length(levels(pData(object)[, column])) < 2) {
-      stop("Column ", column, " should have at least two levels!")
-    }
-  }
-  group_combos <- utils::combn(levels(pData(object)[, group]), 2)
+
+  group_combos <- utils::combn(levels(colData(object)[, group]), 2)
 
   if (is.null(time)) {
     for (i in seq_len(ncol(group_combos))) {
       object_split <- object[, which(
-        pData(object)[, group] %in% c(group_combos[1, i], group_combos[2, i]))]
-      pData(object_split) <- droplevels(pData(object_split))
+        colData(object)[, group] %in% c(group_combos[1, i], 
+                                        group_combos[2, i]))]
+      colData(object_split) <- droplevels(colData(object_split))
 
       if (is.null(res)) {
-        res <- .help_cohens_d(object_split, group, id, time)
+        res <- .help_cohens_d(object_split, group, id, time, from)
       } else {
         res <- dplyr::full_join(res,
-                                .help_cohens_d(object_split, group, id, time),
-                                by = "Feature_ID")
+          .help_cohens_d(object_split, group, id, time, from),
+          by = "Feature_ID")
       }
     }
   } else {
-    res <- .help_cohens_d_time(res, group_combos, object, group, id, time)
+    res <- .help_cohens_d_time(res, group_combos, object, group, id, time, from)
   }
   rownames(res) <- res$Feature_ID
   res
@@ -331,24 +331,26 @@ cohens_d <- function(object, group = group_col(object),
 #'
 #' Computes fold change between each group for each feature.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param group character, name of the group column
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A data frame with fold changes for each feature.
 #'
 #' @examples
 #' # Between groups
-#' fc <- fold_change(example_set)
+#' fc <- fold_change(example_set, group = "Group")
 #' # Between time points
 #' fc <- fold_change(example_set, group = "Time")
 #'
 #' @export
-fold_change <- function(object, group = group_col(object)) {
+fold_change <- function(object, group, assay.type = NULL) {
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_cols = group, assay.type = from)
   log_text("Starting to compute fold changes.")
-
-  data <- combined_data(object)
+  data <- combined_data(object, from)
   groups <- utils::combn(levels(data[, group]), 2)
-  features <- Biobase::featureNames(object)
+  features <- rownames(object)
   # Calculate fold changes between groupings
   results_df <- BiocParallel::bplapply(features, FUN = .calc_fold_change,
                                        group, data, groups)
@@ -437,15 +439,15 @@ fold_change <- function(object, group = group_col(object)) {
 #' \code{x, y} and correlations between each x variable
 #' and each y variable are computed.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param x character vector, names of variables to be correlated
 #' @param y character vector, either identical to x (the default) or a distinct 
 #' set of variables to be correlated against x
 #' @param id character, column name for subject IDs. If provided, the 
 #' correlation will be computed using the rmcorr package
-#' @param object2 optional second MetaboSet object. If provided, x variables 
-#' will be taken from object and y variables will be taken from object2. Both 
-#' objects should have the same number of samples.
+#' @param object2 optional second object. If provided, x 
+#' variables will be taken from object and y variables will be taken from 
+#' object2. Both objects should have the same number of samples.
 #' @param fdr logical, whether p-values from the correlation test should be 
 #' adjusted with FDR correction
 #' @param all_pairs logical, whether all pairs between x and y should be tested.
@@ -456,6 +458,10 @@ fold_change <- function(object, group = group_col(object)) {
 #' the order of the variables '(which is x and which is y) is changed. Can be 
 #' useful for e.g. plotting a heatmap of the results, see examples of
 #' \code{\link{plot_effect_heatmap}}
+#' @param assay.type1 character, assay of object(1) to be used in case of 
+#' multiple assays
+#' @param assay.type2 character, assay of object2 to be used in case of 
+#' multiple assays
 #' @param ... other parameters passed to \code{\link{cor.test}}, such as method
 #'
 #' @return A data frame with the results of correlation tests: the pair of 
@@ -464,22 +470,22 @@ fold_change <- function(object, group = group_col(object)) {
 #' @examples
 #' # Correlations between all features
 #' correlations <- perform_correlation_tests(example_set, 
-#'   x = featureNames(example_set))
+#'   x = rownames(example_set), id = "Subject_ID")
 #'
 #' # Spearman Correlations between features and sample information variables
 #' # Drop QCs and convert time to numeric
 #' no_qc <- drop_qcs(example_set)
 #' no_qc$Time <- as.numeric(no_qc$Time)
 #' correlations <- perform_correlation_tests(no_qc,
-#'   x = featureNames(example_set),
+#'   x = rownames(example_set),
 #'   y = c("Time", "Injection_order"), method = "spearman"
 #' )
 #'
-#' # Correlations between variables from two distinct MetaboSets
+#' # Correlations between variables from two distinct objects
 #' cross_object_cor <- perform_correlation_tests(hilic_neg_sample,
-#'   x = featureNames(hilic_neg_sample),
+#'   x = rownames(hilic_neg_sample),
 #'   object2 = hilic_pos_sample,
-#'   y = featureNames(hilic_pos_sample),
+#'   y = rownames(hilic_pos_sample),
 #'   all_pairs = FALSE
 #' )
 #' @seealso \code{\link{cor.test}}, \code{\link[rmcorr]{rmcorr}}
@@ -488,18 +494,29 @@ fold_change <- function(object, group = group_col(object)) {
 perform_correlation_tests <- function(object, x, y = x, id = NULL, 
                                       object2 = NULL, fdr = TRUE, 
                                       all_pairs = TRUE, duplicates = FALSE,
+                                      assay.type1 = NULL, assay.type2 = NULL,
                                       ...) {
   log_text("Starting correlation tests.")
-
-  data1 <- combined_data(object)
+  
+  from1 <- .get_from_name(object, assay.type1)
+  object <- .check_object(object, pheno_cols = id, assay.type = from1)
+  data1 <- combined_data(object, from1)
 
   if (!is.null(object2)) {
     if (ncol(object) != ncol(object2)) {
       stop("The objects have different numbers of samples")
     }
-    data2 <- combined_data(object2)
+    from2 <- .get_from_name(object2, assay.type2)
+    object2 <- .check_object(object2, pheno_factors = id, assay.type = from2)
+    data2 <- combined_data(object2, from2)
+    log_text("Performing correlation tests for two objects")
   } else {
-    data2 <- data1
+    if (!is.null(assay.type2)) {
+      stop("When using a single object, assay.type2 is not considered.")
+    } else {
+      data2 <- data1
+      log_text("Performing correlation tests for single object")
+    }
   }
 
   # Checks for repeated measures correlation
@@ -578,29 +595,30 @@ perform_correlation_tests <- function(object, x, y = x, id = NULL,
 #' Area under curve
 #'
 #' Compute area under curve (AUC) for each subject and feature.
-#' Creates a pseudo MetaboSet object, where the "samples" are subjects
-#' (or subject/group combinations in case the same subjects are submitted to 
-#' different treatments) and the "abundances" are AUCs. This object can then be 
-#' used to compute results of e.g. t-tests of AUCs between groups.
+#' Creates a pseudo SummarizedExperiment or MetaboSet object, where the 
+#' "samples" are subjects (or subject/group combinations in case the same 
+#' subjects are submitted to different treatments) and the "abundances" are 
+#' AUCs. This object can then be  used to compute results of e.g. t-tests of 
+#' AUCs between groups.
 #'
-#' @param object a MetaboSet object
-#' @param time,subject,group column names of pData(object), holding time, 
+#' @param object a SummarizedExperiment or MetaboSet object
+#' @param time,subject,group column names of pheno data holding time, 
 #' subject and group labels
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
-#' @return A pseudo MetaboSet object with the AUCs.
+#' @return A pseudo SummarizedExperiment or MetaboSet object with the AUCs.
 #'
 #' @examples
 #' # Drop QC samples before computing AUCs
-#' aucs <- perform_auc(drop_qcs(example_set))
+#' aucs <- perform_auc(drop_qcs(example_set), time = "Time", 
+#'                     subject = "Subject_ID", group = "Group")
 #' # t-test with the AUCs
 #' t_test_results <- perform_t_test(aucs, formula_char = "Feature ~ Group")
 #'
 #' @seealso \code{\link[PK]{auc}}
 #'
 #' @export
-perform_auc <- function(object, time = time_col(object), 
-                        subject = subject_col(object),
-                        group = group_col(object)) {
+perform_auc <- function(object, time, subject, group, assay.type = NULL) {
   if (!requireNamespace("PK", quietly = TRUE)) {
     stop("Package \"PK\" needed for this function to work. Please install it.",
          call. = FALSE)
@@ -608,8 +626,11 @@ perform_auc <- function(object, time = time_col(object),
   .add_citation("PK package was used to compute AUC:", citation("PK"))
 
   log_text("Starting AUC computation")
-
-  data <- combined_data(object)
+  
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_factors = c(time, group),
+                          pheno_chars = subject, assay.type = from)
+  data <- combined_data(object, from)
 
   # Create new pheno data, only one row per subject and group
   pheno_data <- data[, c(subject, group)] %>%
@@ -620,18 +641,22 @@ perform_auc <- function(object, time = time_col(object),
   pheno_data$Injection_order <- seq_len(nrow(pheno_data))
   rownames(pheno_data) <- pheno_data$Sample_ID
 
-  features <- featureNames(object)
+  features <- rownames(object)
   aucs <- BiocParallel::bplapply(features, .calc_auc, data, pheno_data,
                                  time, subject, group)
   aucs <- do.call(rbind, aucs)
 
-  # Construct new MetaboSet object (with all modes together)
-  new_object <- construct_metabosets(exprs = aucs, feature_data = fData(object),
-                                     pheno_data = pheno_data, group_col = group,
-                                     subject_col = subject) %>%
-    merge_metabosets()
+  # Construct new SummarizedExperiment object (with all modes together)
+  new_object <- SummarizedExperiment(assays = aucs, 
+                                     rowData = rowData(object),
+                                     colData = pheno_data) %>%
+    merge_objects()
 
   log_text("AUC computation finished")
+  
+  if (!is.null(attr(object, "original_class"))) {
+    new_object <- as(new_object, "MetaboSet")
+  }
   new_object
 }
 
@@ -686,13 +711,14 @@ perform_auc <- function(object, time = time_col(object),
 
 # Helper function for running a variety of simple statistical tests
 .perform_test <- function(object, formula_char, result_fun, all_features, 
-                         fdr = TRUE, packages = NULL, ...) {
-  data <- combined_data(object)
-  features <- Biobase::featureNames(object)
+                          fdr = TRUE, packages = NULL, assay.type, ...) {
+  data <- combined_data(object, assay.type)
+  features <- rownames(object)
 
   results_df <- BiocParallel::bplapply(features, .help_perform_test, data,
                                        formula_char, result_fun, ...)
-  results_df <- do.call(rbind, results_df)
+                                       
+  results_df <- dplyr::bind_rows(results_df)
 
   if (nrow(results_df) == 0) {
     stop("All the tests failed.",
@@ -719,17 +745,18 @@ perform_auc <- function(object, time = time_col(object),
 #' Fits a linear model separately for each feature. Returns all relevant
 #' statistics.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional parameters passed to lm
 #'
 #' @return A data frame with one row per feature, with all the
 #' relevant statistics of the linear model as columns.
 #'
 #' @details The linear model is fit on combined_data(object). Thus, column names
-#' in pData(object) can be specified. To make the formulas flexible, the word 
+#' in pheno data can be specified. To make the formulas flexible, the word 
 #' "Feature" must be used to signal the role of the features in the formula. 
 #' "Feature" will be replaced by the actual Feature IDs during model fitting, 
 #' see the example.
@@ -743,8 +770,12 @@ perform_auc <- function(object, time = time_col(object),
 #' @seealso \code{\link[stats]{lm}}
 #'
 #' @export
-perform_lm <- function(object, formula_char, all_features = FALSE, ...) {
+perform_lm <- function(object, formula_char, all_features = FALSE, 
+                       assay.type = NULL, ...) {
   log_text("Starting linear regression.")
+  
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, assay.type = from)
 
   lm_fun <- function(feature, formula, data) {
     # Try to fit the linear model
@@ -780,7 +811,8 @@ perform_lm <- function(object, formula_char, all_features = FALSE, ...) {
     result_row
   }
 
-  results_df <- .perform_test(object, formula_char, lm_fun, all_features)
+  results_df <- .perform_test(object, formula_char, lm_fun, 
+                              all_features, assay.type = from)
 
   # Set a good column order
   variables <- gsub("_P$", "", 
@@ -801,19 +833,20 @@ perform_lm <- function(object, formula_char, all_features = FALSE, ...) {
 #' Fits a linear model separately for each feature and compute an ANOVA table.
 #' Returns all relevant statistics.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
 #' @param lm_args list of arguments to lm, list names should be parameter names
 #' @param anova_args list of arguments to anova, list names should be parameter 
 #' names
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A data frame with one row per feature, with all the
 #' relevant statistics of the linear model as columns.
 #'
 #' @details The linear model is fit on combined_data(object). Thus, column names
-#' in pData(object) can be specified. To make the formulas flexible, the word 
+#' in pheno data can be specified. To make the formulas flexible, the word 
 #' "Feature" must be used to signal the role of the features in the formula. 
 #' "Feature" will be replaced by the actual Feature IDs during model fitting, 
 #' see the example.
@@ -828,7 +861,10 @@ perform_lm <- function(object, formula_char, all_features = FALSE, ...) {
 #'
 #' @export
 perform_lm_anova <- function(object, formula_char, all_features = FALSE,
-                             lm_args = NULL, anova_args = NULL) {
+                             lm_args = NULL, anova_args = NULL,
+                             assay.type = NULL) {
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, assay.type = from)
   log_text("Starting ANOVA tests")
 
   anova_fun <- function(feature, formula, data) {
@@ -859,7 +895,8 @@ perform_lm_anova <- function(object, formula_char, all_features = FALSE,
     result_row
   }
 
-  results_df <- .perform_test(object, formula_char, anova_fun, all_features)
+  results_df <- .perform_test(object, formula_char, anova_fun, 
+                              all_features, assay.type = from)
 
   log_text("ANOVA tests performed")
 
@@ -872,17 +909,18 @@ perform_lm_anova <- function(object, formula_char, all_features = FALSE,
 #' Fits a logistic regression model separately for each feature. Returns all 
 #' relevant statistics.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional parameters passed to glm
 #'
 #' @return A data frame with one row per feature, with all the
 #' relevant statistics of the linear model as columns.
 #'
 #' @details The logistic regression model is fit on combined_data(object). 
-#' Thus, column names in pData(object) can be specified. To make the formulas 
+#' Thus, column names in pheno data can be specified. To make the formulas 
 #' flexible, the word "Feature" must be used to signal the role of the features 
 #' in the formula. "Feature" will be replaced by the actual Feature IDs during 
 #' model fitting, see the example.
@@ -897,7 +935,10 @@ perform_lm_anova <- function(object, formula_char, all_features = FALSE,
 #' @seealso \code{\link[stats]{glm}}
 #'
 #' @export
-perform_logistic <- function(object, formula_char, all_features = FALSE, ...) {
+perform_logistic <- function(object, formula_char, all_features = FALSE, 
+                             assay.type = NULL, ...) {
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, assay.type = from)
   log_text("Starting logistic regression")
 
   logistic_fun <- function(feature, formula, data) {
@@ -933,7 +974,8 @@ perform_logistic <- function(object, formula_char, all_features = FALSE, ...) {
     result_row
   }
 
-  results_df <- .perform_test(object, formula_char, logistic_fun, all_features)
+  results_df <- .perform_test(object, formula_char, logistic_fun,
+                              all_features, assay.type = from)
 
   # Set a good column order
   variables <- gsub("_P$", "", 
@@ -1050,7 +1092,7 @@ perform_logistic <- function(object, formula_char, all_features = FALSE, ...) {
 #' Fits a linear mixed model separately for each feature. Returns all relevant
 #' statistics.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
@@ -1058,13 +1100,14 @@ perform_logistic <- function(object, formula_char, all_features = FALSE, ...) {
 #' documentation of confint below
 #' @param test_random logical, whether tests for the significance of the random 
 #' effects should be performed
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional parameters passed to lmer
 #'
 #' @return A data frame with one row per feature, with all the
 #' relevant statistics of the linear mixed model as columns.
 #'
 #' @details The model is fit on combined_data(object). Thus, column names
-#' in pData(object) can be specified. To make the formulas flexible, the word 
+#' in pheno data can be specified. To make the formulas flexible, the word 
 #' "Feature" must be used to signal the role of the features in the formula. 
 #' "Feature" will be replaced by the actual Feature IDs during model fitting, 
 #' see the example. With bootstrap ("boot") confidence intervals, the results 
@@ -1083,7 +1126,7 @@ perform_logistic <- function(object, formula_char, all_features = FALSE, ...) {
 #' @export
 perform_lmer <- function(object, formula_char, all_features = FALSE,
                          ci_method = c("Wald", "profile", "boot"),
-                         test_random = FALSE, ...) {
+                         test_random = FALSE, assay.type = NULL, ...) {
   log_text("Starting fitting linear mixed models.")
 
   if (!requireNamespace("lmerTest", quietly = TRUE)) {
@@ -1103,10 +1146,12 @@ perform_lmer <- function(object, formula_char, all_features = FALSE,
 
   # Check that ci_method is one of the accepted choices
   ci_method <- match.arg(ci_method)
-
+  
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, assay.type = from)
   results_df <- .perform_test(object, formula_char, .help_lmer, all_features,
                               packages = "lmerTest", ci_method = ci_method,
-                              test_random = test_random)
+                              test_random = test_random, assay.type = from)
 
   # Set a good column order
   fixed_effects <- 
@@ -1140,14 +1185,14 @@ perform_lmer <- function(object, formula_char, all_features = FALSE,
 #' Performs Bartlett's, Levene's and Fligner-Killeen tests for equality of 
 #' variances.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
-#' Defaults to "Feature ~ group_col(object)
 #' @param all_features should all features be included in FDR correction?
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @details The model is fit on combined_data(object). Thus, column names
-#' in pData(object) can be specified. To make the formulas flexible, the word 
+#' in pheno data can be specified. To make the formulas flexible, the word 
 #' "Feature" must be used to signal the role of the features in the formula. 
 #' "Feature" will be replaced by the actual Feature IDs during model fitting. 
 #' For example, if testing for equality of variances in study groups, use 
@@ -1163,15 +1208,18 @@ perform_lmer <- function(object, formula_char, all_features = FALSE,
 #'
 #' @export
 perform_homoscedasticity_tests <- function(object, formula_char, 
-                                           all_features = FALSE) {
+                                           all_features = FALSE, 
+                                           assay.type = NULL) {
   if (!requireNamespace("car", quietly = TRUE)) {
     stop("Package \'car\' needed for this function to work. Please install it.",
          call. = FALSE)
   }
   .add_citation("car package was used for Levene's test of homoscedasticity:",
                 citation("car"))
-
   log_text("Starting homoscedasticity tests.")
+  
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, assay.type = from)
 
   homosced_fun <- function(feature, formula, data) {
     result_row <- NULL
@@ -1191,7 +1239,8 @@ perform_homoscedasticity_tests <- function(object, formula_char,
     result_row
   }
 
-  results_df <- .perform_test(object, formula_char, homosced_fun, all_features)
+  results_df <- .perform_test(object, formula_char, homosced_fun, all_features,
+                              assay.type = from)
 
   log_text("Homoscedasticity tests performed.")
 
@@ -1202,14 +1251,14 @@ perform_homoscedasticity_tests <- function(object, formula_char,
 #'
 #' Performs Kruskal-Wallis rank-sum test for equality.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
-#' Defaults to "Feature ~ group_col(object)
 #' @param all_features should all features be included in FDR correction?
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @details The model is fit on combined_data(object). Thus, column names
-#' in pData(object) can be specified. To make the formulas flexible, the word 
+#' in pheno data can be specified. To make the formulas flexible, the word 
 #' "Feature" must be used to signal the role of the features in the formula. 
 #' "Feature" will be replaced by the actual Feature IDs during model fitting. 
 #' For example, if testing for equality of means in study groups, use 
@@ -1223,8 +1272,11 @@ perform_homoscedasticity_tests <- function(object, formula_char,
 #' perform_kruskal_wallis(example_set, formula_char = "Feature ~ Group")
 #'
 #' @export
-perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE) {
+perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE,
+                                   assay.type = NULL) {
   log_text("Starting Kruskal-Wallis tests.")
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, assay.type = from)
 
   kruskal_fun <- function(feature, formula, data) {
     result_row <- NULL
@@ -1240,7 +1292,8 @@ perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE) {
     result_row
   }
 
-  results_df <- .perform_test(object, formula_char, kruskal_fun, all_features)
+  results_df <- .perform_test(object, formula_char, kruskal_fun, all_features,
+                              assay.type = from)
 
   log_text("Kruskal-Wallis tests performed.")
 
@@ -1255,14 +1308,15 @@ perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE) {
 #' Can also perform classic ANOVA with assumption of equal variances.
 #' Uses base R function \code{oneway.test}.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details).
 #' @param all_features should all features be included in FDR correction?
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other parameters to \code{\link{oneway.test}}
 #'
 #' @details The model is fit on combined_data(object). Thus, column names
-#' in pData(object) can be specified. To make the formulas flexible, the word 
+#' in pheno data can be specified. To make the formulas flexible, the word 
 #' "Feature" must be used to signal the role of the features in the formula. 
 #' "Feature" will be replaced by the actual Feature IDs during model fitting. 
 #' For example, if testing for equality of means in study groups, use 
@@ -1276,9 +1330,11 @@ perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE) {
 #' perform_oneway_anova(example_set, formula_char = "Feature ~ Group")
 #'
 #' @export
-perform_oneway_anova <- function(object, formula_char, 
-                                 all_features = FALSE, ...) {
+perform_oneway_anova <- function(object, formula_char, all_features = FALSE,
+                                 assay.type = NULL, ...) {
   log_text("Starting ANOVA tests.")
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, assay.type = from)
 
   anova_fun <- function(feature, formula, data) {
     result_row <- NULL
@@ -1294,7 +1350,8 @@ perform_oneway_anova <- function(object, formula_char,
     result_row
   }
 
-  results_df <- .perform_test(object, formula_char, anova_fun, all_features)
+  results_df <- .perform_test(object, formula_char, anova_fun, all_features,
+                              assay.type = from)
 
   log_text("ANOVA performed.")
 
@@ -1307,13 +1364,14 @@ perform_oneway_anova <- function(object, formula_char,
 #' (unequal variances), use var.equal = TRUE for Student's t-test. Use 
 #' \code{is_paired} for paired t-tests.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param is_paired logical, use paired t-test
 #' @param id character, name of the subject identification column for paired 
 #' version
 #' @param all_features should all features be included in FDR correction?
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other parameters passed to stats::t.test
 #'
 #' @details P-values of each comparison are corrected separately from each 
@@ -1336,19 +1394,21 @@ perform_oneway_anova <- function(object, formula_char,
 #' @seealso \code{\link[stats]{t.test}}
 #'
 #' @export
-perform_t_test <- function(object, formula_char,
-                           is_paired = FALSE, id = NULL, 
-                           all_features = FALSE, ...) {
+perform_t_test <- function(object, formula_char, is_paired = FALSE, id = NULL, 
+                           all_features = FALSE, assay.type = NULL, ...) {
   message("The functionality of this function has changed.", 
           " It now encompasses pairwise and paired t-tests.")
   message("Remember that t.test returns difference between group means",
           " in different order than lm.\n",
           "This function mimics this behavior, so the effect size is",
           " mean of first level minus mean of second level.")
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, assay.type = from)
+  assays(object) <- assays(object)[from]
   
   group <- unlist(strsplit(formula_char, " ~ "))[2]
 
-  if (!is.factor(pData(object)[, group])) {
+  if (!is.factor(colData(object)[, group])) {
     stop("Group column should be a factor")
   }
 
@@ -1357,7 +1417,7 @@ perform_t_test <- function(object, formula_char,
                                    all_features = all_features, 
                                    is_paired = is_paired, ...)
   
-  if (length(featureNames(object)) != nrow(results_df)) {
+  if (length(rownames(object)) != nrow(results_df)) {
     warning("Results don't contain all features.")
   }
   rownames(results_df) <- results_df$Feature_ID
@@ -1379,7 +1439,7 @@ perform_t_test <- function(object, formula_char,
 }
 
 # Calculate pairwise and/or paired statistics
-.calc_simple_test <- function(feature, subset1, subset2, 
+.calc_simple_test <- function(feature, fname, subset1, subset2, 
                               pair, test, is_paired, ...) {
   result_row <- NULL
   tryCatch({
@@ -1396,18 +1456,17 @@ perform_t_test <- function(object, formula_char,
     }
     # Get a single-row data.frame with results
     conf_level <- attr(res$conf.int, "conf.level") * 100
-    result_row <- data.frame(Statistic = res$statistic,
+    result_row <- data.frame(Feature_ID = fname, Statistic = res$statistic,
                              Estimate = res$estimate[1], LCI = res$conf.int[1],
                              UCI = res$conf.int[2], P = res$p.value,
                              stringsAsFactors = FALSE)
     ci_idx <- grepl("CI", colnames(result_row))
     colnames(result_row)[ci_idx] <- paste0(colnames(result_row)[ci_idx],
                                            conf_level)
-    colnames(result_row) <- paste0(pair[1], "_vs_", pair[2], "_", 
-                                   test, "_", colnames(result_row))
+    colnames(result_row)[-1] <- paste0(pair[1], "_vs_", pair[2], "_", 
+                                   test, "_", colnames(result_row)[-1])
     result_row
-  },
-  error = function(e) e$message)
+  }, error = function(e) message(fname, ": ", e$message))
 } 
 
 # Sets up subsets, calls .calc_simple_test and processes results for simple
@@ -1416,7 +1475,7 @@ perform_t_test <- function(object, formula_char,
                               all_features = FALSE, is_paired, ...) {
   results_df <- NULL
   data <- combined_data(object)
-  features <- featureNames(object)
+  features <- rownames(object)
   groups <- data[, group]
   pair <- levels(groups)
   if (!is(groups, "factor")) groups <- as.factor(groups)
@@ -1452,25 +1511,18 @@ perform_t_test <- function(object, formula_char,
   }
   
   # Calculate paired or unpaired test for the subsets
-  results <- BiocParallel::bplapply(data[, features], .calc_simple_test, 
-                                    subset1, subset2, pair, test, 
-                                    is_paired, ...)
-  # Message errors and make boolean list for keeping features without errors
-  errors <- mapply(function(result, fname) {
-    if (length(result) != 5) {
-      message(fname, ": ", result)
-      TRUE
-    } else {FALSE}
-  }, results, names(results))
+  result_rows <- BiocParallel::bpmapply(
+    .calc_simple_test, data[, features], features, 
+     MoreArgs = list(subset1, subset2, pair, test, is_paired, ...),
+     SIMPLIFY = FALSE)
+                                          
+  results_df <- dplyr::bind_rows(result_rows)
   # Check that results actually contain results
-  if (sum(errors == TRUE) == length(results)) {
-    stop("All the tests failed.",
-         call. = FALSE)
+  if (nrow(results_df) == 0) {
+     stop("All the tests failed", call. = FALSE)
   }
-  # Keep features without errors
-  results_df <- data.frame(Feature_ID = features, 
-                           do.call(rbind, results[!errors]),
-                           check.names = FALSE)
+  rownames(results_df) <- results_df$Feature_ID
+  
   # Rows full of NA for features where the test failed
   results_df <- .fill_results(results_df, features)
   # FDR correction
@@ -1493,14 +1545,14 @@ perform_t_test <- function(object, formula_char,
 # comparison, also in the case of two groups
 .setup_simple_test <- function(object, group, ...) {
   df <- NULL
-  groups <- levels(pData(object)[, group])
+  groups <- levels(colData(object)[, group])
   combinations <- utils::combn(groups, 2)
   for (i in seq_len(ncol(combinations))) {
     group1 <- as.character(combinations[1, i])
     group2 <- as.character(combinations[2, i])
     # Subset the pair of groups
-    object_tmp <- object[, pData(object)[, group] %in% c(group1, group2)]
-    pData(object_tmp) <- droplevels(pData(object_tmp))
+    object_tmp <- object[, colData(object)[, group] %in% c(group1, group2)]
+    colData(object_tmp) <- droplevels(colData(object_tmp))
 
     res <- .help_simple_test(object_tmp, group = group, ...)
     ifelse(is.null(df), df <- res, df <- dplyr::left_join(df, res))
@@ -1513,17 +1565,18 @@ perform_t_test <- function(object, formula_char,
 #' Performs pairwise and paired non-parametric tests. The default is Mann-
 #' Whitney U test, use \code{is_paired} for Wilcoxon signed rank tests.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param formula_char character, the formula to be used in the tests
 #' @param is_paired logical, use paired test
 #' @param id character, name of the subject identification column for paired 
 #' version
 #' @param all_features should all features be included in FDR correction?
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other parameters passed to test stats::wilcox.test
 #'
 #' @details P-values of each comparison are corrected separately from each 
 #' other. The model is fit on combined_data(object). Thus, column names
-#' in pData(object) can be specified. To make the formulas flexible, the word 
+#' in pheno data can be specified. To make the formulas flexible, the word 
 #' "Feature" must be used to signal the role of the features in the formula. 
 #' "Feature" will be replaced by the actual features during model fitting. 
 #' For example, if testing for equality of means in study groups, use 
@@ -1543,18 +1596,21 @@ perform_t_test <- function(object, formula_char,
 #'   id = "Subject_ID")
 #' # Only two groups
 #' mann_whitney_results <- perform_non_parametric(drop_qcs(example_set), 
-#'   formula_char = "Feature ~ Group", is_paired = FALSE)
+#'   formula_char = "Feature ~ Group")
 #'
 #' @seealso \code{\link[stats]{wilcox.test}}
 #'
 #' @export
-perform_non_parametric <- function(object, formula_char, 
-                                   is_paired = FALSE, id = NULL,
-                                   all_features = FALSE, ...) {
+perform_non_parametric <- function(object, formula_char, is_paired = FALSE, 
+                                   id = NULL, all_features = FALSE, 
+                                   assay.type = NULL, ...) {
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, assay.type = from)
+  assays(object) <- assays(object)[from]
   group <- unlist(strsplit(formula_char, " ~ "))[2]
 
-  if (!is.factor(pData(object)[, group])) {
-    stop("Group column should be a factor")
+  if (!is.factor(colData(object)[, group])) {
+    stop("Grouping column should be a factor")
   }
 
   results_df <- .setup_simple_test(object, group = group, 
@@ -1562,7 +1618,7 @@ perform_non_parametric <- function(object, formula_char,
                                    all_features = all_features, 
                                    is_paired = is_paired, ...)
   
-  if (length(featureNames(object)) != nrow(results_df)) {
+  if (length(rownames(object)) != nrow(results_df)) {
     warning("Results don't contain all features.")
   }
   rownames(results_df) <- results_df$Feature_ID

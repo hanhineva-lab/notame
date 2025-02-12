@@ -1,14 +1,15 @@
 # ------- HELPER FUNCTIONS ----------------
 
 # Helper function for computing PCA
-.pca_helper <- function(object, pcs, center, scale, ...) {
+.pca_helper <- function(object, pcs, center, scale, assay.type, ...) {
   if (!requireNamespace("pcaMethods", quietly = TRUE)) {
     stop("Package \'pcaMethods\' needed for this function to work.",
          " Please install it.", call. = FALSE)
   }
   .add_citation("PCA was performed using pcaMethods package:",
                 citation("pcaMethods"))
-  res_pca <- pcaMethods::pca(object, nPcs = max(pcs), scale = scale, 
+  res_pca <- pcaMethods::pca(t(assay(object, assay.type)),
+                             nPcs = max(pcs), scale = scale, 
                              center = center, ...)
   pca_scores <- as.data.frame(pcaMethods::scores(res_pca))[, pcs]
   r2 <- summary(res_pca)["R2", pcs]
@@ -18,7 +19,8 @@
 }
 
 # Helper function for computing t-SNE
-.t_sne_helper <- function(object, center, scale, perplexity, pca_method, ...) {
+.t_sne_helper <- function(object, center, scale, perplexity, 
+                          pca_method, assay.type, ...) {
   if (!requireNamespace("pcaMethods", quietly = TRUE)) {
     stop("Package \'pcaMethods\' needed for this function to work.",
          " Please install it.", call. = FALSE)
@@ -28,17 +30,20 @@
          " Please install it.", call. = FALSE)
   }
   .add_citation("Rtsne package was used for t-SNE figures:", citation("Rtsne"))
-  prepd <- pcaMethods::prep(object, center = center, scale = scale)
 
-  if (sum(is.na(exprs(prepd))) > 0) {
-    res_pca <- pcaMethods::pca(object, method = pca_method, 
+  prepd <- pcaMethods::prep(t(assay(object, assay.type)), 
+                            center = center, scale = scale)
+
+  if (sum(is.na(prepd)) > 0) {
+    res_pca <- pcaMethods::pca(t(assay(object, assay.type)), 
+                               method = pca_method, 
                                nPcs = min(nrow(object), ncol(object), 50),
                                scale = "none", center = FALSE)
     pca_scores <- pcaMethods::scores(res_pca)
     res_tsne <- Rtsne::Rtsne(pca_scores, perplexity = perplexity,
                              pca = FALSE, ...)
   } else {
-    res_tsne <- Rtsne::Rtsne(t(exprs(prepd)), perplexity = perplexity, ...)
+    res_tsne <- Rtsne::Rtsne(prepd, perplexity = perplexity, ...)
   }
   data.frame(res_tsne$Y)
 }
@@ -50,7 +55,7 @@
 #' Computes PCA using one of the methods provided in the Bioconductor package
 #' pcaMethods and plots the two first principal components.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
@@ -75,6 +80,7 @@
 #' If a continuous variable is used as color, density curve will be colorless.
 #' @param text_base_size numeric, base size for text
 #' @param point_size numeric, size of the points
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional arguments passed to pcaMethods::pca
 #'
 #' @return A ggplot object. If \code{density} is \code{TRUE}, the plot will 
@@ -87,21 +93,25 @@
 #'
 #' @export
 plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE, 
-                     center = TRUE, scale = "uv", color = group_col(object),
+                     center = TRUE, scale = "uv", color = NULL,
                      shape = color, label = NULL, density = FALSE, 
                      title = "PCA", subtitle = NULL, color_scale = NA,
                      shape_scale = getOption("notame.shape_scale"), 
                      fill_scale = getOption("notame.fill_scale_dis"),
-                     text_base_size = 14, point_size = 2, ...) {
+                     text_base_size = 14, point_size = 2,
+                     assay.type = NULL, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-
-  pca_results <- .pca_helper(object, pcs, center, scale, ...)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_cols = c(color, shape), 
+                          assay.type = from)
+  
+  pca_results <- .pca_helper(object, pcs, center, scale, assay.type = from, ...)
   pca_scores <- pca_results$pca_scores
   pc_names <- colnames(pca_scores)
-  pca_scores[color] <- pData(object)[, color]
-  pca_scores[shape] <- pData(object)[, shape]
-  pca_scores[label] <- pData(object)[, label]
+  pca_scores[color] <- colData(object)[, color]
+  pca_scores[shape] <- colData(object)[, shape]
+  pca_scores[label] <- colData(object)[, label]
 
   .scatter_plot(pca_scores, x = pc_names[1], y = pc_names[2], 
                 xlab = pca_results$labels[1], ylab = pca_results$labels[2],
@@ -118,7 +128,7 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' of \code{pcaMethods::pca}, the  method can be changed to "ppca" if nipals 
 #' fails.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
@@ -144,6 +154,7 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' If a continuous variable is used as color, density curve will be colorless.
 #' @param text_base_size numeric, base size for text
 #' @param point_size numeric, size of the points
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional arguments passed to \code{Rtsne::Rtsne}
 #'
 #' @return A ggplot object. If \code{density} is \code{TRUE}, the plot will 
@@ -157,22 +168,27 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' @export
 plot_tsne <- function(object, all_features = FALSE, center = TRUE, 
                       scale = "uv", perplexity = 30, pca_method = "nipals",
-                      color = group_col(object), shape = color, label = NULL,
+                      color = NULL, shape = color, label = NULL,
                       density = FALSE, title = "t-SNE",
                       subtitle = paste("Perplexity:", perplexity), 
                       color_scale = NA,
                       shape_scale = getOption("notame.shape_scale"), 
                       fill_scale = getOption("notame.fill_scale_dis"),
-                      text_base_size = 14, point_size = 2, ...) {
+                      text_base_size = 14, point_size = 2, 
+                      assay.type = NULL, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_cols = c(color, shape),
+                          assay.type = from)
+
   # t-SNE
-  tsne_scores <- .t_sne_helper(object, center, scale, 
-                               perplexity, pca_method, ...)
+  tsne_scores <- .t_sne_helper(object, center, scale, perplexity, 
+                               pca_method, from, ...)
   # Add columns for plotting
-  tsne_scores[color] <- pData(object)[, color]
-  tsne_scores[shape] <- pData(object)[, shape]
-  tsne_scores[label] <- pData(object)[, label]
+  tsne_scores[color] <- colData(object)[, color]
+  tsne_scores[shape] <- colData(object)[, shape]
+  tsne_scores[label] <- colData(object)[, label]
 
   .scatter_plot(tsne_scores, x = "X1", y = "X2", color = color, shape = shape,
                 label = label, density = density, title = title, 
@@ -279,7 +295,7 @@ plot_tsne <- function(object, all_features = FALSE, center = TRUE,
 #' Computes PCA using one of the methods provided in the Bioconductor package
 #' pcaMethods and plots the loadings of first principal components.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
@@ -293,6 +309,7 @@ plot_tsne <- function(object, all_features = FALSE, center = TRUE,
 #' @param text_base_size numeric, base size for text
 #' @param point_size numeric, size of the points
 #' @param label_text_size numeric, size of the labels
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional arguments passed to pcaMethods::pca
 #'
 #' @return A ggplot object.
@@ -308,7 +325,7 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
                               n_features = c(10, 10),
                               title = "PCA loadings", subtitle = NULL,
                               text_base_size = 14, point_size = 2,
-                              label_text_size = 4, ...) {
+                              label_text_size = 4, assay.type = NULL, ...) {
   if (!requireNamespace("pcaMethods", quietly = TRUE)) {
     stop("Package \"pcaMethods\" needed for this function to work.", 
          " Please install it.", call. = FALSE)
@@ -319,8 +336,11 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
   
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-  pca_res <- pcaMethods::pca(object, nPcs = max(pcs), center = center, 
-                             scale = scale, ...)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, assay.type = from, feature_ID = TRUE)
+
+  pca_res <- pcaMethods::pca(t(assay(object, from)), nPcs = max(pcs), 
+                             center = center, scale = scale, ...)
 
   loads <- as.data.frame(pcaMethods::loadings(pca_res))[, pcs]
   pc_names <- colnames(loads)
@@ -353,7 +373,7 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' where the value of the coloring variable is summarised for each bin, by 
 #' default as the mean of the values inside the bin.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param all_features logical, should all features be used? If FALSE (the 
@@ -367,6 +387,7 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' @param bins the number of bins in x and y axes
 #' @param title,subtitle the titles of the plot
 #' @param fill_scale the fill scale as returned by a ggplot function
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional arguments passed to pcaMethods::pca
 #'
 #' @return A ggplot object.
@@ -382,14 +403,16 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
                             fill = "Injection_order", summary_fun = "mean",
                             bins = 10, title = "PCA", subtitle = NULL,
                             fill_scale = getOption("notame.fill_scale_con"),
-                            ...) {
+                            assay.type = NULL, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_nums = fill, assay.type = from)
 
-  pca_results <- .pca_helper(object, pcs, center, scale, ...)
+  pca_results <- .pca_helper(object, pcs, center, scale, assay.type = from, ...)
   pca_scores <- pca_results$pca_scores
   pc_names <- colnames(pca_scores)
-  pca_scores[fill] <- pData(object)[, fill]
+  pca_scores[fill] <- colData(object)[, fill]
 
   .hexbin_plot(data = pca_scores, x = pc_names[1], y = pc_names[2], 
                xlab = pca_results$labels[1], ylab = pca_results$labels[2],
@@ -406,7 +429,7 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' of \code{pcaMethods::pca}, the  method can be changed to "ppca" if nipals 
 #' fails.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
@@ -420,6 +443,7 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' @param bins the number of bins in x and y axes
 #' @param title,subtitle the titles of the plot
 #' @param fill_scale the fill scale as returned by a ggplot function
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional arguments passed to Rtsne::Rtsne
 #'
 #' @return
@@ -437,15 +461,16 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
                              summary_fun = "mean", bins = 10, title = "t-SNE",
                              subtitle = paste("Perplexity:", perplexity),
                              fill_scale = getOption("notame.fill_scale_con"),
-                             ...) {
+                             assay.type = NULL, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
-
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_nums = fill, assay.type = from)
   # t-SNE
   tsne_scores <- .t_sne_helper(object, center, scale,
-                               perplexity, pca_method, ...)
+                               perplexity, pca_method, from, ...)
   # Add columns for plotting
-  tsne_scores[fill] <- pData(object)[, fill]
+  tsne_scores[fill] <- colData(object)[, fill]
 
   .hexbin_plot(tsne_scores, x = "X1", y = "X2", fill = fill, 
                summary_fun = summary_fun, bins = bins,
@@ -493,7 +518,7 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
 #' Plots changes in PCA space according to time. All the observations of a 
 #' single subject are connected by an arrow ending at the last observation.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
@@ -512,14 +537,17 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
 #' @param color_scale the color scale as returned by a ggplot function
 #' @param text_base_size the base size of the text
 #' @param line_width the width of the arrows
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional arguments passed to pcaMethods::pca
 #'
 #' @return A ggplot object.
 #'
 #' @examples
-#' plot_pca_arrows(drop_qcs(example_set))
+#' plot_pca_arrows(drop_qcs(example_set), color = "Group", time = "Time",
+#'   subject = "Subject_ID")
 #' # If the sample size is large, plot groups separately
-#' plot_pca_arrows(drop_qcs(example_set)) +
+#' plot_pca_arrows(drop_qcs(example_set), color = "Group", 
+#'                 time = "Time", subject = "Subject_ID") +
 #'   facet_wrap(~Group)
 #'
 #' @seealso \code{\link[pcaMethods]{pca}}
@@ -527,21 +555,24 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
 #' @export
 plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE, 
                             center = TRUE, scale = "uv",
-                            color = group_col(object), time = time_col(object),
-                            subject = subject_col(object), alpha = 0.6,
+                            color, time, subject, alpha = 0.6,
                             arrow_style = arrow(), title = "PCA changes",
                             subtitle = NULL, 
                             color_scale = getOption("notame.color_scale_dis"),
-                            text_base_size = 14, line_width = 0.5, ...) {
+                            text_base_size = 14, line_width = 0.5, 
+                            assay.type = NULL, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_cols = c(color, time, subject),
+                         assay.type = from)
 
-  pca_results <- .pca_helper(object, pcs, center, scale, ...)
+  pca_results <- .pca_helper(object, pcs, center, scale, assay.type = from, ...)
   pca_scores <- pca_results$pca_scores
   pc_names <- colnames(pca_scores)
-  pca_scores[color] <- pData(object)[, color]
-  pca_scores[time] <- pData(object)[, time]
-  pca_scores[subject] <- pData(object)[, subject]
+  pca_scores[color] <- colData(object)[, color]
+  pca_scores[time] <- colData(object)[, time]
+  pca_scores[subject] <- colData(object)[, subject]
 
   .arrow_plot(data = pca_scores, x = pc_names[1], y = pc_names[2], 
               color = color, time = time, subject = subject,
@@ -551,8 +582,6 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
               text_base_size = text_base_size, line_width = line_width)
 }
 
-
-
 #' t-SNE plot with arrows
 #'
 #' Computes t-SNE into two dimensions and plots changes according to time.
@@ -561,7 +590,7 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' using the nipals method of \code{pcaMethods::pca}, the method can be changed 
 #' to "ppca" if nipals fails.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
@@ -581,39 +610,43 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' @param color_scale the color scale as returned by a ggplot function
 #' @param text_base_size the base size of the text
 #' @param line_width the width of the arrows
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... additional arguments passed to \code{Rtsne::Rtsne}
 #'
 #' @return A ggplot object. If \code{density} is \code{TRUE}, the plot will 
 #' consist of multiple parts and is harder to modify.
 #'
 #' @examples
-#' plot_tsne_arrows(drop_qcs(example_set), perplexity = 10)
+#' plot_tsne_arrows(drop_qcs(example_set), perplexity = 10, color = "Group", 
+#'   time = "Time", subject = "Subject_ID")
 #' # If the sample size is large, plot groups separately
-#' plot_tsne_arrows(drop_qcs(example_set), perplexity = 10) +
-#'   facet_wrap(~Group)
+#' plot_tsne_arrows(drop_qcs(example_set), perplexity = 10, color = "Group", 
+#'   time = "Time", subject = "Subject_ID") +
+#'     facet_wrap(~Group)
 #'
 #' @seealso \code{\link[Rtsne]{Rtsne}}
 #'
 #' @export
 plot_tsne_arrows <- function(object, all_features = FALSE, center = TRUE, 
                              scale = "uv", perplexity = 30, 
-                             pca_method = "nipals",
-                             color = group_col(object),
-                             time = time_col(object), 
-                             subject = subject_col(object),
+                             pca_method = "nipals", color, time, subject,
                              alpha = 0.6, arrow_style = arrow(), 
                              title = "t-SNE changes",
                              subtitle = paste("Perplexity:", perplexity),
                              color_scale = getOption("notame.color_scale_dis"),
-                             text_base_size = 14, line_width = 0.5, ...) {
+                             text_base_size = 14, line_width = 0.5,
+                             assay.type = NULL, ...) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_cols = c(color, time, subject),
+                         assay.type = from)
 
   tsne_scores <- .t_sne_helper(object, center, scale, 
-                               perplexity, pca_method, ...)
-  tsne_scores[color] <- pData(object)[, color]
-  tsne_scores[time] <- pData(object)[, time]
-  tsne_scores[subject] <- pData(object)[, subject]
+                               perplexity, pca_method, from, ...)
+  tsne_scores[color] <- colData(object)[, color]
+  tsne_scores[time] <- colData(object)[, time]
+  tsne_scores[subject] <- colData(object)[, subject]
 
   .arrow_plot(data = tsne_scores, x = "X1", y = "X2", color = color,
               time = time, subject = subject, alpha = alpha, 
@@ -633,8 +666,9 @@ minus_log10 <- scales::trans_new("minus_log10",
 #'
 #' Draws a volcano plot of effect size and p-values.
 #'
-#' @param object a MetaboSet object or a data frame. If x is a MetaboSet 
-#' object, fData(x) is used. If x is a data frame, it is used as is.
+#' @param object a SummarizedExperiment object or a data frame. If x is a 
+#' SummarizedExperiment object, feature data of x is used. If x is a data 
+#' frame, it is used as is.
 #' @param x,p the column names of effect size (x-axis) and p-values
 #' @param p_fdr column name of FDR corrected p-values, used to draw a line 
 #' showing the fdr-corrected significance level
@@ -718,12 +752,30 @@ setMethod("volcano_plot", c(object = "data.frame"),
   }
 )
 
+#' @rdname volcano_plot
+#' @export
+setMethod("volcano_plot", c(object = "SummarizedExperiment"),
+  function(object, x, p, p_fdr = NULL, color = NULL,
+           p_breaks = c(0.05, 0.01, 0.001, 1e-4), fdr_limit = 0.05,
+           log2_x = FALSE, center_x_axis = TRUE, x_lim = NULL, 
+           label = NULL, label_limit = 0.05, 
+           color_scale = getOption("notame.color_scale_con"),
+           title = "Volcano plot", subtitle = NULL,
+           text_base_size = 14, label_text_size = 4, ...) {
+    .volcano_plotter(as.data.frame(rowData(object), optional = TRUE), x, p, 
+                     p_fdr, color, 
+                     p_breaks, fdr_limit, log2_x, center_x_axis, x_lim, label, 
+                     label_limit, color_scale, title, subtitle,
+                     text_base_size, label_text_size, ...)
+  }
+)
+
 
 .volcano_plotter <- function(data, x, p, p_fdr, color, p_breaks, fdr_limit, 
                             log2_x, center_x_axis, x_lim, label, label_limit,
                             color_scale, title, subtitle, text_base_size,
                             label_text_size, ...) {
-                              
+  .check_feature_data(data, feature_cols = c(x, p, p_fdr, color, label))
                               
   if (center_x_axis && !is.null(x_lim)) {
     warning("Manually setting x-axis limits overrides x-axis centering.")
@@ -813,8 +865,9 @@ setMethod("volcano_plot", c(object = "data.frame"),
 #' the effect, so part of the points will "drop" from the p = 1 (-log10(p) = 0) 
 #' line. This results in a so-called directed Manhattan plot.
 #'
-#' @param object a MetaboSet object or a data frame. If x is a MetaboSet 
-#' object, fData(x) is used. If x is a data frame, it is used as is.
+#' @param object a SummarizedExperiment object or a data frame. If x is a 
+#' SummarizedExperiment object, feature data of x is used. If x is a data 
+#' frame, it is used as is.
 #' @param x,p the column names of x-axis and p-values
 #' @param effect column name of effect size (should have negative and positive 
 #' values).
@@ -837,17 +890,17 @@ setMethod("volcano_plot", c(object = "data.frame"),
 #' # naturally, this looks messy as there are not enough p-values
 #' lm_results <- perform_lm(drop_qcs(example_set), 
 #'   formula_char = "Feature ~ Group")
-#' lm_data <- dplyr::left_join(fData(example_set), lm_results)
+#' lm_data <- dplyr::left_join(as.data.frame(rowData(example_set)), lm_results)
 #' # Traditional Manhattan plot from data frame
 #' manhattan_plot(lm_data,
-#'   x = "Mass",
+#'   x = "Average_Mz",
 #'   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
 #'   fdr_limit = 0.1
 #' )
-#' # Directed Manhattan plot from MetaboSet
-#' with_results <- join_fData(example_set, lm_results)
+#' # Directed Manhattan plot from SummarizedExperiment
+#' with_results <- join_rowData(example_set, lm_results)
 #' manhattan_plot(with_results,
-#'   x = "Mass", effect = "GroupB_Estimate",
+#'   x = "Average_Mz", effect = "GroupB_Estimate",
 #'   p = "GroupB_P", p_fdr = "GroupB_P_FDR",
 #'   fdr_limit = 0.1
 #' )
@@ -871,7 +924,7 @@ setMethod("manhattan_plot", c(object = "MetaboSet"),
            x_lim = NULL, y_lim = NULL,
            color_scale = getOption("notame.color_scale_con"),
            title = "Manhattan plot", subtitle = NULL, ...) {
-    .manhattan_plotter(fData(object), x, p, effect, p_fdr, color, p_breaks,
+    .manhattan_plotter(rowData(object), x, p, effect, p_fdr, color, p_breaks, 
                        fdr_limit, x_lim, y_lim, color_scale, 
                        title, subtitle, ...)
   }
@@ -890,10 +943,28 @@ setMethod("manhattan_plot", c(object = "data.frame"),
   }
 )
 
+#' @rdname manhattan_plot
+#' @export
+setMethod("manhattan_plot", c(object = "SummarizedExperiment"),
+  function(object, x, p, effect = NULL, p_fdr = NULL, color = NULL,
+           p_breaks = c(0.05, 0.01, 0.001, 1e-4), fdr_limit = 0.05,
+           x_lim = NULL, y_lim = NULL,
+           color_scale = getOption("notame.color_scale_con"),
+           title = "Manhattan plot", subtitle = NULL, ...) {
+    .manhattan_plotter(as.data.frame(rowData(object), optional = TRUE), x, p, 
+                       effect, p_fdr, 
+                       color, p_breaks, fdr_limit, x_lim, y_lim, color_scale, 
+                       title, subtitle, ...)
+  }
+)
+
 
 .manhattan_plotter <- function(data, x, p, effect, p_fdr, color, p_breaks,
                               fdr_limit, x_lim, y_lim, color_scale,
                               title, subtitle, ...) {
+  
+  .check_feature_data(data, feature_cols = c(x, p, effect, p_fdr, color))
+  
   if (min(data[, p]) > max(p_breaks)) {
     warning("All the p-values are larger than the p-value breaks supplied.", 
             " Consider using larger p_breaks for plotting.")
@@ -970,8 +1041,8 @@ setMethod("manhattan_plot", c(object = "data.frame"),
 #' represents a feature. The plot has retention time on x-axis, m/z on y-axis 
 #' and the size of the points is scaled based on p-value
 #'
-#' @param object a MetaboSet object or a data frame. If x is a MetaboSet 
-#' object, fData(x) is used.
+#' @param object a SummarizedExperiment object or a data frame. If x is a 
+#' SummarizedExperiment object, rowData(x) is used.
 #' If x is a data frame, it is used as is.
 #' @param p_col the column name containing p-values. This is used to scale the 
 #' size of the points.
@@ -985,7 +1056,7 @@ setMethod("manhattan_plot", c(object = "data.frame"),
 #' @param color_scale color scale as returned by a ggplot function. Defaults to 
 #' current continuous color scale.
 #' @param all_features logical, should all features be retained? Should be used 
-#' only if x is a MetaboSet object.
+#' only if x is a SummarizedExperiment object.
 #' @param ...  parameters passed to \code{\link[ggplot2]{geom_point}},
 #' such as shape and alpha values. New aesthetics can
 #' also be passed using \code{mapping = aes(...)}.
@@ -995,14 +1066,15 @@ setMethod("manhattan_plot", c(object = "data.frame"),
 #' @examples
 #' # Compute results from a linear model
 #' lm_results <- perform_lm(example_set, formula_char = "Feature ~ Group")
-#' with_results <- join_fData(example_set, lm_results)
+#' with_results <- join_rowData(example_set, lm_results)
 #'
-#' # Plot from the MetaboSet object
+#' # Plot from the SummarizedExperiment object
 #' # automatically facet by analytical mode in variable Split
 #' mz_rt_plot(with_results, p_col = "GroupB_P", color = "GroupB_Estimate")
 #'
 #' # Plot the results from the results dataframe
-#' mz_rt_plot(with_results, p_col = "GroupB_P", color = "GroupB_Estimate")
+#' lm_data <- dplyr::left_join(as.data.frame(rowData(example_set)), lm_results)
+#' mz_rt_plot(lm_data, p_col = "GroupB_P", color = "GroupB_Estimate")
 #'
 #' @export
 setGeneric("mz_rt_plot", signature = "object",
@@ -1020,8 +1092,8 @@ setMethod("mz_rt_plot", c(object = "MetaboSet"),
            color = NULL, title = "m/z vs retention time", subtitle = NULL,
            color_scale = getOption("notame.color_scale_con"), 
            all_features = FALSE) {
-    .mz_rt_plotter(fData(drop_flagged(object, all_features)), p_col, p_limit,
-                   mz_col, rt_col, color, title, subtitle, 
+    .mz_rt_plotter(fData(drop_flagged(object, all_features)),
+                   p_col, p_limit, mz_col, rt_col, color, title, subtitle, 
                    color_scale, all_features)
   }
 )
@@ -1036,10 +1108,26 @@ setMethod("mz_rt_plot", c(object = "data.frame"),
                    title, subtitle, color_scale)
   }
 )
+#' @rdname mz_rt_plot
+#' @export
+setMethod("mz_rt_plot", c(object = "SummarizedExperiment"),
+  function(object, p_col = NULL, p_limit = NULL, mz_col = NULL, rt_col = NULL,
+           color = NULL, title = "m/z vs retention time", subtitle = NULL,
+           color_scale = getOption("notame.color_scale_con"), 
+           all_features = FALSE) {
+    data <- as.data.frame(rowData(drop_flagged(object, all_features)), 
+                          optional = TRUE)
+    .mz_rt_plotter(data, p_col, p_limit, mz_col, rt_col, color, title, 
+                   subtitle, color_scale, all_features)
+  }
+)
+
 
 
 .mz_rt_plotter <- function(x, p_col, p_limit, mz_col, rt_col, color, 
                           title, subtitle, color_scale, all_features) {
+  .check_feature_data(x, feature_cols = c(p_col, mz_col, rt_col, color),
+                      feature_split = TRUE)
   if (!is.null(p_limit) && !is.null(p_col)) {
     x <- x[which(x[, p_col] < p_limit), ]
     if (nrow(x) == 0) {

@@ -7,16 +7,17 @@
 plot_sample_boxplots(
   object,
   all_features = FALSE,
-  order_by = as.character(stats::na.omit(c(group_col(object), time_col(object)))),
-  fill_by = as.character(stats::na.omit(c(group_col(object), time_col(object)))),
+  order_by,
+  fill_by,
   title = "Boxplot of samples",
   subtitle = NULL,
   fill_scale = getOption("notame.fill_scale_dis"),
-  zoom_boxplot = TRUE
+  zoom_boxplot = TRUE,
+  assay.type = NULL
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{all_features}{logical, should all features be used? If FALSE (the 
 default), flagged features are removed before visualization.}
@@ -32,6 +33,8 @@ ggplot function}
 
 \item{zoom_boxplot}{logical, whether outliers should be left outside the 
 plot and only the boxplots shown. Defaults to TRUE.}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
 A ggplot object.

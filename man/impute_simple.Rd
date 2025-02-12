@@ -4,10 +4,10 @@
 \alias{impute_simple}
 \title{Simple imputation}
 \usage{
-impute_simple(object, value, na_limit = 0)
+impute_simple(object, value, na_limit = 0, assay.type = NULL, name = NULL)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{value}{the value used for imputation, either a numeric or one of 
 '"min", "half_min", "small_random", see above}
@@ -15,9 +15,13 @@ impute_simple(object, value, na_limit = 0)
 \item{na_limit}{only impute features with the proportion of NAs over this 
 limit. For example, if \code{na_limit = 0.5}, only features with at least 
 half of the values missing are imputed.}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
+
+\item{name}{character, name of the resultant assay in case of multiple assays}
 }
 \value{
-A MetaboSet object with an imputed assay.
+A SummarizedExperiment or Metaboset object with imputed peak table.
 }
 \description{
 Impute missing values using a simple imputation strategy. All missing values

@@ -45,9 +45,10 @@ init_log(log_file = file.path(ppath, "log.txt"))
 ```
 
 ## Read data
-Now we can read in the actual data! The data is from a project with samples 
-from three different groups. The data is scrambled; the feature information 
-does not correspond to the abundances given. 
+The data is mock data with two balanced groups and two balanced time points. 
+The time points also correspond to two batches. There are 50 samples with ten 
+regularly interspersed QC samples and 80 features divided into four analytical 
+modes.
 
 ```{r}
 data <- read_from_excel(
@@ -69,20 +70,22 @@ sapply(data, class)
 sapply(data, dim)
 ```
 
-## Construct MetaboSet objects
-These three parts can be used to construct MetaboSet objects using 
-construct_metabosets(). The function parameters are the three 
-parts of a dataset, plus special column names: `group_col`, `time_col` 
-and `subject_col`, which can be stored in the instance for convenience as 
-many functions use the columns as default values.
+## Construct SummarizedExperiment object 
+These three parts can be used to construct SummarizedExperiment using the 
+native SummarizedExperiment constructor or MetaboSet objects using 
+construct_metabosets(). The example data contains four analytical modes, so we 
+separate them using fix_object(), which also conveniently checks the object for 
+compatibility with all of notame. 
 
 ```{r}
-modes <- construct_metabosets(
-  exprs = data$exprs, pheno_data = data$pheno_data, 
-  feature_data = data$feature_data, group_col = "Group")
+data <- SummarizedExperiment(assays = data$exprs, 
+                             rowData = data$feature_data,
+                             colData = data$pheno_data)
+                             
+modes <- fix_object(data, split_data = TRUE)
 ```
 
-The function returns a list of MetaboSet objects, one per mode (LC column x 
+Now we have a list of objects, one per mode (LC column x 
 ionization mode) or whatever split was supplied to read_from_excel().
 
 ```{r, results = 'markup'}
@@ -113,17 +116,23 @@ for (i in seq_along(modes)) {
   # Set all zero abundances to NA
   mode <- mark_nas(mode, value = 0)
   # Flag features with low detection rate
-  mode <- flag_detection(mode, qc_limit = 0.7, group_limit = 0.8)
+  mode <- flag_detection(mode, group = "Group")
   # Visualize data before drift correction
-  visualizations(mode, prefix = paste0(ppath, "figures/", name, "_ORIG"))
+  visualizations(mode, prefix = paste0(ppath, "figures/", name, "_ORIG"),
+                 perplexity = 5, group = "Group", time = "Time", 
+                 id = "Subject_ID", color = "Group")
   # Correct drift
   corrected <- correct_drift(mode)
   # Visualize data after drift correction
-  visualizations(corrected, prefix = paste0(ppath, "figures/", name, "_DRIFT"))
+  visualizations(corrected, prefix = paste0(ppath, "figures/", name, "_DRIFT"),
+                 perplexity = 5, group = "Group", time = "Time", 
+                 id = "Subject_ID", color = "Group")
   # Flag low-quality features
   corrected <- corrected %>% assess_quality() %>% flag_quality()
   # Visualize data after removal of low-quality features
-  visualizations(corrected, prefix = paste0(ppath, "figures/", name, "_CLEAN"))
+  visualizations(corrected, prefix = paste0(ppath, "figures/", name, "_CLEAN"),
+                 perplexity = 5, group = "Group", time = "Time",
+                 id = "Subject_ID", color = "Group")
   # Save result of iteration
   processed[[i]] <- corrected
 }
@@ -138,7 +147,7 @@ quality metrics after drift correction, along with a note documenting this
 action in feature information. 
 
 ```{r, results = 'markup'}
-fData(processed[[1]])$DC_note
+rowData(processed[[1]])$DC_note
 ```
 
 ## Data pretreatment for the complete dataset
@@ -146,8 +155,10 @@ fData(processed[[1]])$DC_note
 Next, it is time to merge the modes together and visualize the complete dataset.
 
 ```{r}
-merged <- merge_metabosets(processed)
-visualizations(merged, prefix = paste0(ppath, "figures/_FULL"))
+merged <- merge_objects(processed)
+visualizations(merged, prefix = paste0(ppath, "figures/_FULL"),
+               group = "Group", time = "Time",
+               id = "Subject_ID", color = "Group")
 ```
 
 Then, QC samples can (and should) be removed, as they are no longer needed, and 
@@ -155,7 +166,9 @@ the dataset is visualized anew.
 
 ```{r}
 merged_no_qc <- drop_qcs(merged)
-visualizations(merged_no_qc, prefix = paste0(ppath, "figures/FULL_NO_QC"))
+visualizations(merged_no_qc, prefix = paste0(ppath, "figures/FULL_NO_QC"),
+               group = "Group", time = "Time",
+               id = "Subject_ID", color = "Group")
 ```
 
 If there are any missing values in the data, they need to be imputed. Let's use 
@@ -166,7 +179,9 @@ forest imputation to guarantee reproducibility of results.
 ```{r}
 set.seed(2024)
 imputed <- impute_rf(merged_no_qc)
-visualizations(imputed, prefix = paste0(ppath, "figures/FULL_IMPUTED"))
+visualizations(imputed, prefix = paste0(ppath, "figures/FULL_IMPUTED"),
+               group = "Group", time = "Time",
+               id = "Subject_ID", color = "Group")
 ```
 
 By default, the imputation procedure only operates on good quality features, 
@@ -192,11 +207,13 @@ save(base, file = paste0(ppath, "full_data.RData"))
 # Feature selection
 
 ## Univariate analysis
-First, we'll use a linear model to evaluate the features in terms of the probability of obtaining the observed abundances given the null hypothesis, namely that there is no difference in feature abundance across study groups.
+First, we'll use a linear model to evaluate the features in terms of the 
+probability of obtaining the observed abundances given the null hypothesis, 
+namely that there is no difference in feature abundance across study groups.
 
 ```{r}
 lm_results <- perform_lm(log(base), formula_char = "Feature ~ Group")
-base <- join_fData(base, lm_results)
+base <- join_rowData(base, lm_results)
 ```
 
 ## Supervised learning
@@ -213,7 +230,7 @@ rf_results <- fit_rf(base, y = "Group")
 
 rf_importance <- importance_rf(rf_results)
 
-base <- join_fData(base, 
+base <- join_rowData(base, 
   rf_importance[, c("Feature_ID", "MeanDecreaseAccuracy")])
 ```
 

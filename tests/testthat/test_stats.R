@@ -4,7 +4,7 @@ library(notame)
 # Summary statistics ----
 test_that("summary statistics work without grouping", {
   smry <- summary_statistics(mark_nas(example_set, 0))
-  ex <- exprs(mark_nas(example_set, 0))
+  ex <- assay(mark_nas(example_set, 0))
 
   for (fun in c("finite_mean", "finite_sd", "finite_median", "finite_mad")) {
     expect_equal(unname(apply(ex, 1, fun)), smry[, gsub("finite_", "", fun)])
@@ -16,7 +16,7 @@ test_that("summary statistics work without grouping", {
 
 test_that("summary statistics work with grouping", {
   smry <- summary_statistics(mark_nas(example_set, 0), grouping_cols = "Group")
-  exa <- exprs(mark_nas(example_set[, example_set$Group == "A"], 0))
+  exa <- assay(mark_nas(example_set[, example_set$Group == "A"], 0))
 
   for (fun in c("finite_mean", "finite_sd", "finite_median", "finite_mad")) {
     expect_equal(unname(apply(exa, 1, fun)), smry[, gsub("finite", "A", fun)])
@@ -24,7 +24,7 @@ test_that("summary statistics work with grouping", {
   expect_equal(unname(apply(exa, 1, finite_quantile, probs = 0.25)), smry$A_Q25)
   expect_equal(unname(apply(exa, 1, finite_quantile, probs = 0.75)), smry$A_Q75)
 
-  exb <- exprs(mark_nas(example_set[, example_set$Group == "B"], 0))
+  exb <- assay(mark_nas(example_set[, example_set$Group == "B"], 0))
 
   for (fun in c("finite_mean", "finite_sd", "finite_median", "finite_mad")) {
     expect_equal(unname(apply(exb, 1, fun)), smry[, gsub("finite", "B", fun)])
@@ -35,12 +35,12 @@ test_that("summary statistics work with grouping", {
 
 test_that("summary statistics work with all NA features", {
   ex_set_na <- mark_nas(example_set, 0)
-  exprs(ex_set_na)[1, ] <- NA
+  assay(ex_set_na)[1, ] <- NA
 
   smry <- summary_statistics(ex_set_na)
 
-  expect_equal(nrow(smry), nrow(exprs(ex_set_na)))
-  expect_equal(smry$Feature_ID, featureNames(ex_set_na))
+  expect_equal(nrow(smry), nrow(assay(ex_set_na)))
+  expect_equal(smry$Feature_ID, rownames(ex_set_na))
   expect_true(all(is.na(smry[1, 2:ncol(smry)])))
 })
 
@@ -56,7 +56,7 @@ test_that("Cohen's d works", {
   cd2 <- cd[cd$Time == 2, ]
 
   d <- c()
-  for (feature in featureNames(ex)) {
+  for (feature in rownames(ex)) {
     tdiff <- data.frame(
       feature = cd2[, feature] - cd1[, feature],
       group = cd1$Group
@@ -68,10 +68,10 @@ test_that("Cohen's d works", {
     d <- c(d, (mean_b - mean_a) / sqrt(mean(c(sd_a^2, sd_b^2))))
   }
 
-  cohd <- cohens_d(ex, id = "Subject_ID", time = "Time")
+  cohd <- cohens_d(ex, group = "Group", id = "Subject_ID", time = "Time")
 
   df <- data.frame(
-    Feature_ID = featureNames(ex),
+    Feature_ID = rownames(ex),
     B_vs_A_2_minus_1_Cohen_d = d,
     stringsAsFactors = FALSE
   )
@@ -81,31 +81,35 @@ test_that("Cohen's d works", {
 
 test_that("Cohen's d work with all NA features", {
   ex_set_na <- drop_qcs(mark_nas(example_set, 0))
-  exprs(ex_set_na)[1:2, ] <- NA
+  assay(ex_set_na)[1:2, ] <- NA
 
-  cohd <- cohens_d(ex_set_na)
+  cohd <- cohens_d(ex_set_na, group = "Group")
 
-  expect_equal(nrow(cohd), nrow(exprs(ex_set_na)))
-  expect_equal(cohd$Feature_ID, featureNames(ex_set_na))
+  expect_equal(nrow(cohd), nrow(assay(ex_set_na)))
+  expect_equal(cohd$Feature_ID, rownames(ex_set_na))
   expect_true(all(is.na(cohd[1:2, 2:ncol(cohd)])))
 })
 
 test_that("Cohen's d data checking works", {
   ex <- example_set
   ex$Group <- c(1, 2)
-  expect_error(cohens_d(ex, id = "Subject_ID", time = "Time"), "should be a factor")
+  expect_error(cohens_d(ex, group = "Group", id = "Subject_ID", time = "Time"),
+               "column is not a factor")
 
   ex <- example_set
   ex$Time <- c(1, 2)
-  expect_error(cohens_d(ex, id = "Subject_ID", time = "Time"), "should be a factor")
+  expect_error(cohens_d(ex, group = "Group", id = "Subject_ID", time = "Time"),
+               "column is not a factor")
 
   ex <- example_set
   ex$Group <- factor(1)
-  expect_error(cohens_d(ex, id = "Subject_ID", time = "Time"), "should have at least two levels")
+  expect_error(cohens_d(ex, group = "Group", id = "Subject_ID", time = "Time"), 
+                        "should have at least two levels")
 
   ex <- example_set
   ex$Time <- factor(1)
-  expect_error(cohens_d(ex, id = "Subject_ID", time = "Time"), "should have at least two levels")
+  expect_error(cohens_d(ex, group = "Group", id = "Subject_ID", time = "Time"), 
+               "should have at least two levels")
 })
 
 # Fold change ----
@@ -119,7 +123,7 @@ test_that("Fold change works", {
   cd2 <- cd[cd$Time == 2, ]
 
   fc <- data.frame(
-    Feature_ID = featureNames(ex),
+    Feature_ID = rownames(ex),
     B_vs_A_FC = 1,
     QC_vs_A_FC = 1,
     QC_vs_B_FC = 1,
@@ -137,19 +141,19 @@ test_that("Fold change works", {
     fc$QC_vs_B_FC[i] <- mean_qc / mean_b
   }
 
-  foldc <- fold_change(ex)
+  foldc <- fold_change(ex, group = "Group")
 
   expect_equal(foldc, fc)
 })
 
 test_that("Fold change works with all NA features", {
   ex_set_na <- drop_qcs(mark_nas(example_set, 0))
-  exprs(ex_set_na)[1:2, ] <- NA
+  assay(ex_set_na)[1:2, ] <- NA
 
-  foldc <- fold_change(ex_set_na)
+  foldc <- fold_change(ex_set_na, group = "Group")
 
-  expect_equal(nrow(foldc), nrow(exprs(ex_set_na)))
-  expect_equal(foldc$Feature_ID, featureNames(ex_set_na))
+  expect_equal(nrow(foldc), nrow(assay(ex_set_na)))
+  expect_equal(foldc$Feature_ID, rownames(ex_set_na))
   expect_true(all(is.na(foldc[1:2, 2:ncol(foldc)])))
 })
 
@@ -201,13 +205,13 @@ test_that("Linear model works", {
 
   # Works with column with only NA values
   ex_set_na <- drop_qcs(mark_nas(example_set, 0))
-  exprs(ex_set_na)[1:2, ] <- NA
+  assay(ex_set_na)[1:2, ] <- NA
 
   lm_res <- perform_lm(ex_set_na,
     formula_char = "Feature ~ Time"
   )
-  expect_equal(nrow(lm_res), nrow(exprs(example_set)))
-  expect_equal(lm_res$Feature_ID, featureNames(example_set))
+  expect_equal(nrow(lm_res), nrow(assay(example_set)))
+  expect_equal(lm_res$Feature_ID, rownames(example_set))
   expect_true(all(is.na(lm_res[1:2, 2:ncol(lm_res)])))
 
   # FDR correction ignored for flagged compounds
@@ -240,22 +244,22 @@ test_that("Logistic regression works", {
 
 
   ex_set_na <- drop_qcs(mark_nas(example_set, 0))
-  exprs(ex_set_na)[1:2, ] <- NA
+  assay(ex_set_na)[1:2, ] <- NA
 
   glm_res <- perform_logistic(ex_set_na,
     formula_char = "Group ~ Feature"
   )
-  expect_equal(nrow(glm_res), nrow(exprs(example_set)))
-  expect_equal(glm_res$Feature_ID, featureNames(example_set))
+  expect_equal(nrow(glm_res), nrow(assay(example_set)))
+  expect_equal(glm_res$Feature_ID, rownames(example_set))
   expect_true(all(is.na(glm_res[1:2, 2:ncol(glm_res)])))
 })
 
 test_that("Cohens D values are counted right", {
   object <- drop_qcs(example_set)[, 1:30]
-  pData(object)$Group <- factor(c("A", "B", "C"))
+  colData(object)$Group <- factor(c("A", "B", "C"))
 
   data <- combined_data(object)
-  features <- featureNames(object)
+  features <- rownames(object)
   group1 <- data[which(data[, "Group"] == levels(data[, "Group"])[1]), ]
   group2 <- data[which(data[, "Group"] == levels(data[, "Group"])[2]), ]
   group3 <- data[which(data[, "Group"] == levels(data[, "Group"])[3]), ]
@@ -277,22 +281,22 @@ test_that("Cohens D values are counted right", {
   })
   ds <- do.call(rbind, ds)
   rownames(ds) <- ds$Feature_ID
-  cohd <- cohens_d(object)
+  cohd <- cohens_d(object, group = "Group")
   expect_identical(cohd, ds)
 })
 
 test_that("Cohens D values between time points are counted right", {
   object <- drop_qcs(example_set[, 1:30])
-  pData(object)$Group <- factor(rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
-  pData(object)$Subject_ID <- factor(rep(1:8, 3))
-  pData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
+  colData(object)$Group <- factor(rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
+  colData(object)$Subject_ID <- factor(rep(1:8, 3))
+  colData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
 
   # Create results with time points manually
   data <- combined_data(object)
-  features <- featureNames(object)
+  features <- rownames(object)
 
-  group_combos <- utils::combn(levels(pData(object)[, "Group"]), 2)
-  time_combos <- utils::combn(levels(pData(object)[, "Time"]), 2)
+  group_combos <- utils::combn(levels(colData(object)[, "Group"]), 2)
+  time_combos <- utils::combn(levels(colData(object)[, "Time"]), 2)
   for (i in seq_len(ncol(group_combos))) {
     group1 <- data[which(data[, "Group"] == group_combos[1, i]), ]
     group2 <- data[which(data[, "Group"] == group_combos[2, i]), ]
@@ -371,34 +375,41 @@ test_that("Cohens D values between time points are counted right", {
   ds <- do.call(rbind, ds)
   
   rownames(ds) <- ds$Feature_ID
-  expect_identical(cohens_d(object, time = "Time", id = "Subject_ID"), ds)
+  expect_identical(cohens_d(object, group = "Group", time = "Time", 
+                            id = "Subject_ID"),
+                   ds)
 })
 
 test_that("Cohens D warnings work", {
   object <- drop_qcs(example_set[, 1:30])
-  pData(object)$Group <- factor(rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
-  pData(object)$Subject_ID <- factor(rep(1:8, 3))
-  pData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
+  colData(object)$Group <- factor(
+    rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
+  colData(object)$Subject_ID <- factor(rep(1:8, 3))
+  colData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
   # Remove one sample
   expect_warning(
     cohens_d(object[, -1],
+      group = "Group",
       time = "Time",
-      id = "Subject_ID",
+      id = "Subject_ID"
     ),
     regexp = "[One or more subject(s) missing time points]"
   )
   # all time points missing in one group
-  expect_warning(cohens_d(object[, -(23:24)], time = "Time", id = "Subject_ID"),
+  expect_warning(cohens_d(object[, -(23:24)], group = "Group", 
+                          time = "Time", id = "Subject_ID"),
     regexp = "[Groups don't have two observations of at least two subjects]"
   )
   # all but one time points missing in one group
-  expect_warning(cohens_d(object[, -24], time = "Time", id = "Subject_ID"),
+  expect_warning(cohens_d(object[, -24], group = "Group",
+                          time = "Time", id = "Subject_ID"),
     regexp = "[Groups don't have two observations of at least two subjects]"
   )
   # Same subject is in two groups
   tmp <- object
-  pData(tmp)$Group[1] <- "B"
-  expect_warning(cohens_d(tmp, time = "Time", id = "Subject_ID"),
+  colData(tmp)$Group[1] <- "B"
+  expect_warning(cohens_d(tmp, group = "Group", 
+                          time = "Time", id = "Subject_ID"),
     regexp = "[Same subject recorded in two groups]"
   )
 })
@@ -416,7 +427,7 @@ test_that("Paired t-test works", {
   # Check comparison order
   expect_equal(t_res[t_res$Feature_ID == feature, 3], mean1 - mean2)
   # Check row names
-  expect_identical(rownames(t_res), featureNames(drop_qcs(example_set)))
+  expect_identical(rownames(t_res), rownames(drop_qcs(example_set)))
   # Check column names
   expect_identical(colnames(t_res), c(
     "Feature_ID",
@@ -437,13 +448,14 @@ test_that("Paired t-test works", {
 # Pairwise t-tests ----
 test_that("Pairwise t-test works", {
   object <- drop_qcs(example_set[, 1:30])
-  pData(object)$Group <- factor(rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
-  pData(object)$Subject_ID <- factor(rep(1:8, 3))
-  pData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
+  colData(object)$Group <- factor(
+    rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
+  colData(object)$Subject_ID <- factor(rep(1:8, 3))
+  colData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
 
   pwt_res <- perform_t_test(object, formula_char = "Feature ~ Time")
 
-  expect_identical(rownames(pwt_res), featureNames(drop_qcs(example_set)))
+  expect_identical(rownames(pwt_res), rownames(drop_qcs(example_set)))
   prefixes <- c("1_vs_2_t_test_", "1_vs_3_t_test_", "2_vs_3_t_test_")
   suffixes <- c("Statistic", "Estimate", "LCI95", 
                 "UCI95", "P", "P_FDR")
@@ -455,7 +467,7 @@ test_that("Pairwise t-test works", {
     do.call(paste0, cols[order(cols$Var1), ])[7:18]
   ))
   # These should be identical as no paired mode
-  pData(object)$Subject_ID <- factor(rep(1:12, 2))
+  colData(object)$Subject_ID <- factor(rep(1:12, 2))
   expect_identical(perform_t_test(object, 
                                   formula_char = "Feature ~ Time"), 
                    pwt_res)
@@ -469,16 +481,17 @@ test_that("Pairwise t-test works", {
 
 test_that("Pairwise paired t-test works", {
   object <- drop_qcs(example_set[, 1:30])
-  pData(object)$Group <- factor(rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
-  pData(object)$Subject_ID <- factor(rep(1:8, 3))
-  pData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
+  colData(object)$Group <- factor(
+    rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
+  colData(object)$Subject_ID <- factor(rep(1:8, 3))
+  colData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
 
   flag(object)[1:2] <- "Flagged"
 
   pwpt_res <- perform_t_test(object, formula_char = "Feature ~ Time", 
                              id = "Subject_ID", is_paired = TRUE)
 
-  expect_identical(rownames(pwpt_res), featureNames(drop_qcs(example_set)))
+  expect_identical(rownames(pwpt_res), rownames(drop_qcs(example_set)))
   prefixes <- paste0(c("1_vs_2_", "1_vs_3_", "2_vs_3_"), "t_test_")
   suffixes <- c("Statistic", "Estimate", "LCI95", "UCI95", "P", "P_FDR")
   cols <- expand.grid(prefixes, suffixes)
@@ -489,7 +502,7 @@ test_that("Pairwise paired t-test works", {
   fdr_cols <- colnames(pwpt_res[grepl("P_FDR", colnames(pwpt_res))])
   expect(all(is.na(pwpt_res[1:2, fdr_cols])), "Pairwise paired t-tests don't skip flagged features")
   # Change Subject IDs
-  pData(object)$Subject_ID <- factor(rep(1:12, 2))
+  colData(object)$Subject_ID <- factor(rep(1:12, 2))
   pwpt_res_2 <- perform_t_test(object, formula_char = "Feature ~ Time",
                                id = "Subject_ID", is_paired = TRUE)
   # These shouldn't match because means are counted only from paired samples
@@ -515,7 +528,7 @@ test_that("Mann-Whitney U-tests work", {
     }
     u
   }
-  us <- apply(exprs(object), 1, get_u)
+  us <- apply(assay(object), 1, get_u)
 
   cols <- c("Feature_ID", paste0(
     "A_vs_B_Mann_Whitney_",
@@ -539,7 +552,7 @@ test_that("Wilcoxon signed rank tests work", {
     d <- x_mat - y_mat
     finite_median(d)
   }
-  median_diffs <- apply(exprs(object), 1, get_median_diffs)
+  median_diffs <- apply(assay(object), 1, get_median_diffs)
 
   cols <- c("Feature_ID", paste0(
     "1_vs_2_Wilcox_",
@@ -557,11 +570,12 @@ test_that("Wilcoxon signed rank tests work", {
 
 test_that("Pairwise Mann-Whitney tests works", {
   object <- drop_qcs(example_set[, 1:30])
-  pData(object)$Group <- factor(rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
-  pData(object)$Subject_ID <- factor(rep(1:8, 3))
-  pData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
+  colData(object)$Group <- factor(
+    rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
+  colData(object)$Subject_ID <- factor(rep(1:8, 3))
+  colData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
 
-  medians <- apply(exprs(object), 1, tapply, object$Group, finite_median)
+  medians <- apply(assay(object), 1, tapply, object$Group, finite_median)
   median_diffs1 <- medians %>%
     apply(2, function(x) {
       x[1] - x[2]
@@ -570,7 +584,7 @@ test_that("Pairwise Mann-Whitney tests works", {
   pwnp_res <- suppressWarnings(
     perform_non_parametric(object, formula_char = "Feature ~ Time"))
 
-  expect_identical(rownames(pwnp_res), featureNames(drop_qcs(example_set)))
+  expect_identical(rownames(pwnp_res), rownames(drop_qcs(example_set)))
   prefixes <- paste0(c("1_vs_2_", "1_vs_3_", "2_vs_3_"), "Mann_Whitney_")
   suffixes <- c("Statistic", "Estimate", "LCI95", "UCI95", "P", "P_FDR")
   cols <- expand.grid(suffixes, prefixes)
@@ -578,7 +592,7 @@ test_that("Pairwise Mann-Whitney tests works", {
   # Check column names
   expect_identical(colnames(pwnp_res), cols)
   # These should be identical as no paired mode
-  pData(object)$Subject_ID <- factor(rep(1:12, 2))
+  colData(object)$Subject_ID <- factor(rep(1:12, 2))
   expect_identical(
     suppressWarnings(perform_non_parametric(object, 
                                             formula_char = "Feature ~ Time")), 
@@ -590,8 +604,71 @@ test_that("Pairwise Mann-Whitney tests works", {
     suppressWarnings(perform_non_parametric(object,
                                             formula_char = "Feature ~ Time", 
                                             id = "Subject_ID",
-                                            is_paired = TRUE, 
-                                            conf.level = 0.5)),
+                                            is_paired = TRUE)),
     pwnp_res
   ))
+})
+
+test_that("Assay control works (with correlation tests)", {
+  ex_set <- example_set[1:10, ]
+  names(assays(ex_set)) <- c("original")
+  # Don't require assay.type if object has only one assay for consistence
+  correlations_one <- perform_correlation_tests(ex_set,
+    x = rownames(ex_set))
+  
+  # Assay not found
+  expect_error(perform_correlation_tests(ex_set, 
+    x = rownames(ex_set), assay.type1 = "nope"))
+  
+  # Assay not found with multiple assays
+  assay(ex_set, "alternative") <- assay(ex_set)
+  expect_error(perform_correlation_tests(ex_set, 
+    x = rownames(ex_set), assay.type1 = "nope"))
+
+  # When a single object is considered, assay.type2 throws error message
+  expect_error(perform_correlation_tests(ex_set, 
+    x = rownames(ex_set), assay.type1 = "original",
+    assay.type2 = "alternative"))
+  
+  # Correlation works the same way using one and two objects
+  correlations_two <- perform_correlation_tests(ex_set, object2 = ex_set,
+    x = rownames(ex_set), assay.type1 = "original",
+    assay.type2 = "original")    
+  expect_identical(correlations_one, correlations_two)
+
+  # Specified assays are considered when using two objects
+  assay(ex_set, "alternative")[1, ] <- 0
+  correlations <- perform_correlation_tests(ex_set, object2 = ex_set,
+    x = rownames(ex_set), assay.type1 = "original",
+    assay.type2 = "alternative")  
+  expect_false(identical(correlations, correlations_one))
+  
+  # MetaboSet works with single object
+  ms_set <- as(ex_set, "MetaboSet")
+  correlations_one <- perform_correlation_tests(ms_set,
+    x = rownames(ms_set))
+    
+  # MetaboSet works with two objects
+  ms_correlations_two <- perform_correlation_tests(ms_set, 
+    object2 = ms_set, x = rownames(ms_set))
+    
+  # Correlation works the samy was using one or two MetaboSet objects
+  expect_identical(correlations_one, correlations_two)
+})
+
+test_that("Simple tests work in cases where alternative levels for confidence intervals are returned in case 95% confidence interval can't be computed", {
+  ex_set <- example_set
+  assay(ex_set)[1, ] <- stats::runif(ncol(ex_set), 3000, 3000)
+  res <- perform_non_parametric(drop_qcs(ex_set), 
+                                formula_char = "Feature ~ Time", 
+                                id = "Subject_ID",  is_paired = TRUE)
+  expect_true(any(grepl(c("UCI0"), colnames(res))))  
+  
+})
+
+test_that("Simple tests return all features despite errors for single features", {
+  ex_set <- example_set
+  assay(ex_set)[1, ex_set$Group == "A"] <- NA
+  res <- perform_t_test(drop_qcs(ex_set), formula_char = "Feature ~ Group")
+  expect_true(all(lapply(res[1, -1], function(col_value) is.na(col_value))))
 })

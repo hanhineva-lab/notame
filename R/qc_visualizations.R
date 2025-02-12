@@ -18,7 +18,7 @@
 #'
 #' Plot density of distances between samples in QC samples and actual samples.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? 
 #' If FALSE (the default), flagged features are removed before visualization.
 #' @param dist_method method for calculating the distances, passed to dist
@@ -31,6 +31,7 @@
 #' a ggplot function
 #' @param title the plot title
 #' @param subtitle the plot subtitle
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A ggplot object.
 #'
@@ -49,18 +50,21 @@ plot_dist_density <- function(object, all_features = FALSE,
                               fill_scale = getOption("notame.fill_scale_dis"),
                               title = paste("Density plot of", dist_method,
                                             "distances between samples"),
-                              subtitle = NULL) {
+                              subtitle = NULL, assay.type = NULL) {
   if (!requireNamespace("pcaMethods", quietly = TRUE)) {
     stop("Package \'pcaMethods\' needed for this function to work.", 
          " Please install it.", call. = FALSE)
   }
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_QC = TRUE, assay.type = from)
 
-  object <- pcaMethods::prep(object, center = center, scale = scale)
+  assay <- pcaMethods::prep(t(assay(object, from)), 
+                            center = center, scale = scale)
 
-  qc_data <- t(exprs(object)[, object$QC == "QC"])
-  sample_data <- t(exprs(object)[, object$QC != "QC"])
+  qc_data <- assay[object$QC == "QC", ]
+  sample_data <- assay[!object$QC == "QC", ]
 
   qc_dist <- stats::dist(qc_data, method = dist_method) %>% as.numeric()
   sample_dist <- stats::dist(sample_data, method = dist_method) %>% as.numeric()
@@ -80,9 +84,10 @@ plot_dist_density <- function(object, all_features = FALSE,
 #' by injection order alone. The expected uniform distribution is represented 
 #' by a dashed red line.
 #'
-#' @param object A MetaboSet object
+#' @param object A SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? 
 #' If FALSE (the default), flagged features are removed before visualization.
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A ggplot object.
 #'
@@ -92,15 +97,20 @@ plot_dist_density <- function(object, all_features = FALSE,
 #' plot_injection_lm(example_set)
 #'
 #' @export
-plot_injection_lm <- function(object, all_features = FALSE) {
+plot_injection_lm <- function(object, all_features = FALSE, assay.type = NULL) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_injection = TRUE, pheno_QC = TRUE,
+                         assay.type = from)
 
   # Apply linear model to QC samples and biological samples separately
-  lm_all <- perform_lm(object, "Feature ~ Injection_order")
+  lm_all <- perform_lm(object, "Feature ~ Injection_order", assay.type = from)
   lm_sample <- perform_lm(object[, object$QC != "QC"], 
-                          "Feature ~ Injection_order")
-  lm_qc <- perform_lm(object[, object$QC == "QC"], "Feature ~ Injection_order")
+                          "Feature ~ Injection_order",
+                          assay.type = from)
+  lm_qc <- perform_lm(object[, object$QC == "QC"], "Feature ~ Injection_order",
+                      assay.type = from)
 
   # Only interested in the p_values
   p_values <- list("All samples" = lm_all$Injection_order_P,
@@ -172,11 +182,13 @@ plot_p_histogram <- function(p_values, hline = TRUE, combine = TRUE,
 #'
 #' Plots distribution of each quality metric, and a distribution of the flags.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param plot_flags logical, should the distribution of flags be added as a 
 #' barplot?
+#' @param assay.type character, assay to be used in case of multiple assays and 
+#' no quality metrics are present in feature data
 #'
 #' @return A ggplot object.
 #'
@@ -184,7 +196,12 @@ plot_p_histogram <- function(p_values, hline = TRUE, combine = TRUE,
 #' plot_quality(example_set)
 #'
 #' @export
-plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE) {
+plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE,
+                         assay.type = NULL) {
+  # Drop flagged features
+  object <- drop_flagged(object, all_features = all_features)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, feature_flag = TRUE)
   if (plot_flags) {
     # Plot bar plot of flags
     flags <- flag(object)
@@ -199,13 +216,9 @@ plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE) {
       labs(x = "Flag")
   }
 
-
-  # Drop flagged features
-  object <- drop_flagged(object, all_features = all_features)
-
   if (is.null(quality(object))) {
     message("\n", "Quality metrics not found, computing them now")
-    object <- assess_quality(object)
+    object <- assess_quality(object, assay.type = from)
   }
 
   # Distribution of quality metrics
@@ -229,7 +242,7 @@ plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE) {
 #' in the pheno data. By default, order and fill are both determined by the 
 #' combination of group and time columns.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param order_by character vector, names of columns used to order the samples
@@ -239,6 +252,7 @@ plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE) {
 #' ggplot function
 #' @param zoom_boxplot logical, whether outliers should be left outside the 
 #' plot and only the boxplots shown. Defaults to TRUE.
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A ggplot object.
 #'
@@ -246,18 +260,19 @@ plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE) {
 #' plot_sample_boxplots(example_set, order_by = "Group", fill_by = "Group")
 #'
 #' @export
-plot_sample_boxplots <- function(
-    object, all_features = FALSE,
-    order_by = as.character(stats::na.omit(c(group_col(object),
-                                             time_col(object)))),
-    fill_by = as.character(stats::na.omit(c(group_col(object),
-                                            time_col(object)))),
-    title = "Boxplot of samples", subtitle = NULL,
-    fill_scale = getOption("notame.fill_scale_dis"), zoom_boxplot = TRUE) {
+plot_sample_boxplots <- function(object, all_features = FALSE, order_by, 
+                                 fill_by, title = "Boxplot of samples", 
+                                 subtitle = NULL,
+                                 fill_scale = 
+                                 getOption("notame.fill_scale_dis"), 
+                                 zoom_boxplot = TRUE,  assay.type = NULL) {
   # Drop flagged compounds if not told otherwise
   object <- drop_flagged(object, all_features)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_cols = c(order_by, fill_by),
+                         assay.type = from)
 
-  data <- combined_data(object)
+  data <- combined_data(object, from)
 
   if (length(order_by) == 1) {
     data$order_by <- data[, order_by]
@@ -275,7 +290,7 @@ plot_sample_boxplots <- function(
 
   data$Sample_ID <- factor(data$Sample_ID, levels = data$Sample_ID)
 
-  data <- tidyr::gather(data, "Variable", "Value", rownames(exprs(object)))
+  data <- tidyr::gather(data, "Variable", "Value", rownames(object))
 
   p <- ggplot(data, aes(x = .data$Sample_ID, y = .data$Value, fill = fill_by))
 

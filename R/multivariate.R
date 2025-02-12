@@ -8,14 +8,15 @@
 #' After fitting the random forest, use rf_importance as a shortcut for getting 
 #' the feature importance in random forest prediction.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param y character, column name of phenoData giving the dependent variable 
 #' of the model
 #' @param all_features logical, should all features be included in the model? 
 #' if FALSE, flagged features are left out
-#' @param covariates character, column names of pData to use as covariates in 
-#' the model, in addition to molecular features
+#' @param covariates character, column names of pheno data
+#' to use as covariates in the model, in addition to molecular features
 #' @param importance Should importance of features be assessed?
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other parameters passed to \code{randomForest::randomForest}
 #'
 #' @return An object of class randomForest.
@@ -30,18 +31,22 @@
 #'
 #' @export
 fit_rf <- function(object, y, all_features = FALSE, 
-                   covariates = NULL, importance = TRUE, ...) {
+                   covariates = NULL, importance = TRUE, 
+                   assay.type = NULL, ...) {
   if (!requireNamespace("randomForest", quietly = TRUE)) {
     stop("Package \"randomForest\" needed for this function to work.",
          " Please install it.", call. = FALSE)
   }
   .add_citation("randomForest package was used to fit random forest models:",
                 citation("randomForest"))
-
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_cols = c(y, covariates),
+                         assay.type = from)
   object <- drop_flagged(object, all_features = all_features)
 
-  x <- combined_data(object)[, c(featureNames(object), covariates)]
-  rf <- randomForest::randomForest(x = x, y = pData(object)[, y], 
+  x <- combined_data(object, assay.type = from)
+  x <- x[, c(rownames(object), covariates)]
+  rf <- randomForest::randomForest(x = x, y = colData(object)[, y], 
                                    importance = importance, ...)
 
   rf
@@ -77,20 +82,20 @@ importance_rf <- function(rf) {
 
 #' A helper function for extracting predictor matrix with covariates
 #'
-#' @param object a MetaboSet object
-#' @param covariates character, column names of pData to use as covariates in 
-#' the model, in addition to molecular features
+#' @param object a SummarizedExperiment or MetaboSet object
+#' @param covariates character, column names of pheno data to use as covariates 
+#' in the model, in addition to molecular features
 #' @return A data frame with predictors, including covariates.
 #' @noRd
-.get_x <- function(object, covariates) {
+.get_x <- function(object, covariates, assay.type = NULL) {
   # Convert covariates to numeric
-  if (any(!vapply(pData(object)[, covariates], .looks_numeric, logical(1)))) {
+  if (any(!vapply(colData(object)[, covariates], .looks_numeric, logical(1)))) {
     stop("All covariates should be convertable to numeric.")
   }
-  pData(object)[covariates] <- lapply(pData(object)[covariates], as.numeric)
+  colData(object)[covariates] <- lapply(colData(object)[covariates], as.numeric)
 
   # Extract X
-  x <- combined_data(object)[, c(featureNames(object), covariates)]
+  x <- combined_data(object, assay.type)[, c(rownames(object), covariates)]
   x
 }
 
@@ -137,7 +142,7 @@ importance_rf <- function(rf) {
 #' components and features}
 #' }
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param y character vector, column names of the grouping variable to predict
 #' @param ncomp number of X components
 #' @param folds the number of folds to use in k-fold cross validation
@@ -148,10 +153,10 @@ importance_rf <- function(rf) {
 #' Only really makes sense if y is a single variable
 #' @param all_features logical, should all features be included in the model? 
 #' if FALSE, flagged features are left out
-#' @param covariates character, column names of pData to use as covariates in 
-#' the model, in addition to
-#' molecular features
+#' @param covariates character, column names of pheno datato use as covariates 
+#' in the model, in addition to molecular features
 #' @param n_features the number of features to try for each component
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... any parameters passed to \code{mixOmics::pls} or 
 #' \code{mixOmics::spls}
 #'
@@ -173,24 +178,29 @@ NULL
 #' @rdname pls
 #' @export
 mixomics_pls <- function(object, y, ncomp, plot_scores = TRUE, 
-                         all_features = FALSE, covariates = NULL, ...) {
+                         all_features = FALSE, covariates = NULL, 
+                         assay.type = NULL, ...) {
   if (!requireNamespace("mixOmics", quietly = TRUE)) {
     stop("Package \"mixOmics\" needed for this function to work.",
          " Please install it.", call. = FALSE)
   }
   .add_citation("mixOmics package was used to fit PLS models:",
                 citation("mixOmics"))
-  object <- drop_flagged(object, all_features = all_features)
 
-  predictors <- .get_x(object, covariates)
-  outcome <- pData(object)[y]
+  object <- drop_flagged(object, all_features = all_features)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_cols = c(y, covariates), 
+                         assay.type = from)
+
+  predictors <- .get_x(object, covariates, from)
+  outcome <- colData(object)[y]
 
   log_text("Fitting PLS")
   pls_model <- mixOmics::pls(predictors, outcome, ncomp = ncomp, ...)
 
   if (plot_scores && ncomp > 1) {
     .plot_pls(pls_model, outcome, y, 
-             title = "PLS: first 2 components and the outcome variable")
+              title = "PLS: first 2 components and the outcome variable")
   }
   pls_model
 }
@@ -200,7 +210,7 @@ mixomics_pls <- function(object, y, ncomp, plot_scores = TRUE,
 #' @export
 mixomics_pls_optimize <- function(object, y, ncomp, folds = 5, nrepeat = 50,
                                   plot_scores = TRUE, all_features = FALSE,
-                                  covariates = NULL, ...) {
+                                  covariates = NULL, assay.type = NULL, ...) {
   if (!requireNamespace("mixOmics", quietly = TRUE)) {
     stop("Package \"mixOmics\" needed for this function to work.", 
          " Please install it.", call. = FALSE)
@@ -208,10 +218,12 @@ mixomics_pls_optimize <- function(object, y, ncomp, folds = 5, nrepeat = 50,
   
   .add_citation("mixOmics package was used to fit PLS models:",
                 citation("mixOmics"))
-
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_cols = c(y, covariates), 
+                         assay.type = from)
   pls_res <- mixomics_pls(object = object, y = y, ncomp = ncomp, 
                           plot_scores = FALSE, all_features = all_features,
-                          covariates = covariates, ...)
+                          covariates = covariates, assay.type = from, ...)
 
   log_text("Evaluating PLS performance")
   perf_pls <- mixOmics::perf(pls_res, validation = "Mfold", 
@@ -263,7 +275,7 @@ mixomics_spls_optimize <- function(object, y, ncomp, n_features =
                                    c(seq_len(10), seq(20, 300, 10)), 
                                    folds = 5, nrepeat = 50, plot_scores = TRUE,
                                    all_features = FALSE, covariates = NULL,
-                                   ...) {
+                                   assay.type = NULL, ...) {
   if (!requireNamespace("mixOmics", quietly = TRUE)) {
     stop("Package \"mixOmics\" needed for this function to work.",
          " Please install it.", call. = FALSE)
@@ -271,9 +283,12 @@ mixomics_spls_optimize <- function(object, y, ncomp, n_features =
   .add_citation("mixOmics package was used to fit PLS models:",
                 citation("mixOmics"))
   object <- drop_flagged(object, all_features = all_features)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_cols = c(y, covariates), 
+                         assay.type = from)
 
-  predictors <- .get_x(object, covariates)
-  outcome <- pData(object)[y]
+  predictors <- .get_x(object, covariates, from)
+  outcome <- colData(object)[y]
 
   # Test different number of components and features with cross validation
   log_text("Tuning sPLS")
@@ -328,7 +343,7 @@ mixomics_spls_optimize <- function(object, y, ncomp, n_features =
 #' of components and features, choose the one with minimal balanced error rate}
 #' }
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param y character, column name of the grouping variable to predict
 #' @param ncomp the number of X components
 #' @param folds the number of folds to use in k-fold cross validation
@@ -343,9 +358,9 @@ mixomics_spls_optimize <- function(object, y, ncomp, n_features =
 #' ellipses
 #' @param all_features logical, should all features be included in the model? 
 #' if FALSE, flagged features are left out
-#' @param covariates character, column names of pData to use as covariates in 
-#' the model, in addition to
-#' molecular features
+#' @param covariates character, column names of pheno data to use as covariates 
+#' in the model, in addition to molecular features
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... any parameters passed to \code{mixOmics::plsda}
 #'
 #' @return An object of class "mixo_plsda".
@@ -369,7 +384,8 @@ NULL
 #' @rdname pls_da
 #' @export
 mixomics_plsda <- function(object, y, ncomp, plot_scores = TRUE, 
-                           all_features = FALSE, covariates = NULL, ...) {
+                           all_features = FALSE, covariates = NULL,
+                           assay.type = NULL, ...) {
   if (!requireNamespace("mixOmics", quietly = TRUE)) {
     stop("Package \"mixOmics\" needed for this function to work.",
          "Please install it.", call. = FALSE)
@@ -377,9 +393,12 @@ mixomics_plsda <- function(object, y, ncomp, plot_scores = TRUE,
   .add_citation("mixOmics package was used to fit PLS models:",
                 citation("mixOmics"))
   object <- drop_flagged(object, all_features = all_features)
+  from <- .get_from_name(object, assay.type)  
+  object <- .check_object(object, pheno_cols = c(y, covariates), 
+                         assay.type = from)
 
-  predictors <- .get_x(object, covariates)
-  outcome <- pData(object)[, y]
+  predictors <- .get_x(object, covariates, from)
+  outcome <- colData(object)[, y]
   # outcome needs to be a factor, this ensures the levels are right
   if (!is(outcome, "factor")) {
     outcome <- as.factor(outcome)
@@ -400,16 +419,22 @@ mixomics_plsda <- function(object, y, ncomp, plot_scores = TRUE,
 #' @export
 mixomics_plsda_optimize <- function(object, y, ncomp, folds = 5, nrepeat = 50,
                                     plot_scores = TRUE, all_features = FALSE,
-                                    covariates = NULL, ...) {
+                                    covariates = NULL, assay.type = NULL, ...) {
   if (!requireNamespace("mixOmics", quietly = TRUE)) {
     stop("Package \"mixOmics\" needed for this function to work.", 
          " Please install it.", call. = FALSE)
   }
   .add_citation("mixOmics package was used to fit PLS models:",
                 citation("mixOmics"))
+  object <- drop_flagged(object, all_features = all_features)
+  from <- .get_from_name(object, assay.type)  
+  object <- .check_object(object, pheno_cols = c(y, covariates), 
+                         assay.type = from)
+
   plsda_res <- mixomics_plsda(object = object, y = y, ncomp = ncomp,
                               plot_scores = FALSE, all_features = all_features,
-                              covariates = covariates, ...)
+                              covariates = covariates, 
+                              assay.type = from, ...)
 
   log_text("Evaluating PLS-DA performance")
   perf_plsda <- mixOmics::perf(plsda_res, validation = "Mfold", folds = 5,
@@ -428,7 +453,7 @@ mixomics_plsda_optimize <- function(object, y, ncomp, folds = 5, nrepeat = 50,
                  "components using", dist_met))
 
   mixomics_plsda(object = object, y = y, ncomp = ncomp_opt, 
-                 plot_scores = plot_scores, ...)
+                 plot_scores = plot_scores, assay.type = from, ...)
 }
 
 
@@ -438,9 +463,9 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
                                      n_features = c(seq_len(10), 
                                                     seq(20, 300, 10)),
                                      folds = 5, nrepeat = 50,
-                                     plot_scores = TRUE,
-                                     all_features = FALSE,
-                                     covariates = NULL, ...) {
+                                     plot_scores = TRUE, all_features = FALSE,
+                                     covariates = NULL, assay.type = NULL, 
+                                     ...) {
   if (!requireNamespace("mixOmics", quietly = TRUE)) {
     stop("Package \"mixOmics\" needed for this function to work.",
          " Please install it.", call. = FALSE)
@@ -448,9 +473,12 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
   .add_citation("mixOmics package was used to fit PLS models:",
                 citation("mixOmics"))
   object <- drop_flagged(object, all_features = all_features)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object,  pheno_cols = c(y, covariates), 
+                         assay.type = from)
 
-  predictors <- .get_x(object, covariates)
-  outcome <- pData(object)[, y]
+  predictors <- .get_x(object, covariates, from)
+  outcome <- colData(object)[, y]
   # outcome needs to be a factor, this ensures the levels are right
   if (!is(outcome, "factor")) {
     outcome <- as.factor(outcome)
@@ -494,18 +522,19 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
 #' A wrapper around the MUVR2 (random forest, PLS(-DA)) and MUVR2_EN (elastic 
 #' net) functions from the MUVR2 package. 
 #'
-#' @param object a MetaboSet object
-#' @param y character, column name in pData of the target variable to predict
-#' @param id character, column name in pData of the subject ID variable in case 
-#' of repeated measurements
+#' @param object a SummarizedExperiment or MetaboSet object
+#' @param y character, column name in pheno data of the target variable
+#' @param id character, column name in pheno data of the subject ID variable in 
+#' case of repeated measurements
 #' @param multi_level logical, whether multi-level modeling should be applied, 
 #' see Details
-#' @param multi_level_var character, column name in pData of the variable for 
-#' splitting the data in multi-level modeling
+#' @param multi_level_var character, column name in pheno data of the variable 
+#' for splitting the data in multi-level modeling
 #' @param all_features logical, should all features be included in the model? 
 #' if FALSE, flagged features are left out
-#' @param covariates,static_covariates character, column names of pData to use 
-#' as covariates in the model, in addition to molecular features. 
+#' @param covariates,static_covariates character, column names of 
+#' pheno data to use as covariates in the model, in addition to molecular 
+#' features. 
 #' \code{static_covariates} are ignored for non-multi-level models.
 #' For multi-level models, the change in \code{covariates} is computed, while
 #' \code{static_covariates} are taken from the first time point. 
@@ -515,6 +544,7 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
 #' @param varRatio Ratio of variables to include in subsequent inner loop 
 #' iteration, parameter of MUVR
 #' @param method Multivariate method. Supports 'PLS', 'RF' and 'EN'
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other parameters to MUVR2::MUVR2 or MUVR2::MUVR2_EN 
 #' and MUVR2::getVar (when method == "EN")
 #'
@@ -556,9 +586,9 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
 #'
 #' # EN on multilevel variable with covariate and static covariate
 #' ex_set <- drop_qcs(example_set)
-#' example_set$Injection_order %<>% as.numeric()
-#' example_set$Group %<>% as.numeric()
-#' en_model <- muvr_analysis(drop_qcs(example_set), id = "Subject_ID", 
+#' ex_set$Injection_order %<>% as.numeric()
+#' ex_set$Group %<>% as.numeric()
+#' en_model <- muvr_analysis(ex_set, id = "Subject_ID", 
 #'  multi_level = TRUE, multi_level_var = "Time", 
 #'  covariates = "Injection_order", static_covariates = "Group", 
 #'  method = "EN", nRep = 2)
@@ -572,7 +602,8 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
                           multi_level_var = NULL, covariates = NULL,
                           static_covariates = NULL, all_features = FALSE,
                           nRep = 50, nOuter = 6, nInner = nOuter - 1,
-                          varRatio = 0.75, method = c("PLS", "RF"), ...) {
+                          varRatio = 0.75, method = c("PLS", "RF"),
+                          assay.type = NULL, ...) {
   if (!requireNamespace("MUVR2", quietly = TRUE)) {
     stop("Package \"MUVR2\" needed for this function to work.",
          " Please install it.", call. = FALSE)
@@ -580,21 +611,25 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
   .add_citation(paste("MUVR2 package was used to fit multivariate models",
                       "with variable selection:"),
                 citation("MUVR2"))
+  object <- drop_flagged(object, all_features = all_features)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, 
+                         pheno_cols = c(y, id, covariates, static_covariates,
+                                        multi_level_var, covariates), 
+                         assay.type = from)
 
   # MUVR2 can only use numeric predictors
-  classes <- vapply(pData(object)[, c(covariates, static_covariates)], 
+  classes <- vapply(colData(object)[, c(covariates, static_covariates)], 
                     class, character(1))
   if (length(classes) && any(classes != "numeric")) {
     stop("MUVR2 can only deal with numeric inputs,", 
          " please transform all covariates to numeric", call. = FALSE)
   }
 
-  object <- drop_flagged(object, all_features = all_features)
-
-  if (any(!vapply(pData(object)[, covariates], .looks_numeric, logical(1)))) {
+  if (any(!vapply(colData(object)[, covariates], .looks_numeric, logical(1)))) {
     stop("All covariates should be convertable to numeric.")
   }
-  pData(object)[covariates] <- lapply(pData(object)[covariates], as.numeric)
+  colData(object)[covariates] <- lapply(colData(object)[covariates], as.numeric)
   
   # Do do.call with MUVR2::MUVR2_EN if method == "EN", to avoid nesting
   if (method == "EN") {
@@ -612,8 +647,8 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
     if (is.null(y)) {
       stop("y variable needs to be defined unless doing multi-level modeling.")
     }
-    predictors <- combined_data(object)[, c(featureNames(object), covariates)]
-    outcome <- pData(object)[, y]
+    predictors <- combined_data(object, from)[, c(rownames(object), covariates)]
+    outcome <- colData(object)[, y]
 
     # Independent samples
     if (is.null(id)) {
@@ -624,7 +659,7 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
       muvr_model <- do.call(func, c(args, add_args))
     } else {
       # Multiple measurements
-      ID <- as.numeric(pData(object)[, id])
+      ID <- as.numeric(colData(object)[, id])
       args <- list(X = predictors, Y = outcome, ID = ID, nRep = nRep, 
                    nOuter = nOuter, nInner = nInner, varRatio = varRatio, 
                    method = method)
@@ -636,8 +671,8 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
       stop("id and multi_level_var needed for multi-level modeling.")
     }
     # Check that multi_level_var has only 2 unique values
-    ml_var <- pData(object)[, multi_level_var] <-
-      as.factor(pData(object)[, multi_level_var])
+    ml_var <- colData(object)[, multi_level_var] <-
+      as.factor(colData(object)[, multi_level_var])
     if (length(levels(ml_var)) != 2) {
       stop("The multilevel variable should have exactly 2 unique values.")
     } else {
@@ -646,12 +681,12 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
     }
 
     # Compute effect matrix with covariates
-    cd <- combined_data(object)
+    cd <- combined_data(object, from)
     cd <- cd[order(cd[, id]), ]
     x1 <- cd[cd[, multi_level_var] == levels(ml_var)[1],
-             c(featureNames(object), covariates)]
+             c(rownames(object), covariates)]
     x2 <- cd[cd[, multi_level_var] == levels(ml_var)[2],
-             c(featureNames(object), covariates)]
+             c(rownames(object), covariates)]
     predictors <- x2 - x1
     # Add static covariates, where we don't want to compute change, such as sex
     predictors[, static_covariates] <- 
@@ -691,7 +726,7 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
 #' Performs permutational multivariate analysis of variance. Uses package 
 #' called PERMANOVA.
 #'
-#' @param object a MetaboSet object
+#' @param object a SummarizedExperiment or MetaboSet object
 #' @param group character, name of the column to compare
 #' @param all_features should all features be included?
 #' @param transform Transformation to use in \code{IniTransform}. By default 
@@ -699,6 +734,7 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
 #' @param coef Coefficient to calculate continuous distances in 
 #' \code{DistContinuous}.
 #' By default uses Pythagorean distances.
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other parameters to \code{\link[PERMANOVA]{PERMANOVA}}
 #'
 #' @return A PERMANOVA object.
@@ -709,7 +745,7 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
 #' @export
 perform_permanova <- function(object, group, all_features = FALSE,
                               transform = "Standardize columns",
-                              coef = "Pythagorean", ...) {
+                              coef = "Pythagorean", assay.type = NULL, ...) {
   if (!requireNamespace("PERMANOVA", quietly = TRUE)) {
     stop("Package \"PERMANOVA\" needed for this function to work.", 
          " Please install it.", call. = FALSE)
@@ -718,17 +754,17 @@ perform_permanova <- function(object, group, all_features = FALSE,
   .add_citation(paste("PERMANOVA was used for permutational multivariate", 
                       "analysis of variance:"),
                 citation("PERMANOVA"))
-
-  if (!is.factor(pData(object)[, group])) {
-    stop("Group column is not a factor.")
-  }
+                
+  object <- drop_flagged(object, all_features = all_features)
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_factors = group,
+                         assay.type = from)
 
   log_text("Starting PERMANOVA tests")
-  object <- drop_flagged(object, all_features = all_features)
-  data <- t(exprs(object))
+  data <- t(assay(object, from))
   data <- PERMANOVA::IniTransform(data, transform = transform)
   initialized <- PERMANOVA::DistContinuous(data, coef = coef)
-  res <- PERMANOVA::PERMANOVA(initialized, pData(object)[, group], ...)
+  res <- PERMANOVA::PERMANOVA(initialized, colData(object)[, group], ...)
   log_text("PERMANOVA performed")
 
   res

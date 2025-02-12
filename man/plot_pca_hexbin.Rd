@@ -16,11 +16,12 @@ plot_pca_hexbin(
   title = "PCA",
   subtitle = NULL,
   fill_scale = getOption("notame.fill_scale_con"),
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{pcs}{numeric vector of length 2, the principal components to plot}
 
@@ -42,6 +43,8 @@ variance}
 \item{title, subtitle}{the titles of the plot}
 
 \item{fill_scale}{the fill scale as returned by a ggplot function}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{...}{additional arguments passed to pcaMethods::pca}
 }

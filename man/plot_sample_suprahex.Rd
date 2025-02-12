@@ -15,11 +15,12 @@ plot_sample_suprahex(
   height = 7,
   fontsize = 10,
   colormap = "jet",
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{all_features}{if FALSE, flagged features are droppped}
 
@@ -36,6 +37,8 @@ plot_sample_suprahex(
 \item{fontsize}{the fontsize for sample labels}
 
 \item{colormap}{colormap for the hexagons}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{...}{other parameters for supraHex::sPipeline}
 }

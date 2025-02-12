@@ -10,11 +10,16 @@ visualizations(
   format = "pdf",
   perplexity = 30,
   merge = FALSE,
-  remove_singles = FALSE
+  remove_singles = FALSE,
+  group = NULL,
+  time = NULL,
+  id = NULL,
+  color = NULL,
+  assay.type = NULL
 )
 }
 \arguments{
-\item{object}{A MetaboSet object}
+\item{object}{A SummarizedExperiment or MetaboSet object}
 
 \item{prefix}{character, a file path prefix added to the file paths}
 
@@ -28,6 +33,17 @@ see Details}
 
 \item{remove_singles}{logical, whether to remove single plot files after 
 merging. Only used if \code{merge = TRUE}}
+
+\item{group}{character, name of pheno data column containing the group labels}
+
+\item{time}{character, name of pheno data column containing timepoints}
+
+\item{id}{character, name of pheno data column containing subject identifiers}
+
+\item{color}{character, name of pheno data column used for coloring sample
+labels for dendrograms}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
 None, the function is invoked for its plot-saving side effect.
@@ -96,7 +112,9 @@ in time point order
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
-visualizations(example_set, prefix="figures/example_set", perplexity=5)
+visualizations(example_set, prefix="figures/example_set", perplexity=5,
+               group = "Group", color = "Group", time = "Time", 
+               id = "Subject_ID")
 \dontshow{setwd(.old_wd)}
 
 }

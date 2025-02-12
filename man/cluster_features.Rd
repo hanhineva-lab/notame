@@ -12,18 +12,19 @@ cluster_features(
   rt_window = 1/60,
   corr_thresh = 0.9,
   d_thresh = 0.8,
-  plotting = FALSE,
+  plotting = TRUE,
   min_size_plotting = 3,
-  prefix = NULL
+  prefix = NULL,
+  assay.type = NULL
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
-\item{mz_col}{the column name in fData(object) that holds mass-to-charge 
+\item{mz_col}{the column name in feature data that holds mass-to-charge 
 ratios}
 
-\item{rt_col}{the column name in fData(object) that holds retention times}
+\item{rt_col}{the column name in feature data that holds retention times}
 
 \item{all_features}{logical, should all features be included in the 
 clustering? If FALSE, as the default, flagged features are not included in 
@@ -43,10 +44,13 @@ between features}
 have to be plotted}
 
 \item{prefix}{the prefix to the files to be plotted}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
-a MetaboSet object, with median peak area (MPA), the cluster ID, the 
-features in the cluster, and cluster size added to fData.
+a SummarizedExperiment or MetaboSet object, with median peak area 
+(MPA), the cluster ID, the features in the cluster, and cluster size added 
+to feature data.
 }
 \description{
 Clusters features potentially originating from the same compound. Features 
@@ -60,6 +64,6 @@ that are based on the MATLAB code by David Broadhurst.
 \examples{
 # The parameters are really weird because example data is imaginary
 clustered <- cluster_features(example_set, rt_window = 1, corr_thresh = 0.5, 
-d_thresh = 0.6)
+  d_thresh = 0.6)
 
 }

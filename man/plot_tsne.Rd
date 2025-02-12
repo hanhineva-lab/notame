@@ -11,7 +11,7 @@ plot_tsne(
   scale = "uv",
   perplexity = 30,
   pca_method = "nipals",
-  color = group_col(object),
+  color = NULL,
   shape = color,
   label = NULL,
   density = FALSE,
@@ -22,11 +22,12 @@ plot_tsne(
   fill_scale = getOption("notame.fill_scale_dis"),
   text_base_size = 14,
   point_size = 2,
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{all_features}{logical, should all features be used? If FALSE (the 
 default), flagged features are removed before visualization.}
@@ -66,6 +67,8 @@ If a continuous variable is used as color, density curve will be colorless.}
 \item{text_base_size}{numeric, base size for text}
 
 \item{point_size}{numeric, size of the points}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{...}{additional arguments passed to \code{Rtsne::Rtsne}}
 }

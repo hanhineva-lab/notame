@@ -21,11 +21,12 @@ save_scatter_plots(
   point_size = 2,
   title_line_length = 40,
   theme = theme_bw(base_size = text_base_size),
+  assay.type = NULL,
   ...
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{x}{character, name of the column to be used as x-axis}
 
@@ -47,8 +48,8 @@ variable.}
 
 \item{shape}{character, name of the column used for shape}
 
-\item{title, subtitle}{column names from fData to use as plot title/filename 
-and subtitle.
+\item{title, subtitle}{column names from feature data to use as plot 
+title/filename and subtitle.
 Set to NULL for no title/subtitle, this creates running numbered filenames}
 
 \item{shape_scale}{the shape scale as returned by a ggplot function}
@@ -61,6 +62,8 @@ Set to NULL for no title/subtitle, this creates running numbered filenames}
 characters, passed to stringr::str_wrap}
 
 \item{theme}{a ggplot theme to be added to the plot}
+
+\item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{...}{other arguments to graphic device functions, like width and height}
 }
@@ -83,7 +86,7 @@ save_scatter_plots(
   format = "pdf"
 )
 # Plot one feature
-save_scatter_plots(example_set[1, ], save = FALSE, color = "Group")
+save_scatter_plots(example_set[1, ], save = FALSE)
 \dontshow{setwd(.old_wd)}
 
 }

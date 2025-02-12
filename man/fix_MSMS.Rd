@@ -13,7 +13,7 @@ fix_MSMS(
 )
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{ms_ms_spectrum_col}{name of column with original MS/MS spectra}
 
@@ -24,8 +24,8 @@ fix_MSMS(
 \item{deci_num}{maximum number of decimals to m/z value (Recommended: >2)}
 }
 \value{
-A MetaboSet object as the one supplied, with publication-ready MS/MS 
-peak information.
+A SummarizedExperiment or MetaboSet object as the one supplied, with 
+publication-ready MS/MS peak information.
 }
 \description{
 Change the MS/MS output from MS-DIAL format to publication-ready format.
@@ -46,15 +46,16 @@ m/z  (Abundance)
 }
 \examples{
 # Spectra before fixing
-fData(example_set)$MS_MS_spectrum <- NA
-fData(example_set)[1, ]$MS_MS_spectrum <- "28.769:53 44.933:42 52.106:89 
-69.518:140"
-fData(example_set)$MS_MS_spectrum[
-  !is.na(fData(example_set)$MS_MS_spectrum)]
+ex_set <- example_set
+rowData(ex_set)$MS_MS_spectrum <- NA
+rowData(ex_set)[1, ]$MS_MS_spectrum <- 
+  "28.769:53 44.933:42 52.106:89 69.518:140"
+rowData(ex_set)$MS_MS_spectrum[
+  !is.na(rowData(ex_set)$MS_MS_spectrum)]
 # Fixing spectra with default settings
-fixed_MSMS_peaks <- fix_MSMS(example_set)
+fixed_MSMS_peaks <- fix_MSMS(ex_set)
 # Spectra after fixing
-fData(fixed_MSMS_peaks)$MS_MS_Spectrum_clean[
-  !is.na(fData(fixed_MSMS_peaks)$MS_MS_Spectrum_clean)]
+rowData(fixed_MSMS_peaks)$MS_MS_Spectrum_clean[
+  !is.na(rowData(fixed_MSMS_peaks)$MS_MS_Spectrum_clean)]
 
 }

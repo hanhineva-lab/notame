@@ -3,19 +3,22 @@
 \name{exponential}
 \alias{exponential}
 \alias{exponential,MetaboSet-method}
+\alias{exponential,SummarizedExperiment-method}
 \title{Exponential function}
 \usage{
 exponential(object, base = exp(1))
 
 \S4method{exponential}{MetaboSet}(object, base = exp(1))
+
+\S4method{exponential}{SummarizedExperiment}(object, base = exp(1))
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a SummarizedExperiment or MetaboSet object}
 
 \item{base}{base of the exponential}
 }
 \value{
-A MetaboSet object with altered feature abundances.
+An object with altered feature abundances.
 }
 \description{
 Apply the exponential function to feature abundances (exprs).
