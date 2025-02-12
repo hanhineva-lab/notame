@@ -20,6 +20,7 @@ A data frame with fold changes for each feature.
 Computes fold change between each group for each feature.
 }
 \examples{
+data(example_set)
 # Between groups
 fc <- fold_change(example_set, group = "Group")
 # Between time points

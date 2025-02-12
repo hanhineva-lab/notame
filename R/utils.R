@@ -237,8 +237,8 @@ utils::globalVariables(c('i', '.'))
 #' @return None, the function is invoked for its side effect.
 #'
 #' @examples
-#'
 #' citations()
+#' data(example_set)
 #' plot_tsne(example_set, perplexity = 10, group = "Group", color = "Group")
 #' # Rtsne added to citations
 #' citations()
@@ -324,6 +324,7 @@ finite_quantile <- function(x, ...) {
 #' @return A numeric, the proportion of non-missing values in a vector.
 #'
 #' @examples
+#' data(example_set)
 #' ex_set <- mark_nas(example_set, value = 0)
 #' prop_na(assay(ex_set))
 #' 
@@ -339,6 +340,7 @@ prop_na <- function(x) {
 #' @return A numeric, the proportion of non-missing values in vector.
 #'
 #' @examples
+#' data(example_set)
 #' ex_set <- mark_nas(example_set, value = 0)
 #' prop_found(assay(example_set))
 #'

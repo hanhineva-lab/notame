@@ -23,6 +23,7 @@ The repeatability ranges from 0 to 1. Higher repeatability depicts less
 variation between batches.
 }
 \examples{
+data(example_set)
 # Batch correction
 replicates <- list(which(example_set$QC == "QC"))
 batch_corrected <- ruvs_qc(example_set, replicates = replicates)

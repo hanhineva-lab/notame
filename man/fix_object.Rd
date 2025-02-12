@@ -68,6 +68,7 @@ If a "Sample_ID" column is not found, it will be created using the
 \code{id_prefix} and injection order or by renaming \code{id_column}.
 }
 \examples{
+data(example_set)
 ex_set <- example_set
 rowData(ex_set)$Flag <- NULL
 fixed <- fix_object(ex_set)

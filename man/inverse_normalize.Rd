@@ -21,5 +21,6 @@ Applies inverse rank normalization to all features to approximate
 a normal distribution.
 }
 \examples{
+data(example_set)
 normalized <- inverse_normalize(example_set)
 }

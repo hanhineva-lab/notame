@@ -26,6 +26,7 @@
 #' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @examples
+#' data(example_set)
 #' # Group by "Group"
 #' sum_stats <- summary_statistics(example_set, grouping_cols = "Group")
 #' # Group by Group and Time
@@ -110,6 +111,7 @@ summary_statistics <- function(object, grouping_cols = NULL,
 #' @return A data frame with removed and/or renamed columns.
 #'
 #' @examples
+#' data(example_set)
 #' # Simple manipulation to linear model results
 #' lm_results <- perform_lm(drop_qcs(example_set), 
 #'   formula_char = "Feature ~ Group + Time")
@@ -277,6 +279,7 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
 #' @return A data frame with Cohen's d for each feature.
 #'
 #' @examples
+#' data(example_set)
 #' d_results <- cohens_d(drop_qcs(example_set), group = "Group")
 #' d_results_time <- cohens_d(drop_qcs(example_set),
 #'   group = "Group", time = "Time", id = "Subject_ID"
@@ -338,6 +341,7 @@ cohens_d <- function(object, group, id = NULL,
 #' @return A data frame with fold changes for each feature.
 #'
 #' @examples
+#' data(example_set)
 #' # Between groups
 #' fc <- fold_change(example_set, group = "Group")
 #' # Between time points
@@ -468,6 +472,7 @@ fold_change <- function(object, group, assay.type = NULL) {
 #' variables, correlation coefficient and p-value.
 #'
 #' @examples
+#' data(example_set)
 #' # Correlations between all features
 #' correlations <- perform_correlation_tests(example_set, 
 #'   x = rownames(example_set), id = "Subject_ID")
@@ -609,6 +614,7 @@ perform_correlation_tests <- function(object, x, y = x, id = NULL,
 #' @return A pseudo SummarizedExperiment or MetaboSet object with the AUCs.
 #'
 #' @examples
+#' data(example_set)
 #' # Drop QC samples before computing AUCs
 #' aucs <- perform_auc(drop_qcs(example_set), time = "Time", 
 #'                     subject = "Subject_ID", group = "Group")
@@ -762,6 +768,7 @@ perform_auc <- function(object, time, subject, group, assay.type = NULL) {
 #' see the example.
 #'
 #' @examples
+#' data(example_set)
 #' # A simple example without QC samples
 #' # Features predicted by Group and Time
 #' lm_results <- perform_lm(drop_qcs(example_set), 
@@ -852,6 +859,7 @@ perform_lm <- function(object, formula_char, all_features = FALSE,
 #' see the example.
 #'
 #' @examples
+#' data(example_set)
 #' # A simple example without QC samples
 #' # Features predicted by Group and Time
 #' lm_anova_results <- perform_lm_anova(drop_qcs(example_set), 
@@ -926,6 +934,7 @@ perform_lm_anova <- function(object, formula_char, all_features = FALSE,
 #' model fitting, see the example.
 #'
 #' @examples
+#' data(example_set)
 #' # A simple example without QC samples
 #' # Time predicted by features
 #' logistic_results <- perform_logistic(drop_qcs(example_set),
@@ -1114,6 +1123,7 @@ perform_logistic <- function(object, formula_char, all_features = FALSE,
 #' are reproducible if RNGseed is set for the BiocParallel backend. 
 #' 
 #' @examples
+#' data(example_set)
 #' # A simple example without QC samples
 #' # Features predicted by Group and Time as fixed effects with Subject ID as a 
 #' # random effect
@@ -1201,6 +1211,7 @@ perform_lmer <- function(object, formula_char, all_features = FALSE,
 #' @return A data frame with the results.
 #'
 #' @examples
+#' data(example_set)
 #' perform_homoscedasticity_tests(example_set, formula_char = "Feature ~ Group")
 #'
 #' @seealso \code{\link{bartlett.test}}, \code{\link[car]{leveneTest}}, 
@@ -1269,6 +1280,7 @@ perform_homoscedasticity_tests <- function(object, formula_char,
 #' @seealso \code{\link{kruskal.test}}
 #'
 #' @examples
+#' data(example_set)
 #' perform_kruskal_wallis(example_set, formula_char = "Feature ~ Group")
 #'
 #' @export
@@ -1327,6 +1339,7 @@ perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE,
 #' @seealso \code{\link{oneway.test}}
 #'
 #' @examples
+#' data(example_set)
 #' perform_oneway_anova(example_set, formula_char = "Feature ~ Group")
 #'
 #' @export
@@ -1380,6 +1393,7 @@ perform_oneway_anova <- function(object, formula_char, all_features = FALSE,
 #' @return A data frame with the results.
 #'
 #' @examples
+#' data(example_set)
 #' # Including QCs as a study group for example
 #' t_test_results <- perform_t_test(example_set, 
 #'   formula_char = "Feature ~ Group")
@@ -1585,6 +1599,7 @@ perform_t_test <- function(object, formula_char, is_paired = FALSE, id = NULL,
 #' @return A data frame with the results.
 #'
 #' @examples
+#' data(example_set)
 #' # Including QCs as a study group for example for pairwise tests
 #' mann_whitney_results <- perform_non_parametric(example_set, 
 #'   formula_char = "Feature ~ Group")

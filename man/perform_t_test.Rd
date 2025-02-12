@@ -44,6 +44,7 @@ P-values of each comparison are corrected separately from each
 other.
 }
 \examples{
+data(example_set)
 # Including QCs as a study group for example
 t_test_results <- perform_t_test(example_set, 
   formula_char = "Feature ~ Group")

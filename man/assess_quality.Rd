@@ -29,6 +29,7 @@ Assess features using the quality metrics defined in (Broadhurst
 \code{flag_quality}
 }
 \examples{
+data(example_set)
 ex_set <- assess_quality(example_set)
 rowData(ex_set)
 

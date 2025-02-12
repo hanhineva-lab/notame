@@ -68,6 +68,7 @@
 #' [\code{spar_lower, spar_upper}] using cross validation.
 #'
 #' @examples
+#' data(example_set)
 #' dc <- dc_cubic_spline(example_set)
 #' corrected <- dc$object
 #'
@@ -182,6 +183,7 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
 #' @seealso \code{\link{correct_drift}}, \code{\link{save_dc_plots}}
 #'
 #' @examples
+#' data(example_set)
 #' dc <- dc_cubic_spline(example_set)
 #' corrected <- dc$object
 #' inspected <- inspect_dc(
@@ -259,6 +261,7 @@ inspect_dc <- function(orig, dc, check_quality,
 #' @seealso \code{\link{correct_drift}}
 #'
 #' @examples
+#' data(example_set)
 #' \dontshow{.old_wd <- setwd(tempdir())}
 #' dc <- dc_cubic_spline(example_set)
 #' corrected <- dc$object
@@ -400,6 +403,7 @@ save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
 #' By default, the column used for color is also used for shape.
 #'
 #' @examples
+#' data(example_set)
 #' corrected <- correct_drift(example_set)
 #'
 #' @seealso \code{\link[stats]{smooth.spline}} for details about the regression

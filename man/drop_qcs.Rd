@@ -17,6 +17,7 @@ without QC samples.
 Drop QC samples
 }
 \examples{
+data(example_set)
 dim(example_set)
 noqc <- drop_qcs(example_set)
 dim(noqc)

@@ -31,6 +31,7 @@ but the sample IDs will be adjusted so that they are unique.
 }
 \examples{
 # Merge analytical modes
+data(hilic_neg_sample, hilic_pos_sample, rp_neg_sample, rp_pos_sample)
 merged <- merge_objects(
   hilic_neg_sample, hilic_pos_sample,
   rp_neg_sample, rp_pos_sample

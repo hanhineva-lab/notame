@@ -25,6 +25,7 @@
 #' \code{\link{importance_rf}}
 #'
 #' @examples
+#' data(example_set)
 #' rf <- fit_rf(example_set, y = "Group")
 #' rf
 #' importance_rf(rf)
@@ -64,6 +65,7 @@ fit_rf <- function(object, y, all_features = FALSE,
 #' @seealso \code{\link[randomForest]{randomForest}}, \code{\link{fit_rf}}
 #'
 #' @examples
+#' data(example_set)
 #' rf <- fit_rf(example_set, y = "Group")
 #' rf
 #' importance_rf(rf)
@@ -163,6 +165,7 @@ importance_rf <- function(rf) {
 #' @return An object of class "mixo_pls" or "mixo_spls".
 #'
 #' @examples
+#' data(example_set)
 #' pls_res <- mixomics_pls(example_set, y = "Injection_order", ncomp = 3)
 #' pls_opt <- mixomics_pls_optimize(example_set, 
 #'   y = "Injection_order", ncomp = 3)
@@ -366,6 +369,7 @@ mixomics_spls_optimize <- function(object, y, ncomp, n_features =
 #' @return An object of class "mixo_plsda".
 #'
 #' @examples
+#' data(example_set)
 #' noqc <- drop_qcs(example_set)
 #' plsda_res <- mixomics_plsda(noqc, y = "Group", ncomp = 2)
 #' set.seed(38)
@@ -569,6 +573,7 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
 #' Many of these return different plots depending on the model specification.
 #'
 #' @examples
+#' data(example_set)
 #' # PLS simple
 #' rf_model <- muvr_analysis(drop_qcs(example_set), 
 #'   y = "Group", nRep = 2, method = "PLS")
@@ -740,6 +745,7 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
 #' @return A PERMANOVA object.
 #'
 #' @examples
+#' data(example_set)
 #' permanova_res <- perform_permanova(drop_qcs(example_set), group = "Group")
 #'
 #' @export

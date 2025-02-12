@@ -11,7 +11,6 @@ Authors@R: c(
 Description: Provides functionality for untargeted LC-MS metabolomics research as specified in the associated protocol article in the 'Metabolomics Data Processing and Data Analysis—Current Best Practices' special issue of the Metabolites journal (2020). This includes data pretreatment and quality control, uni- and multivariate analysis as well as quality control visualizations, feature-wise visualizations and results visualizations. Raw data preprocessing and functionality related to biological context, such as pathway analysis, is not included.
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 biocViews: BiomedicalInformatics, Metabolomics, DataImport, MassSpectrometry, BatchEffect, MultipleComparison, Normalization, QualityControl, Visualization, Preprocessing
 Depends:
     R (>= 4.4.0),

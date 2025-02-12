@@ -1,6 +1,7 @@
 context("Testing statistics")
 
-library(notame)
+data(example_set, package = "notame")
+
 # Summary statistics ----
 test_that("summary statistics work without grouping", {
   smry <- summary_statistics(mark_nas(example_set, 0))

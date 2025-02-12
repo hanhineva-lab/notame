@@ -26,6 +26,7 @@ change between two time points is computed for each subject,
 and Cohen's d is computed from the changes.
 }
 \examples{
+data(example_set)
 d_results <- cohens_d(drop_qcs(example_set), group = "Group")
 d_results_time <- cohens_d(drop_qcs(example_set),
   group = "Group", time = "Time", id = "Subject_ID"

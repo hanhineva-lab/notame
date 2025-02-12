@@ -21,6 +21,7 @@ This function is usually used internally by some of the functions in the
 package, but can be useful.
 }
 \examples{
+data(example_set)
 ex_set <- as(example_set, "MetaboSet")
 new_info <- data.frame(
   Feature_ID = featureNames(ex_set),

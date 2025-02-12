@@ -1,7 +1,5 @@
 context("Testing logging")
 
-library(notame)
-
 test_that("Error/warning handling changes when logging and is set to NULL after logging", {
   # Save current error handling
   orig_error <- options("error")

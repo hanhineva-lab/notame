@@ -140,6 +140,7 @@ A ggplot object.
 Draws a volcano plot of effect size and p-values.
 }
 \examples{
+data(example_set)
 # naturally, this looks messy as there are not enough p-values
 lm_results <- perform_lm(drop_qcs(example_set), 
   formula_char = "Feature ~ Group")

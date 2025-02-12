@@ -40,6 +40,7 @@ Performs permutational multivariate analysis of variance. Uses package
 called PERMANOVA.
 }
 \examples{
+data(example_set)
 permanova_res <- perform_permanova(drop_qcs(example_set), group = "Group")
 
 }

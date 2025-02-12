@@ -28,6 +28,7 @@ Draws histograms of p-values with expected uniform distribution represented
 by a dashed red line.
 }
 \examples{
+data(example_set)
 lm_sample <- perform_lm(drop_qcs(example_set), "Feature ~ Injection_order")
 p_values <- list("Biological samples" = lm_sample$Injection_order_P)
 plot_p_histogram(p_values)

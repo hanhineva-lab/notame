@@ -40,6 +40,7 @@ as "Low_group_detection". The detection rates for all the groups are
 recorded in feature data.
 }
 \examples{
+data(example_set)
 ex_set <- mark_nas(example_set, value = 0)
 ex_set <- flag_detection(ex_set, group = "Group")
 rowData(ex_set)

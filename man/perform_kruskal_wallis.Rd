@@ -36,6 +36,7 @@ For example, if testing for equality of means in study groups, use
 "Feature ~ Group".
 }
 \examples{
+data(example_set)
 perform_kruskal_wallis(example_set, formula_char = "Feature ~ Group")
 
 }

@@ -116,6 +116,7 @@ the effect, so part of the points will "drop" from the p = 1 (-log10(p) = 0)
 line. This results in a so-called directed Manhattan plot.
 }
 \examples{
+data(example_set)
 # naturally, this looks messy as there are not enough p-values
 lm_results <- perform_lm(drop_qcs(example_set), 
   formula_char = "Feature ~ Group")

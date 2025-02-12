@@ -37,6 +37,7 @@ For example, if testing for equality of variances in study groups, use
 "Feature ~ Group".
 }
 \examples{
+data(example_set)
 perform_homoscedasticity_tests(example_set, formula_char = "Feature ~ Group")
 
 }

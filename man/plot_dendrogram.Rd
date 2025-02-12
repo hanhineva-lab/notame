@@ -52,6 +52,7 @@ Draws a dendrogram of a hierarchical clustering applied to the samples of an
 experiment.
 }
 \examples{
+data(example_set)
 plot_dendrogram(example_set, color = "Group")
 
 }

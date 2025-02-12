@@ -127,6 +127,7 @@
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
+#' data(example_set)
 #' save_subject_line_plots(drop_qcs(example_set)[1:10], x = "Time", 
 #'   id = "Subject_ID", file_path = "./subject_line_plots.pdf",
 #'   format = "emf", title = NULL)
@@ -241,6 +242,7 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
+#' data(example_set)
 #' # Default boxplots by group
 #' save_group_boxplots(drop_qcs(example_set)[1:10],
 #'   file_path = "./group_boxplots.pdf",
@@ -345,6 +347,7 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
+#' data(example_set)
 #' # Default beeswarms by group
 #' save_beeswarm_plots(drop_qcs(example_set)[1:10],
 #'   file_path = "./beeswarm_plots.pdf",
@@ -455,6 +458,7 @@ save_beeswarm_plots <- function(object, all_features = FALSE, save = TRUE,
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
+#' data(example_set)
 #' # Against injection order, colored by group
 #' save_scatter_plots(
 #'   object = example_set[1:10],
@@ -559,6 +563,7 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
+#' data(example_set)
 #' save_group_lineplots(drop_qcs(example_set)[1:10],
 #'   file_path = "./group_line_plots.pdf",
 #'   format = "pdf", x = "Time", group = "Group"

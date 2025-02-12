@@ -30,6 +30,7 @@ A ggplot object.
 Plots distribution of each quality metric, and a distribution of the flags.
 }
 \examples{
+data(example_set)
 plot_quality(example_set)
 
 }

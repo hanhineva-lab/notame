@@ -22,6 +22,7 @@ If an error occurs with the plot, an empty file is created.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
+data(example_set)
 lm_results <- perform_lm(drop_qcs(example_set), 
   formula_char = "Feature ~ Group")
 

@@ -24,10 +24,12 @@ specified variable.
 Get and set the name of the special column for time points
 }
 \examples{
+data(example_set)
 ex_set <- as(example_set, "MetaboSet")
 # Get name of time variable
 time_col(ex_set)
 
+data(example_set)
 ex_set <- as(example_set, "MetaboSet")
 # Set time variable
 time_col(ex_set) <- "Time"

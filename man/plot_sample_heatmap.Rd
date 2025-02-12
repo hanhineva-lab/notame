@@ -62,6 +62,7 @@ Draws a heatmap of the distances between the samples of an experiment,
 the samples are ordered by hierarchical clustering.
 }
 \examples{
+data(example_set)
 plot_sample_heatmap(example_set, group = "Group")
 
 }

@@ -634,6 +634,7 @@ construct_metabosets <- function(exprs, pheno_data, feature_data,
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
+#' data(example_set)
 #' write_to_excel(example_set, file = "example_set.xlsx")
 #' \dontshow{setwd(.old_wd)}
 #'
@@ -732,6 +733,7 @@ setMethod("show", c(object = "MetaboSet"),
 #' one row per sample.
 #'
 #' @examples
+#' data(example_set)
 #' combined_data(example_set)
 #'
 #' @export
@@ -752,6 +754,7 @@ setMethod("combined_data", c(object = "MetaboSet"),
 #' @return Character, the name of the grouping variable.
 #'
 #' @examples
+#' data(example_set)
 #' ex_set <- as(example_set, "MetaboSet")
 #' # Get name of grouping variable
 #' group_col(ex_set)
@@ -772,6 +775,7 @@ setMethod("group_col", "MetaboSet", function(object) object@group_col)
 #' the specified variable.
 #'
 #' @examples
+#' data(example_set)
 #' ex_set <- as(example_set, "MetaboSet")
 #' # Set grouping variable
 #' group_col(ex_set) <- "Group"
@@ -797,6 +801,7 @@ setMethod("group_col<-", "MetaboSet",
 #' @return Character, name of time variable.
 #'
 #' @examples
+#' data(example_set)
 #' ex_set <- as(example_set, "MetaboSet")
 #' # Get name of time variable
 #' time_col(ex_set)
@@ -819,6 +824,7 @@ setMethod("time_col", "MetaboSet",
 #' specified variable.
 #'
 #' @examples
+#' data(example_set)
 #' ex_set <- as(example_set, "MetaboSet")
 #' # Set time variable
 #' time_col(ex_set) <- "Time"
@@ -845,6 +851,7 @@ setMethod("time_col<-", "MetaboSet",
 #' @return Character, the name of the subject variable.
 #'
 #' @examples
+#' data(example_set)
 #' ex_set <- as(example_set, "MetaboSet")
 #' # Get name of subject variable
 #' subject_col(ex_set)
@@ -866,6 +873,7 @@ setMethod("subject_col", "MetaboSet",
 #' specified variable.
 #'
 #' @examples
+#' data(example_set)
 #' ex_set <- as(example_set, "MetaboSet")
 #' # Set subject variable
 #' subject_col(ex_set) <- "Subject_ID"
@@ -892,6 +900,7 @@ setMethod("subject_col<-", "MetaboSet",
 #' @return Character vector of feature flags.
 #'
 #' @examples
+#' data(example_set)
 #' # Get values in flag column of rowData
 #' flag(example_set)
 #'
@@ -911,6 +920,7 @@ setMethod("flag", "MetaboSet",
 #' @return For the endomorphism, an object with a modified flag column.
 #'
 #' @examples
+#' data(example_set)
 #' # Flag a suspicious feature manually
 #' flag(example_set)[1] <- "Contaminant, known from experience"
 #' @export
@@ -940,6 +950,7 @@ setMethod("flag<-", "MetaboSet",
 #' @param dframe a data frame with the new information
 #'
 #' @examples
+#' data(example_set)
 #' ex_set <- as(example_set, "MetaboSet")
 #' new_info <- data.frame(
 #'   Feature_ID = featureNames(ex_set),
@@ -975,6 +986,7 @@ setMethod("join_fData", c("MetaboSet", "data.frame"),
 #' @param dframe a data frame with the new information
 #'
 #' @examples
+#' data(example_set)
 #' ex_set <- as(example_set, "MetaboSet")
 #' new_info <- data.frame(
 #'   Sample_ID = sampleNames(ex_set),
@@ -1167,6 +1179,7 @@ setAs("MetaboSet", "SummarizedExperiment", function(from) {
 #' \code{id_prefix} and injection order or by renaming \code{id_column}.
 #'
 #' @examples
+#' data(example_set)
 #' ex_set <- example_set
 #' rowData(ex_set)$Flag <- NULL
 # 'Flag' column is created in feature data
@@ -1363,6 +1376,7 @@ setMethod("flag<-", "SummarizedExperiment",
 #' @param dframe a data frame with the new information
 #'
 #' @examples
+#' data(example_set)
 #' new_info <- data.frame(
 #'   Feature_ID = rownames(example_set),
 #'   Feature_number = seq_len(nrow(example_set))
@@ -1399,6 +1413,7 @@ setMethod("join_rowData", c("SummarizedExperiment", "data.frame"),
 #' @param dframe a data frame with the new information
 #'
 #' @examples
+#' data(example_set)
 #' new_info <- data.frame(
 #'   Sample_ID = colnames(example_set),
 #'   BMI = stats::runif(ncol(example_set), 22, 26)

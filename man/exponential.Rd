@@ -24,6 +24,7 @@ An object with altered feature abundances.
 Apply the exponential function to feature abundances (exprs).
 }
 \examples{
+data(example_set)
 example_set <- mark_nas(example_set, value = 0)
 log_data <- log(example_set)
 orig_data <- exponential(log_data)

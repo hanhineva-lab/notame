@@ -47,6 +47,7 @@ For example, if testing for equality of means in study groups, use
 "Feature ~ Group".
 }
 \examples{
+data(example_set)
 # Including QCs as a study group for example for pairwise tests
 mann_whitney_results <- perform_non_parametric(example_set, 
   formula_char = "Feature ~ Group")

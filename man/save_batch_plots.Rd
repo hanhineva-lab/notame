@@ -54,6 +54,7 @@ the default scale only has 2 values, so it can only accomodate 2 shapes.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
+data(example_set)
 # Batch correction
 replicates <- list(which(example_set$QC == "QC"))
 batch_corrected <- normalize_batches(example_set, 

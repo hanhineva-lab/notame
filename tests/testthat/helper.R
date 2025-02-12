@@ -1,6 +1,6 @@
-test_plot_saving_helper <- function(func, title, func_args) {
+test_plot_saving_helper <- function(object, func, title, func_args) {
   prefix <- paste0(tempdir(), "\\test\\")
-  tmp <- example_set[1:5]
+  tmp <- object[1:5]
   rowData(tmp)$Metabolite_name <- c("Glucose", "Threoline", "5-AVAB", "1/2 acid", "20:0 carbon chain")
   do.call(func, c(list(drop_qcs(tmp), file_path = prefix, format = "emf", title = title), func_args))
   if (is.null(title)) {
@@ -15,7 +15,6 @@ test_plot_saving_helper <- function(func, title, func_args) {
   }
   unlink(prefix, recursive = TRUE)
 }
-
 
 test_file_extension_helper <- function(fileext) {
   p <- ggplot()

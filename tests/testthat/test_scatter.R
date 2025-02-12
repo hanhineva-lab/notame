@@ -1,6 +1,6 @@
 context("Testing scatter.R plots")
 
-library(notame)
+data(example_set, package = "notame")
 
 test_that("mz_rt_plot uses correct data", {
   gg <- mz_rt_plot(example_set)

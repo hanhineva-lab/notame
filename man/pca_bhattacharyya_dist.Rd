@@ -43,6 +43,7 @@ Computes Bhattacharyya distance between all pairs of batches after
 projecting the samples into PCA space with pcaMethods::pca.
 }
 \examples{
+data(example_set)
 # Batch correction
 replicates <- list(which(example_set$QC == "QC"))
 batch_corrected <- ruvs_qc(example_set, replicates = replicates)

@@ -1,8 +1,6 @@
 context("Testing transformations")
 
-library(notame)
-
-data("example_set")
+data(example_set, package = "notame")
 
 test_that("Marking NAs works properly", {
   marked <- mark_nas(example_set, value = 0)

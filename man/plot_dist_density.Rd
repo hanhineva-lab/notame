@@ -49,6 +49,7 @@ A ggplot object.
 Plot density of distances between samples in QC samples and actual samples.
 }
 \examples{
+data(example_set)
 plot_dist_density(example_set)
 # Drift correction tightens QCs together
 plot_dist_density(correct_drift(example_set))
