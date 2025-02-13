@@ -20,8 +20,6 @@
 #' \item \code{\link{flag_detection}} flag features with low detection rate
 #' \item \code{\link{flag_contaminants}} flag contaminants based on blanks
 #' \item \code{\link{correct_drift}} correct drift using cubic spline
-#' \item \code{\link{align_batches}} align features between batches
-#' \item \code{\link{normalize_batches}} normalize between batches
 #' \item \code{\link{ruvs_qc}} Remove Unwanted Variation (RUV) between batches
 #' \item \code{\link{pca_bhattacharyya_dist}} Bhattacharyya distance between 
 #' batches in PCA space
@@ -60,7 +58,6 @@
 #' \item \code{\link{plot_dendrogram}} sample dendrogram
 #' \item \code{\link{plot_sample_heatmap}} sample heatmap
 #' \item \code{\link{plot_pca_loadings}} PCA loadings plot
-#' \item \code{\link{plot_sample_suprahex}} sample suprahex plots
 #' \item \code{\link{plot_quality}} plot quality metrics
 #' }
 #' 

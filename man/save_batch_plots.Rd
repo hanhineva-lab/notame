@@ -58,8 +58,7 @@ the default scale only has 2 values, so it can only accomodate 2 shapes.
 data(example_set)
 # Batch correction
 replicates <- list(which(example_set$QC == "QC"))
-batch_corrected <- normalize_batches(example_set, 
-  batch = "Batch", group = "QC", ref_label = "QC")
+batch_corrected <- ruvs_qc(example_set, replicates = replicates)
 # Plots of each feature
 save_batch_plots(
   orig = example_set[1:10], corrected = batch_corrected[1:10],
