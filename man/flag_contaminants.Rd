@@ -14,7 +14,9 @@ flag_contaminants(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{blank_col}{character, the column name in pheno data with blank labels}
 

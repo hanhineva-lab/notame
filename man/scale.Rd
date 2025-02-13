@@ -20,8 +20,8 @@ A Metaboset object with modified peak table.
 A SummarizedExperiment object with modified assay.
 }
 \description{
-Applies the base R function scale to transposed exprs matrix. See ?scale for 
-details.
+Applies the base R function scale to transposed peak table. 
+See \code{\link{scale}} for details.
 
 Applies the base R function scale to transposed assay matrix. See ?scale for 
 details.

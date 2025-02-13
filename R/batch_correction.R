@@ -1,14 +1,16 @@
 #' Remove Unwanted Variation (RUV) between batches
 #'
-#' An interface for the RUVs method in RUVSeq package.
+#' An interface for \code{link[RUVSeq]{RUVs}} method
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param replicates list of numeric vectors, indexes of replicates
 #' @param k The number of factors of unwanted variation to be estimated from 
 #' the data.
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param name character, name of the resultant assay in case of multiple assays
-#' @param ... other parameters passed to RUVSeq::RUVs
+#' @param ... other parameters passed to \code{link[RUVSeq]{RUVs}}
 #' @return A SummarizedExperiment or Metaboset object with the normalized data.
 #'
 #' @examples
@@ -60,20 +62,24 @@ ruvs_qc <- function(object, replicates, k = 3,
 
 #' Bhattacharyya distance between batches in PCA space
 #'
-#' Computes Bhattacharyya distance between all pairs of batches after
-#' projecting the samples into PCA space with pcaMethods::pca. 
+#' Computes Bhattacharyya distance between all pairs of batches using 
+#' \code{\link[fpc:bhattacharyya.matrix]{fpc:bhattacharyya.matrix}} 
+#' after projecting the samples into PCA space with 
+#' \code{\link[pcaMethods]{pca}}.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param batch column name of pheno data giving the batch labels
 #' @param all_features logical, should all features be used? If FALSE
 #' (the default), flagged features are removed before imputation.
 #' @param center logical, should the data be centered prior to PCA?
 #' (usually yes)
-#' @param scale scaling used, as in pcaMethods::prep. Default is "uv" for unit
-#' variance
+#' @param scale scaling used, as in 
+#' \code{\link[pcaMethods]{prep}}. Default is "uv" for unit variance
 #' @param nPcs the number of principal components to use
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... other parameters to pcaMethods::pca
+#' @param ... other parameters to \code{\link[pcaMethods]{pca}}
 #'
 #' @return A matrix of Bhattacharyya distances between batches.
 #'
@@ -165,7 +171,9 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
 #' The repeatability ranges from 0 to 1. Higher repeatability depicts less
 #' variation between batches.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param group column name of pheno data giving the group labels
 #' @param assay.type character, assay to be used in case of multiple assays
 #'
@@ -374,8 +382,9 @@ normalize_batches <- function(object, batch, group, ref_label,
 #' NOTE: if you change the shape variable, be sure to set a shape scale as well,
 #' the default scale only has 2 values, so it can only accomodate 2 shapes.
 #'
-#' @param orig,corrected SummarizedExperiment or MetaboSet objects before and 
-#' after batch effect correction
+#' @param orig,corrected \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} objects before and after batch effect correction
 #' @param file path to the PDF file where the plots will be saved
 #' @param width,height width and height of the plots in inches
 #' @param batch,color,shape column names of pheno data for batch labels,

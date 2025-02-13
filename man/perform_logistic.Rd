@@ -13,7 +13,9 @@ perform_logistic(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{formula_char}{character, the formula to be used in the linear model 
 (see Details)}
@@ -22,7 +24,7 @@ perform_logistic(
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{...}{additional parameters passed to glm}
+\item{...}{additional parameters passed to \code{\link[stats]{glm}}}
 }
 \value{
 A data frame with one row per feature, with all the

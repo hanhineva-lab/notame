@@ -27,7 +27,9 @@ save_subject_line_plots(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{all_features}{logical, should all features be used?
 If FALSE (the default), flagged features are removed before visualization.}
@@ -61,7 +63,7 @@ as color)}
 \item{mean_line_width}{numeric, width of the mean line}
 
 \item{title_line_length}{integer, maximum length of the title line in 
-characters, passed to stringr::str_wrap}
+characters, passed to \code{\link[stringr]{str_wrap}}}
 
 \item{theme}{a ggplot theme to be added to the plot}
 

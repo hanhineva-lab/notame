@@ -77,7 +77,7 @@ list.
 \details{
 If skip_checks = FALSE, \code{\link{read_from_excel}} attempts to modify the 
 data as per \code{\link{fix_object}} and checks the data. If skip_checks 
-= TRUE, parameters for \code{\link{fix_object}} are ignored.
+= TRUE, parameters for \code{fix_object} are ignored.
 }
 \examples{
 data <- read_from_excel(

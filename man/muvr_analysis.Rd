@@ -23,7 +23,9 @@ muvr_analysis(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{y}{character, column name in pheno data of the target variable}
 
@@ -59,33 +61,36 @@ iteration, parameter of MUVR}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{...}{other parameters to MUVR2::MUVR2 or MUVR2::MUVR2_EN 
-and MUVR2::getVar (when method == "EN")}
+\item{...}{other parameters to \code{\link[MUVR2]{MUVR2}} or 
+\code{\link[MUVR2]{MUVR2_EN}} and 
+\code{\link[MUVR2]{getVar}} (when method == "EN")}
 }
 \value{
-A MUVR object. (make this more descriptive)
+A MUVR object.
 }
 \description{
-A wrapper around the MUVR2 (random forest, PLS(-DA)) and MUVR2_EN (elastic 
-net) functions from the MUVR2 package.
+A wrapper around \code{\link[MUVR2]{MUVR2}} (random forest,
+PLS(-DA)) and \code{\link[MUVR2]{MUVR2_EN}} (elastic net)
+functions from the MUVR2 package.
 }
 \details{
 This function is now using the MUVR2 package, characterized as an 
 upgrade extending the original MUVR package by the inclusion of elastic net 
-regression (EN) and other functionality not covered by this wrapper. Elastic 
+regression (EN) and some functionality not covered by this wrapper. Elastic 
 net regression supports covariate adjustment by suppressing regularization 
 of specified features from the regularization procedure. Note that this is 
 different from simply including covariates such as sex. EN also differs from 
 PLS and RF in that no recursive variable elimination is performed, so an 
 additional scheme is used to obtain the 'min', 'mid' and 'max' models using
-MUVR2::getVar in this wrapper. 
+\code{\link[MUVR2]{getVar}}. 
 
 Sex would be entered as a static covariate, since the change in sex is zero 
 for all individuals, so computing the change and using that as a covariate 
 does not make sense.
 
 Note that there are several more plots available in MUVR2 for inspecting the 
-results, notably MUVR2::plotMV, MUVR2::plotStability and MUVR2::plotVIRank. 
+results, notably \code{\link[MUVR2]{plotMV}}, 
+\code{\link[MUVR2]{plotStability}} and \code{\link[MUVR2]{plotVIRank}}
 Many of these return different plots depending on the model specification.
 }
 \examples{

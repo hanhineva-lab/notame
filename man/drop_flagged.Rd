@@ -13,7 +13,9 @@ drop_flagged(object, all_features = FALSE)
 \S4method{drop_flagged}{SummarizedExperiment}(object, all_features = FALSE)
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{all_features}{logical, should all features be retained? Mainly used by 
 internal functions}

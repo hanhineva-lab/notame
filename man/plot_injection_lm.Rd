@@ -7,7 +7,9 @@
 plot_injection_lm(object, all_features = FALSE, assay.type = NULL)
 }
 \arguments{
-\item{object}{A SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{all_features}{logical, should all features be used? 
 If FALSE (the default), flagged features are removed before visualization.}

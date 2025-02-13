@@ -19,7 +19,9 @@ visualizations(
 )
 }
 \arguments{
-\item{object}{A SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{prefix}{character, a file path prefix added to the file paths}
 

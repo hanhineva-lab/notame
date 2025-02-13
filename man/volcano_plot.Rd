@@ -92,9 +92,10 @@ volcano_plot(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment object or a data frame. If x is a 
-SummarizedExperiment object, feature data of x is used. If x is a data 
-frame, it is used as is.}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+, \code{\link{MetaboSet}} object or a data frame.
+Feature data is used. If x is a data frame, it is used as is.}
 
 \item{x, p}{the column names of effect size (x-axis) and p-values}
 

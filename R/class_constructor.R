@@ -382,7 +382,7 @@
 #' @details
 #' If skip_checks = FALSE, \code{\link{read_from_excel}} attempts to modify the 
 #' data as per \code{\link{fix_object}} and checks the data. If skip_checks 
-#' = TRUE, parameters for \code{\link{fix_object}} are ignored.
+#' = TRUE, parameters for \code{fix_object} are ignored.
 #' @export
 read_from_excel <- function(file, sheet = 1, id_column = NULL, 
                             corner_row = NULL, corner_column = NULL,
@@ -542,9 +542,9 @@ setValidity(
 
 #' Construct MetaboSet objects
 #'
-#' Construct MetaboSet objects from input read by read_from_excel.
-#' Returns a list of MetaboSet objects, one per mode. The modes are separated 
-#' by the "Split" column in feature_data.
+#' Construct \code{\link{MetaboSet}} objects from input read by 
+#' \code{\link{read_from_excel}}. Returns a list of MetaboSet objects, one per 
+#' mode. The modes are separated by the "Split" column in feature data.
 #'
 #' @param exprs matrix, the feature abundances, size features x samples
 #' @param pheno_data data frame, sample information, size sample info variables 
@@ -626,9 +626,12 @@ construct_metabosets <- function(exprs, pheno_data, feature_data,
 #' in upper left corner and choose "Convert to Number". This will fix the file,
 #' but can take quite a while.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param file path to the file to write
-#' @param ... Additional parameters passed to \code{openxlsx::write.xlsx}
+#' @param ... Additional parameters passed to
+#' \code{\link[openxlsx]{write.xlsx}}
 #'
 #' @return None, the function is invoked for its side effect.
 #'
@@ -727,7 +730,7 @@ setMethod("show", c(object = "MetaboSet"),
 )
 #' Retrieve both sample information and features
 #'
-#' @param object a MetaboSet object
+#' @param object a \code{\link{MetaboSet}} object
 #' @param ... additional arguments passed to methods
 #' @return A data frame with sample information plus all features as columns,
 #' one row per sample.
@@ -749,7 +752,7 @@ setMethod("combined_data", c(object = "MetaboSet"),
 )
 
 #' Get and set name of the special column for group labels
-#' @param object a MetaboSet object
+#' @param object a \code{\link{MetaboSet}} object
 #' 
 #' @return Character, the name of the grouping variable.
 #'
@@ -768,7 +771,7 @@ setGeneric("group_col", signature = "object",
 setMethod("group_col", "MetaboSet", function(object) object@group_col)
 
 #' @rdname group_col
-#' @param object a MetaboSet object
+#' @param object a \code{\link{MetaboSet}} object
 #' @param value string, name of column to be designated for holding group labels
 #' 
 #' @return For the endomorphism, an object with the grouping variable set to 
@@ -796,7 +799,7 @@ setMethod("group_col<-", "MetaboSet",
   }
 )
 #' Get and set the name of the special column for time points
-#' @param object a MetaboSet object
+#' @param object a \code{\link{MetaboSet}} object
 #'
 #' @return Character, name of time variable.
 #'
@@ -817,7 +820,7 @@ setMethod("time_col", "MetaboSet",
           function(object) object@time_col)
 
 #' @rdname time_col
-#' @param object a MetaboSet object
+#' @param object a \code{\link{MetaboSet}} object
 #' @param value string, name of column to be designated for holding time points
 #'
 #' @return For the endomorphism, an object with the time variable set to the 
@@ -846,7 +849,7 @@ setMethod("time_col<-", "MetaboSet",
 
 
 #' Get and set the name of special column for subject identifiers
-#' @param object a MetaboSet object
+#' @param object a \code{\link{MetaboSet}} object
 #'
 #' @return Character, the name of the subject variable.
 #'
@@ -865,7 +868,7 @@ setMethod("subject_col", "MetaboSet",
           function(object) object@subject_col)
 
 #' @rdname subject_col
-#' @param object a MetaboSet object
+#' @param object a \code{\link{MetaboSet}} object
 #' @param value string, name of column to be designated for holding subject 
 #' identifiers
 #'
@@ -895,7 +898,9 @@ setMethod("subject_col<-", "MetaboSet",
 
 
 #' Get and set the values in the flag column
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' 
 #' @return Character vector of feature flags.
 #'
@@ -914,7 +919,9 @@ setMethod("flag", "MetaboSet",
           function(object) fData(object)$Flag)
 
 #' @rdname flag
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param value character vector, values for flag column
 #'
 #' @return For the endomorphism, an object with a modified flag column.
@@ -946,7 +953,7 @@ setMethod("flag<-", "MetaboSet",
 #' This function is usually used internally by some of the functions in the 
 #' package, but can be useful.
 #'
-#' @param object a MetaboSet object
+#' @param object a \code{\link{MetaboSet}} object
 #' @param dframe a data frame with the new information
 #'
 #' @examples
@@ -982,7 +989,7 @@ setMethod("join_fData", c("MetaboSet", "data.frame"),
 #'
 #' Join a new data frame of information to pheno data of a MetaboSet object.
 #'
-#' @param object a MetaboSet object
+#' @param object a \code{\link{MetaboSet}} object
 #' @param dframe a data frame with the new information
 #'
 #' @examples
@@ -1142,7 +1149,9 @@ setAs("MetaboSet", "SummarizedExperiment", function(from) {
 #' supplied "Sample_ID" column if needed. Aims to make the object compatible 
 #' with all of notame.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param id_prefix character, prefix for autogenerated sample IDs, see Details
 #' @param id_column character, column name for unique identification of samples
 #' @param split_by character vector, in the case where all the modes are in the 
@@ -1372,7 +1381,8 @@ setMethod("flag<-", "SummarizedExperiment",
 #' "Feature_ID". This function is usually used internally by some of the 
 #' functions in the package, but can be useful.
 #'
-#' @param object a MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
 #' @param dframe a data frame with the new information
 #'
 #' @examples
@@ -1409,7 +1419,9 @@ setMethod("join_rowData", c("SummarizedExperiment", "data.frame"),
 #' Join a new data frame of information to pheno data of a SummarizedExperiment 
 #' object.
 #'
-#' @param object a SummarizedExperiment object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' object
 #' @param dframe a data frame with the new information
 #'
 #' @examples

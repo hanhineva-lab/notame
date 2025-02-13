@@ -35,6 +35,8 @@
 #' imputation
 #' \item \code{\link{cluster_features}} cluster correlated features originating 
 #' from the same metabolite
+#' \item \code{\link{compress_clusters}} Compress clusters of features to a 
+#' single feature
 #' \item \code{\link{log}} logarithms
 #' \item \code{\link{exponential}} exponential
 #' \item \code{\link{pqn_normalization}} probabilistic quotient normalization

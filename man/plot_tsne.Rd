@@ -27,7 +27,9 @@ plot_tsne(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{all_features}{logical, should all features be used? If FALSE (the 
 default), flagged features are removed before visualization.}
@@ -35,8 +37,8 @@ default), flagged features are removed before visualization.}
 \item{center}{logical, should the data be centered prior to PCA? (usually 
 yes)}
 
-\item{scale}{scaling used, as in pcaMethods::prep. Default is "uv" for unit 
-variance}
+\item{scale}{scaling used, as in \code{\link[pcaMethods]{prep}}. Default is 
+'"uv" for unit variance}
 
 \item{perplexity}{the perplexity used in t-SNE}
 
@@ -70,7 +72,7 @@ If a continuous variable is used as color, density curve will be colorless.}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{...}{additional arguments passed to \code{Rtsne::Rtsne}}
+\item{...}{additional arguments passed to \code{\link[Rtsne]{Rtsne}}}
 }
 \value{
 A ggplot object. If \code{density} is \code{TRUE}, the plot will 
@@ -79,8 +81,8 @@ consist of multiple parts and is harder to modify.
 \description{
 Computes t-SNE into two dimensions and plots the map points.
 In case there are missing values, PCA is performed using the nipals method 
-of \code{pcaMethods::pca}, the  method can be changed to "ppca" if nipals 
-fails.
+of \code{\link[pcaMethods]{pca}}, the method can be changed to "ppca" if 
+nipals fails.
 }
 \examples{
 data(example_set)

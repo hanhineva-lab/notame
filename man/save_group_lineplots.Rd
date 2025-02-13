@@ -30,7 +30,9 @@ save_group_lineplots(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{all_features}{logical, should all features be used? 
 If FALSE (the default), flagged features are removed before visualization}
@@ -51,13 +53,13 @@ used for coloring}
 title/filename and subtitle.
 Set to NULL for no title/subtitle, this creates running numbered filenames}
 
-\item{fun.data}{passed to ggplot2::stat_summary and used for errorbars,
-"A function that is given the complete data and should return a data frame 
-with variables ymin, y, and ymax."}
+\item{fun.data}{passed to \code{\link[ggplot2]{stat_summary}} and used for 
+errorbars, "A function that is given the complete data and should return a 
+data frame with variables ymin, y, and ymax."}
 
 \item{fun.min, fun, fun.max}{Alternative to fun.data, passed to 
-\code{ggplot2::stat_summary}, "supply three individual functions that are 
-each passed a vector of x's and should return a single number"}
+\code{\link[ggplot2]{stat_summary}}, "supply three individual functions that 
+are each passed a vector of x's and should return a single number"}
 
 \item{position_dodge_amount}{numeric: how much the group mean points should 
 dodge away from each other}
@@ -71,7 +73,7 @@ dodge away from each other}
 \item{point_size}{numeric, size of the points}
 
 \item{title_line_length}{integer, maximum length of the title line in 
-characters, passed to stringr::str_wrap}
+characters, passed to \code{\link[stringr]{str_wrap}}}
 
 \item{theme}{a ggplot theme to be added to the plot}
 

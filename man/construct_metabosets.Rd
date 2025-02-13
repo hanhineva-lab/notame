@@ -41,9 +41,9 @@ single MetaboSet object.}
 A list of MetaboSet objects or a single MetaboSet object.
 }
 \description{
-Construct MetaboSet objects from input read by read_from_excel.
-Returns a list of MetaboSet objects, one per mode. The modes are separated 
-by the "Split" column in feature_data.
+Construct \code{\link{MetaboSet}} objects from input read by 
+\code{\link{read_from_excel}}. Returns a list of MetaboSet objects, one per 
+mode. The modes are separated by the "Split" column in feature data.
 }
 \examples{
 data <- read_from_excel(

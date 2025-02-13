@@ -30,8 +30,8 @@ default), flagged features are removed before visualization.}
 \item{center}{logical, should the data be centered prior to PCA? (usually 
 yes)}
 
-\item{scale}{scaling used, as in pcaMethods::prep. Default is "uv" for unit 
-variance}
+\item{scale}{scaling used, as in  \code{\link[pcaMethods]{prep}}. Default is 
+"uv" for unit variance}
 
 \item{pca_method}{the method used in PCA if there are missing values}
 
@@ -49,7 +49,7 @@ variance}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{...}{additional arguments passed to Rtsne::Rtsne}
+\item{...}{additional arguments passed to \code{\link[Rtsne]{Rtsne}}}
 }
 \value{
 A ggplot object.
@@ -59,8 +59,8 @@ Computes t-SNE into two dimensions and plots the map as hexagonal bins,
 where the value of the coloring variable is summarised for each bin, by 
 default as the mean of the values inside the bin.
 In case there are missing values, PCA is performed using the nipals method 
-of \code{pcaMethods::pca}, the  method can be changed to "ppca" if nipals 
-fails.
+of \code{\link[pcaMethods]{pca}}, the method can be changed to "ppca" if 
+nipals fails.
 }
 \examples{
 data(example_set)

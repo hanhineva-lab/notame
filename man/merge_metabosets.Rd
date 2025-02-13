@@ -7,7 +7,7 @@
 merge_metabosets(..., merge = c("features", "samples"))
 }
 \arguments{
-\item{...}{MetaboSet objects or a list of Metaboset objects}
+\item{...}{\code{\link{MetaboSet}} objects or a list of MetaboSet objects}
 
 \item{merge}{what to merge? features is used for combining analytical modes,
 samples is used for batches}

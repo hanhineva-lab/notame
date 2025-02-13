@@ -20,7 +20,9 @@ plot_sample_suprahex(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{all_features}{if FALSE, flagged features are droppped}
 
@@ -40,7 +42,7 @@ plot_sample_suprahex(
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{...}{other parameters for supraHex::sPipeline}
+\item{...}{other parameters for \code{\link[supraHex]{sPipeline}}}
 }
 \value{
 None, the function is invoked for its plotting side effect.

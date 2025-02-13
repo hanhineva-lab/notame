@@ -3,7 +3,9 @@
 #' Plots supraHex plots of each sample using functions from the supraHex 
 #' package. See the supraHex paper and package vignette for more information.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param all_features if FALSE, flagged features are droppped
 #' @param sample_labels the column for labels of samples in the plot
 #' @param grid_xdim,grid_ydim dimensions of the grid for the samples
@@ -13,7 +15,7 @@
 #' @param fontsize the fontsize for sample labels
 #' @param colormap colormap for the hexagons
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... other parameters for supraHex::sPipeline
+#' @param ... other parameters for \code{\link[supraHex]{sPipeline}}
 #'
 #' @return None, the function is invoked for its plotting side effect.
 #'

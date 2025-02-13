@@ -1,7 +1,9 @@
 
 #' Extract quality information of features
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' 
 #' @return A data frame with quality metrics for each feature.
 #'
@@ -37,8 +39,10 @@ quality <- function(object) {
 #'
 #' Assess features using the quality metrics defined in (Broadhurst 
 #' 2018). The quality metrics are described in Details section of 
-#' \code{flag_quality}
-#' @param object a SummarizedExperiment or MetaboSet object
+#' \code{\link{flag_quality}}
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param ... additional arguments passed to methods
 #'
 #' @return A SummarizedExperiment or MetaboSet object with quality metrics in 
@@ -122,9 +126,11 @@ setMethod("assess_quality", signature = c(object = "SummarizedExperiment"),
 #' Flags low-quality features using the quality metrics defined in (Broadhurst 
 #' 2018). The metrics are described in more detain in Details. A condition for 
 #' keeping the features is given as a character, which is passed to 
-#' \code{dplyr::filter}.
+#' \code{\link[dplyr]{filter}}.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param condition character, condition for keeping the features, see Details
 #' @param assay.type character, assay to be used in case of multiple assays
 #'
@@ -216,7 +222,9 @@ flag_quality <- function(object, assay.type = NULL, condition =
 #' as "Low_group_detection". The detection rates for all the groups are 
 #' recorded in feature data.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param qc_limit the detection rate limit for QC samples
 #' @param group_limit the detection rate limit for study groups
 #' @param group the columns name in sample information to use as the grouping 
@@ -297,7 +305,9 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' marked as blanks and are not QCs. If the median of blanks > the median of 
 #' biological samples times a set ratio, the feature is flagged as contaminant.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param blank_col character, the column name in pheno data with blank labels
 #' @param blank_label character, the label for blank samples in blank_col
 #' @param flag_thresh numeric, the ratio threshold for flagging contaminants.

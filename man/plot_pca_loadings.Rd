@@ -21,7 +21,9 @@ plot_pca_loadings(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{pcs}{numeric vector of length 2, the principal components to plot}
 
@@ -31,8 +33,8 @@ default), flagged features are removed before visualization.}
 \item{center}{logical, should the data be centered prior to PCA? (usually 
 yes)}
 
-\item{scale}{scaling used, as in pcaMethods::prep. Default is "uv" for unit 
-variance}
+\item{scale}{scaling used, as in \code{\link[pcaMethods]{prep}}. Default is 
+"uv" for unit variance}
 
 \item{n_features}{numeric vector of length two, number of top feature to plot
 for each principal component}
@@ -47,7 +49,7 @@ for each principal component}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{...}{additional arguments passed to pcaMethods::pca}
+\item{...}{additional arguments passed to \code{\link[pcaMethods]{prep}}}
 }
 \value{
 A ggplot object.

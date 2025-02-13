@@ -7,11 +7,14 @@
 write_to_excel(object, file, ...)
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{file}{path to the file to write}
 
-\item{...}{Additional parameters passed to \code{openxlsx::write.xlsx}}
+\item{...}{Additional parameters passed to
+\code{\link[openxlsx]{write.xlsx}}}
 }
 \value{
 None, the function is invoked for its side effect.

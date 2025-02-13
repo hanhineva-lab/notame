@@ -10,7 +10,9 @@ join_colData(object, dframe)
 \S4method{join_colData}{SummarizedExperiment,data.frame}(object, dframe)
 }
 \arguments{
-\item{object}{a SummarizedExperiment object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+object}
 
 \item{dframe}{a data frame with the new information}
 }

@@ -31,8 +31,8 @@ default), flagged features are removed before visualization.}
 \item{center}{logical, should the data be centered prior to PCA? (usually 
 yes)}
 
-\item{scale}{scaling used, as in pcaMethods::prep. Default is "uv" for unit 
-variance}
+\item{scale}{scaling used, as in \code{\link[pcaMethods]{prep}}. Default is 
+"uv" for unit variance}
 
 \item{fill}{character, name of the column used for coloring the hexagons}
 
@@ -46,7 +46,7 @@ variance}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{...}{additional arguments passed to pcaMethods::pca}
+\item{...}{additional arguments passed to \code{\link[pcaMethods]{pca}}}
 }
 \value{
 A ggplot object.

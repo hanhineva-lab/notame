@@ -5,7 +5,9 @@
 #' For example, vendor software might use 0 or 1 to signal a missing value,
 #' which is not understood by R.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param value the value to be converted to NA
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param name character, name of the resultant assay in case of multiple assays
@@ -48,7 +50,9 @@ mark_nas <- function(object, value, assay.type = NULL, name = NULL) {
 #'
 #' 73.03 (100), 23.193 (27), 73.14 (12.8), 55.016 (8.7)
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param ms_ms_spectrum_col name of column with original MS/MS spectra
 #' @param peak_num maximum number of peak that is kept (Recommended: 4-10)
 #' @param min_abund minimum relative abundance to be kept (Recommended: 1-5)
@@ -124,7 +128,9 @@ fix_MSMS <- function(object, ms_ms_spectrum_col = "MS_MS_spectrum",
 
 #' Drop QC samples
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #'
 #' @return A SummarizedExperiment or MetaboSet object as the one supplied, 
 #' without QC samples.
@@ -153,7 +159,9 @@ drop_qcs <- function(object) {
 #' Removes all features that have been flagged by quality control functions.
 #' Only features that do not have a flag (Flag == NA) are retained.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param all_features logical, should all features be retained? Mainly used by 
 #' internal functions
 #' 
@@ -207,7 +215,9 @@ setMethod("drop_flagged", signature = c(object = "SummarizedExperiment"),
 #' features or samples such as only good-quality features that have not been 
 #' flagged. This function is mainly used internally, but can be useful.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param y matrix containing new values to be merged into peak table
 #'
 #' @return A SummarizedExperiment or MetaboSet object with the new peak table 
@@ -251,16 +261,18 @@ merge_assay <- function(object, y, assay.type = NULL, name = NULL) {
 #' random forest. The estimated error in the imputation is logged.
 #' It is recommended to set the seed number for reproducibility
 #' (it is called random forest for a reason).
-#' This a wrapper around \code{missForest::missForest}.
+#' This a wrapper around \code{\link[missForest]{missForest}}.
 #' Use parallelize = "variables" to run in parallel for faster testing.
 #' NOTE: running in parallel prevents user from setting a seed number.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before imputation.
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param name character, name of the resultant assay in case of multiple assays
-#' @param ... passed to MissForest function
+#' @param ... passed to \code{\link[missForest]{missForest}}
 #'
 #' @return An object as the one supplied, with missing 
 #' values imputed.
@@ -341,7 +353,9 @@ impute_rf <- function(object, all_features = FALSE, assay.type = NULL,
 #' number!).
 #' }
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param value the value used for imputation, either a numeric or one of 
 #' '"min", "half_min", "small_random", see above
 #' @param na_limit only impute features with the proportion of NAs over this 
@@ -420,7 +434,9 @@ impute_simple <- function(object, value, na_limit = 0, assay.type = NULL,
 #' Applies inverse rank normalization to all features to approximate
 #' a normal distribution.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param name character, name of the resultant assay in case of multiple assays
 #' @return An object as the one supplied, with normalized features.
@@ -449,7 +465,9 @@ inverse_normalize <- function(object, assay.type = NULL, name = NULL) {
 #'
 #' Computes the number of features at each stage of flagging for each mode.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #'
 #' @return A data frame with the number of features at each stage of flagging.
 #'
@@ -489,14 +507,17 @@ flag_report <- function(object) {
 
 #' Logarithm
 #'
-#' Log-transforms the exprs part of a MetaboSet object. Shortcuts 
-#' for log2 and log10 also implemented.
+#' Log-transforms the peak table of SummarzedExperiment or MetaboSet object. 
+#' Shortcuts for log2 and log10 also implemented.
 #' For more information, see \code{\link{log}}.
 #'
-#' @param x a MetaboSet object
+#' @param x a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param base the base of the logarithm
 #'
-#' @return A MetaboSet object with the exprs part transformed.
+#' @return A SummarizedExperiment or MetaboSet object with peak table
+#' transformed.
 #'
 #' @rdname log
 #' @export
@@ -527,10 +548,10 @@ setMethod("log10", "MetaboSet",
 
 #' Scale exprs data
 #'
-#' Applies the base R function scale to transposed exprs matrix. See ?scale for 
-#' details.
+#' Applies the base R function scale to transposed peak table. 
+#' See \code{\link{scale}} for details.
 #'
-#' @param x a MetaboSet object
+#' @param x a \code{\link{MetaboSet}} object
 #' @param center,scale as in base scale function
 #' 
 #' @return A Metaboset object with modified peak table.
@@ -547,11 +568,12 @@ setMethod("scale", "MetaboSet",
 
 #' Exponential function
 #'
-#' Apply the exponential function to feature abundances (exprs).
+#' Apply the exponential function to peak table.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param base base of the exponential
-#'
 #'
 #' @return An object with altered feature abundances.
 #'
@@ -577,17 +599,6 @@ setMethod("exponential", c(object = "MetaboSet"),
 
 # ---------- Logarithms ----------
 
-#' Logarithm
-#'
-#' Log-transforms the assay part of a SummarizedExperiment object. Shortcuts 
-#' for log2 and log10 also implemented.
-#' For more information, see \code{\link{log}}.
-#'
-#' @param x a SummarizedExperiment object
-#' @param base the base of the logarithm
-#'
-#' @return A SummarizedExperiment object with the assay transformed.
-#'
 #' @rdname log
 #' @export
 setMethod("log", "SummarizedExperiment", 
@@ -653,7 +664,9 @@ setMethod("exponential", c(object = "SummarizedExperiment"),
 #' calculated from high-quality QC samples and the median of the reference is 
 #' used for normalization. Check parameters for more options.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param ref character, the type of reference samples to use for normalization.
 #' @param method character, the method to use for calculating the reference 
 #' sample.

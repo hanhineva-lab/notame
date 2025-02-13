@@ -10,7 +10,7 @@ subject_col(object)
 subject_col(object) <- value
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a \code{\link{MetaboSet}} object}
 
 \item{value}{string, name of column to be designated for holding subject 
 identifiers}

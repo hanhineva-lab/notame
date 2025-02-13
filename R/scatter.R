@@ -55,14 +55,16 @@
 #' Computes PCA using one of the methods provided in the Bioconductor package
 #' pcaMethods and plots the two first principal components.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
 #' yes)
-#' @param scale scaling used, as in pcaMethods::prep. Default is "uv" for unit 
-#' variance
+#' @param scale scaling used, as in \code{\link[pcaMethods]{prep}}. Default is 
+#' "uv" for unit variance
 #' @param color character, name of the column used for coloring the points. Set 
 #' to NULL for black color.
 #' @param shape character, name of the column used for shape. Set to NULL for 
@@ -81,7 +83,7 @@
 #' @param text_base_size numeric, base size for text
 #' @param point_size numeric, size of the points
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... additional arguments passed to pcaMethods::pca
+#' @param ... additional arguments passed to \code{\link[pcaMethods]{pca}}
 #'
 #' @return A ggplot object. If \code{density} is \code{TRUE}, the plot will 
 #' consist of multiple parts and is harder to modify.
@@ -126,16 +128,18 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
 #'
 #' Computes t-SNE into two dimensions and plots the map points.
 #' In case there are missing values, PCA is performed using the nipals method 
-#' of \code{pcaMethods::pca}, the  method can be changed to "ppca" if nipals 
-#' fails.
+#' of \code{\link[pcaMethods]{pca}}, the method can be changed to "ppca" if 
+#' nipals fails.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
 #' yes)
-#' @param scale scaling used, as in pcaMethods::prep. Default is "uv" for unit 
-#' variance
+#' @param scale scaling used, as in \code{\link[pcaMethods]{prep}}. Default is 
+#' '"uv" for unit variance
 #' @param perplexity the perplexity used in t-SNE
 #' @param pca_method the method used in PCA if there are missing values
 #' @param color character, name of the column used for coloring the points. Set 
@@ -156,7 +160,7 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' @param text_base_size numeric, base size for text
 #' @param point_size numeric, size of the points
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... additional arguments passed to \code{Rtsne::Rtsne}
+#' @param ... additional arguments passed to \code{\link[Rtsne]{Rtsne}}
 #'
 #' @return A ggplot object. If \code{density} is \code{TRUE}, the plot will 
 #' consist of multiple parts and is harder to modify.
@@ -297,14 +301,16 @@ plot_tsne <- function(object, all_features = FALSE, center = TRUE,
 #' Computes PCA using one of the methods provided in the Bioconductor package
 #' pcaMethods and plots the loadings of first principal components.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
 #' yes)
-#' @param scale scaling used, as in pcaMethods::prep. Default is "uv" for unit 
-#' variance
+#' @param scale scaling used, as in \code{\link[pcaMethods]{prep}}. Default is 
+#' "uv" for unit variance
 #' @param n_features numeric vector of length two, number of top feature to plot
 #' for each principal component
 #' @param title,subtitle the titles of the plot
@@ -312,7 +318,7 @@ plot_tsne <- function(object, all_features = FALSE, center = TRUE,
 #' @param point_size numeric, size of the points
 #' @param label_text_size numeric, size of the labels
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... additional arguments passed to pcaMethods::pca
+#' @param ... additional arguments passed to \code{\link[pcaMethods]{prep}}
 #'
 #' @return A ggplot object.
 #'
@@ -383,15 +389,15 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
 #' yes)
-#' @param scale scaling used, as in pcaMethods::prep. Default is "uv" for unit 
-#' variance
+#' @param scale scaling used, as in \code{\link[pcaMethods]{prep}}. Default is 
+#' "uv" for unit variance
 #' @param fill character, name of the column used for coloring the hexagons
 #' @param summary_fun the function used to compute the value for each hexagon
 #' @param bins the number of bins in x and y axes
 #' @param title,subtitle the titles of the plot
 #' @param fill_scale the fill scale as returned by a ggplot function
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... additional arguments passed to pcaMethods::pca
+#' @param ... additional arguments passed to \code{\link[pcaMethods]{pca}}
 #'
 #' @return A ggplot object.
 #'
@@ -430,16 +436,16 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' where the value of the coloring variable is summarised for each bin, by 
 #' default as the mean of the values inside the bin.
 #' In case there are missing values, PCA is performed using the nipals method 
-#' of \code{pcaMethods::pca}, the  method can be changed to "ppca" if nipals 
-#' fails.
+#' of \code{\link[pcaMethods]{pca}}, the method can be changed to "ppca" if 
+#' nipals fails.
 #'
 #' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
 #' yes)
-#' @param scale scaling used, as in pcaMethods::prep. Default is "uv" for unit 
-#' variance
+#' @param scale scaling used, as in  \code{\link[pcaMethods]{prep}}. Default is 
+#' "uv" for unit variance
 #' @param pca_method the method used in PCA if there are missing values
 #' @param perplexity the perplexity used in t-SNE
 #' @param fill character, name of the column used for coloring the hexagons
@@ -448,7 +454,7 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' @param title,subtitle the titles of the plot
 #' @param fill_scale the fill scale as returned by a ggplot function
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... additional arguments passed to Rtsne::Rtsne
+#' @param ... additional arguments passed to \code{\link[Rtsne]{Rtsne}}
 #'
 #' @return
 #' A ggplot object.
@@ -523,14 +529,16 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
 #' Plots changes in PCA space according to time. All the observations of a 
 #' single subject are connected by an arrow ending at the last observation.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
 #' yes)
-#' @param scale scaling used, as in pcaMethods::prep. Default is "uv" for unit 
-#' variance
+#' @param scale scaling used, as in \code{\link[pcaMethods]{prep}}. Default is 
+#' "uv" for unit variance
 #' @param color character, name of the column used for coloring the arrows
 #' @param time character, name of the column containing timepoints
 #' @param subject character, name of the column containing subject identifiers
@@ -543,7 +551,7 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
 #' @param text_base_size the base size of the text
 #' @param line_width the width of the arrows
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... additional arguments passed to pcaMethods::pca
+#' @param ... additional arguments passed to \code{\link[pcaMethods]{pca}}
 #'
 #' @return A ggplot object.
 #'
@@ -593,16 +601,16 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' Computes t-SNE into two dimensions and plots changes according to time.
 #' All the observations of a single subject are connected by an arrow ending at 
 #' the last observation. In case there are missing values, PCA is performed 
-#' using the nipals method of \code{pcaMethods::pca}, the method can be changed 
-#' to "ppca" if nipals fails.
+#' using the nipals method of \code{\link[pcaMethods]{pca}}, the method can be 
+#' changed to "ppca" if nipals fails.
 #'
 #' @param object a SummarizedExperiment or MetaboSet object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
 #' yes)
-#' @param scale scaling used, as in pcaMethods::prep. Default is "uv" for unit 
-#' variance
+#' @param scale scaling used, as in  \code{\link[pcaMethods]{prep}}. Default is 
+#' "uv" for unit variance
 #' @param perplexity the perplexity used in t-SNE
 #' @param pca_method the method used in PCA if there are missing values
 #' @param color character, name of the column used for coloring the points
@@ -617,7 +625,7 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' @param text_base_size the base size of the text
 #' @param line_width the width of the arrows
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... additional arguments passed to \code{Rtsne::Rtsne}
+#' @param ... additional arguments passed to \code{\link[Rtsne]{Rtsne}}
 #'
 #' @return A ggplot object. If \code{density} is \code{TRUE}, the plot will 
 #' consist of multiple parts and is harder to modify.
@@ -673,9 +681,10 @@ minus_log10 <- scales::trans_new("minus_log10",
 #'
 #' Draws a volcano plot of effect size and p-values.
 #'
-#' @param object a SummarizedExperiment object or a data frame. If x is a 
-#' SummarizedExperiment object, feature data of x is used. If x is a data 
-#' frame, it is used as is.
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' , \code{\link{MetaboSet}} object or a data frame.
+#' Feature data is used. If x is a data frame, it is used as is.
 #' @param x,p the column names of effect size (x-axis) and p-values
 #' @param p_fdr column name of FDR corrected p-values, used to draw a line 
 #' showing the fdr-corrected significance level
@@ -873,9 +882,10 @@ setMethod("volcano_plot", c(object = "SummarizedExperiment"),
 #' the effect, so part of the points will "drop" from the p = 1 (-log10(p) = 0) 
 #' line. This results in a so-called directed Manhattan plot.
 #'
-#' @param object a SummarizedExperiment object or a data frame. If x is a 
-#' SummarizedExperiment object, feature data of x is used. If x is a data 
-#' frame, it is used as is.
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' , \code{\link{MetaboSet}} object or a data frame. Feature data is used. If x 
+#' is a data frame, it is used as is.
 #' @param x,p the column names of x-axis and p-values
 #' @param effect column name of effect size (should have negative and positive 
 #' values).
@@ -1050,9 +1060,10 @@ setMethod("manhattan_plot", c(object = "SummarizedExperiment"),
 #' represents a feature. The plot has retention time on x-axis, m/z on y-axis 
 #' and the size of the points is scaled based on p-value
 #'
-#' @param object a SummarizedExperiment object or a data frame. If x is a 
-#' SummarizedExperiment object, rowData(x) is used.
-#' If x is a data frame, it is used as is.
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' , \code{\link{MetaboSet}} object or a data frame. Feature data is used. If x 
+#' is a data frame, it is used as is.
 #' @param p_col the column name containing p-values. This is used to scale the 
 #' size of the points.
 #' @param p_limit numeric, limits plotted features by p-values. If NULL, plots 

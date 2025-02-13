@@ -10,7 +10,7 @@ combined_data(object, ...)
 \S4method{combined_data}{SummarizedExperiment}(object, assay.type = NULL)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a \code{\link{MetaboSet}} object}
 
 \item{...}{additional arguments passed to methods}
 

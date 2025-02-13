@@ -7,7 +7,7 @@
 join_fData(object, dframe)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a \code{\link{MetaboSet}} object}
 
 \item{dframe}{a data frame with the new information}
 }

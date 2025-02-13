@@ -7,7 +7,9 @@
 merge_objects(..., merge = c("features", "samples"), assay.type = NULL)
 }
 \arguments{
-\item{...}{SummarizedExperiment objects or a list of objects}
+\item{...}{\code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+objects or a list of objects}
 
 \item{merge}{what to merge? features is used for combining analytical modes,
 samples is used for batches}

@@ -134,7 +134,9 @@ save_plot <- function(p, file, ...) {
 #' data between major steps of data preprocessing. Saves all visualizations as 
 #' PDFs with a set prefix on filenames.
 #'
-#' @param object A SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param prefix character, a file path prefix added to the file paths
 #' @param format character, format in which the plots should be saved, DOES NOT 
 #' support raster formats

@@ -10,7 +10,9 @@ flag_quality(object, assay.type = NULL, condition =
   (RSD < 0.1 & RSD_r < 0.1 & D_ratio < 0.1)")
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
@@ -23,7 +25,7 @@ a SummarizedExperiment or MetaboSet object with the features flagged.
 Flags low-quality features using the quality metrics defined in (Broadhurst 
 2018). The metrics are described in more detain in Details. A condition for 
 keeping the features is given as a character, which is passed to 
-\code{dplyr::filter}.
+\code{\link[dplyr]{filter}}.
 }
 \details{
 The quality metrics measure two things: internal spread of the QCs,

@@ -7,7 +7,9 @@
 flag_report(object)
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 }
 \value{
 A data frame with the number of features at each stage of flagging.

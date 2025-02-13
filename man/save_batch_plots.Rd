@@ -20,8 +20,9 @@ save_batch_plots(
 )
 }
 \arguments{
-\item{orig, corrected}{SummarizedExperiment or MetaboSet objects before and 
-after batch effect correction}
+\item{orig, corrected}{\code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} objects before and after batch effect correction}
 
 \item{file}{path to the PDF file where the plots will be saved}
 

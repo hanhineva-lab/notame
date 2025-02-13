@@ -59,9 +59,10 @@ mz_rt_plot(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment object or a data frame. If x is a 
-SummarizedExperiment object, rowData(x) is used.
-If x is a data frame, it is used as is.}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+, \code{\link{MetaboSet}} object or a data frame. Feature data is used. If x 
+is a data frame, it is used as is.}
 
 \item{p_col}{the column name containing p-values. This is used to scale the 
 size of the points.}

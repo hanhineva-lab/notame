@@ -26,7 +26,9 @@ save_scatter_plots(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{x}{character, name of the column to be used as x-axis}
 
@@ -59,7 +61,7 @@ Set to NULL for no title/subtitle, this creates running numbered filenames}
 \item{point_size}{numeric, size of the points}
 
 \item{title_line_length}{integer, maximum length of the title line in 
-characters, passed to stringr::str_wrap}
+characters, passed to \code{\link[stringr]{str_wrap}}}
 
 \item{theme}{a ggplot theme to be added to the plot}
 

@@ -7,7 +7,9 @@
 drop_qcs(object)
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 }
 \value{
 A SummarizedExperiment or MetaboSet object as the one supplied, 

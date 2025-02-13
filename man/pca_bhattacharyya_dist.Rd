@@ -16,7 +16,9 @@ pca_bhattacharyya_dist(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{batch}{column name of pheno data giving the batch labels}
 
@@ -26,21 +28,23 @@ pca_bhattacharyya_dist(
 \item{center}{logical, should the data be centered prior to PCA?
 (usually yes)}
 
-\item{scale}{scaling used, as in pcaMethods::prep. Default is "uv" for unit
-variance}
+\item{scale}{scaling used, as in 
+\code{\link[pcaMethods]{prep}}. Default is "uv" for unit variance}
 
 \item{nPcs}{the number of principal components to use}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{...}{other parameters to pcaMethods::pca}
+\item{...}{other parameters to \code{\link[pcaMethods]{pca}}}
 }
 \value{
 A matrix of Bhattacharyya distances between batches.
 }
 \description{
-Computes Bhattacharyya distance between all pairs of batches after
-projecting the samples into PCA space with pcaMethods::pca.
+Computes Bhattacharyya distance between all pairs of batches using 
+\code{\link[fpc:bhattacharyya.matrix]{fpc:bhattacharyya.matrix}} 
+after projecting the samples into PCA space with 
+\code{\link[pcaMethods]{pca}}.
 }
 \examples{
 data(example_set)

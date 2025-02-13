@@ -173,8 +173,9 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
 #' @return A SummarizedExperiment object.
 #'
 #' @details The \code{condition} parameter should be a character giving a 
-#' condition compatible with dplyr::filter. The condition is applied on the 
-#' \strong{changes} in the quality metrics RSD, RSD_r, D_ratio and D_ratio_r. 
+#' condition compatible with \code{\link[dplyr]{filter}}. The condition is 
+#' applied on the \strong{changes} in the quality metrics RSD, RSD_r, D_ratio 
+#' and D_ratio_r. 
 #' For example, the default is "RSD_r < 0 and D_ratio_r < 0",
 #' meaning that both RSD_r and D_ratio_r need to decrease in the drift 
 #' correction, otherwise the  drift corrected feature is discarded and the 
@@ -354,10 +355,13 @@ save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
 #' A wrapper function for applying cubic spline drift correction and saving
 #' before and after plots.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param log_transform logical, should drift correction be done on 
 #' log-transformed values? See Details
-#' @param spar smoothing parameter
+#' @param spar smoothing parameter as in 
+#' \code{\link[stats]{smooth.spline}}
 #' @param spar_lower,spar_upper lower and upper limits for the smoothing 
 #' parameter
 #' @param check_quality logical, whether quality should be monitored.
@@ -394,7 +398,7 @@ save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
 #' will be separately chosen for each feature from the range
 #' [\code{spar_lower, spar_upper}] using cross validation. 
 #' If  \code{check_quality = TRUE}, the \code{condition} parameter should be a 
-#' character giving a condition compatible with dplyr::filter. 
+#' character giving a condition compatible with \code{\link[dplyr]{filter}}. 
 #' The condition is applied on the \strong{changes} in the quality metrics
 #' RSD, RSD_r, D_ratio and D_ratio_r. For example, the default is "RSD_r < 0 
 #' and D_ratio_r < 0", meaning that both RSD_r and D_ratio_r need to decrease 

@@ -10,7 +10,8 @@ join_rowData(object, dframe)
 \S4method{join_rowData}{SummarizedExperiment,data.frame}(object, dframe)
 }
 \arguments{
-\item{object}{a MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}}
 
 \item{dframe}{a data frame with the new information}
 }

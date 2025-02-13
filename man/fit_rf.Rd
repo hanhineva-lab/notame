@@ -15,9 +15,11 @@ fit_rf(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
-\item{y}{character, column name of phenoData giving the dependent variable 
+\item{y}{character, column name of pheno data giving the dependent variable 
 of the model}
 
 \item{all_features}{logical, should all features be included in the model? 
@@ -30,7 +32,8 @@ to use as covariates in the model, in addition to molecular features}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{...}{other parameters passed to \code{randomForest::randomForest}}
+\item{...}{other parameters passed to 
+\code{\link[randomForest]{randomForest}}}
 }
 \value{
 An object of class randomForest.
@@ -38,9 +41,10 @@ An object of class randomForest.
 \description{
 Fits a random forest, where given response column in pheno data is predicted 
 using the features. Can be used both for classification and regression. For 
-more information, see the documentation of \code{randomForest::randomForest}.
-After fitting the random forest, use rf_importance as a shortcut for getting 
-the feature importance in random forest prediction.
+more information, see the documentation of 
+\code{\link[randomForest]{randomForest}}.
+After fitting the random forest, use \code{\link{importance_rf}} as a 
+shortcut for getting the feature importance in random forest prediction.
 }
 \examples{
 data(example_set)

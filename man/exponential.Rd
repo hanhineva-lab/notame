@@ -13,7 +13,9 @@ exponential(object, base = exp(1))
 \S4method{exponential}{SummarizedExperiment}(object, base = exp(1))
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{base}{base of the exponential}
 }
@@ -21,7 +23,7 @@ exponential(object, base = exp(1))
 An object with altered feature abundances.
 }
 \description{
-Apply the exponential function to feature abundances (exprs).
+Apply the exponential function to peak table.
 }
 \examples{
 data(example_set)

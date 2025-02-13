@@ -130,7 +130,7 @@
 #' analytical modes or batches.
 #'
 #'
-#' @param ... MetaboSet objects or a list of Metaboset objects
+#' @param ... \code{\link{MetaboSet}} objects or a list of MetaboSet objects
 #' @param merge what to merge? features is used for combining analytical modes,
 #' samples is used for batches
 #'
@@ -191,7 +191,9 @@ merge_metabosets <- function(..., merge = c("features", "samples")) {
 #' Merges two or more SummarizedExperiment objects together. Can be used to 
 #' merge analytical modes or batches.
 #'
-#' @param ... SummarizedExperiment objects or a list of objects
+#' @param ... \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' objects or a list of objects
 #' @param merge what to merge? features is used for combining analytical modes,
 #' samples is used for batches
 #' @param assay.type character, assay to be used in case of multiple assays. 

@@ -15,22 +15,24 @@ perform_lmer(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{formula_char}{character, the formula to be used in the linear model 
 (see Details)}
 
 \item{all_features}{should all features be included in FDR correction?}
 
-\item{ci_method}{The method for calculating the confidence intervals, see 
-documentation of confint below}
+\item{ci_method}{The method for calculating the confidence intervals as in 
+\code{\link{confint}}}
 
 \item{test_random}{logical, whether tests for the significance of the random 
 effects should be performed}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{...}{additional parameters passed to lmer}
+\item{...}{additional parameters passed to \code{\link[lmerTest]{lmer}}}
 }
 \value{
 A data frame with one row per feature, with all the

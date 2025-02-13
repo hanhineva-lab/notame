@@ -22,21 +22,18 @@
 \S4method{log10}{SummarizedExperiment}(x)
 }
 \arguments{
-\item{x}{a SummarizedExperiment object}
+\item{x}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{base}{the base of the logarithm}
 }
 \value{
-A MetaboSet object with the exprs part transformed.
-
-A SummarizedExperiment object with the assay transformed.
+A SummarizedExperiment or MetaboSet object with peak table
+transformed.
 }
 \description{
-Log-transforms the exprs part of a MetaboSet object. Shortcuts 
-for log2 and log10 also implemented.
-For more information, see \code{\link{log}}.
-
-Log-transforms the assay part of a SummarizedExperiment object. Shortcuts 
-for log2 and log10 also implemented.
+Log-transforms the peak table of SummarzedExperiment or MetaboSet object. 
+Shortcuts for log2 and log10 also implemented.
 For more information, see \code{\link{log}}.
 }

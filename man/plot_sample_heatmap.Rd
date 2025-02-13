@@ -21,20 +21,23 @@ plot_sample_heatmap(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{all_features}{logical, should all features be used? If FALSE (the 
 default), flagged features are removed before visualization.}
 
-\item{dist_method}{distance method used in clustering, see \code{\link{dist}}}
+\item{dist_method}{distance method used in clustering as in
+\code{\link[stats]{dist}}}
 
-\item{clust_method}{clustering method used in clustering, see 
-\code{\link{hclust}}}
+\item{clust_method}{method used in clustering as in
+\code{\link[stats]{hclust}}}
 
-\item{center}{logical, should the data  be centered?}
+\item{center}{logical, should the data be centered?}
 
-\item{scale}{scaling used, as in pcaMethods::prep. 
-Default is "uv" for unit variance}
+\item{scale}{scaling used, as in 
+\code{\link[pcaMethods]{prep}}. Default is "uv" for unit variance}
 
 \item{group_bar}{logical, should a bar showing the groups be drawn under the 
 heat map?}

@@ -8,7 +8,9 @@
 #' peak area (median abundance). This is a wrapper around numerous functions 
 #' that are based on the MATLAB code by David Broadhurst.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param mz_col the column name in feature data that holds mass-to-charge 
 #' ratios
 #' @param rt_col the column name in feature data that holds retention times
@@ -157,7 +159,9 @@ assign_cluster_id <- function(data, clusters, features, name_col) {
 #' the feature with the highest median peak area. The features that were 
 #' discarded are recorded in feature data, under Cluster_features.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #'
 #' @return A SummarizedExperiment or MetaboSet object with only one feature per 
 #' cluster.

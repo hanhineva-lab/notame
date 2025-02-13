@@ -13,7 +13,9 @@ fix_MSMS(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{ms_ms_spectrum_col}{name of column with original MS/MS spectra}
 

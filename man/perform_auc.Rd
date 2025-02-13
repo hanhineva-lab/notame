@@ -7,7 +7,9 @@
 perform_auc(object, time, subject, group, assay.type = NULL)
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{time, subject, group}{column names of pheno data holding time, 
 subject and group labels}

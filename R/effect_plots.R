@@ -94,7 +94,9 @@
 #' A line is drawn for each subject and a mean line is added.
 #' A separate plot is drawn and saved for each feature.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param all_features logical, should all features be used?
 #' If FALSE (the default), flagged features are removed before visualization.
 #' @param save logical, if false, the plots are not saved but returned as a list
@@ -114,7 +116,7 @@
 #' @param line_width numeric, width of the lines
 #' @param mean_line_width numeric, width of the mean line
 #' @param title_line_length integer, maximum length of the title line in 
-#' characters, passed to stringr::str_wrap
+#' characters, passed to \code{\link[stringr]{str_wrap}}
 #' @param theme a ggplot theme to be added to the plot
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other arguments to graphic device functions, like width and height
@@ -211,7 +213,9 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
 #' Draws a boxplot of feature abundances in each group.
 #' A separate plot is drawn and saved for each feature.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param all_features logical, should all features be used? 
 #' If FALSE (the default), flagged features are removed before visualization.
 #' @param save logical, if false, the plots are not saved but returned as a list
@@ -229,7 +233,7 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
 #' @param line_width numeric, width of the lines
 #' @param point_size numeric, size of the mean points
 #' @param title_line_length integer, maximum length of the title line in 
-#' characters, passed to stringr::str_wrap
+#' characters, passed to \code{\link[stringr]{str_wrap}}
 #' @param theme a ggplot theme to be added to the plot
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other arguments to graphic device functions, like width and height
@@ -316,7 +320,9 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
 #' Draws a beeswarm plot of feature abundances in each group.
 #' A separate plot is drawn and saved for each feature.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param save logical, if false, the plots are not saved but returned as a list
@@ -334,7 +340,7 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
 #' @param cex numeric, scaling for adjusting point spacing
 #' @param size numeric, size of points
 #' @param title_line_length integer, maximum length of the title line in 
-#' characters, passed to stringr::str_wrap
+#' characters, passed to \code{\link[stringr]{str_wrap}}
 #' @param theme a ggplot theme to be added to the plot
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other arguments to graphic device functions, like width and height
@@ -425,7 +431,9 @@ save_beeswarm_plots <- function(object, all_features = FALSE, save = TRUE,
 #' Draws a scatterplots with a feature on y-axis and another variable on x-axis.
 #' A separate plot is drawn and saved for each feature.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param x character, name of the column to be used as x-axis
 #' @param save logical, if false, the plots are not saved but returned as a list
 #' @param file_path character, a file path for PDF or prefix added to the file 
@@ -445,7 +453,7 @@ save_beeswarm_plots <- function(object, all_features = FALSE, save = TRUE,
 #' @param text_base_size integer, base size for text in figures
 #' @param point_size numeric, size of the points
 #' @param title_line_length integer, maximum length of the title line in 
-#' characters, passed to stringr::str_wrap
+#' characters, passed to \code{\link[stringr]{str_wrap}}
 #' @param theme a ggplot theme to be added to the plot
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other arguments to graphic device functions, like width and height
@@ -523,7 +531,9 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
 #' A line is drawn for each group and error bars are added.
 #' A separate plot is drawn for each feature.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param all_features logical, should all features be used? 
 #' If FALSE (the default), flagged features are removed before visualization
 #' @param save logical, if false, the plots are not saved but returned as a list
@@ -536,12 +546,12 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
 #' @param title,subtitle column names from feature data to use as plot 
 #' title/filename and subtitle.
 #' Set to NULL for no title/subtitle, this creates running numbered filenames
-#' @param fun.data passed to ggplot2::stat_summary and used for errorbars,
-#' "A function that is given the complete data and should return a data frame 
-#' with variables ymin, y, and ymax."
+#' @param fun.data passed to \code{\link[ggplot2]{stat_summary}} and used for 
+#' errorbars, "A function that is given the complete data and should return a 
+#' data frame with variables ymin, y, and ymax."
 #' @param fun.min,fun,fun.max Alternative to fun.data, passed to 
-#' \code{ggplot2::stat_summary}, "supply three individual functions that are 
-#' each passed a vector of x's and should return a single number"
+#' \code{\link[ggplot2]{stat_summary}}, "supply three individual functions that 
+#' are each passed a vector of x's and should return a single number"
 #' @param position_dodge_amount numeric: how much the group mean points should 
 #' dodge away from each other
 #' @param color_scale the color scale as returned by a ggplot function
@@ -549,7 +559,7 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
 #' @param line_width numeric, width of the lines
 #' @param point_size numeric, size of the points
 #' @param title_line_length integer, maximum length of the title line in 
-#' characters, passed to stringr::str_wrap
+#' characters, passed to \code{\link[stringr]{str_wrap}}
 #' @param theme a ggplot theme to be added to the plot
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other arguments to graphic device functions, like width and height

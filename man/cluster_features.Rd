@@ -19,7 +19,9 @@ cluster_features(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{mz_col}{the column name in feature data that holds mass-to-charge 
 ratios}

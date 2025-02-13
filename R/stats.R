@@ -20,7 +20,9 @@
 #' median absolute deviation (mad), minimum (min), maximum (max)
 #' as well as 25% and 75% quantiles (Q25 & Q75).
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param grouping_cols character vector, the columns by which grouping should 
 #' be done. Use \code{NA} to compute statistics without grouping.
 #' @param assay.type character, assay to be used in case of multiple assays
@@ -270,7 +272,9 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
 #' change between two time points is computed for each subject,
 #' and Cohen's d is computed from the changes.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param id character, name of the subject ID column
 #' @param group character, name of the group column
 #' @param time character, name of the time column
@@ -334,7 +338,9 @@ cohens_d <- function(object, group, id = NULL,
 #'
 #' Computes fold change between each group for each feature.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param group character, name of the group column
 #' @param assay.type character, assay to be used in case of multiple assays
 #'
@@ -443,7 +449,9 @@ fold_change <- function(object, group, assay.type = NULL) {
 #' \code{x, y} and correlations between each x variable
 #' and each y variable are computed.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param x character vector, names of variables to be correlated
 #' @param y character vector, either identical to x (the default) or a distinct 
 #' set of variables to be correlated against x
@@ -606,7 +614,9 @@ perform_correlation_tests <- function(object, x, y = x, id = NULL,
 #' AUCs. This object can then be  used to compute results of e.g. t-tests of 
 #' AUCs between groups.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param time,subject,group column names of pheno data holding time, 
 #' subject and group labels
 #' @param assay.type character, assay to be used in case of multiple assays
@@ -751,12 +761,14 @@ perform_auc <- function(object, time, subject, group, assay.type = NULL) {
 #' Fits a linear model separately for each feature. Returns all relevant
 #' statistics.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... additional parameters passed to lm
+#' @param ... additional parameters passed to \code{\link{lm}}
 #'
 #' @return A data frame with one row per feature, with all the
 #' relevant statistics of the linear model as columns.
@@ -840,7 +852,9 @@ perform_lm <- function(object, formula_char, all_features = FALSE,
 #' Fits a linear model separately for each feature and compute an ANOVA table.
 #' Returns all relevant statistics.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
@@ -917,12 +931,14 @@ perform_lm_anova <- function(object, formula_char, all_features = FALSE,
 #' Fits a logistic regression model separately for each feature. Returns all 
 #' relevant statistics.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... additional parameters passed to glm
+#' @param ... additional parameters passed to \code{\link[stats]{glm}}
 #'
 #' @return A data frame with one row per feature, with all the
 #' relevant statistics of the linear model as columns.
@@ -1101,16 +1117,18 @@ perform_logistic <- function(object, formula_char, all_features = FALSE,
 #' Fits a linear mixed model separately for each feature. Returns all relevant
 #' statistics.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
-#' @param ci_method The method for calculating the confidence intervals, see 
-#' documentation of confint below
+#' @param ci_method The method for calculating the confidence intervals as in 
+#' \code{\link{confint}}
 #' @param test_random logical, whether tests for the significance of the random 
 #' effects should be performed
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... additional parameters passed to lmer
+#' @param ... additional parameters passed to \code{\link[lmerTest]{lmer}}
 #'
 #' @return A data frame with one row per feature, with all the
 #' relevant statistics of the linear mixed model as columns.
@@ -1195,7 +1213,9 @@ perform_lmer <- function(object, formula_char, all_features = FALSE,
 #' Performs Bartlett's, Levene's and Fligner-Killeen tests for equality of 
 #' variances.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
@@ -1262,7 +1282,9 @@ perform_homoscedasticity_tests <- function(object, formula_char,
 #'
 #' Performs Kruskal-Wallis rank-sum test for equality.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
@@ -1320,7 +1342,9 @@ perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE,
 #' Can also perform classic ANOVA with assumption of equal variances.
 #' Uses base R function \code{oneway.test}.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details).
 #' @param all_features should all features be included in FDR correction?
@@ -1377,7 +1401,9 @@ perform_oneway_anova <- function(object, formula_char, all_features = FALSE,
 #' (unequal variances), use var.equal = TRUE for Student's t-test. Use 
 #' \code{is_paired} for paired t-tests.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param is_paired logical, use paired t-test
@@ -1385,7 +1411,7 @@ perform_oneway_anova <- function(object, formula_char, all_features = FALSE,
 #' version
 #' @param all_features should all features be included in FDR correction?
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... other parameters passed to stats::t.test
+#' @param ... other parameters passed to \code{\link{t.test}}
 #'
 #' @details P-values of each comparison are corrected separately from each 
 #' other.
@@ -1579,14 +1605,16 @@ perform_t_test <- function(object, formula_char, is_paired = FALSE, id = NULL,
 #' Performs pairwise and paired non-parametric tests. The default is Mann-
 #' Whitney U test, use \code{is_paired} for Wilcoxon signed rank tests.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param formula_char character, the formula to be used in the tests
 #' @param is_paired logical, use paired test
 #' @param id character, name of the subject identification column for paired 
 #' version
 #' @param all_features should all features be included in FDR correction?
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... other parameters passed to test stats::wilcox.test
+#' @param ... other parameters passed to test \code{\link{wilcox.test}}
 #'
 #' @details P-values of each comparison are corrected separately from each 
 #' other. The model is fit on combined_data(object). Thus, column names

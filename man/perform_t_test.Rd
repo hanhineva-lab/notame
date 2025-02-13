@@ -15,7 +15,9 @@ perform_t_test(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{formula_char}{character, the formula to be used in the linear model 
 (see Details)}
@@ -29,7 +31,7 @@ version}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{...}{other parameters passed to stats::t.test}
+\item{...}{other parameters passed to \code{\link{t.test}}}
 }
 \value{
 A data frame with the results.

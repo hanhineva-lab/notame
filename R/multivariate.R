@@ -4,12 +4,15 @@
 #'
 #' Fits a random forest, where given response column in pheno data is predicted 
 #' using the features. Can be used both for classification and regression. For 
-#' more information, see the documentation of \code{randomForest::randomForest}.
-#' After fitting the random forest, use rf_importance as a shortcut for getting 
-#' the feature importance in random forest prediction.
+#' more information, see the documentation of 
+#' \code{\link[randomForest]{randomForest}}.
+#' After fitting the random forest, use \code{\link{importance_rf}} as a 
+#' shortcut for getting the feature importance in random forest prediction.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
-#' @param y character, column name of phenoData giving the dependent variable 
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
+#' @param y character, column name of pheno data giving the dependent variable 
 #' of the model
 #' @param all_features logical, should all features be included in the model? 
 #' if FALSE, flagged features are left out
@@ -17,7 +20,8 @@
 #' to use as covariates in the model, in addition to molecular features
 #' @param importance Should importance of features be assessed?
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... other parameters passed to \code{randomForest::randomForest}
+#' @param ... other parameters passed to 
+#' \code{\link[randomForest]{randomForest}}
 #'
 #' @return An object of class randomForest.
 #'
@@ -132,10 +136,10 @@ importance_rf <- function(rf) {
 
 #' PLS
 #'
-#' Simple wrappers for fitting a PLS model using pls function of the mixOmics 
-#' package. The object can then be passed to many of the mixOmics functions for 
-#' prediction, performance evaluation etc. Also plot a scores plot of the first 
-#' two components.
+#' Simple wrappers for fitting a PLS model using mixOmics package. The result 
+#' can then be passed to many of the mixOmics functions for prediction, 
+#' performance evaluation etc. 
+#' 
 #' \itemize{
 #' \item{\code{mixomics_pls} A simple PLS model with set number of components 
 #' and all features}
@@ -144,7 +148,9 @@ importance_rf <- function(rf) {
 #' components and features}
 #' }
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param y character vector, column names of the grouping variable to predict
 #' @param ncomp number of X components
 #' @param folds the number of folds to use in k-fold cross validation
@@ -159,8 +165,8 @@ importance_rf <- function(rf) {
 #' in the model, in addition to molecular features
 #' @param n_features the number of features to try for each component
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... any parameters passed to \code{mixOmics::pls} or 
-#' \code{mixOmics::spls}
+#' @param ... any parameters passed to 
+#' \code{\link[mixOmics]{pls}} or \code{\link[mixOmics]{spls}}
 #'
 #' @return An object of class "mixo_pls" or "mixo_spls".
 #'
@@ -334,8 +340,8 @@ mixomics_spls_optimize <- function(object, y, ncomp, n_features =
 
 #' PLS-DA
 #'
-#' A simple wrapper for fitting a PLS-DA model using plsda function of the 
-#' mixOmics package. The object can then be passed to many of the mixOmics 
+#' A simple wrapper for fitting a PLS-DA model using mixOmics package. 
+#' The object can then be passed to many of the mixOmics 
 #' functions for prediction, performance evaluation etc.
 #' \itemize{
 #' \item{\code{mixomics_plsda} A simple PLS-DA model with set number of 
@@ -364,7 +370,8 @@ mixomics_spls_optimize <- function(object, y, ncomp, n_features =
 #' @param covariates character, column names of pheno data to use as covariates 
 #' in the model, in addition to molecular features
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... any parameters passed to \code{mixOmics::plsda}
+#' @param ... any parameters passed to 
+#' \code{\link[mixOmics]{plsda}}
 #'
 #' @return An object of class "mixo_plsda".
 #'
@@ -523,10 +530,13 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
 
 #' Multivariate modelling with minimally biased variable selection (MUVR)
 #'
-#' A wrapper around the MUVR2 (random forest, PLS(-DA)) and MUVR2_EN (elastic 
-#' net) functions from the MUVR2 package. 
+#' A wrapper around \code{\link[MUVR2]{MUVR2}} (random forest,
+#' PLS(-DA)) and \code{\link[MUVR2]{MUVR2_EN}} (elastic net)
+#' functions from the MUVR2 package. 
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param y character, column name in pheno data of the target variable
 #' @param id character, column name in pheno data of the subject ID variable in 
 #' case of repeated measurements
@@ -549,27 +559,29 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
 #' iteration, parameter of MUVR
 #' @param method Multivariate method. Supports 'PLS', 'RF' and 'EN'
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param ... other parameters to MUVR2::MUVR2 or MUVR2::MUVR2_EN 
-#' and MUVR2::getVar (when method == "EN")
+#' @param ... other parameters to \code{\link[MUVR2]{MUVR2}} or 
+#' \code{\link[MUVR2]{MUVR2_EN}} and 
+#' \code{\link[MUVR2]{getVar}} (when method == "EN")
 #'
-#' @return A MUVR object. (make this more descriptive)
+#' @return A MUVR object.
 #'
 #' @details This function is now using the MUVR2 package, characterized as an 
 #' upgrade extending the original MUVR package by the inclusion of elastic net 
-#' regression (EN) and other functionality not covered by this wrapper. Elastic 
+#' regression (EN) and some functionality not covered by this wrapper. Elastic 
 #' net regression supports covariate adjustment by suppressing regularization 
 #' of specified features from the regularization procedure. Note that this is 
 #' different from simply including covariates such as sex. EN also differs from 
 #' PLS and RF in that no recursive variable elimination is performed, so an 
 #' additional scheme is used to obtain the 'min', 'mid' and 'max' models using
-#' MUVR2::getVar in this wrapper. 
+#' \code{\link[MUVR2]{getVar}}. 
 #' 
 #' Sex would be entered as a static covariate, since the change in sex is zero 
 #' for all individuals, so computing the change and using that as a covariate 
 #' does not make sense.
 #'
 #' Note that there are several more plots available in MUVR2 for inspecting the 
-#' results, notably MUVR2::plotMV, MUVR2::plotStability and MUVR2::plotVIRank. 
+#' results, notably \code{\link[MUVR2]{plotMV}}, 
+#' \code{\link[MUVR2]{plotStability}} and \code{\link[MUVR2]{plotVIRank}}
 #' Many of these return different plots depending on the model specification.
 #'
 #' @examples
@@ -731,13 +743,15 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
 #' Performs permutational multivariate analysis of variance. Uses package 
 #' called PERMANOVA.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param group character, name of the column to compare
 #' @param all_features should all features be included?
-#' @param transform Transformation to use in \code{IniTransform}. By default 
-#' uses "Standardize columns".
+#' @param transform Transformation to use in 
+#' \code{\link[PERMANOVA]{IniTransform}}. By default uses "Standardize columns".
 #' @param coef Coefficient to calculate continuous distances in 
-#' \code{DistContinuous}.
+#' \code{\link[PERMANOVA]{IniTransform}}.
 #' By default uses Pythagorean distances.
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param ... other parameters to \code{\link[PERMANOVA]{PERMANOVA}}

@@ -18,16 +18,19 @@ plot_dist_density(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{all_features}{logical, should all features be used? 
 If FALSE (the default), flagged features are removed before visualization.}
 
-\item{dist_method}{method for calculating the distances, passed to dist}
+\item{dist_method}{method for calculating the distances, passed to 
+\code{\link[stats]{dist}}}
 
 \item{center}{logical, should the data be centered?}
 
-\item{scale}{scaling used, as in pcaMethods::prep. 
+\item{scale}{scaling used, as in \code{\link[pcaMethods]{prep}} 
 Default is "uv" for unit variance}
 
 \item{color_scale}{a scale for the color of the edge of density curves, as 

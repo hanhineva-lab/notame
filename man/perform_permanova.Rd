@@ -15,17 +15,19 @@ perform_permanova(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{group}{character, name of the column to compare}
 
 \item{all_features}{should all features be included?}
 
-\item{transform}{Transformation to use in \code{IniTransform}. By default 
-uses "Standardize columns".}
+\item{transform}{Transformation to use in 
+\code{\link[PERMANOVA]{IniTransform}}. By default uses "Standardize columns".}
 
 \item{coef}{Coefficient to calculate continuous distances in 
-\code{DistContinuous}.
+\code{\link[PERMANOVA]{IniTransform}}.
 By default uses Pythagorean distances.}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}

@@ -25,7 +25,9 @@ plot_pca_arrows(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{pcs}{numeric vector of length 2, the principal components to plot}
 
@@ -35,8 +37,8 @@ default), flagged features are removed before visualization.}
 \item{center}{logical, should the data be centered prior to PCA? (usually 
 yes)}
 
-\item{scale}{scaling used, as in pcaMethods::prep. Default is "uv" for unit 
-variance}
+\item{scale}{scaling used, as in \code{\link[pcaMethods]{prep}}. Default is 
+"uv" for unit variance}
 
 \item{color}{character, name of the column used for coloring the arrows}
 
@@ -60,7 +62,7 @@ modified, see \code{?arrow}}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{...}{additional arguments passed to pcaMethods::pca}
+\item{...}{additional arguments passed to \code{\link[pcaMethods]{pca}}}
 }
 \value{
 A ggplot object.

@@ -65,7 +65,8 @@ in the model, in addition to molecular features}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{...}{any parameters passed to \code{mixOmics::plsda}}
+\item{...}{any parameters passed to 
+\code{\link[mixOmics]{plsda}}}
 
 \item{folds}{the number of folds to use in k-fold cross validation}
 
@@ -82,8 +83,8 @@ use \code{\link{mixomics_plsda_optimize}} to find the best distance metric}
 An object of class "mixo_plsda".
 }
 \description{
-A simple wrapper for fitting a PLS-DA model using plsda function of the 
-mixOmics package. The object can then be passed to many of the mixOmics 
+A simple wrapper for fitting a PLS-DA model using mixOmics package. 
+The object can then be passed to many of the mixOmics 
 functions for prediction, performance evaluation etc.
 \itemize{
 \item{\code{mixomics_plsda} A simple PLS-DA model with set number of 

@@ -7,7 +7,9 @@
 cohens_d(object, group, id = NULL, time = NULL, assay.type = NULL)
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{group}{character, name of the group column}
 

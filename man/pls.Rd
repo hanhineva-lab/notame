@@ -46,7 +46,9 @@ mixomics_spls_optimize(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{y}{character vector, column names of the grouping variable to predict}
 
@@ -64,8 +66,8 @@ in the model, in addition to molecular features}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{...}{any parameters passed to \code{mixOmics::pls} or 
-\code{mixOmics::spls}}
+\item{...}{any parameters passed to 
+\code{\link[mixOmics]{pls}} or \code{\link[mixOmics]{spls}}}
 
 \item{folds}{the number of folds to use in k-fold cross validation}
 
@@ -78,10 +80,11 @@ this for faster testing.}
 An object of class "mixo_pls" or "mixo_spls".
 }
 \description{
-Simple wrappers for fitting a PLS model using pls function of the mixOmics 
-package. The object can then be passed to many of the mixOmics functions for 
-prediction, performance evaluation etc. Also plot a scores plot of the first 
-two components.
+Simple wrappers for fitting a PLS model using mixOmics package. The result 
+can then be passed to many of the mixOmics functions for prediction, 
+performance evaluation etc.
+}
+\details{
 \itemize{
 \item{\code{mixomics_pls} A simple PLS model with set number of components 
 and all features}

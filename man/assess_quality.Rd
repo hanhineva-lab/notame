@@ -13,7 +13,9 @@ assess_quality(object, ...)
 \S4method{assess_quality}{SummarizedExperiment}(object, assay.type = NULL)
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a \code{
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+or \code{\link{MetaboSet}} object}
 
 \item{...}{additional arguments passed to methods}
 
@@ -26,7 +28,7 @@ feature data.
 \description{
 Assess features using the quality metrics defined in (Broadhurst 
 2018). The quality metrics are described in Details section of 
-\code{flag_quality}
+\code{\link{flag_quality}}
 }
 \examples{
 data(example_set)
