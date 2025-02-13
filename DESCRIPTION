@@ -13,7 +13,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 biocViews: BiomedicalInformatics, Metabolomics, DataImport, MassSpectrometry, BatchEffect, MultipleComparison, Normalization, QualityControl, Visualization, Preprocessing
 Depends:
-    R (>= 4.4.0),
+    R (>= 4.5.0),
     Biobase,
     ggplot2,
     magrittr,
