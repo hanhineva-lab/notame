@@ -180,16 +180,18 @@ NULL
 
 utils::globalVariables(c('i', '.'))
 
+.onAttach <- function(libname, pkgname){
+  packageStartupMessage("NOTE This is a development version. There is active 
+  development with breaking changes until the package has been approved in 
+  Bioconductor. The original notame package this development is based on can be 
+  installed using `devtools::install_github('antonvsdata/notame@v0.3.1')`")
+}
+
 #' Set default color scales on load
 #'
 #' @param libname,pkgname default parameters
 #' @noRd
 .onLoad <- function(libname, pkgname) {
-  message("NOTE This is a development version. There is active development with 
-  breaking changes until the package has been approved in Bioconductor. Yet, 
-  everything in the main branch is to our knowledge working as it should. The 
-  original notame package this development is based on can be installed using 
-  `devtools::install_github('antonvsdata/notame@v0.3.1')`")
   op <- options()
   op_notame <- list(
     notame.citations = list(
