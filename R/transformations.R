@@ -519,6 +519,9 @@ flag_report <- function(object) {
 #' @return A SummarizedExperiment or MetaboSet object with peak table
 #' transformed.
 #'
+#' @name log
+NULL
+
 #' @rdname log
 #' @export
 setMethod("log", "MetaboSet", 
@@ -549,15 +552,21 @@ setMethod("log10", "MetaboSet",
 #' Scale exprs data
 #'
 #' Applies the base R function scale to transposed peak table. 
-#' See \code{\link{scale}} for details.
+#' See \code{\link[base]{scale}} for details.
 #'
-#' @param x a \code{\link{MetaboSet}} object
+#' @param x a \code{
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
+#' or \code{\link{MetaboSet}} object
 #' @param center,scale as in base scale function
 #' 
-#' @return A Metaboset object with modified peak table.
+#' @return A SummarizedExperiment or MetaboSet object with modified peak table.
 #'
+#' @name scale
+#'
+#' @export
+NULL
+
 #' @rdname scale
-#'
 #' @export
 setMethod("scale", "MetaboSet", 
   function(x, center = TRUE, scale = TRUE) {
@@ -568,7 +577,7 @@ setMethod("scale", "MetaboSet",
 
 #' Exponential function
 #'
-#' Apply the exponential function to peak table.
+#' Apply exponential function to peak table.
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
@@ -626,18 +635,7 @@ setMethod("log10", "SummarizedExperiment",
   }
 )
 
-#' Scale assay data
-#'
-#' Applies the base R function scale to transposed assay matrix. See ?scale for 
-#' details.
-#'
-#' @param x a SummarizedExperiment object
-#' @param center,scale as in base scale function
-#' 
-#' @return A SummarizedExperiment object with modified assay.
-#'
 #' @rdname scale
-#'
 #' @export
 setMethod("scale", "SummarizedExperiment", 
   function(x, center = TRUE, scale = TRUE) {

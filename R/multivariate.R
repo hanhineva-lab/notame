@@ -175,7 +175,7 @@ importance_rf <- function(rf) {
 #' pls_res <- mixomics_pls(example_set, y = "Injection_order", ncomp = 3)
 #' pls_opt <- mixomics_pls_optimize(example_set, 
 #'   y = "Injection_order", ncomp = 3)
-#' pls_res <- mixomics_spls_optimize(example_set,
+#' spls_opt <- mixomics_spls_optimize(example_set,
 #'   y = "Injection_order", ncomp = 3,
 #'   n_features <- c(1:10, 12, 15, 20)
 #' )
@@ -586,24 +586,22 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
 #'
 #' @examples
 #' data(example_set)
-#' # PLS simple
-#' rf_model <- muvr_analysis(drop_qcs(example_set), 
-#'   y = "Group", nRep = 2, method = "PLS")
-#'
-#' # RF with covariate and repeated measures (not longitudinal)
-#' ex_set <- drop_qcs(example_set)
+#' ex_set <- drop_qcs(example_set)[1:10, ]
 #' ex_set$Injection_order %<>% as.numeric()
-#' en_model <- muvr_analysis(drop_qcs(ex_set), y = "Group", id = "Subject_ID", 
+#' # Simple PLS regression model
+#' pls_model <- muvr_analysis(ex_set, 
+#'   y = "Injection_order", nRep = 2, method = "PLS")
+#'
+#' # RF classification with covariate and repeated measures (not longitudinal)
+#' rf_model <- muvr_analysis(ex_set, y = "Group", id = "Subject_ID", 
 #'   nRep = 2, method = "RF", covariates = "Injection_order")
 #'
-#' # RF on multilevel variable comparing levels of y
-#' rf_model_ <- muvr_analysis(drop_qcs(example_set), 
+#' # RF classification on multilevel variable comparing levels of y
+#' rf_model_ <- muvr_analysis(ex_set, 
 #'   y = "Group", multi_level = TRUE, id = "Subject_ID", 
 #'   multi_level_var = "Time", method = "RF", nRep = 2)
 #'
-#' # EN on multilevel variable with covariate and static covariate
-#' ex_set <- drop_qcs(example_set)
-#' ex_set$Injection_order %<>% as.numeric()
+#' # EN regression on multilevel variable with covariate and static covariate
 #' ex_set$Group %<>% as.numeric()
 #' en_model <- muvr_analysis(ex_set, id = "Subject_ID", 
 #'  multi_level = TRUE, multi_level_var = "Time", 

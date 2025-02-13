@@ -23,7 +23,7 @@ or \code{\link{MetaboSet}} object}
 An object with altered feature abundances.
 }
 \description{
-Apply the exponential function to peak table.
+Apply exponential function to peak table.
 }
 \examples{
 data(example_set)

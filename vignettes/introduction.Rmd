@@ -27,25 +27,19 @@ knitr::opts_chunk$set(
 From the perspective of metabolites as the continuation of the central dogma of 
 biology, metabolomics provides the closest link to many phenotypes of interest. 
 This makes metabolomics research promising in teasing apart the complexities of 
-living systems, attracting many new practitioners. However, due to experimental 
-reasons and the extensive data analysis, untargeted LC-MS metabolomics data 
-analysis meets challenges with regard to quality and reproducibility.
+living systems, attracting many new practitioners.
 
-In an effort to meet these challenges, the *notame* R package was developed in 
-parallel with an associated protocol article published in the “Metabolomics 
-Data Processing and Data Analysis—Current Best Practices” special issue of the 
-Metabolites journal (Klåvus et al. 2020) [@notame]. The main outcome is 
-identifying interesting features for laborious downstream steps relating to 
-biological context, such as metabolite identification and pathway analysis, 
-which fall outside the purview of *notame*. Bioconductor packages with 
-complementary functionality in Bioconductor include pmp, phenomis and qmtools; 
-*notame* brings partially overlapping and new functionality to the table. There 
-are also Bioconductor packages for preprocessing, metabolite identification and 
-pathway analysis, allowing for a fully programmatic workflow.
-
-The streamlined *notame* experience, Bioconductor's dependency management and 
-complementary Bioconductor functionality makes for a solid introduction to 
-quality, reproducible metabolomics research.
+The *notame* R package was developed in parallel with an associated protocol 
+article as a general guideline for data analysis in untargeted 
+metabolomics studies [@notame]. The main outcome is identifying interesting 
+features for laborious downstream steps relating to biological context, such as 
+metabolite identification and pathway analysis, which fall outside the purview 
+of *notame*. Bioconductor packages with complementary functionality in 
+Bioconductor include pmp, phenomis and qmtools; *notame* brings partially 
+overlapping and new functionality to the table. There are also Bioconductor 
+packages for preprocessing, metabolite identification and pathway analysis. 
+Together, *notame*, Bioconductor's dependency management and other Bioconductor 
+functionality allow for quality, reproducible metabolomics research.
 
 # Installation
 To install *notame*, install BiocManager first, if it is not installed. 
@@ -62,16 +56,17 @@ library(notame)
 SummarizedExperiment is the primary data structure of this package, but 
 MetaboSet is still supported for old users' preference. One can use a single 
 peak table throughout the analysis as with MetaboSet and also use multiple peak 
-tables with SummarizedExperiment, using the assay.type and name arguments.
+tables with SummarizedExperiment, using the `assay.type` and `name` arguments.
 
 The functionality of *notame* can be broadly divided into data pretreatment and 
-feature selection (Figure 1). Data pretreatment involves reducing unwanted
+feature selection, excluding preprocessing and functionality related to 
+biological context (Figure 1). Data pretreatment involves reducing unwanted
 variation and data preparation dependent on downstream methods. The many 
 visualizations used for inspecting the data pretreatment process also serve as 
 exploratory data analysis. Feature selection aims to select a subset of 
 interesting features across study groups before laborious steps relating to 
-biological context. Please see the notame-package manual page for a complete 
-description of functions, the Project Example vignette for usage and the 
+biological context. Please see the documentation for an overview 
+of functionality (?notame), the Project Example vignette for usage and the 
 associated protocol article for more information [@notame].
 
 ```{r, echo = FALSE}
@@ -80,27 +75,19 @@ knitr::include_graphics("Overview.png")
 ```
 
 ## Input
-MetaboSet is built upon the ExpressionSet class from the Biobase package by 
-Bioconductor. In addition to basic ExpressionSet functionality, three slots and 
-functions of the same names extend the MetaboSet class: group_col(), time_col() 
-and subject_col(). They are used for accessing and setting names of columns 
-with corresponding functionality and as default arguments in many functions.
-
-Data can be read with read_from_excel, which includes checks and 
-preparation of the metadata to prepare the data for analysis. To 
-accommodate typical output from peak-picking software such as Agilent's 
-MassHunter or MS-DIAL, the output is transformed into a spreadsheet for 
-read_from_excel().
-
-Alternatively, data in R can be wrangled and passed to construct_metabosets or 
-the native SummarizedExperiment constructor. 
+Data can be read with `read_from_excel()`, which includes checks and 
+preparation of metadata. To accommodate typical output from peak-picking 
+software such as Agilent's MassHunter or MS-DIAL, the output is transformed 
+into a spreadsheet for `read_from_excel()`. Alternatively, data in R can be 
+wrangled and passed to the `construct_metabosets()` or `SummarizedExperiment()` 
+constructor. 
 
 ```{r, echo = FALSE}
 #| fig.cap = "Structure of spreadsheet for read_from_excel()."
 knitr::include_graphics("Data_input.png")
 ```
 
-There are a few obligatory fields for read_from_excel(), including 
+There are a few obligatory fields for `read_from_excel()`, including 
 "Injection_order" in sample information, "Mass" or "Average mz" in feature data 
 and "Retention time", "RetentionTime", "Average rt(min)" or "rt" in feature 
 information (not case sensitive). There are further optional fields, including 
@@ -115,34 +102,34 @@ parameter.
 Data pretreatment functions return modified objects and are largely 
 based on pooled QC samples [@qcguidelines]. Data pretreatment is generally 
 performed separately for each mode. The visualizations used to monitor data 
-pretreatment are saved to file by default, but can also be returned. The 
-visualizations() wrapper can be used for saving visualizations at different 
-stages of data pretreatment.
+pretreatment are saved to file by default, but can also be returned as ggplot 
+objects. The `visualizations()` wrapper can be used for saving visualizations 
+at different stages of data pretreatment.
 
 ## Feature selection
 Univariate statistics functions return a `data.frame`, to be manually 
 filtered before inclusion into the feature data of the instance. Supervised 
 learning functions return various data structures. 
 
-Comprehensive results visualizations are returned and can be saved to file 
-using save_plot(). Interesting features can be inspected with feature-wise 
-visualizations which are saved to file by default but can be returned as a list.
+Comprehensive results visualizations are returned as ggplot objects and can be 
+saved to file using `save_plot()`. Interesting features can be inspected with 
+feature-wise visualizations which are saved to file by default but can be 
+returned as a list.
 
 ## Utilities
-
-General utilities include combined_data() for representing the instance in a
+General utilities include `combined_data()` for representing the instance in a
 `data.frame` suitable for plotting and various functions for data wrangling. 
 For keeping track of the analysis, *notame* offers a logging system operated 
-using init_log(), log_text() and finish_log(). *notame* also keeps track of all 
-the external packages used, offering you references for each. To see and log a 
-list of references, use citations().
+using `init_log()`, `log_text()` and `finish_log()`. *notame* also keeps track 
+of all the external packages used, offering you references for each. To see and 
+log a list of references, use `citations()`.
 
-Parallellization is provided by the BiocParallel package. 
-BiocParallel defaults to a parallel backend which can be changed using 
-BiocParallel::register(). For a platform-agnostic choice, do:
+Parallellization is used in many feature-wise calculations and is provided by 
+the BiocParallel package. BiocParallel defaults to a parallel backend. For 
+small-scale testing on Windows, it can be quicker to use serial execution:
 
 ```{r, eval = FALSE} 
-BiocParallel::register(BiocParallel::DoparParam())
+BiocParallel::register(BiocParallel::SerialParam())
 ```
 
 # Authors & Acknowledgements

@@ -73,9 +73,9 @@ sapply(data, dim)
 ## Construct SummarizedExperiment object 
 These three parts can be used to construct SummarizedExperiment using the 
 native SummarizedExperiment constructor or MetaboSet objects using 
-construct_metabosets(). The example data contains four analytical modes, so we 
-separate them using fix_object(), which also conveniently checks the object for 
-compatibility with all of notame. 
+`construct_metabosets()`. The example data contains four analytical modes, so 
+we separate them using `fix_object()`, which also conveniently checks the 
+object for compatibility with all of notame. 
 
 ```{r}
 data <- SummarizedExperiment(assays = data$exprs, 
@@ -86,7 +86,7 @@ modes <- fix_object(data, split_data = TRUE)
 ```
 
 Now we have a list of objects, one per mode (LC column x 
-ionization mode) or whatever split was supplied to read_from_excel().
+ionization mode) or whatever split was supplied to `read_from_excel()`.
 
 ```{r, results = 'markup'}
 names(modes)
@@ -102,7 +102,7 @@ performed separately for each mode include marking missing values as NA,
 flagging features with low detection rate [@qcguidelines], drift correction 
 [@driftcorrection], and flagging of low-quality features [@qcguidelines]. 
 Visualizations are drawn to monitor the data pretreatment process and explore 
-the data globally. The visualizations() wrapper does not include feature-
+the data globally. The `visualizations()` wrapper does not include feature-
 wise plots as it may not be feasible to inspect them at this stage of the 
 analysis. For example, drift correction visualizations are best drawn 
 for a subset of interesting features after feature selection.
@@ -140,9 +140,9 @@ for (i in seq_along(modes)) {
 
 Feature-wise flagging information, quality metrics, and brief drift correction 
 notes are included in the feature information after the above steps.
-The correct_drift() function performs drift correction on all features with 
+The `correct_drift()` function performs drift correction on all features with 
 sufficient detection in QC samples by default. In case `check_quality = TRUE`, 
-correct_drift() retains corrected values only for features with improved 
+`correct_drift()` retains corrected values only for features with improved 
 quality metrics after drift correction, along with a note documenting this 
 action in feature information. 
 
@@ -244,7 +244,7 @@ directions. For example, in biomarker discovery, the results may prompt
 validation using targeted LC-MS.
 
 That concludes our project example. The last thing to do is to write the 
-results to an excel file and finish the logging. Thanks!
+results to an Excel file and finish the logging. Thanks!
 
 ```{r}
 write_to_excel(base, file = paste0(ppath, "results.xlsx"))
