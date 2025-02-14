@@ -63,7 +63,6 @@ t-SNE and PCA hexbin plots
 \item \code{\link{plot_dendrogram}} sample dendrogram
 \item \code{\link{plot_sample_heatmap}} sample heatmap
 \item \code{\link{plot_pca_loadings}} PCA loadings plot
-\item \code{\link{plot_sample_suprahex}} sample suprahex plots
 \item \code{\link{plot_quality}} plot quality metrics
 }
 
@@ -171,8 +170,8 @@ Profiling. Metabolites, 10: 135.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/vsuksi/notame}
-  \item Report bugs at \url{https://github.com/vsuksi/notame/issues}
+  \item \url{https://github.com/hanhineva-lab/notame}
+  \item Report bugs at \url{https://github.com/hanhineva-lab/notame/issues}
 }
 
 }
@@ -185,6 +184,14 @@ Authors:
   \item Jussi Paananen [copyright holder]
   \item Oskari Timonen [copyright holder]
   \item Atte Lihtamo
+  \item Retu Haikonen
+  \item Leo Lahti
+  \item Kati Hanhineva
+}
+
+Other contributors:
+\itemize{
+  \item Artur Sannikov [contributor]
 }
 
 }

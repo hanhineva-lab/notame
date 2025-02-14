@@ -7,7 +7,11 @@ Authors@R: c(
     person("Jussi", "Paananen", role = c("aut", "cph")),
     person("Oskari", "Timonen", role = c("aut", "cph")),
     person("Atte", "Lihtamo", role = "aut"),
-    person("Vilhelm", "Suksi", email = "vksuks@utu.fi", role = c("aut", "cre"), comment = c(ORCID = "0009-0005-1108-518X")))
+    person("Vilhelm", "Suksi", email = "vksuks@utu.fi", role = c("aut", "cre"), comment = c(ORCID = "0009-0005-1108-518X")),
+    person("Retu", "Haikonen", role = "aut"),
+    person("Leo", "Lahti", role = "aut"),
+    person("Kati", "Hanhineva", role = "aut"),
+    person("Artur", "Sannikov", role = "ctb"))
 Description: Provides functionality for untargeted LC-MS metabolomics research as specified in the associated protocol article in the 'Metabolomics Data Processing and Data Analysis—Current Best Practices' special issue of the Metabolites journal (2020). This includes data pretreatment and quality control, uni- and multivariate analysis as well as quality control visualizations, feature-wise visualizations and results visualizations. Raw data preprocessing and functionality related to biological context, such as pathway analysis, is not included.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -59,8 +63,8 @@ Suggests:
     Rtsne,
     RUVSeq,
     testthat
-URL: https://github.com/vsuksi/notame
-BugReports: https://github.com/vsuksi/notame/issues
+URL: https://github.com/hanhineva-lab/notame
+BugReports: https://github.com/hanhineva-lab/notame/issues
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 Config/testthat/parallel: true
