@@ -180,17 +180,19 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Anton Klåvus [copyright holder]
-  \item Jussi Paananen [copyright holder]
-  \item Oskari Timonen [copyright holder]
+  \item Anton Klåvus (\href{https://orcid.org/0000-0003-2612-0230}{ORCID}) [copyright holder]
+  \item Jussi Paananen (\href{https://orcid.org/0000-0001-5100-4907}{ORCID}) [copyright holder]
+  \item Oskari Timonen (\href{https://orcid.org/0000-0002-6317-6260}{ORCID}) [copyright holder]
   \item Atte Lihtamo
-  \item Retu Haikonen
-  \item Leo Lahti
-  \item Kati Hanhineva
+  \item Retu Haikonen (\href{https://orcid.org/0000-0003-0830-3850}{ORCID})
+  \item Leo Lahti (\href{https://orcid.org/0000-0001-5537-637X}{ORCID})
+  \item Kati Hanhineva (\href{https://orcid.org/0000-0001-6834-7375}{ORCID})
 }
 
 Other contributors:
 \itemize{
+  \item Ville Koistinen (\href{https://orcid.org/0000-0003-1587-8361}{ORCID}) [contributor]
+  \item Olli Kärkkäinen (\href{https://orcid.org/0000-0003-0825-4956}{ORCID}) [contributor]
   \item Artur Sannikov [contributor]
 }
 

@@ -3,14 +3,25 @@ Type: Package
 Title: Workflow for non-targeted LC-MS metabolic profiling
 Version: 0.99.0
 Authors@R: c(
-    person("Anton", "Klåvus", role = c("aut", "cph")),
-    person("Jussi", "Paananen", role = c("aut", "cph")),
-    person("Oskari", "Timonen", role = c("aut", "cph")),
+    person("Anton", "Klåvus", role = c("aut", "cph"),
+           comment = c(ORCID = "0000-0003-2612-0230")),
+    person("Jussi", "Paananen", role = c("aut", "cph"),
+           comment = c(ORCID = "0000-0001-5100-4907")),
+    person("Oskari", "Timonen", role = c("aut", "cph"),
+           comment = c(ORCID = "0000-0002-6317-6260")),
     person("Atte", "Lihtamo", role = "aut"),
-    person("Vilhelm", "Suksi", email = "vksuks@utu.fi", role = c("aut", "cre"), comment = c(ORCID = "0009-0005-1108-518X")),
-    person("Retu", "Haikonen", role = "aut"),
-    person("Leo", "Lahti", role = "aut"),
-    person("Kati", "Hanhineva", role = "aut"),
+    person("Vilhelm", "Suksi", email = "vksuks@utu.fi", role = c("aut", "cre"), 
+           comment = c(ORCID = "0009-0005-1108-518X")),
+    person("Retu", "Haikonen", role = "aut",
+           comment = c(ORCID = "0000-0003-0830-3850")),
+    person("Leo", "Lahti", role = "aut",
+           comment = c(ORCID = "0000-0001-5537-637X")),
+    person("Kati", "Hanhineva", role = "aut",
+           comment = c(ORCID = "0000-0001-6834-7375")),
+    person("Ville", "Koistinen", role = "ctb",
+           comment = c(ORCID = "0000-0003-1587-8361")),
+    person("Olli", "Kärkkäinen", role = "ctb",
+           comment = c(ORCID = "0000-0003-0825-4956")),
     person("Artur", "Sannikov", role = "ctb"))
 Description: Provides functionality for untargeted LC-MS metabolomics research as specified in the associated protocol article in the 'Metabolomics Data Processing and Data Analysis—Current Best Practices' special issue of the Metabolites journal (2020). This includes data pretreatment and quality control, uni- and multivariate analysis as well as quality control visualizations, feature-wise visualizations and results visualizations. Raw data preprocessing and functionality related to biological context, such as pathway analysis, is not included.
 License: MIT + file LICENSE
