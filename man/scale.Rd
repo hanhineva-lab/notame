@@ -4,7 +4,7 @@
 \alias{scale}
 \alias{scale,MetaboSet-method}
 \alias{scale,SummarizedExperiment-method}
-\title{Scale exprs data}
+\title{Scale peak table}
 \usage{
 \S4method{scale}{MetaboSet}(x, center = TRUE, scale = TRUE)
 

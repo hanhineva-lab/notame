@@ -549,7 +549,7 @@ setMethod("log10", "MetaboSet",
   }
 )
 
-#' Scale exprs data
+#' Scale peak table
 #'
 #' Applies the base R function scale to transposed peak table. 
 #' See \code{\link[base]{scale}} for details.
@@ -562,8 +562,6 @@ setMethod("log10", "MetaboSet",
 #' @return A SummarizedExperiment or MetaboSet object with modified peak table.
 #'
 #' @name scale
-#'
-#' @export
 NULL
 
 #' @rdname scale
