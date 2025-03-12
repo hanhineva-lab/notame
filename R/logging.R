@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
-#' file_name <- "~/log.txt"
+#' file_name <- "log.txt"
 #' init_log(file_name)
 #' # Print the contents of the file
 #' scan(file_name, sep = "\n", what = "character")
@@ -38,7 +38,7 @@ init_log <- function(log_file) {
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
-#' file_name <- "~/log.txt"
+#' file_name <- "log.txt"
 #' init_log(file_name)
 #' log_text("Hello World!")
 #' # Print the contents of the file

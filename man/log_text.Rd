@@ -18,7 +18,7 @@ overwrite the file. Also used internally by many functions in the package.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
-file_name <- "~/log.txt"
+file_name <- "log.txt"
 init_log(file_name)
 log_text("Hello World!")
 # Print the contents of the file
