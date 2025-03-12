@@ -293,8 +293,9 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
 cohens_d <- function(object, group, id = NULL,
                      time = NULL, assay.type = NULL) {
   from <- .get_from_name(object, assay.type)
-  object <- .check_object(object, pheno_factors = c(group, time), 
-                         pheno_cols = id, assay.type = from, feature_ID = TRUE)
+  object <- .check_object(object, pheno_factors = c(group, time),
+                          pheno_chars = id, pheno_cols = id, 
+                          assay.type = from, feature_ID = TRUE)
   res <- NULL
 
   group_combos <- utils::combn(levels(colData(object)[, group]), 2)

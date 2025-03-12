@@ -289,7 +289,7 @@ test_that("Cohens D values are counted right", {
 test_that("Cohens D values between time points are counted right", {
   object <- drop_qcs(example_set[, 1:30])
   colData(object)$Group <- factor(rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
-  colData(object)$Subject_ID <- factor(rep(1:8, 3))
+  colData(object)$Subject_ID <- as.character(rep(1:8, 3))
   colData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
 
   # Create results with time points manually
@@ -385,7 +385,7 @@ test_that("Cohens D warnings work", {
   object <- drop_qcs(example_set[, 1:30])
   colData(object)$Group <- factor(
     rep(c(rep("A", 3), rep("B", 3), rep("C", 2)), 3))
-  colData(object)$Subject_ID <- factor(rep(1:8, 3))
+  colData(object)$Subject_ID <- as.character(rep(1:8, 3))
   colData(object)$Time <- factor(c(rep(1, 8), rep(2, 8), rep(3, 8)))
   # Remove one sample
   expect_warning(
