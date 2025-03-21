@@ -261,6 +261,8 @@ merge_objects <- function(..., merge = c("features", "samples"),
 }
 
 .rowdata_batch_helper <- function(fx, fy) {
+  fx <- as.data.frame(fx)
+  fy <- as.data.frame(fy)
   non_identical_cols <- !identical(colnames(fx), colnames(fy))
   if (non_identical_cols) {
     only_x_cols <- setdiff(colnames(fx), colnames(fy))
