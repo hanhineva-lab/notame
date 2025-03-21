@@ -300,10 +300,10 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 
 #' Flag contaminants based on blanks
 #'
-#' Flags contaminant features by comparing the median values of blanks and 
-#' biological samples. Biological sampels are defined as samples that are not 
-#' marked as blanks and are not QCs. If the median of blanks > the median of 
-#' biological samples times a set ratio, the feature is flagged as contaminant.
+#' Flags contaminant features by comparing either median, mean, or max of biological samples and 
+#' median values of blanks. Biological sampels are defined as samples that are not 
+#' marked as blanks and are not QCs. If the median of biological samples < the
+#' median of blanks times a set ratio, the feature is flagged as contaminant.
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
@@ -311,7 +311,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' @param blank_col character, the column name in pheno data with blank labels
 #' @param blank_label character, the label for blank samples in blank_col
 #' @param flag_thresh numeric, the ratio threshold for flagging contaminants.
-#' If the median of blanks > flag_thresh * median of biological samples, the 
+#' If the median of blanks * flag_thresh > median of biological samples, the 
 #' feature gets flagged.
 #' @param flag_label character, the label used when flagging contaminants. Can 
 #' be changed if sample processing contaminants and carryover contaminants are 
@@ -347,31 +347,49 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #'                                           blank_label = "Blank")
 #' 
 #' @export
-flag_contaminants <- function(object, blank_col, blank_label, 
-                              flag_thresh = 0.05, flag_label = "Contaminant",
+flag_contaminants <- function(object, blank_col, blank_label,
+                               type = c("median", "mean", "max"),
+                              flag_thresh = 20, flag_label = "Contaminant.",
                               assay.type = NULL) {
+  type <- tryCatch(
+    match.arg(type),
+    error = function(e) stop("Wrong contaminant calculation type selected", call. = FALSE)
+  )
+  
   from <- .get_from_name(object, assay.type)
-  object <- .check_object(object, pheno_QC = TRUE, pheno_cols = blank_col, 
-                         assay.type = from)
+  object <- .check_object(object, pheno_QC = TRUE, pheno_cols = blank_col,
+                          assay.type = from)
   
   blanks <- object[, colData(object)[, blank_col] == blank_label]
   samples <- object[, object$QC != "QC" &
-                    colData(object)[, blank_col] != blank_label]
-
-  blank_median <- apply(assay(blanks, from), 1, finite_median)
-  sample_median <- apply(assay(samples, from), 1, finite_median)
-  blank_flag <- blank_median / sample_median > flag_thresh
-
+                      colData(object)[, blank_col] != blank_label]
+  type <- match.arg(type)
+  
+  if (type == "median"){
+    blank_median <- apply(assay(blanks, from), 1, finite_median)
+    sample_median <- apply(assay(samples, from), 1, finite_median)
+  } else if (type == "mean"){
+    blank_median <- apply(assay(blanks, from), 1, finite_median)
+    sample_median <- apply(assay(samples, from), 1, finite_mean)
+  } else if (type == "max"){
+    blank_median <- apply(assay(blanks, from), 1, finite_median)
+    sample_median <- apply(assay(samples, from), 1, finite_max)
+  }
+  blank_flag <- blank_median * flag_thresh > sample_median
+  
   idx <- is.na(flag(object)) & !is.na(blank_flag)
   idx <- idx & blank_flag
+  
+  flag_label <- paste0(flag_label, " Sample ", type, " is not ",
+                       flag_thresh, " higher than ", blank_label)
   flag(object)[idx] <- flag_label
-
+  
   percentage <- scales::percent(sum(flag(object) == flag_label, na.rm = TRUE) /
-                                nrow(object))
+                                  nrow(object))
   log_text(paste0("\n", percentage, " of features flagged as contaminants"))
-
+  
   blank_ratio <- data.frame(Feature_ID = rownames(object), 
-                            Blank_ratio = blank_median / sample_median,
+                            Blank_ratio = sample_median / blank_median,
                             stringsAsFactors = FALSE)
   object <- join_rowData(object, blank_ratio)
   if (!is.null(attr(object, "original_class"))) {
