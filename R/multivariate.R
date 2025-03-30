@@ -173,11 +173,12 @@ importance_rf <- function(rf) {
 #' @examples
 #' data(example_set)
 #' pls_res <- mixomics_pls(example_set, y = "Injection_order", ncomp = 3)
+#' # Cross-validation repeated only 5 times for quick run time 
 #' pls_opt <- mixomics_pls_optimize(example_set, 
-#'   y = "Injection_order", ncomp = 3)
+#'   y = "Injection_order", ncomp = 3, nrepeat = 5)
 #' spls_opt <- mixomics_spls_optimize(example_set,
 #'   y = "Injection_order", ncomp = 3,
-#'   n_features <- c(1:10, 12, 15, 20)
+#'   n_features <- c(1:10, 12, 15, 20), nrepeat = 5
 #' )
 #' @name pls
 #' @seealso \code{\link[mixOmics]{pls}}, \code{\link[mixOmics]{perf}},
@@ -379,12 +380,15 @@ mixomics_spls_optimize <- function(object, y, ncomp, n_features =
 #' data(example_set)
 #' noqc <- drop_qcs(example_set)
 #' plsda_res <- mixomics_plsda(noqc, y = "Group", ncomp = 2)
+#' # Cross-validation repeated only 5 times for quick run time 
 #' set.seed(38)
-#' plsda_opt <- mixomics_plsda_optimize(noqc, y = "Group", ncomp = 3)
+#' plsda_opt <- mixomics_plsda_optimize(noqc, 
+#'   y = "Group", ncomp = 3, nrepeat = 5
+#' )
 #' set.seed(38)
 #' splsda_opt <- mixomics_splsda_optimize(noqc,
 #'   y = "Group", dist = "max.dist", ncomp = 2,
-#'   n_features <- c(1:10, 12, 15, 20)
+#'   n_features <- c(1:10, 12, 15, 20), nrepeat = 5
 #' )
 #' 
 #' @name pls_da
@@ -449,7 +453,7 @@ mixomics_plsda_optimize <- function(object, y, ncomp, folds = 5, nrepeat = 50,
 
   log_text("Evaluating PLS-DA performance")
   perf_plsda <- mixOmics::perf(plsda_res, validation = "Mfold", folds = 5,
-                               auc = TRUE, nrepeat = 50)
+                               auc = TRUE, nrepeat = nrepeat)
 
   plot(perf_plsda, col = mixOmics::color.mixo(seq_len(3)), 
        sd = TRUE, legend.position = "horizontal")

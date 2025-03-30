@@ -96,11 +96,12 @@ components and features}
 \examples{
 data(example_set)
 pls_res <- mixomics_pls(example_set, y = "Injection_order", ncomp = 3)
+# Cross-validation repeated only 5 times for quick run time 
 pls_opt <- mixomics_pls_optimize(example_set, 
-  y = "Injection_order", ncomp = 3)
+  y = "Injection_order", ncomp = 3, nrepeat = 5)
 spls_opt <- mixomics_spls_optimize(example_set,
   y = "Injection_order", ncomp = 3,
-  n_features <- c(1:10, 12, 15, 20)
+  n_features <- c(1:10, 12, 15, 20), nrepeat = 5
 )
 }
 \seealso{

@@ -99,12 +99,15 @@ of components and features, choose the one with minimal balanced error rate}
 data(example_set)
 noqc <- drop_qcs(example_set)
 plsda_res <- mixomics_plsda(noqc, y = "Group", ncomp = 2)
+# Cross-validation repeated only 5 times for quick run time 
 set.seed(38)
-plsda_opt <- mixomics_plsda_optimize(noqc, y = "Group", ncomp = 3)
+plsda_opt <- mixomics_plsda_optimize(noqc, 
+  y = "Group", ncomp = 3, nrepeat = 5
+)
 set.seed(38)
 splsda_opt <- mixomics_splsda_optimize(noqc,
   y = "Group", dist = "max.dist", ncomp = 2,
-  n_features <- c(1:10, 12, 15, 20)
+  n_features <- c(1:10, 12, 15, 20), nrepeat = 5
 )
 
 }
