@@ -24,3 +24,6 @@ A SummarizedExperiment or MetaboSet object with modified peak table.
 Applies the base R function scale to transposed peak table. 
 See \code{\link[base]{scale}} for details.
 }
+\examples{
+scaled_set <- scale(example_set)
+}

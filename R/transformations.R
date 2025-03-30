@@ -561,6 +561,8 @@ setMethod("log10", "MetaboSet",
 #' 
 #' @return A SummarizedExperiment or MetaboSet object with modified peak table.
 #'
+#' @examples
+#' scaled_set <- scale(example_set)
 #' @name scale
 NULL
 
