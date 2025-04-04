@@ -105,11 +105,10 @@ test_that("Group lineplot naming works", {
 test_that("Batch plots work with and without multiple assays", {
   path <- paste0(tempdir(), "\\test\\batch_plots.pdf")
   ex_set <- example_set
-  names(assays(ex_set)) <- c("original")
-
-  replicates <- list(which(ex_set$QC == "QC"))
-  batch_corrected <- ruvs_qc(example_set, replicates = replicates,
-    name = "bcorrected")
+  names(assays(ex_set)) <- "original"
+  batch_corrected <- example_set
+  assay(batch_corrected, "bcorrected") <- assay(batch_corrected)
+  
   # Assay not found with one object with a single assay
   expect_error(save_batch_plots(
     orig = ex_set[1:10], file = path, assay.type1 = c("original"),
