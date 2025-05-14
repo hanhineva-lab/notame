@@ -274,8 +274,9 @@ mixomics_pls_optimize <- function(object, y, ncomp, folds = 5, nrepeat = 50,
                   " is the correct number of components"
   ))
   
-  mixomics_pls(object = object, y = y, ncomp = ncomp_opt, 
-               plot_scores = plot_scores, covariates = covariates, ...)
+  mixomics_pls(object = object, y = y, ncomp = ncomp_opt,
+               plot_scores = plot_scores, all_features = all_features,
+               covariates = covariates, assay.type = from, ...)
 }
 
 #' @rdname pls
@@ -410,7 +411,7 @@ mixomics_plsda <- function(object, y, ncomp, plot_scores = TRUE,
   object <- drop_flagged(object, all_features = all_features)
   from <- .get_from_name(object, assay.type)  
   object <- .check_object(object, pheno_cols = c(y, covariates), 
-                         assay.type = from)
+                          assay.type = from)
 
   predictors <- .get_x(object, covariates, from)
   outcome <- colData(object)[, y]
@@ -444,7 +445,7 @@ mixomics_plsda_optimize <- function(object, y, ncomp, folds = 5, nrepeat = 50,
   object <- drop_flagged(object, all_features = all_features)
   from <- .get_from_name(object, assay.type)  
   object <- .check_object(object, pheno_cols = c(y, covariates), 
-                         assay.type = from)
+                          assay.type = from)
 
   plsda_res <- mixomics_plsda(object = object, y = y, ncomp = ncomp,
                               plot_scores = FALSE, all_features = all_features,
@@ -452,7 +453,7 @@ mixomics_plsda_optimize <- function(object, y, ncomp, folds = 5, nrepeat = 50,
                               assay.type = from, ...)
 
   log_text("Evaluating PLS-DA performance")
-  perf_plsda <- mixOmics::perf(plsda_res, validation = "Mfold", folds = 5,
+  perf_plsda <- mixOmics::perf(plsda_res, validation = "Mfold", folds = folds,
                                auc = TRUE, nrepeat = nrepeat)
 
   plot(perf_plsda, col = mixOmics::color.mixo(seq_len(3)), 
@@ -467,8 +468,9 @@ mixomics_plsda_optimize <- function(object, y, ncomp, folds = 5, nrepeat = 50,
   log_text(paste("Choosing a PLS-DA model with", ncomp_opt, 
                  "components using", dist_met))
 
-  mixomics_plsda(object = object, y = y, ncomp = ncomp_opt, 
-                 plot_scores = plot_scores, assay.type = from, ...)
+  mixomics_plsda(object = object, y = y, ncomp = ncomp_opt,
+                 plot_scores = plot_scores, all_features = all_features,
+                 covariates = covariates, assay.type = from, ...)
 }
 
 
