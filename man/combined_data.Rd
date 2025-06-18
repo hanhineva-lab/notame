@@ -2,19 +2,14 @@
 % Please edit documentation in R/class_constructor.R
 \name{combined_data}
 \alias{combined_data}
-\alias{combined_data,SummarizedExperiment-method}
 \title{Retrieve both sample information and features}
 \usage{
-combined_data(object, ...)
-
-\S4method{combined_data}{SummarizedExperiment}(object, assay.type = NULL)
+combined_data(object, assay.type = NULL)
 }
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
 object}
-
-\item{...}{additional arguments passed to methods}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 }

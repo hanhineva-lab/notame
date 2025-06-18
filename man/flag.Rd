@@ -3,17 +3,11 @@
 \name{flag}
 \alias{flag}
 \alias{flag<-}
-\alias{flag,SummarizedExperiment-method}
-\alias{flag<-,SummarizedExperiment-method}
 \title{Get and set the values in the flag column}
 \usage{
 flag(object)
 
 flag(object) <- value
-
-\S4method{flag}{SummarizedExperiment}(object)
-
-\S4method{flag}{SummarizedExperiment}(object) <- value
 }
 \arguments{
 \item{object}{a \code{

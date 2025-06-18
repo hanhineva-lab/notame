@@ -43,7 +43,7 @@ quality <- function(object) {
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
 #' object
-#' @param ... additional arguments passed to methods
+#' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return A SummarizedExperiment object with quality metrics in 
 #' feature data.
@@ -54,42 +54,35 @@ quality <- function(object) {
 #' rowData(ex_set)
 #'
 #' @export
-setGeneric("assess_quality", signature = "object",
-           function(object, ...) standardGeneric("assess_quality"))
+assess_quality <- function(object, assay.type = NULL) {
+  from <- .get_from_name(object, assay.type)
+  object <- .check_object(object, pheno_QC = TRUE, assay.type = from)
+  # Remove old quality metrics
+  if (!is.null(quality(object))) {
+    object <- .erase_quality(object)
+  }
 
-#' @rdname assess_quality
-#' @param assay.type character, assay to be used in case of multiple assays
-#' @export
-setMethod("assess_quality", signature = c(object = "SummarizedExperiment"),
-  function(object, assay.type = NULL) {
-    from <- .get_from_name(object, assay.type)
-    object <- .check_object(object, pheno_QC = TRUE, assay.type = from)
-    # Remove old quality metrics
-    if (!is.null(quality(object))) {
-      object <- .erase_quality(object)
-    }
-
-    qc_data <- assay(object, from)[, object$QC == "QC"]
-    sample_data <- assay(object, from)[, object$QC != "QC"]
-    features <- rownames(sample_data)
-    
-    quality_metrics <- BiocParallel::bplapply(features, function(feature) {
-      data.frame(
-        Feature_ID = feature,
-        RSD = finite_sd(qc_data[feature, ]) / 
-        abs(finite_mean(qc_data[feature,])),
-        RSD_r = finite_mad(qc_data[feature, ]) /
-          abs(finite_median(qc_data[feature, ])),
-        D_ratio = finite_sd(qc_data[feature, ]) /
-          finite_sd(sample_data[feature, ]),
-        D_ratio_r = finite_mad(qc_data[feature, ]) /
-          finite_mad(sample_data[feature, ]),
-        row.names = feature, stringsAsFactors = FALSE)
-    })
-    quality_metrics <- do.call(rbind, quality_metrics)
-    object <- join_rowData(object, quality_metrics)
-})
+  qc_data <- assay(object, from)[, object$QC == "QC"]
+  sample_data <- assay(object, from)[, object$QC != "QC"]
+  features <- rownames(sample_data)
   
+  quality_metrics <- BiocParallel::bplapply(features, function(feature) {
+    data.frame(
+      Feature_ID = feature,
+      RSD = finite_sd(qc_data[feature, ]) / 
+      abs(finite_mean(qc_data[feature,])),
+      RSD_r = finite_mad(qc_data[feature, ]) /
+        abs(finite_median(qc_data[feature, ])),
+      D_ratio = finite_sd(qc_data[feature, ]) /
+        finite_sd(sample_data[feature, ]),
+      D_ratio_r = finite_mad(qc_data[feature, ]) /
+        finite_mad(sample_data[feature, ]),
+      row.names = feature, stringsAsFactors = FALSE)
+  })
+  quality_metrics <- do.call(rbind, quality_metrics)
+  object <- join_rowData(object, quality_metrics)
+}
+
 #' Flag low-quality features
 #'
 #' Flags low-quality features using the quality metrics defined in (Broadhurst 

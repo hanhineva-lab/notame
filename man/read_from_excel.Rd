@@ -56,7 +56,7 @@ functioning of notame.}
 \value{
 A list of three data frames:
 \itemize{
-  \item exprs: the actual abundances, size features x samples
+  \item assay: the actual abundances, size features x samples
   \item pheno_data: sample information, size sample info variables x samples
   \item feature_data: information about the features, size features x 
 feature info columns

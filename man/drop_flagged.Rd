@@ -2,12 +2,9 @@
 % Please edit documentation in R/transformations.R
 \name{drop_flagged}
 \alias{drop_flagged}
-\alias{drop_flagged,SummarizedExperiment-method}
 \title{Drop flagged features}
 \usage{
 drop_flagged(object, all_features = FALSE)
-
-\S4method{drop_flagged}{SummarizedExperiment}(object, all_features = FALSE)
 }
 \arguments{
 \item{object}{a \code{

@@ -2,12 +2,9 @@
 % Please edit documentation in R/class_constructor.R
 \name{join_colData}
 \alias{join_colData}
-\alias{join_colData,SummarizedExperiment,data.frame-method}
 \title{Join new columns to pheno data}
 \usage{
 join_colData(object, dframe)
-
-\S4method{join_colData}{SummarizedExperiment,data.frame}(object, dframe)
 }
 \arguments{
 \item{object}{a \code{

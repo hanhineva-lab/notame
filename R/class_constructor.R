@@ -564,7 +564,7 @@ write_to_excel <- function(object, file, ...) {
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
 #' object
-#' @param ... additional arguments passed to methods
+#' @param assay.type character, assay to be used in case of multiple assays
 #' @return A data frame with sample information plus all features as columns,
 #' one row per sample.
 #'
@@ -573,8 +573,11 @@ write_to_excel <- function(object, file, ...) {
 #' combined_data(example_set)
 #'
 #' @export
-setGeneric("combined_data", signature = "object",
-           function(object, ...) standardGeneric("combined_data"))
+combined_data <- function(object, assay.type = NULL) {
+  from <- .get_from_name(object, assay.type)
+  cbind(as.data.frame(colData(object)), t(assay(object, from)))
+}
+
 
 #' Get and set the values in the flag column
 #' @param object a \code{
@@ -589,8 +592,7 @@ setGeneric("combined_data", signature = "object",
 #' flag(example_set)
 #'
 #' @export
-setGeneric("flag", signature = "object",
-           function(object) standardGeneric("flag"))
+flag <- function(object) rowData(object)$Flag
 
 #' @rdname flag
 #' @param object a \code{
@@ -605,8 +607,12 @@ setGeneric("flag", signature = "object",
 #' # Flag a suspicious feature manually
 #' flag(example_set)[1] <- "Contaminant, known from experience"
 #' @export
-setGeneric("flag<-", signature = "object",
-           function(object, value) standardGeneric("flag<-"))
+"flag<-" <-  function(object, value) {
+  rowData(object)$Flag <- value
+  if (validObject(object)) {
+    return(object)
+  }
+}
 
 # Wrapper helper function for checking compatibility of SummarizedExperiment
 # object  with notame. The parameters with boolean arguments check for set 
@@ -835,32 +841,6 @@ fix_object <- function(object, id_prefix = "ID_", id_column = NULL,
   feature_data
 }
 
-#' @rdname combined_data
-#' @param assay.type character, assay to be used in case of multiple assays
-#' @export
-setMethod("combined_data", c(object = "SummarizedExperiment"), 
-  function(object, assay.type = NULL) {
-    from <- .get_from_name(object, assay.type)
-    cbind(as.data.frame(colData(object)), t(assay(object, from)))
-  }
-)
-
-#' @rdname flag
-#' @export
-setMethod("flag", "SummarizedExperiment",
-          function(object) rowData(object)$Flag)
-
-#' @rdname flag
-#' @export
-setMethod("flag<-", "SummarizedExperiment",
-  function(object, value) {
-    rowData(object)$Flag <- value
-    if (validObject(object)) {
-      return(object)
-    }
-  }
-)
-
 #' Join new columns to feature data
 #'
 #' Join a new data frame of information to feature data of a 
@@ -885,21 +865,14 @@ setMethod("flag<-", "SummarizedExperiment",
 #' rowData(object).
 #'
 #' @export
-setGeneric("join_rowData", signature = c("object", "dframe"),
-           function(object, dframe) standardGeneric("join_rowData"))
-
-#' @rdname join_rowData
-#' @export
-setMethod("join_rowData", c("SummarizedExperiment", "data.frame"),
-  function(object, dframe) {
-    rowData(object) <- merge(rowData(object), dframe, by = "Feature_ID", 
-                             all.x = TRUE, sort = FALSE)
-    rownames(object) <- rowData(object)$Feature_ID
-    if (validObject(object)) {
-      return(object)
-    }
+join_rowData <- function(object, dframe) {
+  rowData(object) <- merge(rowData(object), dframe, by = "Feature_ID", 
+                           all.x = TRUE, sort = FALSE)
+  rownames(object) <- rowData(object)$Feature_ID
+  if (validObject(object)) {
+    return(object)
   }
-)
+}
   
 #' Join new columns to pheno data
 #'
@@ -924,18 +897,12 @@ setMethod("join_rowData", c("SummarizedExperiment", "data.frame"),
 #' colData(object).
 #'
 #' @export
-setGeneric("join_colData", signature = c("object", "dframe"),
-           function(object, dframe) standardGeneric("join_colData"))
+join_colData <- function(object, dframe) {
+  colData(object) <- merge(colData(object), dframe, by = "Sample_ID",
+                           all.x = TRUE, sort = FALSE)
+  rownames(colData(object)) <- colData(object)$Sample_ID
+  object
+}
 
-#' @rdname join_colData
-#' @export
-setMethod("join_colData", c("SummarizedExperiment", "data.frame"),
-  function(object, dframe) {
-    colData(object) <- merge(colData(object), dframe, by = "Sample_ID",
-                             all.x = TRUE, sort = FALSE)
-    rownames(colData(object)) <- colData(object)$Sample_ID
-    object
-  }
-)
 
 

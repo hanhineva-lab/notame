@@ -80,3 +80,5 @@ rsconnect/
 *.seed
 *.settings
 *.tm_properties
+/doc/
+/Meta/

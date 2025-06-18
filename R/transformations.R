@@ -166,21 +166,14 @@ drop_qcs <- function(object) {
 #' dim(noflags)
 #'
 #' @export
-setGeneric("drop_flagged", signature = "object",
-           function(object, all_features = FALSE) 
-           standardGeneric("drop_flagged"))
-
-#' @rdname drop_flagged
-#' @export
-setMethod("drop_flagged", signature = c(object = "SummarizedExperiment"),
-  function(object, all_features = FALSE) {
-    object <- .check_object(object)
-    if (!all_features) {
-      object <- object[is.na(flag(object)), ]
-    }
-    object
+drop_flagged <- function(object, all_features = FALSE) {
+  object <- .check_object(object)
+  if (!all_features) {
+    object <- object[is.na(flag(object)), ]
   }
-)
+  object
+}
+
 
 #' Partially replace peak table with new values
 #'
@@ -464,113 +457,6 @@ flag_report <- function(object) {
   }
   report
 }
-
-
-# ---------- Logarithms ----------
-
-#' Logarithm
-#'
-#' Log-transforms the peak table of SummarzedExperiment object. 
-#' Shortcuts for log2 and log10 also implemented.
-#' For more information, see \code{\link{log}}.
-#'
-#' @param x a \code{
-#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' object
-#' @param base the base of the logarithm
-#'
-#' @return A SummarizedExperiment object with peak table
-#' transformed.
-#'
-#' @name log
-NULL
-
-#' Scale peak table
-#'
-#' Applies the base R function scale to transposed peak table. 
-#' See \code{\link[base]{scale}} for details.
-#'
-#' @param x a \code{
-#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' object
-#' @param center,scale as in base scale function
-#' 
-#' @return A SummarizedExperiment object with modified peak table.
-#'
-#' @examples
-#' scaled_set <- scale(example_set)
-#' @name scale
-NULL
-
-#' Exponential function
-#'
-#' Apply exponential function to peak table.
-#'
-#' @param object a \code{
-#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' object
-#' @param base base of the exponential
-#'
-#' @return An object with altered feature abundances.
-#'
-#' @examples 
-#' data(example_set)
-#' example_set <- mark_nas(example_set, value = 0)
-#' log_data <- log(example_set)
-#' orig_data <- exponential(log_data)
-#'
-#' @export
-setGeneric("exponential", signature = "object",
-           function(object, base = exp(1)) standardGeneric("exponential"))
-
-# ---------- Logarithms ----------
-
-#' @rdname log
-#' @export
-setMethod("log", "SummarizedExperiment", 
-  function(x, base = exp(1)) {
-    assay(x) <- log(assay(x), base = base)
-    x
-  }
-)
-
-#' @rdname log
-#' @export
-setMethod("log2", "SummarizedExperiment", 
-  function(x) {
-    assay(x) <- log2(assay(x))
-    x
-  }
-)
-
-#' @rdname log
-#' @export
-setMethod("log10", "SummarizedExperiment", 
-  function(x) {
-    assay(x) <- log10(assay(x))
-    x
-  }
-)
-
-#' @rdname scale
-#' @export
-setMethod("scale", "SummarizedExperiment", 
-  function(x, center = TRUE, scale = TRUE) {
-    assay(x) <- t(scale(t(assay(x)), center = center, scale = scale))
-    x
-  }
-)
-
-#' @rdname exponential
-#' @export
-setMethod("exponential", c(object = "SummarizedExperiment"),
-  function(object, base = exp(1)) {
-    assay(object) <- base^assay(object)
-    object
-  }
-)
-
-
 
 #' Probabilistic quotient normalization
 #'

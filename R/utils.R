@@ -35,11 +35,8 @@
 #' from the same metabolite
 #' \item \code{\link{compress_clusters}} Compress clusters of features to a 
 #' single feature
-#' \item \code{\link{log}} logarithms
-#' \item \code{\link{exponential}} exponential
 #' \item \code{\link{pqn_normalization}} probabilistic quotient normalization
 #' \item \code{\link{inverse_normalize}} inverse-rank normalization
-#' \item \code{\link{scale}} scale
 #' }
 #'
 #' Data pretreatment visualizations (for visualization of data pretreatment and 

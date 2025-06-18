@@ -81,7 +81,7 @@ object for compatibility with all of notame.
 data <- SummarizedExperiment(assays = data$assay, 
                              rowData = data$feature_data,
                              colData = data$pheno_data)
-                             
+
 modes <- fix_object(data, split_data = TRUE)
 ```
 
@@ -212,7 +212,9 @@ probability of obtaining the observed abundances given the null hypothesis,
 namely that there is no difference in feature abundance across study groups.
 
 ```{r}
-lm_results <- perform_lm(log(base), formula_char = "Feature ~ Group")
+assay(base, "log") <- log(assay(base))
+lm_results <- perform_lm(base, assay.type = "log", 
+  formula_char = "Feature ~ Group")
 base <- join_rowData(base, lm_results)
 ```
 
@@ -226,7 +228,8 @@ another perspective. A random forest model doesn't require further data
 pretreatment and makes minimal assumptions.
 
 ```{r}
-rf_results <- fit_rf(base, y = "Group")
+names(assays(base))[[1]] <- "abundances"                             
+rf_results <- fit_rf(base, y = "Group", assay.type = "abundances")
 
 rf_importance <- importance_rf(rf_results)
 

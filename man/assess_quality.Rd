@@ -2,19 +2,14 @@
 % Please edit documentation in R/quality_metrics.R
 \name{assess_quality}
 \alias{assess_quality}
-\alias{assess_quality,SummarizedExperiment-method}
 \title{Assess quality information of features}
 \usage{
-assess_quality(object, ...)
-
-\S4method{assess_quality}{SummarizedExperiment}(object, assay.type = NULL)
+assess_quality(object, assay.type = NULL)
 }
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
 object}
-
-\item{...}{additional arguments passed to methods}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 }
