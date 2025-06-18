@@ -15,7 +15,7 @@ perform_oneway_anova(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{formula_char}{character, the formula to be used in the linear model 
 (see Details).}

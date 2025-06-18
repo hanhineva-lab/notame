@@ -11,7 +11,7 @@
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param y character, column name of pheno data giving the dependent variable 
 #' of the model
 #' @param all_features logical, should all features be included in the model? 
@@ -88,7 +88,7 @@ importance_rf <- function(rf) {
 
 #' A helper function for extracting predictor matrix with covariates
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a SummarizedExperiment object
 #' @param covariates character, column names of pheno data to use as covariates 
 #' in the model, in addition to molecular features
 #' @return A data frame with predictors, including covariates.
@@ -150,7 +150,7 @@ importance_rf <- function(rf) {
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param y character vector, column names of the grouping variable to predict
 #' @param ncomp number of X components
 #' @param folds the number of folds to use in k-fold cross validation
@@ -354,7 +354,7 @@ mixomics_spls_optimize <- function(object, y, ncomp, n_features =
 #' of components and features, choose the one with minimal balanced error rate}
 #' }
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a SummarizedExperiment object
 #' @param y character, column name of the grouping variable to predict
 #' @param ncomp the number of X components
 #' @param folds the number of folds to use in k-fold cross validation
@@ -542,7 +542,7 @@ mixomics_splsda_optimize <- function(object, y, ncomp, dist,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param y character, column name in pheno data of the target variable
 #' @param id character, column name in pheno data of the subject ID variable in 
 #' case of repeated measurements
@@ -749,7 +749,7 @@ muvr_analysis <- function(object, y = NULL, id = NULL, multi_level = FALSE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param group character, name of the column to compare
 #' @param all_features should all features be included?
 #' @param transform Transformation to use in 

@@ -25,7 +25,7 @@ muvr_analysis(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{y}{character, column name in pheno data of the target variable}
 

@@ -132,19 +132,10 @@ variables, such as correlations
 Object utilities:
 \itemize{
 \item \code{\link{read_from_excel}} read formatted Excel files
-\item \code{\link{construct_metabosets}} construct MetaboSet objects
 \item \code{\link{write_to_excel}} write results to Excel file
-\item \code{\link{group_col}} get and set name of the special column for 
-group labels
-\item \code{\link{time_col}} get and set the name of the special column for 
-time points
-\item \code{\link{subject_col}} get and set the name of the special column 
-for subject identifiers
 \item \code{\link{flag}} get and set values in the flag column
 \item \code{\link{drop_flagged}} drop flagged features
 \item \code{\link{drop_qcs}} drop QC samples
-\item \code{\link{join_fData}} join new columns to feature data
-\item \code{\link{join_pData}} join new columns to pheno data
 \item \code{\link{combined_data}} retrieve both sample information and 
 features
 \item \code{\link{merge_objects}} merge SummarizedExperiment objects 
@@ -160,7 +151,6 @@ Other utilities:
 \item \code{\link{finish_log}} finish a log
 \item \code{\link{save_plot}} save plot to chosen format
 \item \code{\link{fix_MSMS}} transform the MS/MS output to publication ready
-\item \code{\link{merge_metabosets}} merge MetaboSet objects together
 }
 }
 \references{

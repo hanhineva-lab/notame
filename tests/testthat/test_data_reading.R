@@ -154,7 +154,7 @@ test_that("Easy example data is read correctly", {
   )
 
   # Test that the parts are read as expected
-  expect_equal(read$exprs, ad)
+  expect_equal(read$assay, ad)
   expect_equal(read$pheno_data, pd)
   expect_equal(read$feature_data, fd)
 })
@@ -212,7 +212,7 @@ test_that("Data is split correctly", {
   )
 
   # Test that the parts are read as expected
-  expect_equal(read$exprs, ad)
+  expect_equal(read$assay, ad)
   expect_equal(read$pheno_data, pd)
   expect_equal(read$feature_data, fd)
 })
@@ -235,15 +235,9 @@ test_that("Splitting data works as expected", {
   expect_true(all(unlist(lapply(se_modes, function(se_mode) {
     identical(colData(se_mode), colData(se))
   }))))
-  
-  # All returned objects should be MetaboSet objects
-  ms <- as(example_set, "MetaboSet")
-  ms_modes <- fix_object(ms, split_data = TRUE)
-  expect_true(
-    all(unlist(lapply(ms_modes, function(se_mode) is(se_mode, "MetaboSet")))))
 
   # Splitting into modes shouldn't work without "Split" column
-  fData(ms)$Split <- NULL
+  rowData(se)$Split <- NULL
   expect_error(fix_object(ms, split_data = TRUE))
 })
 
@@ -253,7 +247,9 @@ test_that("Creating dummy injection order works as expected", {
   for (name in names) {
     file <- system.file("extdata", paste0(name, "_sample.xlsx"), package = "notame")
     mode <- read_from_excel(file, name = name)
-    modes[name] <- construct_metabosets(mode$exprs, mode$pheno_data, mode$feature_data)
+    modes[name] <- SummarizedExperiment(assays = SimpleList(mode$assay), 
+                                        colData = mode$pheno_data,
+                                        rowData = mode$feature_data)
   }
   # Modify data
   modes$hilic_neg$Injection_order <- modes$hilic_neg$Injection_order + 1
@@ -261,15 +257,12 @@ test_that("Creating dummy injection order works as expected", {
   modes$rp_neg$Injection_order <- inj_ord_rn
   inj_ord_rp <- modes$rp_pos$Injection_order[5:50] + 5
   modes$rp_pos$Injection_order[5:50] <- inj_ord_rp
-  sampleNames(modes$hilic_neg)[2] <- "ID_666"
-  sampleNames(modes$rp_pos)[22] <- "ID_999"
+  colnames(modes$hilic_neg)[2] <- "ID_666"
+  colData(modes$hilic_neg)$Sample_ID[2] <- "ID_666"
+  colnames(modes$rp_pos)[22] <- "ID_999"
+  colData(modes$rp_pos)$Sample_ID[22] <- "ID_999"
 
-  expect_warning(merged <- merge_metabosets(modes),
-    regexp = "Sample IDs are not identical|Unequal amount of samples"
-  )
-  
-  se_modes <- lapply(modes, function(mode) as(mode, "SummarizedExperiment"))
-  expect_warning(merged <- merge_objects(se_modes),
+  expect_warning(merged <- merge_objects(modes),
     regexp = "Sample IDs are not identical|Unequal amount of samples"
   )
   # Dummy injection

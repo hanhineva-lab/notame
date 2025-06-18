@@ -7,12 +7,12 @@
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param value the value to be converted to NA
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param name character, name of the resultant assay in case of multiple assays
 #'
-#' @return SummarizedExperiment or MetaboSet object as the one supplied, with 
+#' @return SummarizedExperiment object as the one supplied, with 
 #' missing values correctly set to NA.
 #'
 #' @examples
@@ -26,10 +26,7 @@ mark_nas <- function(object, value, assay.type = NULL, name = NULL) {
   ex <- assay(object, from_to[[1]])
   ex[ex == value] <- NA
   assay(object, from_to[[2]]) <- ex
-  if (!is.null(attr(object, "original_class"))) {
-    object <- as(object, "MetaboSet")
-    attr(object, "original_class") <- NULL
-  }
+
   object
 }
 
@@ -52,13 +49,13 @@ mark_nas <- function(object, value, assay.type = NULL, name = NULL) {
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param ms_ms_spectrum_col name of column with original MS/MS spectra
 #' @param peak_num maximum number of peak that is kept (Recommended: 4-10)
 #' @param min_abund minimum relative abundance to be kept (Recommended: 1-5)
 #' @param deci_num maximum number of decimals to m/z value (Recommended: >2)
 #'
-#' @return A SummarizedExperiment or MetaboSet object as the one supplied, with 
+#' @return A SummarizedExperiment object as the one supplied, with 
 #' publication-ready MS/MS peak information.
 #'
 #' @examples
@@ -118,11 +115,7 @@ fix_MSMS <- function(object, ms_ms_spectrum_col = "MS_MS_spectrum",
   rowData(object)$MS_MS_Spectrum_clean <- to_metab
   log_text(paste0("Saving fixed MS/MS spectra to column",
                   " \'MS_MS_Spectrum_clean\' in rowData"))
-                  
-  if (!is.null(attr(object, "original_class"))) {
-    object <- as(object, "MetaboSet")
-    attr(object, "original_class") <- NULL
-  }
+
   object
 }
 
@@ -130,9 +123,9 @@ fix_MSMS <- function(object, ms_ms_spectrum_col = "MS_MS_spectrum",
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #'
-#' @return A SummarizedExperiment or MetaboSet object as the one supplied, 
+#' @return A SummarizedExperiment object as the one supplied, 
 #' without QC samples.
 #'
 #' @examples
@@ -146,10 +139,7 @@ drop_qcs <- function(object) {
   object <- .check_object(object)
   object <- object[, object$QC != "QC"]
   colData(object) <- droplevels(colData(object))
-  if (!is.null(attr(object, "original_class"))) {
-    object <- as(object, "MetaboSet")
-    attr(object, "original_class") <- NULL
-  }
+
   object
 }
 
@@ -161,11 +151,11 @@ drop_qcs <- function(object) {
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param all_features logical, should all features be retained? Mainly used by 
 #' internal functions
 #' 
-#' @return A SummarizedExperiment or MetaboSet object without the previously 
+#' @return A SummarizedExperiment object without the previously 
 #' flagged features.
 #'
 #' @examples
@@ -179,22 +169,6 @@ drop_qcs <- function(object) {
 setGeneric("drop_flagged", signature = "object",
            function(object, all_features = FALSE) 
            standardGeneric("drop_flagged"))
-
-#' @rdname drop_flagged
-#' @export
-setMethod("drop_flagged", signature = c(object = "MetaboSet"),
-  function(object, all_features = FALSE) {
-    object <- .check_object(object, feature_flag = TRUE)
-    if (!all_features) {
-      object <- object[is.na(flag(object)), ]
-    }
-    if (!is.null(attr(object, "original_class"))) {
-      object <- as(object, "MetaboSet")
-      attr(object, "original_class") <- NULL
-    }
-    object
-  }
-)
 
 #' @rdname drop_flagged
 #' @export
@@ -217,10 +191,10 @@ setMethod("drop_flagged", signature = c(object = "SummarizedExperiment"),
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param y matrix containing new values to be merged into peak table
 #'
-#' @return A SummarizedExperiment or MetaboSet object with the new peak table 
+#' @return A SummarizedExperiment object with the new peak table 
 #' values.
 #'
 #' @examples
@@ -267,7 +241,7 @@ merge_assay <- function(object, y, assay.type = NULL, name = NULL) {
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before imputation.
 #' @param assay.type character, assay to be used in case of multiple assays
@@ -321,10 +295,6 @@ impute_rf <- function(object, all_features = FALSE, assay.type = NULL,
                         name = from_to[[2]])
   log_text(paste("Random forest imputation finished at", Sys.time(), "\n"))
   
-  if (!is.null(attr(object, "original_class"))) {
-    object <- as(object, "MetaboSet")
-    attr(object, "original_class") <- NULL
-  }
   object
 }
 
@@ -355,7 +325,7 @@ impute_rf <- function(object, all_features = FALSE, assay.type = NULL,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param value the value used for imputation, either a numeric or one of 
 #' '"min", "half_min", "small_random", see above
 #' @param na_limit only impute features with the proportion of NAs over this 
@@ -364,7 +334,7 @@ impute_rf <- function(object, all_features = FALSE, assay.type = NULL,
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param name character, name of the resultant assay in case of multiple assays
 #'
-#' @return A SummarizedExperiment or Metaboset object with imputed peak table.
+#' @return A SummarizedExperiment object with imputed peak table.
 #'
 #' @examples
 #' data(example_set)
@@ -422,10 +392,6 @@ impute_simple <- function(object, value, na_limit = 0, assay.type = NULL,
   obj <- merge_assay(object, imp, assay.type = from_to[[1]],
                      name = from_to[[2]])
   
-  if (!is.null(attr(obj, "original_class"))) {
-    object <- as(obj, "MetaboSet")
-    attr(object, "original_class") <- NULL
-  }
   obj
 }
 
@@ -436,7 +402,7 @@ impute_simple <- function(object, value, na_limit = 0, assay.type = NULL,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param name character, name of the resultant assay in case of multiple assays
 #' @return An object as the one supplied, with normalized features.
@@ -453,10 +419,7 @@ inverse_normalize <- function(object, assay.type = NULL, name = NULL) {
       stats::qnorm((rank(x, na.last = "keep") - 0.5) / sum(!is.na(x)))
     }) %>%
     t()
-  if (!is.null(attr(object, "original_class"))) {
-    object <- as(object, "MetaboSet")
-    attr(object, "original_class") <- NULL
-  }
+
   object
 }
 
@@ -467,7 +430,7 @@ inverse_normalize <- function(object, assay.type = NULL, name = NULL) {
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #'
 #' @return A data frame with the number of features at each stage of flagging.
 #'
@@ -507,47 +470,20 @@ flag_report <- function(object) {
 
 #' Logarithm
 #'
-#' Log-transforms the peak table of SummarzedExperiment or MetaboSet object. 
+#' Log-transforms the peak table of SummarzedExperiment object. 
 #' Shortcuts for log2 and log10 also implemented.
 #' For more information, see \code{\link{log}}.
 #'
 #' @param x a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param base the base of the logarithm
 #'
-#' @return A SummarizedExperiment or MetaboSet object with peak table
+#' @return A SummarizedExperiment object with peak table
 #' transformed.
 #'
 #' @name log
 NULL
-
-#' @rdname log
-#' @export
-setMethod("log", "MetaboSet", 
-  function(x, base = exp(1)) {
-    exprs(x) <- log(exprs(x), base = base)
-    x
-  }
-)
-
-#' @rdname log
-#' @export
-setMethod("log2", "MetaboSet", 
-  function(x) {
-    exprs(x) <- log2(exprs(x))
-    x
-  }
-)
-
-#' @rdname log
-#' @export
-setMethod("log10", "MetaboSet", 
-  function(x) {
-    exprs(x) <- log10(exprs(x))
-    x
-  }
-)
 
 #' Scale peak table
 #'
@@ -556,24 +492,15 @@ setMethod("log10", "MetaboSet",
 #'
 #' @param x a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param center,scale as in base scale function
 #' 
-#' @return A SummarizedExperiment or MetaboSet object with modified peak table.
+#' @return A SummarizedExperiment object with modified peak table.
 #'
 #' @examples
 #' scaled_set <- scale(example_set)
 #' @name scale
 NULL
-
-#' @rdname scale
-#' @export
-setMethod("scale", "MetaboSet", 
-  function(x, center = TRUE, scale = TRUE) {
-    exprs(x) <- t(scale(t(exprs(x)), center = center, scale = scale))
-    x
-  }
-)
 
 #' Exponential function
 #'
@@ -581,7 +508,7 @@ setMethod("scale", "MetaboSet",
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param base base of the exponential
 #'
 #' @return An object with altered feature abundances.
@@ -595,16 +522,6 @@ setMethod("scale", "MetaboSet",
 #' @export
 setGeneric("exponential", signature = "object",
            function(object, base = exp(1)) standardGeneric("exponential"))
-
-#' @rdname exponential
-#' @export
-setMethod("exponential", c(object = "MetaboSet"),
-  function(object, base = exp(1)) {
-    exprs(object) <- base^exprs(object)
-    object
-  }
-)
-
 
 # ---------- Logarithms ----------
 
@@ -658,13 +575,13 @@ setMethod("exponential", c(object = "SummarizedExperiment"),
 #' Probabilistic quotient normalization
 #'
 #' Apply probabilistic quotient normalization (PQN) to the peak table of a 
-#' SummarizedExperiment or MetaboSet object. By default, reference is 
+#' SummarizedExperiment object. By default, reference is 
 #' calculated from high-quality QC samples and the median of the reference is 
 #' used for normalization. Check parameters for more options.
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param ref character, the type of reference samples to use for normalization.
 #' @param method character, the method to use for calculating the reference 
 #' sample.
@@ -673,7 +590,7 @@ setMethod("exponential", c(object = "SummarizedExperiment"),
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param name character, name of the resultant assay in case of multiple assays
 #'
-#' @return A SummarizedExperiment or MetaboSet object with altered feature 
+#' @return A SummarizedExperiment object with altered feature 
 #' abundances.
 #'
 #' @examples
@@ -715,9 +632,5 @@ pqn_normalization <- function(object, ref = c("qc", "all"),
   rownames(pqn_data) <- rownames(data)
   assay(object, from_to[[2]]) <- pqn_data
   
-  if (!is.null(attr(object, "original_class"))) {
-    object <- as(object, "MetaboSet")
-    attr(object, "original_class") <- NULL
-  }
   object
 }

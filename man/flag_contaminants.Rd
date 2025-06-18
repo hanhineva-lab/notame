@@ -16,7 +16,7 @@ flag_contaminants(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{blank_col}{character, the column name in pheno data with blank labels}
 
@@ -33,7 +33,7 @@ flagged separately.}
 \item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
-A SummarizedExperiment or MetaboSet object with contaminant features 
+A SummarizedExperiment object with contaminant features 
 flagged.
 }
 \description{

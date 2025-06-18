@@ -2,29 +2,11 @@
 % Please edit documentation in R/scatter.R
 \name{manhattan_plot}
 \alias{manhattan_plot}
-\alias{manhattan_plot,MetaboSet-method}
 \alias{manhattan_plot,data.frame-method}
 \alias{manhattan_plot,SummarizedExperiment-method}
 \title{Manhattan plot}
 \usage{
 manhattan_plot(
-  object,
-  x,
-  p,
-  effect = NULL,
-  p_fdr = NULL,
-  color = NULL,
-  p_breaks = c(0.05, 0.01, 0.001, 1e-04),
-  fdr_limit = 0.05,
-  x_lim = NULL,
-  y_lim = NULL,
-  color_scale = getOption("notame.color_scale_con"),
-  title = "Manhattan plot",
-  subtitle = NULL,
-  ...
-)
-
-\S4method{manhattan_plot}{MetaboSet}(
   object,
   x,
   p,
@@ -78,7 +60,7 @@ manhattan_plot(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-, \code{\link{MetaboSet}} object or a data frame. Feature data is used. If x 
+object or a data frame. Feature data is used. If x 
 is a data frame, it is used as is.}
 
 \item{x, p}{the column names of x-axis and p-values}

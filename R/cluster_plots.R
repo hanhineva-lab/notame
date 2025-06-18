@@ -5,7 +5,7 @@
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param color character, name of the column used for coloring the sample 
@@ -84,7 +84,7 @@ plot_dendrogram <- function(object, all_features = FALSE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param dist_method distance method used in clustering as in

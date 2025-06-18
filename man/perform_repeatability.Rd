@@ -9,7 +9,7 @@ perform_repeatability(object, group, assay.type = NULL)
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{group}{column name of pheno data giving the group labels}
 

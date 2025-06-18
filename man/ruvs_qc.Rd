@@ -9,7 +9,7 @@ ruvs_qc(object, replicates, k = 3, assay.type = NULL, name = NULL, ...)
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{replicates}{list of numeric vectors, indexes of replicates}
 
@@ -23,7 +23,7 @@ the data.}
 \item{...}{other parameters passed to \code{link[RUVSeq]{RUVs}}}
 }
 \value{
-A SummarizedExperiment or Metaboset object with the normalized data.
+A SummarizedExperiment object with the normalized data.
 }
 \description{
 An interface for \code{link[RUVSeq]{RUVs}} method

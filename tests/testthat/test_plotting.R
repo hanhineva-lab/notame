@@ -122,17 +122,5 @@ test_that("Batch plots work with and without multiple assays", {
   expect_error(save_batch_plots(
     orig = ex_set[1:10], corrected = batch_corrected[1:10],
     file = path, assay.type1 = 1))
-      
-  # MetaboSet works
-  ms_set <- as(ex_set, "MetaboSet")
-  ms_batch_corrected <- as(batch_corrected, "MetaboSet")
-  save_batch_plots(
-    orig = ms_set[1:10], corrected = ms_batch_corrected[1:10],
-    file = path)
-
-  # assay.type throws error with MetaboSet
-  expect_error(save_batch_plots(
-    orig = ms_set[1:10], corrected = ms_batch_corrected[1:10],
-    file = path, assay.type1 = "nope"))
 })
 

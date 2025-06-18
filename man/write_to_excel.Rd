@@ -9,7 +9,7 @@ write_to_excel(object, file, ...)
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{file}{path to the file to write}
 
@@ -20,7 +20,7 @@ or \code{\link{MetaboSet}} object}
 None, the function is invoked for its side effect.
 }
 \description{
-Writes all the data in a SummarizedExperiment or MetaboSet object to an 
+Writes all the data in a SummarizedExperiment object to an 
 Excel spreadsheet.
 The format is similar to the one used to read data in, except for the fact 
 that EVERYTHING NEEDS TO BE WRITTEN AS TEXT. To fix numeric values in Excel,

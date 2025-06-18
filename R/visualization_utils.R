@@ -134,7 +134,7 @@ save_plot <- function(p, file, ...) {
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param prefix character, a file path prefix added to the file paths
 #' @param format character, format in which the plots should be saved, DOES NOT 
 #' support raster formats

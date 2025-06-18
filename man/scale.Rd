@@ -2,23 +2,20 @@
 % Please edit documentation in R/transformations.R
 \name{scale}
 \alias{scale}
-\alias{scale,MetaboSet-method}
 \alias{scale,SummarizedExperiment-method}
 \title{Scale peak table}
 \usage{
-\S4method{scale}{MetaboSet}(x, center = TRUE, scale = TRUE)
-
 \S4method{scale}{SummarizedExperiment}(x, center = TRUE, scale = TRUE)
 }
 \arguments{
 \item{x}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{center, scale}{as in base scale function}
 }
 \value{
-A SummarizedExperiment or MetaboSet object with modified peak table.
+A SummarizedExperiment object with modified peak table.
 }
 \description{
 Applies the base R function scale to transposed peak table. 

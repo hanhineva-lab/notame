@@ -17,7 +17,7 @@ fit_rf(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{y}{character, column name of pheno data giving the dependent variable 
 of the model}

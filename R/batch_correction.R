@@ -4,14 +4,14 @@
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param replicates list of numeric vectors, indexes of replicates
 #' @param k The number of factors of unwanted variation to be estimated from 
 #' the data.
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param name character, name of the resultant assay in case of multiple assays
 #' @param ... other parameters passed to \code{link[RUVSeq]{RUVs}}
-#' @return A SummarizedExperiment or Metaboset object with the normalized data.
+#' @return A SummarizedExperiment object with the normalized data.
 #'
 #' @examples
 #' data(example_set)
@@ -52,10 +52,6 @@ ruvs_qc <- function(object, replicates, k = 3,
   assay(object, from_to[[2]]) <- ruv_results$normalizedCounts
   colData(object) <- cbind(colData(object), ruv_results$W)
   
-  if (!is.null(attr(object, "original_class"))) {
-    object <- as(object, "MetaboSet")
-    attr(object, "original_class") <- NULL
-  }
   object
 }
 
@@ -69,7 +65,7 @@ ruvs_qc <- function(object, replicates, k = 3,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param batch column name of pheno data giving the batch labels
 #' @param all_features logical, should all features be used? If FALSE
 #' (the default), flagged features are removed before imputation.
@@ -173,7 +169,7 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param group column name of pheno data giving the group labels
 #' @param assay.type character, assay to be used in case of multiple assays
 #'
@@ -219,7 +215,7 @@ perform_repeatability <- function(object, group, assay.type = NULL) {
 #'
 #' @param orig,corrected \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} objects before and after batch effect correction
+#' objects before and after batch effect correction
 #' @param file path to the PDF file where the plots will be saved
 #' @param width,height width and height of the plots in inches
 #' @param batch,color,shape column names of pheno data for batch labels,

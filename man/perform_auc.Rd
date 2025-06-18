@@ -9,7 +9,7 @@ perform_auc(object, time, subject, group, assay.type = NULL)
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{time, subject, group}{column names of pheno data holding time, 
 subject and group labels}
@@ -17,11 +17,11 @@ subject and group labels}
 \item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
-A pseudo SummarizedExperiment or MetaboSet object with the AUCs.
+A pseudo SummarizedExperiment object with the AUCs.
 }
 \description{
 Compute area under curve (AUC) for each subject and feature.
-Creates a pseudo SummarizedExperiment or MetaboSet object, where the 
+Creates a pseudo SummarizedExperiment object, where the 
 "samples" are subjects (or subject/group combinations in case the same 
 subjects are submitted to different treatments) and the "abundances" are 
 AUCs. This object can then be  used to compute results of e.g. t-tests of 

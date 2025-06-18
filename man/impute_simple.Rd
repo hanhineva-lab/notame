@@ -9,7 +9,7 @@ impute_simple(object, value, na_limit = 0, assay.type = NULL, name = NULL)
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{value}{the value used for imputation, either a numeric or one of 
 '"min", "half_min", "small_random", see above}
@@ -23,7 +23,7 @@ half of the values missing are imputed.}
 \item{name}{character, name of the resultant assay in case of multiple assays}
 }
 \value{
-A SummarizedExperiment or Metaboset object with imputed peak table.
+A SummarizedExperiment object with imputed peak table.
 }
 \description{
 Impute missing values using a simple imputation strategy. All missing values

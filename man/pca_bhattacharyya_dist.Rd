@@ -18,7 +18,7 @@ pca_bhattacharyya_dist(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{batch}{column name of pheno data giving the batch labels}
 

@@ -22,7 +22,7 @@
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param grouping_cols character vector, the columns by which grouping should 
 #' be done. Use \code{NA} to compute statistics without grouping.
 #' @param assay.type character, assay to be used in case of multiple assays
@@ -274,7 +274,7 @@ summarize_results <- function(df, remove = c("Intercept", "CI95", "Std_error",
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param id character, name of the subject ID column
 #' @param group character, name of the group column
 #' @param time character, name of the time column
@@ -341,7 +341,7 @@ cohens_d <- function(object, group, id = NULL,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param group character, name of the group column
 #' @param assay.type character, assay to be used in case of multiple assays
 #'
@@ -452,7 +452,7 @@ fold_change <- function(object, group, assay.type = NULL) {
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param x character vector, names of variables to be correlated
 #' @param y character vector, either identical to x (the default) or a distinct 
 #' set of variables to be correlated against x
@@ -609,7 +609,7 @@ perform_correlation_tests <- function(object, x, y = x, id = NULL,
 #' Area under curve
 #'
 #' Compute area under curve (AUC) for each subject and feature.
-#' Creates a pseudo SummarizedExperiment or MetaboSet object, where the 
+#' Creates a pseudo SummarizedExperiment object, where the 
 #' "samples" are subjects (or subject/group combinations in case the same 
 #' subjects are submitted to different treatments) and the "abundances" are 
 #' AUCs. This object can then be  used to compute results of e.g. t-tests of 
@@ -617,12 +617,12 @@ perform_correlation_tests <- function(object, x, y = x, id = NULL,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param time,subject,group column names of pheno data holding time, 
 #' subject and group labels
 #' @param assay.type character, assay to be used in case of multiple assays
 #'
-#' @return A pseudo SummarizedExperiment or MetaboSet object with the AUCs.
+#' @return A pseudo SummarizedExperiment object with the AUCs.
 #'
 #' @examples
 #' data(example_set)
@@ -671,9 +671,6 @@ perform_auc <- function(object, time, subject, group, assay.type = NULL) {
 
   log_text("AUC computation finished")
   
-  if (!is.null(attr(object, "original_class"))) {
-    new_object <- as(new_object, "MetaboSet")
-  }
   new_object
 }
 
@@ -764,7 +761,7 @@ perform_auc <- function(object, time, subject, group, assay.type = NULL) {
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
@@ -855,7 +852,7 @@ perform_lm <- function(object, formula_char, all_features = FALSE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
@@ -934,7 +931,7 @@ perform_lm_anova <- function(object, formula_char, all_features = FALSE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
@@ -1120,7 +1117,7 @@ perform_logistic <- function(object, formula_char, all_features = FALSE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
@@ -1216,7 +1213,7 @@ perform_lmer <- function(object, formula_char, all_features = FALSE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
@@ -1285,7 +1282,7 @@ perform_homoscedasticity_tests <- function(object, formula_char,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param all_features should all features be included in FDR correction?
@@ -1345,7 +1342,7 @@ perform_kruskal_wallis <- function(object, formula_char, all_features = FALSE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details).
 #' @param all_features should all features be included in FDR correction?
@@ -1404,7 +1401,7 @@ perform_oneway_anova <- function(object, formula_char, all_features = FALSE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param formula_char character, the formula to be used in the linear model 
 #' (see Details)
 #' @param is_paired logical, use paired t-test
@@ -1608,7 +1605,7 @@ perform_t_test <- function(object, formula_char, is_paired = FALSE, id = NULL,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param formula_char character, the formula to be used in the tests
 #' @param is_paired logical, use paired test
 #' @param id character, name of the subject identification column for paired 

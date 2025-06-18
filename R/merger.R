@@ -124,68 +124,6 @@
   objects
 }
 
-#' Merge MetaboSet objects together
-#'
-#' Merges two or more MetaboSet objects together. Can be used to merge 
-#' analytical modes or batches.
-#'
-#'
-#' @param ... \code{\link{MetaboSet}} objects or a list of MetaboSet objects
-#' @param merge what to merge? features is used for combining analytical modes,
-#' samples is used for batches
-#'
-#' @return A merged MetaboSet object.
-#'
-#' @details When merging samples, sample IDs that beging with "QC" or "Ref" are 
-#' combined so that they have running numbers on them. This means that if both 
-#' batches have samples called "QC_1", this will not result in an error,
-#' but the sample IDs will be adjusted so that they are unique.
-#'
-#' @examples
-#' # Merge analytical modes
-#' data(hilic_neg_sample, hilic_pos_sample, rp_neg_sample, rp_pos_sample)
-#' modes <- list(hilic_neg_sample, hilic_pos_sample, 
-#'               rp_neg_sample, rp_pos_sample)
-#' modes <- lapply(modes, function(mode) as(mode, "MetaboSet"))
-#' merged <- merge_metabosets(modes)
-#'
-#' # Merge batches
-#' data(example_set)
-#' batch1 <- example_set[, example_set$Batch == 1]
-#' batch2 <- example_set[, example_set$Batch == 2]
-#' merged <- merge_metabosets(batch1, batch2, merge = "samples")
-#'
-#' @export
-merge_metabosets <- function(..., merge = c("features", "samples")) {
-  merge <- match.arg(merge)
-  # Combine the objects to a list
-  objects <- .to_list(...)
-  # Convert to SE
-  objects <- lapply(objects, function(object) {
-    object <- .check_object(object)
-  })
-  # Choose merging function
-  if (merge == "features") {
-    merge_fun <- .merge_mode_helper
-  } else {
-    merge_fun <- .merge_batch_helper
-  }
-  # Merge objects together one by one
-  merged <- NULL
-  for (object in objects) {
-    if (is.null(merged)) {
-      merged <- object
-    } else {
-      merged <- merge_fun(merged, object)
-    }
-  }
-  if (!is.null(attr(merged, "original_class"))) {
-    merged <- as(merged, "MetaboSet")
-    attr(object, "original_class") <- NULL
-  }
-  merged
-}
-
 #' Merge SummarizedExperiment objects together
 #'
 #' Merges two or more SummarizedExperiment objects together. Can be used to 

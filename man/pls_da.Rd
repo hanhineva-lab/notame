@@ -47,7 +47,7 @@ mixomics_splsda_optimize(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a SummarizedExperiment object}
 
 \item{y}{character, column name of the grouping variable to predict}
 

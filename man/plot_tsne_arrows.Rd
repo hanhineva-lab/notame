@@ -26,7 +26,7 @@ plot_tsne_arrows(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a SummarizedExperiment object}
 
 \item{all_features}{logical, should all features be used? If FALSE (the 
 default), flagged features are removed before visualization.}

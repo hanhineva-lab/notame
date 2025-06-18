@@ -21,7 +21,7 @@ cluster_features(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{mz_col}{the column name in feature data that holds mass-to-charge 
 ratios}
@@ -50,7 +50,7 @@ have to be plotted}
 \item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
-a SummarizedExperiment or MetaboSet object, with median peak area 
+a SummarizedExperiment object, with median peak area 
 (MPA), the cluster ID, the features in the cluster, and cluster size added 
 to feature data.
 }

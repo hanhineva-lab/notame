@@ -15,7 +15,7 @@ flag_detection(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{qc_limit}{the detection rate limit for QC samples}
 
@@ -27,7 +27,7 @@ variable}
 \item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
-A SummarizedExperiment or MetaboSet object with the features flagged.
+A SummarizedExperiment object with the features flagged.
 }
 \description{
 Flags features with too high amount of missing values. There are two 

@@ -28,7 +28,7 @@ save_scatter_plots(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{x}{character, name of the column to be used as x-axis}
 

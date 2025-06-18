@@ -2,20 +2,11 @@
 % Please edit documentation in R/transformations.R
 \name{log}
 \alias{log}
-\alias{log,MetaboSet-method}
-\alias{log2,MetaboSet-method}
-\alias{log10,MetaboSet-method}
 \alias{log,SummarizedExperiment-method}
 \alias{log2,SummarizedExperiment-method}
 \alias{log10,SummarizedExperiment-method}
 \title{Logarithm}
 \usage{
-\S4method{log}{MetaboSet}(x, base = exp(1))
-
-\S4method{log2}{MetaboSet}(x)
-
-\S4method{log10}{MetaboSet}(x)
-
 \S4method{log}{SummarizedExperiment}(x, base = exp(1))
 
 \S4method{log2}{SummarizedExperiment}(x)
@@ -25,16 +16,16 @@
 \arguments{
 \item{x}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{base}{the base of the logarithm}
 }
 \value{
-A SummarizedExperiment or MetaboSet object with peak table
+A SummarizedExperiment object with peak table
 transformed.
 }
 \description{
-Log-transforms the peak table of SummarzedExperiment or MetaboSet object. 
+Log-transforms the peak table of SummarzedExperiment object. 
 Shortcuts for log2 and log10 also implemented.
 For more information, see \code{\link{log}}.
 }

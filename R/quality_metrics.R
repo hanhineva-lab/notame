@@ -3,7 +3,7 @@
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' 
 #' @return A data frame with quality metrics for each feature.
 #'
@@ -42,10 +42,10 @@ quality <- function(object) {
 #' \code{\link{flag_quality}}
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param ... additional arguments passed to methods
 #'
-#' @return A SummarizedExperiment or MetaboSet object with quality metrics in 
+#' @return A SummarizedExperiment object with quality metrics in 
 #' feature data.
 #' 
 #' @examples
@@ -56,37 +56,6 @@ quality <- function(object) {
 #' @export
 setGeneric("assess_quality", signature = "object",
            function(object, ...) standardGeneric("assess_quality"))
-
-#' @rdname assess_quality
-#' @export
-setMethod("assess_quality", signature = c(object = "MetaboSet"),
-  function(object) {
-    object <- .check_object(object, pheno_QC = TRUE, assay.type = 1)
-    # Remove old quality metrics
-    if (!is.null(quality(object))) {
-      object <- .erase_quality(object)
-    }
-
-    qc_data <- assay(object)[, object$QC == "QC"]
-    sample_data <- assay(object)[, object$QC != "QC"]
-    features <- rownames(sample_data)
-    
-    quality_metrics <- BiocParallel::bplapply(features, function(feature) {
-      data.frame(
-        Feature_ID = feature,
-        RSD = finite_sd(qc_data[feature, ]) / 
-        abs(finite_mean(qc_data[feature,])),
-        RSD_r = finite_mad(qc_data[feature, ]) /
-          abs(finite_median(qc_data[feature, ])),
-        D_ratio = finite_sd(qc_data[feature, ]) /
-          finite_sd(sample_data[feature, ]),
-        D_ratio_r = finite_mad(qc_data[feature, ]) /
-          finite_mad(sample_data[feature, ]),
-        row.names = feature, stringsAsFactors = FALSE)
-    })
-  quality_metrics <- do.call(rbind, quality_metrics)
-  object <- join_rowData(object, quality_metrics)
-})
 
 #' @rdname assess_quality
 #' @param assay.type character, assay to be used in case of multiple assays
@@ -130,7 +99,7 @@ setMethod("assess_quality", signature = c(object = "SummarizedExperiment"),
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param condition character, condition for keeping the features, see Details
 #' @param assay.type character, assay to be used in case of multiple assays
 #'
@@ -154,7 +123,7 @@ setMethod("assess_quality", signature = c(object = "SummarizedExperiment"),
 #' \deqn{RSD_r < 0.2 \& D_ratio_r < 0.4}
 #' \deqn{RSD < 0.1 \& RSD_r < 0.1 \& D_ratio < 0.1}
 #'
-#' @return a SummarizedExperiment or MetaboSet object with the features flagged.
+#' @return a SummarizedExperiment object with the features flagged.
 #'
 #' @references Broadhurst, David et al. Guidelines and considerations for the 
 #' use of system suitability and quality control samples in mass spectrometry 
@@ -202,10 +171,7 @@ flag_quality <- function(object, assay.type = NULL, condition =
                                     na.rm =TRUE) 
                                 / nrow(rowData(object)))
   log_text(paste0("\n", percentage, " of features flagged for low quality"))
-  if (!is.null(attr(object, "original_class"))) {
-    object <- as(object, "MetaboSet")
-    attr(object, "original_class") <- NULL
-  }
+
   object
 }
 
@@ -224,13 +190,13 @@ flag_quality <- function(object, assay.type = NULL, condition =
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param qc_limit the detection rate limit for QC samples
 #' @param group_limit the detection rate limit for study groups
 #' @param group the columns name in sample information to use as the grouping 
 #' variable
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @return A SummarizedExperiment or MetaboSet object with the features flagged.
+#' @return A SummarizedExperiment object with the features flagged.
 #'
 #' @examples
 #' data(example_set)
@@ -290,10 +256,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
                   " of features flagged for low detection rate"))
 
   object <- join_rowData(object, proportions)
-  if (!is.null(attr(object, "original_class"))) {
-    object <- as(object, "MetaboSet")
-    attr(object, "original_class") <- NULL
-  }
+
   object
 }
 
@@ -307,7 +270,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param blank_col character, the column name in pheno data with blank labels
 #' @param blank_label character, the label for blank samples in blank_col
 #' @param flag_thresh numeric, the ratio threshold for flagging contaminants.
@@ -317,7 +280,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' be changed if sample processing contaminants and carryover contaminants are 
 #' flagged separately.
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @return A SummarizedExperiment or MetaboSet object with contaminant features 
+#' @return A SummarizedExperiment object with contaminant features 
 #' flagged.
 #'
 #' @examples
@@ -374,9 +337,6 @@ flag_contaminants <- function(object, blank_col, blank_label,
                             Blank_ratio = blank_median / sample_median,
                             stringsAsFactors = FALSE)
   object <- join_rowData(object, blank_ratio)
-  if (!is.null(attr(object, "original_class"))) {
-    object <- as(object, "MetaboSet")
-    attr(object, "original_class") <- NULL
-  }
+
   object
 }

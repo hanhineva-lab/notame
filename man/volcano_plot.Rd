@@ -2,33 +2,11 @@
 % Please edit documentation in R/scatter.R
 \name{volcano_plot}
 \alias{volcano_plot}
-\alias{volcano_plot,MetaboSet-method}
 \alias{volcano_plot,data.frame-method}
 \alias{volcano_plot,SummarizedExperiment-method}
 \title{Volcano plot}
 \usage{
 volcano_plot(
-  object,
-  x,
-  p,
-  p_fdr = NULL,
-  color = NULL,
-  p_breaks = c(0.05, 0.01, 0.001, 1e-04),
-  fdr_limit = 0.05,
-  log2_x = FALSE,
-  center_x_axis = TRUE,
-  x_lim = NULL,
-  label = NULL,
-  label_limit = 0.05,
-  color_scale = getOption("notame.color_scale_con"),
-  title = "Volcano plot",
-  subtitle = NULL,
-  text_base_size = 14,
-  label_text_size = 4,
-  ...
-)
-
-\S4method{volcano_plot}{MetaboSet}(
   object,
   x,
   p,
@@ -94,7 +72,7 @@ volcano_plot(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-, \code{\link{MetaboSet}} object or a data frame.
+object or a data frame.
 Feature data is used. If x is a data frame, it is used as is.}
 
 \item{x, p}{the column names of effect size (x-axis) and p-values}

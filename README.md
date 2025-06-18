@@ -14,7 +14,7 @@ Before we go into the list of features, it is good for you to know how the workf
 Here is a list of the current main functionalities of the package:
 
 - Reading data from Excel spreadsheets created with MS-DIAL
-- Data is stored in a SummarizedExperiment or MetaboSet object that holds all the information about the features and samples along with the feature abundance matrix. This allows for a simple interface for all of the functions in the package, as there is no need to juggle with different matrices/data frames.
+- Data is stored in a SummarizedExperiment object that holds all the information about the features and samples along with the feature abundance matrix. This allows for a simple interface for all of the functions in the package, as there is no need to juggle with different matrices/data frames.
 - Drift correction: correcting for systematic drift in the intensity of molecular features using cubic spline correction (see [Kirwan & Broadhurst et al.](https://doi.org/10.1007/s00216-013-6856-7))
 - Identifying and flagging (or removing) low-quality molecular features using quality metrics defined by [Broadhurst et al.](https://doi.org/10.1007/s11306-018-1367-3)
 - Imputing missing values, multiple strategies available. Random forest imputation recommended, see [Kokla et al.](https://doi.org/10.1186/s12859-019-3110-0)

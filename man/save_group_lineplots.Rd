@@ -32,7 +32,7 @@ save_group_lineplots(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{all_features}{logical, should all features be used? 
 If FALSE (the default), flagged features are removed before visualization}

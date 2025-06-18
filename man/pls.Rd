@@ -48,7 +48,7 @@ mixomics_spls_optimize(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{y}{character vector, column names of the grouping variable to predict}
 

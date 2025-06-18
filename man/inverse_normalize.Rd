@@ -9,7 +9,7 @@ inverse_normalize(object, assay.type = NULL, name = NULL)
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 

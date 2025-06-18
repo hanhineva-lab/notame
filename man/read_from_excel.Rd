@@ -85,8 +85,4 @@ data <- read_from_excel(
   package = "notame"), sheet = 1, corner_row = 11, corner_column = "H",
   split_by = c("Column", "Ion_mode"))
 
-modes <- construct_metabosets(exprs = data$exprs, 
-  pheno_data = data$pheno_data, feature_data = data$feature_data,
-  group_col = "Group")
-
 }

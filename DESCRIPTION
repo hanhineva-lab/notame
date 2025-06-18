@@ -29,7 +29,6 @@ Encoding: UTF-8
 biocViews: BiomedicalInformatics, Metabolomics, DataImport, MassSpectrometry, BatchEffect, MultipleComparison, Normalization, QualityControl, Visualization, Preprocessing
 Depends:
     R (>= 4.5.0),
-    Biobase,
     ggplot2,
     magrittr,
     SummarizedExperiment

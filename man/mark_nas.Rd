@@ -9,7 +9,7 @@ mark_nas(object, value, assay.type = NULL, name = NULL)
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{value}{the value to be converted to NA}
 
@@ -18,7 +18,7 @@ or \code{\link{MetaboSet}} object}
 \item{name}{character, name of the resultant assay in case of multiple assays}
 }
 \value{
-SummarizedExperiment or MetaboSet object as the one supplied, with 
+SummarizedExperiment object as the one supplied, with 
 missing values correctly set to NA.
 }
 \description{

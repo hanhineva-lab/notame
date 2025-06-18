@@ -17,7 +17,7 @@ perform_permanova(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{group}{character, name of the column to compare}
 

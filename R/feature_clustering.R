@@ -10,7 +10,7 @@
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param mz_col the column name in feature data that holds mass-to-charge 
 #' ratios
 #' @param rt_col the column name in feature data that holds retention times
@@ -28,7 +28,7 @@
 #' @param prefix the prefix to the files to be plotted
 #' @param assay.type character, assay to be used in case of multiple assays
 #'
-#' @return a SummarizedExperiment or MetaboSet object, with median peak area 
+#' @return a SummarizedExperiment object, with median peak area 
 #' (MPA), the cluster ID, the features in the cluster, and cluster size added 
 #' to feature data.
 #'
@@ -101,10 +101,6 @@ cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
   clustered <- join_rowData(orig, features[c("Feature_ID", "MPA",
                                             "Cluster_ID", "Cluster_size",
                                             "Cluster_features")])
-  if (!is.null(attr(clustered, "original_class"))) {
-    clustered <- as(clustered, "MetaboSet")
-    attr(object, "original_class") <- NULL
-  }                                          
   clustered
 }
 
@@ -161,9 +157,9 @@ assign_cluster_id <- function(data, clusters, features, name_col) {
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #'
-#' @return A SummarizedExperiment or MetaboSet object with only one feature per 
+#' @return A SummarizedExperiment object with only one feature per 
 #' cluster.
 #'
 #' @examples
@@ -192,10 +188,7 @@ compress_clusters <- function(object) {
 
   object <- object[idx, ]
   log_text(paste("Clusters compressed, left with", nrow(object), "features"))
-  if (!is.null(attr(object, "original_class"))) {
-    object <- as(object, "MetaboSet")
-    attr(object, "original_class") <- NULL
-  }
+
   object
 }
 
@@ -370,7 +363,7 @@ find_clusters <- function(connections, d_thresh = 0.8) {
     message(n_comp, " components found")
 
     # Only keep the densely connected part of each component (subgraph)
-    clusters_tmp <- BiocParallel::bplapply(comp, function(subg) {
+    clusters_tmp <- lapply(comp, function(subg) {
       n_nodes <- length(igraph::V(subg))
       d <- igraph::degree(subg)
       # The limit of the degree a node needs to be kept

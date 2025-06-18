@@ -9,7 +9,7 @@ summary_statistics(object, grouping_cols = NULL, assay.type = NULL)
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{grouping_cols}{character vector, the columns by which grouping should 
 be done. Use \code{NA} to compute statistics without grouping.}

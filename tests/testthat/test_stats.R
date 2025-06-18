@@ -643,18 +643,6 @@ test_that("Assay control works (with correlation tests)", {
     x = rownames(ex_set), assay.type1 = "original",
     assay.type2 = "alternative")  
   expect_false(identical(correlations, correlations_one))
-  
-  # MetaboSet works with single object
-  ms_set <- as(ex_set, "MetaboSet")
-  correlations_one <- perform_correlation_tests(ms_set,
-    x = rownames(ms_set))
-    
-  # MetaboSet works with two objects
-  ms_correlations_two <- perform_correlation_tests(ms_set, 
-    object2 = ms_set, x = rownames(ms_set))
-    
-  # Correlation works the samy was using one or two MetaboSet objects
-  expect_identical(correlations_one, correlations_two)
 })
 
 test_that("Simple tests work in cases where alternative levels for confidence intervals are returned in case 95% confidence interval can't be computed", {

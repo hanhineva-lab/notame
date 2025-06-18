@@ -2,26 +2,23 @@
 % Please edit documentation in R/transformations.R
 \name{drop_flagged}
 \alias{drop_flagged}
-\alias{drop_flagged,MetaboSet-method}
 \alias{drop_flagged,SummarizedExperiment-method}
 \title{Drop flagged features}
 \usage{
 drop_flagged(object, all_features = FALSE)
-
-\S4method{drop_flagged}{MetaboSet}(object, all_features = FALSE)
 
 \S4method{drop_flagged}{SummarizedExperiment}(object, all_features = FALSE)
 }
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{all_features}{logical, should all features be retained? Mainly used by 
 internal functions}
 }
 \value{
-A SummarizedExperiment or MetaboSet object without the previously 
+A SummarizedExperiment object without the previously 
 flagged features.
 }
 \description{

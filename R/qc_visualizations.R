@@ -20,7 +20,7 @@
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param all_features logical, should all features be used? 
 #' If FALSE (the default), flagged features are removed before visualization.
 #' @param dist_method method for calculating the distances, passed to 
@@ -90,7 +90,7 @@ plot_dist_density <- function(object, all_features = FALSE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param all_features logical, should all features be used? 
 #' If FALSE (the default), flagged features are removed before visualization.
 #' @param assay.type character, assay to be used in case of multiple assays
@@ -192,7 +192,7 @@ plot_p_histogram <- function(p_values, hline = TRUE, combine = TRUE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param plot_flags logical, should the distribution of flags be added as a 
@@ -255,7 +255,7 @@ plot_quality <- function(object, all_features = FALSE, plot_flags = TRUE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param order_by character vector, names of columns used to order the samples

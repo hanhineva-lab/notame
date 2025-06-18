@@ -28,7 +28,7 @@ plot_pca(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{pcs}{numeric vector of length 2, the principal components to plot}
 

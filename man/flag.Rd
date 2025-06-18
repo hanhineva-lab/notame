@@ -18,7 +18,7 @@ flag(object) <- value
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{value}{character vector, values for flag column}
 }

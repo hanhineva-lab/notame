@@ -223,11 +223,4 @@ test_that("Assay control works for transformations (with drift correction)", {
   # Only one name can be supplied to transformed assay
   expect_error(correct_drift(ex_set,
     assay.type = "original", name = c("A", "B")))
-  # MetaboSet works
-  ms_set <- as(ex_set, "MetaboSet")
-  ms_corrected <- correct_drift(ms_set)
-  # assay.type throws error with MetaboSet
-  expect_error(correct_drift(ms_set, assay.type = "nope", name = "corrected"))
-  # # name throws error with MetaboSet
-  # expect_error(correct_drift(ms_set, assay.type = "nope", name = "corrected"))
 })

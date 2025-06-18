@@ -21,7 +21,7 @@ plot_pca_hexbin(
 )
 }
 \arguments{
-\item{object}{a SummarizedExperiment or MetaboSet object}
+\item{object}{a SummarizedExperiment object}
 
 \item{pcs}{numeric vector of length 2, the principal components to plot}
 

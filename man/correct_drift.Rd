@@ -27,7 +27,7 @@ correct_drift(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{log_transform}{logical, should drift correction be done on 
 log-transformed values? See Details}
@@ -62,7 +62,7 @@ ggplot function}
 \item{name}{character, name of the resultant assay in case of multiple assays}
 }
 \value{
-A SummarizedExperiment or MetaboSet object as the one supplied, with 
+A SummarizedExperiment object as the one supplied, with 
 drift corrected features.
 }
 \description{

@@ -2,20 +2,17 @@
 % Please edit documentation in R/transformations.R
 \name{exponential}
 \alias{exponential}
-\alias{exponential,MetaboSet-method}
 \alias{exponential,SummarizedExperiment-method}
 \title{Exponential function}
 \usage{
 exponential(object, base = exp(1))
-
-\S4method{exponential}{MetaboSet}(object, base = exp(1))
 
 \S4method{exponential}{SummarizedExperiment}(object, base = exp(1))
 }
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{base}{base of the exponential}
 }

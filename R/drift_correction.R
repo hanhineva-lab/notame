@@ -357,7 +357,7 @@ save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param log_transform logical, should drift correction be done on 
 #' log-transformed values? See Details
 #' @param spar smoothing parameter as in 
@@ -378,7 +378,7 @@ save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param name character, name of the resultant assay in case of multiple assays
 #'
-#' @return A SummarizedExperiment or MetaboSet object as the one supplied, with 
+#' @return A SummarizedExperiment object as the one supplied, with 
 #' drift corrected features.
 #'
 #' @details If \code{log_transform = TRUE}, the correction will be done on 
@@ -448,10 +448,6 @@ correct_drift <- function(object, log_transform = TRUE, spar = NULL,
                   color = color, shape = shape, color_scale = color_scale,
                   shape_scale = shape_scale, from = from_to[[1]], 
                   to = from_to[[2]])
-  }
-  if (!is.null(attr(inspected, "original_class"))) {
-    inspected <- as(inspected, "MetaboSet")
-    attr(inspected, "original_class") <- NULL
   }
   # Return the final version
   inspected

@@ -15,7 +15,7 @@ fix_MSMS(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{ms_ms_spectrum_col}{name of column with original MS/MS spectra}
 
@@ -26,7 +26,7 @@ or \code{\link{MetaboSet}} object}
 \item{deci_num}{maximum number of decimals to m/z value (Recommended: >2)}
 }
 \value{
-A SummarizedExperiment or MetaboSet object as the one supplied, with 
+A SummarizedExperiment object as the one supplied, with 
 publication-ready MS/MS peak information.
 }
 \description{

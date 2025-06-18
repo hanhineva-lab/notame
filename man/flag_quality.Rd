@@ -12,14 +12,14 @@ flag_quality(object, assay.type = NULL, condition =
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{condition}{character, condition for keeping the features, see Details}
 }
 \value{
-a SummarizedExperiment or MetaboSet object with the features flagged.
+a SummarizedExperiment object with the features flagged.
 }
 \description{
 Flags low-quality features using the quality metrics defined in (Broadhurst 

@@ -16,7 +16,7 @@ pqn_normalization(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{ref}{character, the type of reference samples to use for normalization.}
 
@@ -31,12 +31,12 @@ reference sample?}
 \item{name}{character, name of the resultant assay in case of multiple assays}
 }
 \value{
-A SummarizedExperiment or MetaboSet object with altered feature 
+A SummarizedExperiment object with altered feature 
 abundances.
 }
 \description{
 Apply probabilistic quotient normalization (PQN) to the peak table of a 
-SummarizedExperiment or MetaboSet object. By default, reference is 
+SummarizedExperiment object. By default, reference is 
 calculated from high-quality QC samples and the median of the reference is 
 used for normalization. Check parameters for more options.
 }

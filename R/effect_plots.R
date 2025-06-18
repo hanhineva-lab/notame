@@ -2,7 +2,7 @@
 #'
 #' Helper function for saving plots of individual features
 #' to either one multi-page PDF or separate EMF figures.
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a SummarizedExperiment object
 #' @param file_path character, a file path for PDF or prefix added to the file 
 #' paths for other formats
 #' @param format character, format in which the plots should be saved
@@ -96,7 +96,7 @@
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param all_features logical, should all features be used?
 #' If FALSE (the default), flagged features are removed before visualization.
 #' @param save logical, if false, the plots are not saved but returned as a list
@@ -215,7 +215,7 @@ save_subject_line_plots <- function(object, all_features = FALSE, save = TRUE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param all_features logical, should all features be used? 
 #' If FALSE (the default), flagged features are removed before visualization.
 #' @param save logical, if false, the plots are not saved but returned as a list
@@ -322,7 +322,7 @@ save_group_boxplots <- function(object, all_features = FALSE, save = TRUE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param save logical, if false, the plots are not saved but returned as a list
@@ -433,7 +433,7 @@ save_beeswarm_plots <- function(object, all_features = FALSE, save = TRUE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param x character, name of the column to be used as x-axis
 #' @param save logical, if false, the plots are not saved but returned as a list
 #' @param file_path character, a file path for PDF or prefix added to the file 
@@ -533,7 +533,7 @@ save_scatter_plots <- function(object, x = "Injection_order", save = TRUE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param all_features logical, should all features be used? 
 #' If FALSE (the default), flagged features are removed before visualization
 #' @param save logical, if false, the plots are not saved but returned as a list

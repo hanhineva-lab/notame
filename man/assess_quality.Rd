@@ -2,27 +2,24 @@
 % Please edit documentation in R/quality_metrics.R
 \name{assess_quality}
 \alias{assess_quality}
-\alias{assess_quality,MetaboSet-method}
 \alias{assess_quality,SummarizedExperiment-method}
 \title{Assess quality information of features}
 \usage{
 assess_quality(object, ...)
-
-\S4method{assess_quality}{MetaboSet}(object)
 
 \S4method{assess_quality}{SummarizedExperiment}(object, assay.type = NULL)
 }
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-or \code{\link{MetaboSet}} object}
+object}
 
 \item{...}{additional arguments passed to methods}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
-A SummarizedExperiment or MetaboSet object with quality metrics in 
+A SummarizedExperiment object with quality metrics in 
 feature data.
 }
 \description{

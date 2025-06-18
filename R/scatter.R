@@ -57,7 +57,7 @@
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
@@ -133,7 +133,7 @@ plot_pca <- function(object, pcs = c(1, 2), all_features = FALSE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
@@ -303,7 +303,7 @@ plot_tsne <- function(object, all_features = FALSE, center = TRUE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
@@ -382,7 +382,7 @@ plot_pca_loadings <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' where the value of the coloring variable is summarised for each bin, by 
 #' default as the mean of the values inside the bin.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a SummarizedExperiment object
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param all_features logical, should all features be used? If FALSE (the 
@@ -439,7 +439,7 @@ plot_pca_hexbin <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' of \code{\link[pcaMethods]{pca}}, the method can be changed to "ppca" if 
 #' nipals fails.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a SummarizedExperiment object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
@@ -531,7 +531,7 @@ plot_tsne_hexbin <- function(object, all_features = FALSE, center = TRUE,
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' or \code{\link{MetaboSet}} object
+#' object
 #' @param pcs numeric vector of length 2, the principal components to plot
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
@@ -604,7 +604,7 @@ plot_pca_arrows <- function(object, pcs = c(1, 2), all_features = FALSE,
 #' using the nipals method of \code{\link[pcaMethods]{pca}}, the method can be 
 #' changed to "ppca" if nipals fails.
 #'
-#' @param object a SummarizedExperiment or MetaboSet object
+#' @param object a SummarizedExperiment object
 #' @param all_features logical, should all features be used? If FALSE (the 
 #' default), flagged features are removed before visualization.
 #' @param center logical, should the data be centered prior to PCA? (usually 
@@ -683,7 +683,7 @@ minus_log10 <- scales::trans_new("minus_log10",
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' , \code{\link{MetaboSet}} object or a data frame.
+#' object or a data frame.
 #' Feature data is used. If x is a data frame, it is used as is.
 #' @param x,p the column names of effect size (x-axis) and p-values
 #' @param p_fdr column name of FDR corrected p-values, used to draw a line 
@@ -732,23 +732,6 @@ setGeneric("volcano_plot", signature = "object",
           title = "Volcano plot", subtitle = NULL,
           text_base_size = 14, label_text_size = 4, ...) {
     standardGeneric("volcano_plot")
-  }
-)
-
-#' @rdname volcano_plot
-#' @export
-setMethod("volcano_plot", c(object = "MetaboSet"),
-  function(object, x, p, p_fdr = NULL, color = NULL,
-           p_breaks = c(0.05, 0.01, 0.001, 1e-4), fdr_limit = 0.05,
-           log2_x = FALSE, center_x_axis = TRUE, x_lim = NULL, 
-           label = NULL, label_limit = 0.05, 
-           color_scale = getOption("notame.color_scale_con"),
-           title = "Volcano plot", subtitle = NULL,
-           text_base_size = 14, label_text_size = 4, ...) {
-    .volcano_plotter(fData(object), x, p, p_fdr, color, p_breaks, fdr_limit,
-                     log2_x, center_x_axis, x_lim, label, label_limit,
-                     color_scale, title, subtitle,
-                     text_base_size, label_text_size, ...)
   }
 )
 
@@ -884,7 +867,7 @@ setMethod("volcano_plot", c(object = "SummarizedExperiment"),
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' , \code{\link{MetaboSet}} object or a data frame. Feature data is used. If x 
+#' object or a data frame. Feature data is used. If x 
 #' is a data frame, it is used as is.
 #' @param x,p the column names of x-axis and p-values
 #' @param effect column name of effect size (should have negative and positive 
@@ -932,20 +915,6 @@ setGeneric("manhattan_plot", signature = "object",
            color_scale = getOption("notame.color_scale_con"),
            title = "Manhattan plot", subtitle = NULL, ...) {
     standardGeneric("manhattan_plot")
-  }
-)
-
-#' @rdname manhattan_plot
-#' @export
-setMethod("manhattan_plot", c(object = "MetaboSet"),
-  function(object, x, p, effect = NULL, p_fdr = NULL, color = NULL,
-           p_breaks = c(0.05, 0.01, 0.001, 1e-4), fdr_limit = 0.05,
-           x_lim = NULL, y_lim = NULL,
-           color_scale = getOption("notame.color_scale_con"),
-           title = "Manhattan plot", subtitle = NULL, ...) {
-    .manhattan_plotter(rowData(object), x, p, effect, p_fdr, color, p_breaks, 
-                       fdr_limit, x_lim, y_lim, color_scale, 
-                       title, subtitle, ...)
   }
 )
 
@@ -1062,7 +1031,7 @@ setMethod("manhattan_plot", c(object = "SummarizedExperiment"),
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-#' , \code{\link{MetaboSet}} object or a data frame. Feature data is used. If x 
+#' object or a data frame. Feature data is used. If x 
 #' is a data frame, it is used as is.
 #' @param p_col the column name containing p-values. This is used to scale the 
 #' size of the points.
@@ -1103,19 +1072,6 @@ setGeneric("mz_rt_plot", signature = "object",
            color = NULL, title = "m/z retention time", subtitle = NULL,
            color_scale = getOption("notame.color_scale_con"), ...) {
     standardGeneric("mz_rt_plot")
-  }
-)
-
-#' @rdname mz_rt_plot
-#' @export
-setMethod("mz_rt_plot", c(object = "MetaboSet"),
-  function(object, p_col = NULL, p_limit = NULL, mz_col = NULL, rt_col = NULL,
-           color = NULL, title = "m/z vs retention time", subtitle = NULL,
-           color_scale = getOption("notame.color_scale_con"), 
-           all_features = FALSE) {
-    .mz_rt_plotter(fData(drop_flagged(object, all_features)),
-                   p_col, p_limit, mz_col, rt_col, color, title, subtitle, 
-                   color_scale, all_features)
   }
 )
 

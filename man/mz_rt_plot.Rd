@@ -2,7 +2,6 @@
 % Please edit documentation in R/scatter.R
 \name{mz_rt_plot}
 \alias{mz_rt_plot}
-\alias{mz_rt_plot,MetaboSet-method}
 \alias{mz_rt_plot,data.frame-method}
 \alias{mz_rt_plot,SummarizedExperiment-method}
 \title{Plot m/z vs retention time plot (cloud plot)}
@@ -18,19 +17,6 @@ mz_rt_plot(
   subtitle = NULL,
   color_scale = getOption("notame.color_scale_con"),
   ...
-)
-
-\S4method{mz_rt_plot}{MetaboSet}(
-  object,
-  p_col = NULL,
-  p_limit = NULL,
-  mz_col = NULL,
-  rt_col = NULL,
-  color = NULL,
-  title = "m/z vs retention time",
-  subtitle = NULL,
-  color_scale = getOption("notame.color_scale_con"),
-  all_features = FALSE
 )
 
 \S4method{mz_rt_plot}{data.frame}(
@@ -61,7 +47,7 @@ mz_rt_plot(
 \arguments{
 \item{object}{a \code{
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
-, \code{\link{MetaboSet}} object or a data frame. Feature data is used. If x 
+object or a data frame. Feature data is used. If x 
 is a data frame, it is used as is.}
 
 \item{p_col}{the column name containing p-values. This is used to scale the 
