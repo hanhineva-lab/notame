@@ -150,7 +150,7 @@ plot_injection_lm <- function(object, all_features = FALSE, assay.type = NULL) {
 #' @return If combine = TRUE, a ggplot object. Otherwise a list of ggplot 
 #' objects.
 #'
-#' @export
+#'
 plot_p_histogram <- function(p_values, hline = TRUE, combine = TRUE, 
                              x_label = "p-value") {
   # Custom breaks for the x-axis

@@ -45,8 +45,7 @@ the same length.}
 \item{duplicates}{logical, whether correlations should be duplicated. If 
 \code{TRUE}, each correlation will be included in the results twice, where 
 the order of the variables '(which is x and which is y) is changed. Can be 
-useful for e.g. plotting a heatmap of the results, see examples of
-\code{\link{plot_effect_heatmap}}}
+useful for e.g. plotting a heatmap of the results}
 
 \item{assay.type1}{character, assay of object(1) to be used in case of 
 multiple assays}

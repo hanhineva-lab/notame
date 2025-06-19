@@ -218,25 +218,6 @@ lm_results <- perform_lm(base, assay.type = "log",
 base <- join_rowData(base, lm_results)
 ```
 
-## Supervised learning
-Univariate hypothesis testing does not take into account the multivariate, 
-interconnected nature of the data. Parametric tests as the one above also make 
-assumptions about the data which may undermine the reliability of the results, 
-as they are likely to be violated in untargeted LC-MS datasets. Let's use 
-supervised learning to see which features best predict group membership to get 
-another perspective. A random forest model doesn't require further data 
-pretreatment and makes minimal assumptions.
-
-```{r}
-names(assays(base))[[1]] <- "abundances"                             
-rf_results <- fit_rf(base, y = "Group", assay.type = "abundances")
-
-rf_importance <- importance_rf(rf_results)
-
-base <- join_rowData(base, 
-  rf_importance[, c("Feature_ID", "MeanDecreaseAccuracy")])
-```
-
 Next, univariate and supervised rankings of features could be combined in a 
 final ranking. Such a final ranking would combine the qualities of univariate 
 analysis and supervised learning. The final results are more practical than 

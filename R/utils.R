@@ -56,6 +56,7 @@
 #' \item \code{\link{plot_sample_heatmap}} sample heatmap
 #' \item \code{\link{plot_pca_loadings}} PCA loadings plot
 #' \item \code{\link{plot_quality}} plot quality metrics
+#' \item \code{\link{save_batch_plots}} save batch correction plots
 #' }
 #' 
 #' Feature selection – Univariate analysis (return data.frames):
@@ -76,49 +77,6 @@
 #' \item \code{\link{fold_change}} fold change
 #' \item \code{\link{summary_statistics}} summary statistics
 #' \item \code{\link{summarize_results}} statistics cleaning
-#' }
-#'
-#' Feature selection – Supervised learning (return various objects):
-#' \itemize{
-#' \item \code{\link{muvr_analysis}} multivariate modelling with minimally 
-#' biased variable selection (MUVR2) 
-#' \item \code{\link{mixomics_pls}}, \code{\link{mixomics_plsda}} a simple 
-#' PLS(-DA) model with set number of components and all features
-#' \item \code{\link{mixomics_pls_optimize}},
-#' \code{\link{mixomics_plsda_optimize}} test different numbers of components 
-#' for PLS(-DA)
-#' \item \code{\link{mixomics_spls_optimize}},
-#' \code{\link{mixomics_splsda_optimize}} test different numbers of 
-#' components and features for PLS(-DA)
-#' \item \code{\link{fit_rf}}, \code{\link{importance_rf}} fit random forest
-#' and feature importance
-#' \item \code{\link{perform_permanova}} PERMANOVA
-#' }
-#'
-#' Feature-wise visualizations (these are often drawn for a subset of 
-#' interesting features after analysis, saved by default):
-#' \itemize{
-#' \item \code{\link{save_beeswarm_plots}} save beeswarm plots of each feature 
-#' by group
-#' \item \code{\link{save_group_boxplots}} save box plots of each feature by 
-#' group
-#' \item \code{\link{save_scatter_plots}} save scatter plots of each feature 
-#' against a set variable
-#' \item \code{\link{save_subject_line_plots}} save line plots with mean
-#' \item \code{\link{save_group_lineplots}} save line plots with errorbars by 
-#' group
-#' \item \code{\link{save_batch_plots}} save batch correction plots
-#' }
-#'
-#' Results visualizations (returned by default, save them using 
-#' \code{\link{save_plot}}):
-#' \itemize{
-#' \item \code{\link{plot_p_histogram}} histogram of p-values
-#' \item \code{\link{volcano_plot}} volcano plot
-#' \item \code{\link{manhattan_plot}} manhattan plot
-#' \item \code{\link{mz_rt_plot}} m/z vs retention time plot (cloud plot)
-#' \item \code{\link{plot_effect_heatmap}} heatmap of effects between 
-#' variables, such as correlations
 #' }
 #' 
 #' Object utilities:

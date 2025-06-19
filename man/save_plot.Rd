@@ -23,15 +23,8 @@ If an error occurs with the plot, an empty file is created.
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
 data(example_set)
-lm_results <- perform_lm(drop_qcs(example_set), 
-  formula_char = "Feature ~ Group")
 
-p <- volcano_plot(lm_results,
-  x = "GroupB_Estimate",
-  p = "GroupB_P", p_fdr = "GroupB_P_FDR",
-  label = "Feature_ID",
-  fdr_limit = 0.1
-)
+p <- plot_sample_heatmap(example_set, group = "Group")
 
 save_plot(p, file = "test.pdf")
 \dontshow{setwd(.old_wd)}
