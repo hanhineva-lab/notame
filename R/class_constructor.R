@@ -648,10 +648,8 @@ flag <- function(object) rowData(object)$Flag
 
 #' Fix object for functioning of notame
 #' 
-#' Attempts to create missing columns in pheno and feature data. Optionally 
-#' cleans the object and splits the object by mode. Modifies 
-#' supplied "Sample_ID" column if needed. Aims to make the object compatible 
-#' with all of notame.
+#' Attempts to create missing columns needed for notame in pheno and feature 
+#' data. Optionally cleans the object and splits the object by mode.
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
@@ -671,9 +669,8 @@ flag <- function(object) rowData(object)$Flag
 #' single object.
 #' @param assay.type character, assay to be used in case of multiple assays
 #'
-#' @return A new SummarizedExperiment object object with a single 
-#' peak table. If split_data = TRUE, a list containing separate objects 
-#' for analytical modes.
+#' @return A new SummarizedExperiment object with a single peak table. If 
+#' split_data = TRUE, a list containing separate objects for analytical modes.
 #'
 #' @details Only specify one of \code{split_by} and \code{name}. The feature 
 #' data will contain columns named "Split", used to separate features from 
@@ -712,6 +709,7 @@ fix_object <- function(object, id_prefix = "ID_", id_column = NULL,
   feature_data <- .fix_feature_data(rowData(object), split_by = split_by,
                                     name = name, clean = clean,
                                     log_messages = TRUE)
+
   assay <- .fix_assay(assay(object, from))
                                          
   rownames(assay) <- rownames(feature_data)
@@ -727,14 +725,15 @@ fix_object <- function(object, id_prefix = "ID_", id_column = NULL,
       obj_list[[part]] <- SummarizedExperiment(assays = ad_tmp,
                                                colData = pheno_data,
                                                rowData = fd_tmp)
+      names(assays(obj_list[[part]])) <- from
     }
     return(obj_list)
   } else {
     object <- SummarizedExperiment(assays = assay,
                                    colData = pheno_data,
                                    rowData = feature_data)
-
-    return(object)
+    names(assays(object)) <- from
+    object
   }
 }
 
