@@ -81,8 +81,9 @@ object for compatibility with all of notame.
 data <- SummarizedExperiment(assays = data$assay, 
                              rowData = data$feature_data,
                              colData = data$pheno_data)
+names(assays(data)) <- "abundances"
 
-modes <- fix_object(data, split_data = TRUE)
+modes <- fix_object(data, split_data = TRUE, assay.type = "abundances")
 ```
 
 Now we have a list of objects, one per mode (LC column x 
