@@ -1,0 +1,208 @@
+INFO [2025-06-23 22:36:42] 
+Checking feature information
+INFO [2025-06-23 22:36:42] Checking that feature IDs are unique and not storedas numbers
+INFO [2025-06-23 22:36:42] Checking that feature data includes a 'Split' column
+INFO [2025-06-23 22:36:42] Checking that feature data includes a 'Flag' column
+INFO [2025-06-23 22:36:42] Checking that feature abundances only contain numeric values
+INFO [2025-06-23 22:36:42] Setting row and column names of exprs based on feature and pheno data
+INFO [2025-06-23 22:36:43] 
+Checking feature information
+INFO [2025-06-23 22:36:43] Checking that feature IDs are unique and not storedas numbers
+INFO [2025-06-23 22:36:43] Checking that feature data includes a 'Split' column
+INFO [2025-06-23 22:36:43] Checking that feature data includes a 'Flag' column
+INFO [2025-06-23 22:36:43] Checking that feature abundances only contain numeric values
+INFO [2025-06-23 22:36:43] Setting row and column names of exprs based on feature and pheno data
+INFO [2025-06-23 22:36:43] Starting linear regression.
+INFO [2025-06-23 22:36:44] Linear regression performed.
+INFO [2025-06-23 22:36:45] 
+Checking feature information
+INFO [2025-06-23 22:36:45] Checking that feature IDs are unique and not storedas numbers
+INFO [2025-06-23 22:36:45] Checking that feature data includes a 'Split' column
+INFO [2025-06-23 22:36:45] Checking that feature data includes a 'Flag' column
+INFO [2025-06-23 22:36:45] Checking that feature abundances only contain numeric values
+INFO [2025-06-23 22:36:45] Setting row and column names of exprs based on feature and pheno data
+INFO [2025-06-23 22:36:45] 
+Checking feature information
+INFO [2025-06-23 22:36:45] Checking that feature IDs are unique and not storedas numbers
+INFO [2025-06-23 22:36:45] Checking that feature data includes a 'Split' column
+INFO [2025-06-23 22:36:45] Checking that feature data includes a 'Flag' column
+INFO [2025-06-23 22:36:45] Checking that feature abundances only contain numeric values
+INFO [2025-06-23 22:36:45] Setting row and column names of exprs based on feature and pheno data
+INFO [2025-06-23 22:36:45] 
+Checking feature information
+INFO [2025-06-23 22:36:45] Checking that feature IDs are unique and not storedas numbers
+INFO [2025-06-23 22:36:45] Checking that feature data includes a 'Split' column
+INFO [2025-06-23 22:36:45] Checking that feature data includes a 'Flag' column
+INFO [2025-06-23 22:36:45] Checking that feature abundances only contain numeric values
+INFO [2025-06-23 22:36:45] Setting row and column names of exprs based on feature and pheno data
+INFO [2025-06-23 22:36:45] 
+Checking feature information
+INFO [2025-06-23 22:36:45] Checking that feature IDs are unique and not storedas numbers
+INFO [2025-06-23 22:36:45] Checking that feature data includes a 'Split' column
+INFO [2025-06-23 22:36:45] Checking that feature data includes a 'Flag' column
+INFO [2025-06-23 22:36:45] Checking that feature abundances only contain numeric values
+INFO [2025-06-23 22:36:45] Setting row and column names of exprs based on feature and pheno data
+INFO [2025-06-23 22:36:59] Starting linear regression.
+INFO [2025-06-23 22:37:00] Linear regression performed.
+INFO [2025-06-23 22:37:00] Identified m/z column Average_Mz and retention time column Average_Rt_min
+INFO [2025-06-23 22:37:00] Identified m/z column Average_Mz and retention time column Average_Rt_min
+INFO [2025-06-23 22:37:08] Starting AUC computation
+INFO [2025-06-23 22:37:12] AUC computation finished
+INFO [2025-06-23 22:37:12] Starting tests for A & B
+INFO [2025-06-23 22:37:12] Tests performed
+INFO [2025-06-23 22:37:12] Starting correlation tests.
+INFO [2025-06-23 22:37:12] Performing correlation tests for single object
+INFO [2025-06-23 22:37:20] Correlation tests performed.
+INFO [2025-06-23 22:37:20] Starting correlation tests.
+INFO [2025-06-23 22:37:20] Performing correlation tests for single object
+INFO [2025-06-23 22:37:20] Correlation tests performed.
+INFO [2025-06-23 22:37:20] Starting correlation tests.
+INFO [2025-06-23 22:37:20] Performing correlation tests for two objects
+INFO [2025-06-23 22:37:20] Correlation tests performed.
+INFO [2025-06-23 22:37:21] Starting homoscedasticity tests.
+INFO [2025-06-23 22:37:21] Homoscedasticity tests performed.
+INFO [2025-06-23 22:37:25] Starting Kruskal-Wallis tests.
+INFO [2025-06-23 22:37:26] Kruskal-Wallis tests performed.
+INFO [2025-06-23 22:37:26] Starting linear regression.
+INFO [2025-06-23 22:37:26] Linear regression performed.
+INFO [2025-06-23 22:37:27] Starting ANOVA tests
+INFO [2025-06-23 22:37:27] ANOVA tests performed
+INFO [2025-06-23 22:37:27] Starting fitting linear mixed models.
+INFO [2025-06-23 22:37:30] Linear mixed models fit.
+INFO [2025-06-23 22:37:30] Starting logistic regression
+INFO [2025-06-23 22:37:31] Logistic regression performed.
+INFO [2025-06-23 22:37:32] Starting tests for A & B
+INFO [2025-06-23 22:37:32] Tests performed
+INFO [2025-06-23 22:37:33] Starting tests for A & QC
+INFO [2025-06-23 22:37:33] Tests performed
+INFO [2025-06-23 22:37:33] Starting tests for B & QC
+INFO [2025-06-23 22:37:34] Tests performed
+INFO [2025-06-23 22:37:34] Starting paired tests for 1 & 2
+INFO [2025-06-23 22:37:34] Found 20 complete pairs.
+INFO [2025-06-23 22:37:34] Paired tests performed.
+INFO [2025-06-23 22:37:34] Starting paired tests for 1 & QC
+INFO [2025-06-23 22:37:34] Found 0 complete pairs.
+INFO [2025-06-23 22:37:34] Starting paired tests for 2 & QC
+INFO [2025-06-23 22:37:34] Found 0 complete pairs.
+INFO [2025-06-23 22:37:34] Starting tests for A & B
+INFO [2025-06-23 22:37:35] Tests performed
+INFO [2025-06-23 22:37:36] Starting ANOVA tests.
+INFO [2025-06-23 22:37:36] ANOVA performed.
+INFO [2025-06-23 22:37:36] Starting PERMANOVA tests
+INFO [2025-06-23 22:37:37] PERMANOVA performed
+INFO [2025-06-23 22:37:38] Starting tests for A & B
+INFO [2025-06-23 22:37:38] Tests performed
+INFO [2025-06-23 22:37:38] Starting tests for A & QC
+INFO [2025-06-23 22:37:38] Tests performed
+INFO [2025-06-23 22:37:38] Starting tests for B & QC
+INFO [2025-06-23 22:37:38] Tests performed
+INFO [2025-06-23 22:37:38] Starting paired tests for 1 & 2
+INFO [2025-06-23 22:37:38] Found 20 complete pairs.
+INFO [2025-06-23 22:37:38] Paired tests performed.
+INFO [2025-06-23 22:37:38] Starting paired tests for 1 & QC
+INFO [2025-06-23 22:37:38] Found 0 complete pairs.
+INFO [2025-06-23 22:37:38] Starting paired tests for 2 & QC
+INFO [2025-06-23 22:37:38] Found 0 complete pairs.
+INFO [2025-06-23 22:37:38] Starting tests for A & B
+INFO [2025-06-23 22:37:39] Tests performed
+INFO [2025-06-23 22:37:39] 
+Starting drift correction at 2025-06-23 22:37:39.926356
+INFO [2025-06-23 22:37:39] Zero values in feature abundances detected. Zeroes will be replaced with 1.1.
+INFO [2025-06-23 22:37:40] Drift correction performed at 2025-06-23 22:37:40.251752
+INFO [2025-06-23 22:37:40] Inspecting drift correction results 2025-06-23 22:37:40.456545
+INFO [2025-06-23 22:37:40] Drift correction results inspected at 2025-06-23 22:37:40.773323
+INFO [2025-06-23 22:37:40] 
+Drift correction results inspected, report:
+Drift_corrected: 100%
+INFO [2025-06-23 22:37:41] Starting correlation tests.
+INFO [2025-06-23 22:37:41] Performing correlation tests for single object
+INFO [2025-06-23 22:37:43] Correlation tests performed.
+INFO [2025-06-23 22:37:44] Starting linear regression.
+INFO [2025-06-23 22:37:45] Linear regression performed.
+INFO [2025-06-23 22:37:45] Starting linear regression.
+INFO [2025-06-23 22:37:45] Linear regression performed.
+INFO [2025-06-23 22:37:45] Starting linear regression.
+INFO [2025-06-23 22:37:46] Linear regression performed.
+INFO [2025-06-23 22:37:47] Starting linear regression.
+INFO [2025-06-23 22:37:47] Linear regression performed.
+INFO [2025-06-23 22:37:54] Fitting PLS
+INFO [2025-06-23 22:37:55] Fitting PLS
+INFO [2025-06-23 22:37:55] Evaluating PLS performance
+INFO [2025-06-23 22:37:55] Choosing a PLS model with 1 component(s) based on the minimal MSE
+Take a look at the plot and make sure this is the correct number of components
+INFO [2025-06-23 22:37:55] Fitting PLS
+INFO [2025-06-23 22:37:55] Tuning sPLS
+INFO [2025-06-23 22:37:59] Final model has 1 components with the numbers of features: 20
+INFO [2025-06-23 22:38:00] Fitting PLS-DA
+INFO [2025-06-23 22:38:06] Fitting PLS-DA
+INFO [2025-06-23 22:38:06] Evaluating PLS-DA performance
+INFO [2025-06-23 22:38:08] Choosing a PLS-DA model with 1 components using centroids.dist
+INFO [2025-06-23 22:38:08] Fitting PLS-DA
+INFO [2025-06-23 22:38:08] Tuning sPLS-DA
+INFO [2025-06-23 22:38:11] Final model has 1 components with the numbers of features: 1
+INFO [2025-06-23 22:38:11] Starting PQN normalization
+INFO [2025-06-23 22:38:11] Using median of qc samples as reference spectrum
+INFO [2025-06-23 22:38:12] Corner detected correctly at row 11, column H
+INFO [2025-06-23 22:38:12] 
+Extracting sample information from rows 1 to 11 and columns I to BF
+INFO [2025-06-23 22:38:12] Replacing spaces in sample information column names with underscores (_)
+INFO [2025-06-23 22:38:12] Naming the last column of sample information "Datafile"
+INFO [2025-06-23 22:38:12] 
+Extracting feature information from rows 12 to 91 and columns A to H
+INFO [2025-06-23 22:38:12] 
+Extracting feature abundances from rows 12 to 91 and columns I to BF
+INFO [2025-06-23 22:38:12] Pheno data was cleaned
+INFO [2025-06-23 22:38:12] Feature data was cleaned
+INFO [2025-06-23 22:38:12] 
+Checking sample information
+INFO [2025-06-23 22:38:12] Checking 'Injection_order' column in feature data
+INFO [2025-06-23 22:38:12] Checking 'Sample_ID' column in pheno data
+INFO [2025-06-23 22:38:12] Checking 'QC' column in feature data
+INFO [2025-06-23 22:38:12] Checking that feature abundances only contain numeric values
+INFO [2025-06-23 22:38:12] 
+Checking feature information
+INFO [2025-06-23 22:38:12] Checking that feature IDs are unique and not storedas numbers
+INFO [2025-06-23 22:38:12] Checking that m/z and retention time values are reasonable.
+INFO [2025-06-23 22:38:12] Identified m/z column Average_Mz and retention time column Average_Rt_min
+INFO [2025-06-23 22:38:12] Identified m/z column Average_Mz and retention time column Average_Rt_min
+INFO [2025-06-23 22:38:12] Checking that feature data includes a 'Split' column
+INFO [2025-06-23 22:38:12] Checking that feature data includes a 'Flag' column
+INFO [2025-06-23 22:38:12] 
+Checking feature information
+INFO [2025-06-23 22:38:12] Checking that feature IDs are unique and not storedas numbers
+INFO [2025-06-23 22:38:12] Checking that feature data includes a 'Split' column
+INFO [2025-06-23 22:38:12] Checking that feature data includes a 'Flag' column
+INFO [2025-06-23 22:38:12] Checking that feature abundances only contain numeric values
+INFO [2025-06-23 22:38:12] Setting row and column names of exprs based on feature and pheno data
+INFO [2025-06-23 22:38:31] 
+Checking feature information
+INFO [2025-06-23 22:38:31] Checking that feature IDs are unique and not storedas numbers
+INFO [2025-06-23 22:38:31] Checking that feature data includes a 'Split' column
+INFO [2025-06-23 22:38:31] Checking that feature data includes a 'Flag' column
+INFO [2025-06-23 22:38:31] Checking that feature abundances only contain numeric values
+INFO [2025-06-23 22:38:31] Setting row and column names of exprs based on feature and pheno data
+INFO [2025-06-23 22:38:31] 
+Checking feature information
+INFO [2025-06-23 22:38:31] Checking that feature IDs are unique and not storedas numbers
+INFO [2025-06-23 22:38:31] Checking that feature data includes a 'Split' column
+INFO [2025-06-23 22:38:31] Checking that feature data includes a 'Flag' column
+INFO [2025-06-23 22:38:31] Checking that feature abundances only contain numeric values
+INFO [2025-06-23 22:38:31] Setting row and column names of exprs based on feature and pheno data
+INFO [2025-06-23 22:38:31] Starting linear regression.
+INFO [2025-06-23 22:38:32] Linear regression performed.
+INFO [2025-06-23 22:38:34] 
+Checking feature information
+INFO [2025-06-23 22:38:34] Checking that feature IDs are unique and not storedas numbers
+INFO [2025-06-23 22:38:34] Checking that feature data includes a 'Split' column
+INFO [2025-06-23 22:38:34] Checking that feature data includes a 'Flag' column
+INFO [2025-06-23 22:38:34] Checking that feature abundances only contain numeric values
+INFO [2025-06-23 22:38:34] Setting row and column names of exprs based on feature and pheno data
+INFO [2025-06-23 22:38:34] 
+Checking feature information
+INFO [2025-06-23 22:38:34] Checking that feature IDs are unique and not storedas numbers
+INFO [2025-06-23 22:38:34] Checking that feature data includes a 'Split' column
+INFO [2025-06-23 22:38:34] Checking that feature data includes a 'Flag' column
+INFO [2025-06-23 22:38:34] Checking that feature abundances only contain numeric values
+INFO [2025-06-23 22:38:34] Setting row and column names of exprs based on feature and pheno data
+INFO [2025-06-23 22:38:41] Starting linear regression.
+INFO [2025-06-23 22:38:41] Linear regression performed.
