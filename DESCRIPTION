@@ -74,7 +74,7 @@ Suggests:
     Rtsne,
     RUVSeq,
     testthat
-URL: https://github.com/hanhineva-lab/notame
+URL: https://github.com/hanhineva-lab/notame, https://hanhineva-lab.github.io/notame/
 BugReports: https://github.com/hanhineva-lab/notame/issues
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr

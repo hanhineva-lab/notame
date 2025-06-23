@@ -141,9 +141,11 @@
 #' \item \code{\link{join_pData}} join new columns to pheno data
 #' \item \code{\link{combined_data}} retrieve both sample information and 
 #' features
+#' \item \code{\link{merge_metabosets}} merge MetaboSet objects together
 #' \item \code{\link{merge_objects}} merge SummarizedExperiment objects 
 #' together
 #' \item \code{\link{fix_object}} fix object for functioning of notame
+#' \item \code{\link{MetaboSet-class}} MetaboSet
 #' }
 #' 
 #' Other utilities:
@@ -154,7 +156,6 @@
 #' \item \code{\link{finish_log}} finish a log
 #' \item \code{\link{save_plot}} save plot to chosen format
 #' \item \code{\link{fix_MSMS}} transform the MS/MS output to publication ready
-#' \item \code{\link{merge_metabosets}} merge MetaboSet objects together
 #' }
 #'
 #' @name notame-package

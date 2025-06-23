@@ -146,9 +146,11 @@ for subject identifiers
 \item \code{\link{join_pData}} join new columns to pheno data
 \item \code{\link{combined_data}} retrieve both sample information and 
 features
+\item \code{\link{merge_metabosets}} merge MetaboSet objects together
 \item \code{\link{merge_objects}} merge SummarizedExperiment objects 
 together
 \item \code{\link{fix_object}} fix object for functioning of notame
+\item \code{\link{MetaboSet-class}} MetaboSet
 }
 
 Other utilities:
@@ -159,7 +161,6 @@ Other utilities:
 \item \code{\link{finish_log}} finish a log
 \item \code{\link{save_plot}} save plot to chosen format
 \item \code{\link{fix_MSMS}} transform the MS/MS output to publication ready
-\item \code{\link{merge_metabosets}} merge MetaboSet objects together
 }
 }
 \references{
@@ -170,6 +171,7 @@ Profiling. Metabolites, 10: 135.
 Useful links:
 \itemize{
   \item \url{https://github.com/hanhineva-lab/notame}
+  \item \url{https://hanhineva-lab.github.io/notame/}
   \item Report bugs at \url{https://github.com/hanhineva-lab/notame/issues}
 }
 

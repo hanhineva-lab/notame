@@ -7,3 +7,7 @@
 ^\.Rproj\.user$
 ^.*\.lintr$
 ^LICENSE\.md$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$

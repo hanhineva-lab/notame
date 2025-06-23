@@ -1,0 +1,131 @@
+url: https://hanhineva-lab.github.io/notame/
+template:
+  bootstrap: 5
+  
+destination: docs
+reference:
+- title: Tabular data preprocessing
+- contents:
+  - mark_nas
+  - flag_detection
+  - flag_contaminants
+  - correct_drift
+  - ruvs_qc
+  - pca_bhattacharyya_dist
+  - perform_repeatability
+  - assess_quality
+  - quality
+  - flag_quality
+  - flag_report
+  - impute_rf
+  - impute_simple
+  - cluster_features
+  - compress_clusters
+  - log
+  - exponential
+  - pqn_normalization
+  - inverse_normalize
+  - scale
+
+- title: Preprocessing visualizations
+- contents:
+  - visualizations
+  - plot_injection_lm
+  - plot_sample_boxplots
+  - plot_dist_density
+  - plot_tsne
+  - plot_pca
+  - plot_tsne_arrows
+  - plot_pca_arrows
+  - plot_tsne_hexbin
+  - plot_pca_hexbin
+  - plot_dendrogram
+  - plot_sample_heatmap
+  - plot_pca_loadings
+  - plot_quality
+  - save_batch_plots
+
+- title: Feature selection
+- subtitle: Univariate analysis
+- contents:
+  - perform_lm
+  - perform_logistic
+  - perform_lmer
+  - perform_oneway_anova
+  - perform_lm_anova
+  - perform_t_test
+  - perform_kruskal_wallis
+  - perform_non_parametric
+  - perform_correlation_tests
+  - perform_auc
+  - perform_homoscedasticity_tests
+  - cohens_d
+  - fold_change
+  - summary_statistics
+  - summarize_results
+- subtitle: Supervised learning
+- contents:
+  - muvr_analysis
+  - mixomics_pls
+  - mixomics_plsda
+  - mixomics_pls_optimize
+  - mixomics_plsda_optimize
+  - mixomics_spls_optimize
+  - mixomics_splsda_optimize
+  - fit_rf
+  - importance_rf
+  - perform_permanova
+  
+- title: Feature wise visualizations
+- contents:
+  - save_beeswarm_plots
+  - save_group_boxplots
+  - save_scatter_plots
+  - save_subject_line_plots
+  - save_group_lineplots
+  
+- title: Results visualizations
+- contents:
+  - plot_p_histogram
+  - volcano_plot
+  - manhattan_plot
+  - mz_rt_plot
+  - plot_effect_heatmap
+  
+- title: Object utilities
+- contents:
+  - read_from_excel
+  - construct_metabosets
+  - write_to_excel
+  - group_col
+  - time_col
+  - subject_col
+  - flag
+  - drop_flagged
+  - drop_qcs
+  - join_fData
+  - join_pData
+  - join_rowData
+  - join_colData
+  - combined_data
+  - merge_metabosets
+  - merge_objects
+  - fix_object
+  - MetaboSet-class
+  
+- title: Other utilities
+- contents: 
+  - citations
+  - init_log
+  - log_text
+  - finish_log
+  - save_plot
+  - fix_MSMS
+
+- title: Datasets
+- contents:
+  - example_set
+  
+- title: Package
+- contents: 
+  - notame-package
