@@ -9,8 +9,8 @@
 Provides functionality for untargeted LC-MS metabolomics research as 
 specified in the associated publication in the 'Metabolomics Data
 Processing and Data Analysis—Current Best Practices' special issue of the 
-Metabolites journal (2020). This includes data pretreatment, feature 
-selection and supporting visualizations. Raw data preprocessing and 
+Metabolites journal (2020). This includes tabular data preprocessing, 
+feature selection and supporting visualizations. Raw data preprocessing and 
 functionality related to biological context, such as pathway analysis, is 
 not included.
 }
@@ -18,7 +18,7 @@ not included.
 In roughly chronological order, the functionality of notame is as follows. 
 Please see the vignettes and paper for more information.
 
-Data pretreatment (for reducing unwanted variation and completing the 
+Tabular data preprocessing (reducing unwanted variation and completing the 
 dataset, returning modifed objects):
 \itemize{
 \item \code{\link{mark_nas}} mark specified values as missing
@@ -47,10 +47,9 @@ single feature
 \item \code{\link{scale}} scale
 }
 
-Data pretreatment visualizations (for visualization of data pretreatment and 
-exploring the data at large, saved to file by default):
+Tabular data preprocessing visualizations (saved to file by default):
 \itemize{
-\item \code{\link{visualizations}} write all relevant data pretreatment 
+\item \code{\link{visualizations}} write all relevant data preprocessing 
 visualizations to pdf
 \item \code{\link{plot_injection_lm}} estimate the magnitude of drift
 \item \code{\link{plot_sample_boxplots}} plot a boxplot for each sample
