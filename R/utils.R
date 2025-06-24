@@ -62,21 +62,6 @@
 #' Feature selection – Univariate analysis (return data.frames):
 #' \itemize{
 #' \item \code{\link{perform_lm}} linear models 
-#' \item \code{\link{perform_logistic}} logistic regression
-#' \item \code{\link{perform_lmer}} linear mixed models 
-#' \item \code{\link{perform_oneway_anova}} Welch’s ANOVA and classic ANOVA
-#' \item \code{\link{perform_lm_anova}} linear models ANOVA table
-#' \item \code{\link{perform_t_test}} pairwise and paired t-tests
-#' \item \code{\link{perform_kruskal_wallis}} Kruskal-Wallis rank-sum test
-#' \item \code{\link{perform_non_parametric}} pairwise and paired non-
-#' parametric tests
-#' \item \code{\link{perform_correlation_tests}} correlation test
-#' \item \code{\link{perform_auc}} area under curve
-#' \item \code{\link{perform_homoscedasticity_tests}} test homoscedasticity
-#' \item \code{\link{cohens_d}} Cohen's D
-#' \item \code{\link{fold_change}} fold change
-#' \item \code{\link{summary_statistics}} summary statistics
-#' \item \code{\link{summarize_results}} statistics cleaning
 #' }
 #' 
 #' Object utilities:
@@ -138,8 +123,7 @@ utils::globalVariables(c('i', '.'))
     notame.citations = list(
       "Preprocessing and analyses were performed using notame package:" =
       utils::citation("notame"),
-      "notame is built on a class from Biobase package:" =
-      utils::citation("Biobase"),
+      "The primary data structure in notame is SummarizedExperiment:" = utils::citation("SummarizedExperiment"),
       "visualizations in notame are built with ggplot2:" =
       utils::citation("ggplot2")),
     notame.color_scale_con = scale_color_viridis_c(),
@@ -167,8 +151,8 @@ utils::globalVariables(c('i', '.'))
 
 #' Show citations
 #'
-#' This function lists citations for all the major packages used by the notame 
-#' functions that have been called during the session. All notame functions 
+#' This function lists citations behind the notame functions that have been 
+#' called during the session. All notame functions 
 #' update the list automatically. The citations are taken from the call to 
 #' '\code{citation("package")}, and complemented with a brief description of 
 #' what the package was used for.
@@ -181,8 +165,8 @@ utils::globalVariables(c('i', '.'))
 #' @examples
 #' citations()
 #' data(example_set)
-#' plot_tsne(example_set, perplexity = 10, group = "Group", color = "Group")
-#' # Rtsne added to citations
+#' ex_set <- flag_quality(example_set)
+#' # Broadhurst et al.(2018) added to citations
 #' citations()
 #'
 #' @export

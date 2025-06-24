@@ -42,15 +42,12 @@ single object.}
 \item{assay.type}{character, assay to be used in case of multiple assays}
 }
 \value{
-A new SummarizedExperiment object object with a single 
-peak table. If split_data = TRUE, a list containing separate objects 
-for analytical modes.
+A new SummarizedExperiment object with a single peak table. If 
+split_data = TRUE, a list containing separate objects for analytical modes.
 }
 \description{
-Attempts to create missing columns in pheno and feature data. Optionally 
-cleans the object and splits the object by mode. Modifies 
-supplied "Sample_ID" column if needed. Aims to make the object compatible 
-with all of notame.
+Attempts to create missing columns needed for notame in pheno and feature 
+data. Optionally cleans the object and splits the object by mode.
 }
 \details{
 Only specify one of \code{split_by} and \code{name}. The feature 

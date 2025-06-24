@@ -54,17 +54,11 @@ Imports:
     utils
 Suggests:
     BiocStyle,
-    car,
     fpc,
     igraph,
     knitr,
-    lmerTest,
     missForest,
-    MuMIn,
     pcaMethods,
-    PERMANOVA,
-    PK,
-    rmcorr,
     Rtsne,
     RUVSeq,
     testthat
