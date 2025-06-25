@@ -38,31 +38,6 @@
 #' \item \code{\link{pqn_normalization}} probabilistic quotient normalization
 #' \item \code{\link{inverse_normalize}} inverse-rank normalization
 #' }
-#'
-#' Data pretreatment visualizations (for visualization of data pretreatment and 
-#' exploring the data at large, saved to file by default):
-#' \itemize{
-#' \item \code{\link{visualizations}} write all relevant data pretreatment 
-#' visualizations to pdf
-#' \item \code{\link{plot_injection_lm}} estimate the magnitude of drift
-#' \item \code{\link{plot_sample_boxplots}} plot a boxplot for each sample
-#' \item \code{\link{plot_dist_density}} plot distance density
-#' \item \code{\link{plot_tsne}}, \code{\link{plot_pca}} t-SNE and PCA plot
-#' \item \code{\link{plot_tsne_arrows}}, \code{\link{plot_pca_arrows}} t-SNE 
-#' and PCA plots with arrows
-#' \item \code{\link{plot_tsne_hexbin}}, \code{\link{plot_pca_hexbin}}
-#' t-SNE and PCA hexbin plots
-#' \item \code{\link{plot_dendrogram}} sample dendrogram
-#' \item \code{\link{plot_sample_heatmap}} sample heatmap
-#' \item \code{\link{plot_pca_loadings}} PCA loadings plot
-#' \item \code{\link{plot_quality}} plot quality metrics
-#' \item \code{\link{save_batch_plots}} save batch correction plots
-#' }
-#' 
-#' Feature selection – Univariate analysis (return data.frames):
-#' \itemize{
-#' \item \code{\link{perform_lm}} linear models 
-#' }
 #' 
 #' Object utilities:
 #' \itemize{
@@ -84,7 +59,6 @@
 #' \item \code{\link{init_log}} initialize log to a file
 #' \item \code{\link{log_text}} log text to the current log file
 #' \item \code{\link{finish_log}} finish a log
-#' \item \code{\link{save_plot}} save plot to chosen format
 #' \item \code{\link{fix_MSMS}} transform the MS/MS output to publication ready
 #' }
 #'

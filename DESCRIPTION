@@ -36,10 +36,8 @@ Imports:
     BiocGenerics,
     BiocParallel,
     cowplot,
-    devEMF,
     dplyr,
     futile.logger,
-    ggdendro,
     ggrepel,
     grDevices,
     methods,
@@ -48,8 +46,6 @@ Imports:
     S4Vectors,
     scales,
     stringr,
-    stats, 
-    tibble,
     tidyr,
     utils
 Suggests:
@@ -59,7 +55,6 @@ Suggests:
     knitr,
     missForest,
     pcaMethods,
-    Rtsne,
     RUVSeq,
     testthat
 URL: https://github.com/hanhineva-lab/notame

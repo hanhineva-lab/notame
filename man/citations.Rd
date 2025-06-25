@@ -10,8 +10,8 @@ citations()
 None, the function is invoked for its side effect.
 }
 \description{
-This function lists citations for all the major packages used by the notame 
-functions that have been called during the session. All notame functions 
+This function lists citations behind the notame functions that have been 
+called during the session. All notame functions 
 update the list automatically. The citations are taken from the call to 
 '\code{citation("package")}, and complemented with a brief description of 
 what the package was used for.
@@ -22,8 +22,8 @@ The output is written to the current log file, if specified.
 \examples{
 citations()
 data(example_set)
-plot_tsne(example_set, perplexity = 10, group = "Group", color = "Group")
-# Rtsne added to citations
+ex_set <- flag_quality(example_set)
+# Broadhurst et al.(2018) added to citations
 citations()
 
 }
