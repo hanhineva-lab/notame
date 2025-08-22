@@ -19,9 +19,9 @@ Computes the number of features at each stage of flagging for each mode.
 }
 \examples{
 data(example_set)
-flagged <- example_set \%>\%
-  mark_nas(0) \%>\%
-  flag_detection(group = "Group") \%>\%
+flagged <- example_set |>
+  mark_nas(0) |>
+  flag_detection(group = "Group") |>
   flag_quality()
 flag_report(flagged)
 

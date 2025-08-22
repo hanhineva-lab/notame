@@ -93,11 +93,11 @@ test_that("Inverse normalization works as expected", {
   normalized <- inverse_normalize(imputed)
 
   # Ranks should be identical
-  orig_ranks <- assay(imputed) %>%
-    apply(1, rank) %>%
+  orig_ranks <- assay(imputed) |>
+    apply(1, rank) |>
     t()
-  norm_ranks <- assay(normalized) %>%
-    apply(1, rank) %>%
+  norm_ranks <- assay(normalized) |>
+    apply(1, rank) |>
     t()
   expect_identical(norm_ranks, orig_ranks)
 
@@ -110,7 +110,7 @@ test_that("Inverse normalization works as expected", {
   expect_true(all(sd_diffs < 0.1))
 
   # Shapiro-Wilk normality tests are non-significant
-  shapiro_p <- assay(normalized) %>%
+  shapiro_p <- assay(normalized) |>
     apply(1, function(x) {
       shapiro.test(x)$p.value
     })

@@ -18,14 +18,14 @@ for (mode in modes) {
     stringsAsFactors = FALSE)
   
   # Create Feature ID
-  round_mz <- as.numeric(feature_data$Average_Mz) %>%
-    round(digits = 4) %>%
-    as.character() %>%
-    gsub("[.]", "_", .)
-  round_rt <- as.numeric(feature_data$Average_Rt_min) %>%
-    round(digits = 4) %>%
-    as.character() %>%
-    gsub("[.]", "_", .)
+  round_mz <- as.numeric(feature_data$Average_Mz) |>
+    round(digits = 4) |>
+    as.character() |>
+    gsub("[.]", "_", x = _)
+  round_rt <- as.numeric(feature_data$Average_Rt_min) |>
+    round(digits = 4) |>
+    as.character() |>
+    gsub("[.]", "_", x = _)
   feature_data$Feature_ID <- paste0(mode, "_", round_mz, "a", round_rt)
   feature_data <- dplyr::select(feature_data, "Feature_ID", everything())
 
@@ -36,7 +36,7 @@ for (mode in modes) {
 # Pheno data
 n_samples <- 50
 # Make batch as if paired samples were measured in different batches
-qc_idx <- seq(1, n_samples / 2, length.out = 5) %>% round()
+qc_idx <- seq(1, n_samples / 2, length.out = 5) |> round()
 subject_ids <- as.character(seq_len(n_samples / 2))
 group <- sample(LETTERS[1:2], n_samples / 2, replace = TRUE)
 time <- as.character(rep(c(1, 2), each = n_samples / 2))

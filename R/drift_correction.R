@@ -130,9 +130,9 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
   } else if (any(dc_data[feature, ] < 0, na.rm = TRUE)) {
     dc_note <- "Negative_DC"
   } else if (check_quality) {
-    pass <- paste0("qdiff[feature, ] %>% dplyr::filter(", condition, 
-                   ") %>% nrow() %>% as.logical()") %>%
-      parse(text = .) %>%
+    pass <- paste0("qdiff[feature, ] |> dplyr::filter(", condition, 
+                   ") |> nrow() |> as.logical()") |>
+      parse(text = .) |>
       eval()
     if (!pass) {
       dc_note <- "Low_quality"
@@ -223,10 +223,10 @@ inspect_dc <- function(orig, dc, check_quality,
 
   # Log information
   dc_note <- inspected$dc_notes$DC_note
-  note_counts <- table(dc_note) %>% unname()
+  note_counts <- table(dc_note) |> unname()
   note_percentage <- note_counts / sum(note_counts)
   note_percentage <- scales::percent(as.numeric(note_percentage))
-  note_labels <- table(dc_note) %>% names()
+  note_labels <- table(dc_note) |> names()
   report <- paste(note_labels, note_percentage, sep = ": ", collapse = ",  ")
   log_text(paste0("\nDrift correction results inspected, report:\n", report))
 

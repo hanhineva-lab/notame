@@ -407,10 +407,10 @@ impute_simple <- function(object, value, na_limit = 0, assay.type = NULL,
 inverse_normalize <- function(object, assay.type = NULL, name = NULL) {
   from_to <- .get_from_to_names(object, assay.type, name)
   object <- .check_object(object, assay.type = from_to[[1]])
-  assay(object, from_to[[2]]) <- assay(object, from_to[[1]]) %>%
+  assay(object, from_to[[2]]) <- assay(object, from_to[[1]]) |>
     apply(1, function(x) {
       stats::qnorm((rank(x, na.last = "keep") - 0.5) / sum(!is.na(x)))
-    }) %>%
+    }) |>
     t()
 
   object
@@ -429,9 +429,9 @@ inverse_normalize <- function(object, assay.type = NULL, name = NULL) {
 #'
 #' @examples
 #' data(example_set)
-#' flagged <- example_set %>%
-#'   mark_nas(0) %>%
-#'   flag_detection(group = "Group") %>%
+#' flagged <- example_set |>
+#'   mark_nas(0) |>
+#'   flag_detection(group = "Group") |>
 #'   flag_quality()
 #' flag_report(flagged)
 #'
@@ -443,9 +443,9 @@ flag_report <- function(object) {
   flag(object)[is.na(flag(object))] <- "Kept"
   for (split in splits) {
     tmp <- object[rowData(object)$Split == split, ]
-    report_row <- flag(tmp) %>%
-      table() %>%
-      as.matrix() %>%
+    report_row <- flag(tmp) |>
+      table() |>
+      as.matrix() |>
       t()
     report_row <- data.frame(Split = split, report_row)
     if (is.null(report_row$Kept)) {

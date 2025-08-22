@@ -131,7 +131,7 @@ for (i in seq_along(modes)) {
                  perplexity = 5, group = "Group", time = "Time", 
                  id = "Subject_ID", color = "Group")
   # Flag low-quality features
-  corrected <- corrected %>% assess_quality() %>% flag_quality()
+  corrected <- corrected |> assess_quality() |> flag_quality()
   # Visualize data after removal of low-quality features
   visualizations(corrected, prefix = paste0(ppath, "figures/", name, "_CLEAN"),
                  perplexity = 5, group = "Group", time = "Time",

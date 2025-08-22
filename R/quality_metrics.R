@@ -151,9 +151,9 @@ flag_quality <- function(object, assay.type = NULL, condition =
     "assays applied in untargeted clinical metabolomic studies.",
     "Metabolomics : Official journal of the Metabolomic Society",
     "vol. 14,6 (2018): 72. doi:10.1007/s11306-018-1367-3"))
-  good <- paste0("as.data.frame(rowData(object)) %>% 
-                 dplyr::filter(", condition, ")") %>%
-    parse(text = .) %>%
+  good <- paste0("as.data.frame(rowData(object)) |> 
+                 dplyr::filter(", condition, ")") |>
+    parse(text = _) |>
     eval()
   good <- good$Feature_ID
 
@@ -217,10 +217,10 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
   # Compute proportions found in each study group
   if (!is.null(group)) {
     proportions <- combined_data(object, from)[, c("Sample_ID", group,
-                                               rownames(object))] %>%
-      tidyr::gather("Feature_ID", "Intensity", rownames(object)) %>%
-      dplyr::group_by(.data$Feature_ID, !!as.name(group)) %>%
-      dplyr::summarise(proportion_found = prop_found(.data$Intensity)) %>%
+                                               rownames(object))] |>
+      tidyr::gather("Feature_ID", "Intensity", rownames(object)) |>
+      dplyr::group_by(.data$Feature_ID, !!as.name(group)) |>
+      dplyr::summarise(proportion_found = prop_found(.data$Intensity)) |>
       tidyr::spread(!!as.name(group), "proportion_found")
     # Remove a possible QC column
     proportions$QC <- NULL

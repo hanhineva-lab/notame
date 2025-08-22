@@ -35,7 +35,7 @@
   }
 
 
-  overlap_cols <- intersect(colnames(colData(x)), colnames(colData(y))) %>%
+  overlap_cols <- intersect(colnames(colData(x)), colnames(colData(y))) |>
     setdiff(c("Sample_ID", "Injection_order"))
 
   if (length(overlap_cols)) {
@@ -88,16 +88,16 @@
   merged_coldata <- dplyr::full_join(as.data.frame(colData(x)), 
                                      as.data.frame(colData(y)),
                                      by = intersect(colnames(colData(x)),
-                                                    colnames(colData(y)))) %>%
+                                                    colnames(colData(y)))) |>
     S4Vectors::DataFrame()
   rownames(merged_coldata) <- merged_coldata$Sample_ID
-  merged_rowdata <- rbind(rowData(x), rowData(y)) %>%
+  merged_rowdata <- rbind(rowData(x), rowData(y)) |>
     S4Vectors::DataFrame()
   if (identical(colnames(assay(x)), colnames(assay(y)))) {
     merged_assay <- rbind(assay(x), assay(y))
   } else {
     merged_assay <- dplyr::bind_rows(as.data.frame(assay(x)),
-                                     as.data.frame(assay(y))) %>% 
+                                     as.data.frame(assay(y))) |> 
       as.matrix()
     rownames(merged_assay) <- rownames(merged_rowdata)
   }
@@ -221,7 +221,7 @@ merge_objects <- function(..., merge = c("features", "samples"),
 
   if (non_identical_cols) {
     merged_rowdata <-dplyr::left_join(merged_rowdata, only_x, 
-                                      by = "Feature_ID") %>%
+                                      by = "Feature_ID") |>
       dplyr::left_join(only_y, by = "Feature_ID")
     rownames(merged_rowdata) <- merged_rowdata$Feature_ID
   }
@@ -243,7 +243,7 @@ merge_objects <- function(..., merge = c("features", "samples"),
   }
 
   rownames(merged_coldata) <- merged_coldata$Sample_ID
-  merged_coldata <- merged_coldata %>%
+  merged_coldata <- merged_coldata |>
     S4Vectors::DataFrame()
 
   if (identical(rownames(assay(x)), rownames(assay(y)))) {
@@ -251,12 +251,12 @@ merge_objects <- function(..., merge = c("features", "samples"),
     colnames(merged_assay) <- rownames(merged_coldata)
   } else {
     merged_assay <- dplyr::bind_rows(as.data.frame(t(assay(x))),
-                                     as.data.frame(t(assay(y)))) %>% 
+                                     as.data.frame(t(assay(y)))) |> 
      t()
     colnames(merged_assay) <- rownames(merged_coldata)
   }
 
-  merged_rowdata <- .rowdata_batch_helper(rowData(x), rowData(y)) %>%
+  merged_rowdata <- .rowdata_batch_helper(rowData(x), rowData(y)) |>
     S4Vectors::DataFrame()
 
   merged_object <- SummarizedExperiment(assays = merged_assay, 

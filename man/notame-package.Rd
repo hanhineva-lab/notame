@@ -6,66 +6,8 @@
 \alias{notame-package}
 \title{\code{notame} package.}
 \description{
-Provides functionality for untargeted LC-MS metabolomics research as 
-specified in the associated publication in the 'Metabolomics Data
-Processing and Data Analysis—Current Best Practices' special issue of the 
-Metabolites journal (2020). This includes data pretreatment, feature 
-selection and supporting visualizations. Raw data preprocessing and 
-functionality related to biological context, such as pathway analysis, is 
-not included.
-}
-\details{
-In roughly chronological order, the functionality of notame is as follows. 
-Please see the vignettes and paper for more information.
-
-Data pretreatment (for reducing unwanted variation and completing the 
-dataset, returning modifed objects):
-\itemize{
-\item \code{\link{mark_nas}} mark specified values as missing
-\item \code{\link{flag_detection}} flag features with low detection rate
-\item \code{\link{flag_contaminants}} flag contaminants based on blanks
-\item \code{\link{correct_drift}} correct drift using cubic spline
-\item \code{\link{ruvs_qc}} Remove Unwanted Variation (RUV) between batches
-\item \code{\link{pca_bhattacharyya_dist}} Bhattacharyya distance between 
-batches in PCA space
-\item \code{\link{perform_repeatability}} compute repeatability measures
-\item \code{\link{assess_quality}} assess quality information of features
-\item \code{\link{quality}} extract quality information of features
-\item \code{\link{flag_quality}} flag low-quality features
-\item \code{\link{flag_report}} report of flagged features
-\item \code{\link{impute_rf}} impute missing values using random forest
-\item \code{\link{impute_simple}} impute missing values using simple 
-imputation
-\item \code{\link{cluster_features}} cluster correlated features originating 
-from the same metabolite
-\item \code{\link{compress_clusters}} Compress clusters of features to a 
-single feature
-\item \code{\link{pqn_normalization}} probabilistic quotient normalization
-\item \code{\link{inverse_normalize}} inverse-rank normalization
-}
-
-Object utilities:
-\itemize{
-\item \code{\link{read_from_excel}} read formatted Excel files
-\item \code{\link{write_to_excel}} write results to Excel file
-\item \code{\link{flag}} get and set values in the flag column
-\item \code{\link{drop_flagged}} drop flagged features
-\item \code{\link{drop_qcs}} drop QC samples
-\item \code{\link{combined_data}} retrieve both sample information and 
-features
-\item \code{\link{merge_objects}} merge SummarizedExperiment objects 
-together
-\item \code{\link{fix_object}} fix object for functioning of notame
-}
-
-Other utilities:
-\itemize{
-\item \code{\link{citations}} show citations
-\item \code{\link{init_log}} initialize log to a file
-\item \code{\link{log_text}} log text to the current log file
-\item \code{\link{finish_log}} finish a log
-\item \code{\link{fix_MSMS}} transform the MS/MS output to publication ready
-}
+Provides tabular data preprocessing and data wrangling functionality for 
+untargeted LC-MS metabolomics research.
 }
 \references{
 Klåvus et al. (2020). "notame": Workflow for Non-Targeted LC-MS Metabolic 

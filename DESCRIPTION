@@ -30,7 +30,6 @@ biocViews: BiomedicalInformatics, Metabolomics, DataImport, MassSpectrometry, Ba
 Depends:
     R (>= 4.5.0),
     ggplot2,
-    magrittr,
     SummarizedExperiment
 Imports:
     BiocGenerics,

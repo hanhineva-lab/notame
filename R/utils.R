@@ -13,7 +13,6 @@ NULL
 
 #' @rawNamespace import(ggplot2, except = Position)
 #' @importFrom utils citation
-#' @importFrom magrittr "%>%" "%<>%"
 #' @import BiocGenerics
 #' @import methods
 #' @import SummarizedExperiment

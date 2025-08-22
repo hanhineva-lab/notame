@@ -196,7 +196,7 @@
   .log_text_if("Checking that feature abundances only contain numeric values",
                log_messages)
   # Check that all rows are full of numbers
-  non_numerics <- assay_ %>% apply(1, function(x) !.looks_numeric(x))
+  non_numerics <- assay_ |> apply(1, function(x) !.looks_numeric(x))
   if (sum(non_numerics)) {
     stop(paste("Non-numeric values found in the abundances on rows",
                paste(which(non_numerics), collapse = ", ")))
@@ -477,12 +477,12 @@ read_from_excel <- function(file, sheet = 1, id_column = NULL,
                   " and retention time column ", rt_col))
   log_text("Creating feature IDs from Split, m/z and retention time")
 
-  round_mz <- as.numeric(feature_data[, mz_col]) %>%
-    as.character() %>%
-    gsub("[.]", "_", .)
-  round_rt <- as.numeric(feature_data[, rt_col]) %>%
-    as.character() %>%
-    gsub("[.]", "_", .)
+  round_mz <- as.numeric(feature_data[, mz_col]) |>
+    as.character() |>
+    gsub("[.]", "_", x = _)
+  round_rt <- as.numeric(feature_data[, rt_col]) |>
+    as.character() |>
+    gsub("[.]", "_", x = _)
   feature_data$Feature_ID <- paste0(feature_data$Split, "_", 
                                     round_mz, "a", round_rt)
   if (anyDuplicated(feature_data$Feature_ID)) {
@@ -529,9 +529,9 @@ write_to_excel <- function(object, file, ...) {
   # - abundance values
   bottom <- as.data.frame(cbind(rowData(object), assay(object)))
   # All columns must be characters to allow combination with the top block
-  bottom <- bottom %>%
-    dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) %>%
-    rbind(colnames(.), .)
+  bottom <- bottom |>
+    dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
+  bottom <- rbind(colnames(bottom), bottom)
   # Top block holds the sample information
   pd <- as.data.frame(colData(object))
   datafile_cols <- colnames(pd)[grepl("Datafile", colnames(pd))]
@@ -772,13 +772,13 @@ fix_object <- function(object, id_prefix = "ID_", id_column = NULL,
 
 .fix_assay <- function(assay_, log_messages = FALSE) {
   # Check that all rows are full of numbers
-  non_numerics <- assay_ %>% apply(1, function(x) !.looks_numeric(x))
+  non_numerics <- assay_ |> apply(1, function(x) !.looks_numeric(x))
   if (sum(non_numerics)) {
     stop(paste("Non-numeric values found in the abundances on rows",
                paste(which(non_numerics), collapse = ", ")))
   }
   # Convert to numeric
-  assay_ <- assay_ %>% apply(2, as.numeric)
+  assay_ <- assay_ |> apply(2, as.numeric)
 
   assay_
 }
@@ -810,7 +810,7 @@ fix_object <- function(object, id_prefix = "ID_", id_column = NULL,
       }
       log_text(paste0("Creating Split column from ",
                       paste0(split_by, collapse = ", ")))
-      feature_data <- feature_data %>%
+      feature_data <- feature_data |>
         tidyr::unite("Split", split_by, remove = FALSE)
     }
   }
@@ -824,14 +824,14 @@ fix_object <- function(object, id_prefix = "ID_", id_column = NULL,
   if (clean) {
     # Reorganise columns and change classes
     pre_clean <- feature_data
-    feature_data <- as.data.frame(feature_data) %>%
-      dplyr::select("Feature_ID", "Split", dplyr::everything()) %>%
-      .best_classes() %>%
+    feature_data <- as.data.frame(feature_data) |>
+      dplyr::select("Feature_ID", "Split", dplyr::everything()) |>
+      .best_classes() |>
       dplyr::mutate_if(is.factor, as.character)
     # Replace dots with underscores in colnames
-    colnames(feature_data) <- gsub("[.]", "_", colnames(feature_data)) %>%
+    colnames(feature_data) <- gsub("[.]", "_", colnames(feature_data)) |>
       # Remove duplicate underscores
-      gsub("_{2,}", "_", .)
+      gsub("_{2,}", "_", x = _)
     if (!isTRUE(all.equal(as.data.frame(pre_clean), feature_data))) {
       log_text("Feature data was cleaned")
     }

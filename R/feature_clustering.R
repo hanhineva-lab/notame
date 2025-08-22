@@ -179,8 +179,8 @@ compress_clusters <- function(object) {
          "please run cluster_features first!")
   }
   # Get only "real" clusters
-  clusters <- cluster_names[grepl("^Cluster_", cluster_names)] %>%
-    gsub("^Cluster_", "", .) %>%
+  clusters <- cluster_names[grepl("^Cluster_", cluster_names)] |>
+    gsub("^Cluster_", "", x = _) |>
     unique()
   alone_features <- cluster_names[!grepl("^Cluster_", cluster_names)]
   # This ensures the order of the features stays the same
@@ -218,8 +218,8 @@ pull_clusters <- function(data, features, name_col) {
          "please run assign_cluster_id first!")
   }
   # Get only "real" clusters
-  clusters <- cluster_names[grepl("^Cluster_", cluster_names)] %>%
-    gsub("^Cluster_", "", .) %>%
+  clusters <- cluster_names[grepl("^Cluster_", cluster_names)] |>
+    gsub("^Cluster_", "", x = _) |>
     unique()
   alone_features <- cluster_names[!grepl("^Cluster_", cluster_names)]
   # This ensures the order of the features stays the same
