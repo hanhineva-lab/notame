@@ -53,7 +53,8 @@ library(notame)
 ```
 
 # How it works
-SummarizedExperiment is the primary data structure of this package. The functionality of *notame* can be broadly divided into data pretreatment and 
+SummarizedExperiment is the primary data structure of this package. The 
+functionality of *notame* can be broadly divided into data pretreatment and 
 feature selection, excluding preprocessing and functionality related to 
 biological context (Figure 1). Data pretreatment involves reducing unwanted
 variation and data preparation dependent on downstream methods. The many 

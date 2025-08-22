@@ -20,8 +20,7 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE,
   results = FALSE,
-  comment = "##",
-  eval = FALSE
+  comment = "##"
 )
 ```
 
@@ -41,6 +40,8 @@ output for the rest of the document for brevity.
 
 ```{r, results = 'markup'}
 library(notame)
+library(notameViz)
+library(notameStats)
 ppath <- tempdir()
 init_log(log_file = file.path(ppath, "log.txt"))
 ```
@@ -71,7 +72,7 @@ sapply(data, class)
 sapply(data, dim)
 ```
 
-## Construct SummarizedExperiment object 
+## Construct SummarizedExperiment object
 These three parts can be used to construct SummarizedExperiment using the 
 native SummarizedExperiment constructor objects using 
 `construct_metabosets()`. The example data contains four analytical modes, so 

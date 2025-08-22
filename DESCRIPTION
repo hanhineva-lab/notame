@@ -54,6 +54,8 @@ Suggests:
     igraph,
     knitr,
     missForest,
+    notameViz,
+    notameStats,
     pcaMethods,
     RUVSeq,
     testthat
