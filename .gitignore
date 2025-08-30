@@ -42,6 +42,8 @@ vignettes/*.pdf
 
 # pkgdown site
 docs/
+/doc/
+/Meta/
 
 # translation temp files
 po/*~
@@ -80,5 +82,3 @@ rsconnect/
 *.seed
 *.settings
 *.tm_properties
-/doc/
-/Meta/

@@ -17,6 +17,7 @@ Profiling. Metabolites, 10: 135.
 Useful links:
 \itemize{
   \item \url{https://github.com/hanhineva-lab/notame}
+  \item \url{https://hanhineva-lab.github.io/notame/}
   \item Report bugs at \url{https://github.com/hanhineva-lab/notame/issues}
 }
 

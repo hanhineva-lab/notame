@@ -53,16 +53,20 @@ library(notame)
 ```
 
 # How it works
-SummarizedExperiment is the primary data structure of this package. The 
-functionality of *notame* can be broadly divided into data pretreatment and 
-feature selection, excluding preprocessing and functionality related to 
-biological context (Figure 1). Data pretreatment involves reducing unwanted
-variation and data preparation dependent on downstream methods. The many 
-visualizations used for inspecting the data pretreatment process also serve as 
-exploratory data analysis. Feature selection aims to select a subset of 
-interesting features across study groups before laborious steps relating to 
-biological context. Please see the documentation for an overview 
-of functionality (?notame), the Project Example vignette for usage and the 
+SummarizedExperiment is the primary data structure of this package, but 
+MetaboSet is still supported for old users' preference. One can use a single 
+peak table throughout the analysis as with MetaboSet and also use multiple peak 
+tables with SummarizedExperiment, using the `assay.type` and `name` arguments.
+
+The functionality of *notame* can be broadly divided into tabular data 
+preprocessing and feature selection, excluding sample preprocessing and 
+functionality related to biological context (Figure 1). Tabular data processing
+involves reducing unwanted variation and data preparation dependent on 
+downstream methods. The many visualizations used for inspecting the process 
+also serve as exploratory data analysis. Feature selection aims to select a 
+subset of interesting features across study groups before laborious steps 
+relating to biological context. Please see the documentation for an overview of 
+functionality (?notame), the Project Example vignette for usage and the 
 associated protocol article for more information [@notame].
 
 ```{r, echo = FALSE}
@@ -94,13 +98,13 @@ mode, supplied as arguments to the `split_by` parameter. If the file only
 contains one mode, specify the name of the mode, e.g. "HILIC_pos" to the `name` 
 parameter. 
 
-## Data pretreatment
-Data pretreatment functions return modified objects and are largely 
-based on pooled QC samples [@qcguidelines]. Data pretreatment is generally 
-performed separately for each mode. The visualizations used to monitor data 
-pretreatment are saved to file by default, but can also be returned as ggplot 
-objects. The `visualizations()` wrapper can be used for saving visualizations 
-at different stages of data pretreatment.
+## Tabular data preprocessing
+The main functions return modified objects and are largely 
+based on pooled QC samples [@qcguidelines]. Tabular data preprocessing is 
+generally performed separately for each mode. The visualizations used to 
+monitor tabular data preprocessing are saved to file by default, but can also 
+be returned as ggplot objects. The `visualizations()` wrapper can be used for 
+saving visualizations at different stages of processing.
 
 ## Feature selection
 Univariate statistics functions return a `data.frame`, to be manually 

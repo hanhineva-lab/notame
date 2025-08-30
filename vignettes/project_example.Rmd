@@ -84,19 +84,19 @@ names(modes)
 sapply(modes, class)
 ```
 
-# Data pretreatment
+# Tabular data preprocessing
 
-## Data pretreatment by mode
-Data pretreatment is performed to complete the dataset by way of reducing 
-unwanted variation and data preparation dependent on downstream methods. Steps 
-performed separately for each mode include marking missing values as NA, 
-flagging features with low detection rate [@qcguidelines], drift correction 
-[@driftcorrection], and flagging of low-quality features [@qcguidelines]. 
-Visualizations are drawn to monitor the data pretreatment process and explore 
-the data globally. The `visualizations()` wrapper does not include feature-
-wise plots as it may not be feasible to inspect them at this stage of the 
-analysis. For example, drift correction visualizations are best drawn 
-for a subset of interesting features after feature selection.
+## Preprocessing by mode
+Tabular data preprocessing is performed to complete the dataset by way of 
+reducing unwanted variation and data preparation dependent on downstream 
+methods. Steps performed separately for each mode include marking missing 
+values as NA, flagging features with low detection rate [@qcguidelines], drift 
+correction [@driftcorrection], and flagging of low-quality features 
+[@qcguidelines]. Visualizations are drawn to monitor the process and explore 
+the data globally. The `visualizations()` wrapper does not include
+feature-wise plots as it may not be feasible to inspect them at this 
+stage of the analysis. For example, drift correction visualizations are best 
+drawn for a subset of interesting features after feature selection.
 
 ```{r}
 # Initialize empty list for processed objects
@@ -141,7 +141,7 @@ action in feature information.
 rowData(processed[[1]])$DC_note
 ```
 
-## Data pretreatment for the complete dataset
+## Preprocessing for the complete dataset
 
 Next, it is time to merge the modes together and visualize the complete dataset.
 

@@ -1,0 +1,109 @@
+url: https://hanhineva-lab.github.io/notame/
+template:
+  bootstrap: 5
+  
+destination: docs
+
+reference:
+- title: Tabular data preprocessing
+- contents:
+  - mark_nas
+  - flag_detection
+  - flag_contaminants
+  - correct_drift
+  - ruvs_qc
+  - pca_bhattacharyya_dist
+  - perform_repeatability
+  - assess_quality
+  - quality
+  - flag_quality
+  - flag_report
+  - impute_rf
+  - impute_simple
+  - cluster_features
+  - compress_clusters
+  - pqn_normalization
+  - inverse_normalize
+
+- title: Preprocessing visualizations
+- contents:
+  - notameViz::visualizations
+  - notameViz::plot_injection_lm
+  - notameViz::plot_sample_boxplots
+  - notameViz::plot_dist_density
+  - notameViz::plot_tsne
+  - notameViz::plot_pca
+  - notameViz::plot_tsne_arrows
+  - notameViz::plot_pca_arrows
+  - notameViz::plot_tsne_hexbin
+  - notameViz::plot_pca_hexbin
+  - notameViz::plot_dendrogram
+  - notameViz::plot_sample_heatmap
+  - notameViz::plot_pca_loadings
+  - notameViz::plot_quality
+  - notameViz::save_batch_plots
+
+- title: Feature selection
+- subtitle: Univariate analysis
+- contents:
+  - notameStats::perform_lm
+  - notameStats::perform_logistic
+  - notameStats::perform_lmer
+  - notameStats::perform_oneway_anova
+  - notameStats::perform_lm_anova
+  - notameStats::perform_t_test
+  - notameStats::perform_kruskal_wallis
+  - notameStats::perform_non_parametric
+  - notameStats::perform_correlation_tests
+  - notameStats::perform_auc
+  - notameStats::perform_homoscedasticity_tests
+  - notameStats::cohens_d
+  - notameStats::fold_change
+  - notameStats::summary_statistics
+  - notameStats::summarize_results
+  
+- title: Feature wise visualizations
+- contents:
+  - notameViz::save_beeswarm_plots
+  - notameViz::save_group_boxplots
+  - notameViz::save_scatter_plots
+  - notameViz::save_subject_line_plots
+  - notameViz::save_group_lineplots
+  
+- title: Results visualizations
+- contents:
+  - notameViz::plot_p_histogram
+  - notameViz::volcano_plot
+  - notameViz::manhattan_plot
+  - notameViz::mz_rt_plot
+  - notameViz::plot_effect_heatmap
+  
+- title: Object utilities
+- contents:
+  - import_MSDIAL
+  - write_to_excel
+  - flag
+  - drop_flagged
+  - drop_qcs
+  - join_rowData
+  - join_colData
+  - combined_data
+  - merge_objects
+  - fix_object
+  
+- title: Other utilities
+- contents: 
+  - citations
+  - init_log
+  - log_text
+  - finish_log
+  - notameViz::save_plot
+  - fix_MSMS
+
+- title: Datasets
+- contents:
+  - example_set
+  
+- title: Package
+- contents: 
+  - notame-package

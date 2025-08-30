@@ -23,7 +23,7 @@ Authors@R: c(
     person("Olli", "Kärkkäinen", role = "ctb",
            comment = c(ORCID = "0000-0003-0825-4956")),
     person("Artur", "Sannikov", role = "ctb"))
-Description: Provides functionality for untargeted LC-MS metabolomics research as specified in the associated protocol article in the 'Metabolomics Data Processing and Data Analysis—Current Best Practices' special issue of the Metabolites journal (2020). This includes data pretreatment and quality control, uni- and multivariate analysis as well as quality control visualizations, feature-wise visualizations and results visualizations. Raw data preprocessing and functionality related to biological context, such as pathway analysis, is not included.
+Description: Provides functionality for untargeted LC-MS metabolomics research as specified in the associated protocol article in the 'Metabolomics Data Processing and Data Analysis—Current Best Practices' special issue of the Metabolites journal (2020). This includes tabular data preprocessing and quality control, uni- and multivariate analysis as well as quality control visualizations, feature-wise visualizations and results visualizations. Raw data preprocessing and functionality related to biological context, such as pathway analysis, is not included.
 License: MIT + file LICENSE
 Encoding: UTF-8
 biocViews: BiomedicalInformatics, Metabolomics, DataImport, MassSpectrometry, BatchEffect, MultipleComparison, Normalization, QualityControl, Visualization, Preprocessing
@@ -58,7 +58,7 @@ Suggests:
     pcaMethods,
     RUVSeq,
     testthat
-URL: https://github.com/hanhineva-lab/notame
+URL: https://github.com/hanhineva-lab/notame, https://hanhineva-lab.github.io/notame/
 BugReports: https://github.com/hanhineva-lab/notame/issues
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
