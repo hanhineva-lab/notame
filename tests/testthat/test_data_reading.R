@@ -147,16 +147,16 @@ test_that("Easy example data is read correctly", {
   dimnames(ad) <- list(rownames(fd), rownames(pd))
 
   # Read the file
-  read <- read_from_excel(system.file("testdata", "easy_data.xlsx", package = "notame"),
+  read <- import_from_excel(system.file("testdata", "easy_data.xlsx", package = "notame"),
     sheet = 1,
     corner_row = 4, corner_column = "D",
     name = "easy", id_prefix = "TEST_"
   )
 
   # Test that the parts are read as expected
-  expect_equal(read$assay, ad)
-  expect_equal(read$pheno_data, pd)
-  expect_equal(read$feature_data, fd)
+  expect_equal(assay(read), ad)
+  expect_equal(as.data.frame(colData(read)), pd)
+  expect_equal(as.data.frame(rowData(read)), fd)
 })
 
 test_that("Data is split correctly", {
@@ -205,21 +205,21 @@ test_that("Data is split correctly", {
 
 
   # Read the file
-  read <- read_from_excel(system.file("testdata", "split_data.xlsx", package = "notame"),
+  read <- import_from_excel(system.file("testdata", "split_data.xlsx", package = "notame"),
     sheet = 1,
     corner_row = 4, corner_column = "F",
     split_by = c("Column", "Mode"), id_prefix = "TEST_"
   )
 
   # Test that the parts are read as expected
-  expect_equal(read$assay, ad)
-  expect_equal(read$pheno_data, pd)
-  expect_equal(read$feature_data, fd)
+  expect_equal(assay(read), ad)
+  expect_equal(as.data.frame(colData(read)), pd)
+  expect_equal(as.data.frame(rowData(read)), fd)
 })
 
 test_that("Splitting data works as expected", {
   split_by <- c("Ion mode", "gswregh") # Wrong column name
-  expect_error(read_from_excel(
+  expect_error(import_from_excel(
     system.file("testdata", "sample_data_whole.xlsx",
       package = "notame"
     ),
@@ -246,10 +246,10 @@ test_that("Creating dummy injection order works as expected", {
   modes <- list()
   for (name in names) {
     file <- system.file("extdata", paste0(name, "_sample.xlsx"), package = "notame")
-    mode <- read_from_excel(file, name = name)
-    modes[name] <- SummarizedExperiment(assays = SimpleList(mode$assay), 
-                                        colData = mode$pheno_data,
-                                        rowData = mode$feature_data)
+    mode <- import_from_excel(file, name = name)
+    modes[name] <- SummarizedExperiment(assays = SimpleList(assay(mode)), 
+                                        colData = colData(mode),
+                                        rowData = rowData(mode))
   }
   # Modify data
   modes$hilic_neg$Injection_order <- modes$hilic_neg$Injection_order + 1

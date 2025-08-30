@@ -53,43 +53,31 @@ regularly interspersed QC samples and 80 features divided into four analytical
 modes.
 
 ```{r}
-data <- read_from_excel(
+data <- import_from_excel(
   file = system.file("extdata", "example_set.xlsx", package = "notame"), 
   sheet = 1, corner_row = 11, corner_column = "H", 
   split_by = c("Column", "Ion_mode"))
+  
+names(assays(data)) <- "abundances"
 ```
 
-The function read_from_excel() returns a list holding the three parts of 
-the data:
+The function import_from_excel() returns a SummarizedExperiment object with three 
+main parts and corresponding accessors for streamlined data wrangling.
 
-- `exprs`: feature abundances across the samples  
-- `pheno_data`: sample information  
-- `feature_data`: feature information
+- `assay`: feature abundances across the samples  
+- `colData`: sample information  
+- `rowData`: feature information
 
-```{r, results = 'markup'}
-names(data)
-sapply(data, class)
-sapply(data, dim)
-```
-
-## Construct SummarizedExperiment object
-These three parts can be used to construct SummarizedExperiment using the 
-native SummarizedExperiment constructor objects using 
-`construct_metabosets()`. The example data contains four analytical modes, so 
-we separate them using `fix_object()`, which also conveniently checks the 
-object for compatibility with all of notame. 
+The example data contains four analytical modes, so we separate them using 
+`fix_object()`, which also conveniently checks the object for compatibility 
+with all of notame. 
 
 ```{r}
-data <- SummarizedExperiment(assays = data$assay, 
-                             rowData = data$feature_data,
-                             colData = data$pheno_data)
-names(assays(data)) <- "abundances"
-
 modes <- fix_object(data, split_data = TRUE, assay.type = "abundances")
 ```
 
 Now we have a list of objects, one per mode (LC column x 
-ionization mode) or whatever split was supplied to `read_from_excel()`.
+ionization mode) or whatever split was supplied to `import_from_excel()`.
 
 ```{r, results = 'markup'}
 names(modes)

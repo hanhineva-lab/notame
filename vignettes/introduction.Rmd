@@ -1,5 +1,5 @@
 ---
-title: "General introduction"
+title: "Non-targeted metabolomics preprocessing and data wrangling"
 author: "Anton Klåvus, Vilhelm Suksi"
 date: "`r Sys.Date()`"
 output:
@@ -71,19 +71,19 @@ knitr::include_graphics("Overview.png")
 ```
 
 ## Input
-Data can be read with `read_from_excel()`, which includes checks and 
+Data can be read with `import_from_excel()`, which includes checks and 
 preparation of metadata. To accommodate typical output from peak-picking 
 software such as Agilent's MassHunter or MS-DIAL, the output is transformed 
-into a spreadsheet for `read_from_excel()`. Alternatively, data in R can be 
+into a spreadsheet for `import_from_excel()`. Alternatively, data in R can be 
 wrangled and passed to the `construct_metabosets()` or `SummarizedExperiment()` 
 constructor. 
 
 ```{r, echo = FALSE}
-#| fig.cap = "Structure of spreadsheet for read_from_excel()."
+#| fig.cap = "Structure of spreadsheet for import_from_excel()."
 knitr::include_graphics("Data_input.png")
 ```
 
-There are a few obligatory fields for `read_from_excel()`, including 
+There are a few obligatory fields for `import_from_excel()`, including 
 "Injection_order" in sample information, "Mass" or "Average mz" in feature data 
 and "Retention time", "RetentionTime", "Average rt(min)" or "rt" in feature 
 information (not case sensitive). There are further optional fields, including 

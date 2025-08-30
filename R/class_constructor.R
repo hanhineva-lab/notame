@@ -378,22 +378,22 @@
 #' }
 #'
 #' @details
-#' If skip_checks = FALSE, \code{\link{read_from_excel}} attempts to modify the 
+#' If skip_checks = FALSE, \code{\link{import_from_excel}} attempts to modify the 
 #' data as per \code{\link{fix_object}} and checks the data. If skip_checks 
 #' = TRUE, parameters for \code{fix_object} are ignored.
 #'
 #' @examples
-#' data <- read_from_excel(
+#' data <- import_from_excel(
 #'   file = system.file("extdata", "example_set.xlsx", 
 #'   package = "notame"), sheet = 1, corner_row = 11, corner_column = "H",
 #'   split_by = c("Column", "Ion_mode"))
 #'
 #' @export
-read_from_excel <- function(file, sheet = 1, id_column = NULL, 
-                            corner_row = NULL, corner_column = NULL,
-                            id_prefix = "ID_", split_by = NULL, name = NULL,
-                            mz_limits = c(10, 2000), rt_limits = c(0, 20),
-                            skip_checks = FALSE) {
+import_from_excel <- function(file, sheet = 1, id_column = NULL, 
+                          corner_row = NULL, corner_column = NULL,
+                          id_prefix = "ID_", split_by = NULL, name = NULL,
+                          mz_limits = c(10, 2000), rt_limits = c(0, 20),
+                          skip_checks = FALSE) {
   if (is.null(split_by) && is.null(name)) {
     stop("Either name or split_by needs to be defined, see documentation.")
   } else if ((!is.null(split_by)) && (!is.null(name))) {
@@ -425,10 +425,9 @@ read_from_excel <- function(file, sheet = 1, id_column = NULL,
   
   rownames(assay_) <- rownames(feature_data)
   colnames(assay_) <- rownames(pheno_data)
-
-  return(list(assay = assay_, 
-              pheno_data = pheno_data, 
-              feature_data = feature_data))
+  
+  SummarizedExperiment(assays = assay_, rowData = feature_data,
+                       colData = pheno_data)
 }
 
 # Helper function to search for mass and retention time column names
