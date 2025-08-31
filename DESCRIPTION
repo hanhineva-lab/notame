@@ -41,7 +41,6 @@ Imports:
     grDevices,
     methods,
     openxlsx,
-    RColorBrewer,
     S4Vectors,
     scales,
     stringr,
