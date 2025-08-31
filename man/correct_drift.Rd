@@ -21,7 +21,8 @@ correct_drift(
   color_scale = getOption("notame.color_scale_dis"),
   shape_scale = scale_shape_manual(values = c(15, 16)),
   assay.type = NULL,
-  name = NULL
+  name = "corrected",
+  name_predicted = "drift_pred"
 )
 }
 \arguments{
@@ -59,7 +60,10 @@ ggplot function}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{name}{character, name of the resultant assay in case of multiple assays}
+\item{name}{character, name of the resultant assay}
+
+\item{name_predicted}{character, name of the resultant assay with predicted 
+values (for plotting)}
 }
 \value{
 A SummarizedExperiment object as the one supplied, with 
@@ -97,7 +101,8 @@ By default, the column used for color is also used for shape.
 }
 \examples{
 data(example_set)
-corrected <- correct_drift(example_set)
+corrected <- correct_drift(mark_nas(example_set[1:5, ], value = 0),
+  file = "drift_plots.pdf", plotting = TRUE)
 
 }
 \seealso{

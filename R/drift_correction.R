@@ -80,7 +80,8 @@
 #' @noRd
 dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
                             spar_lower = 0.5, spar_upper = 1.5, 
-                            assay.type = NULL, name = NULL) {
+                            assay.type = NULL, name = NULL,
+                            name_predicted = NULL) {
   # Start log
   log_text(paste("\nStarting drift correction at", Sys.time()))
   # Zero values do not behave correctly
@@ -113,12 +114,14 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
   if (log_transform) {
     corrected <- exp(corrected)
   }
+  assay(object, name_predicted) <- dc_data$predicted
   assay(object, name) <- corrected
   # Recompute quality metrics
   object <- assess_quality(object, assay.type = name)
   
   log_text(paste("Drift correction performed at", Sys.time()))
-  return(list(object = object, predicted = dc_data$predicted))
+
+  object
 }
 
 
@@ -195,16 +198,16 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
 #' @noRd
 inspect_dc <- function(orig, dc, check_quality,
                        condition = "RSD_r < 0 & D_ratio_r < 0",
-                       from = NULL, to = NULL) {
+                       assay.orig = NULL, assay.dc = NULL, name = NULL) {
   if (is.null(quality(orig))) {
-    orig <- assess_quality(orig, assay.type = from)
+    orig <- assess_quality(orig, assay.type = assay.orig)
   }
   if (is.null(quality(dc))) {
-    dc <- assess_quality(dc, assay.type = to)
+    dc <- assess_quality(dc, assay.type = assay.dc)
   }
 
-  orig_data <- assay(orig, from)
-  dc_data <- assay(dc, to)
+  orig_data <- assay(orig, assay.orig)
+  dc_data <- assay(dc, assay.dc)
   features <- rownames(orig)
   qdiff <- quality(dc)[2:5] - quality(orig)[2:5]
 
@@ -215,8 +218,8 @@ inspect_dc <- function(orig, dc, check_quality,
   
   inspected <- do.call(.comb, inspected)
 
-  assay(dc, to) <- inspected$data
-  dc <- assess_quality(dc, assay.type = to)
+  assay(dc, name) <- inspected$data
+  dc <- assess_quality(dc, assay.type = name)
   dc <- join_rowData(dc, inspected$dc_notes)
 
   log_text(paste("Drift correction results inspected at", Sys.time()))
@@ -264,24 +267,25 @@ inspect_dc <- function(orig, dc, check_quality,
 #' @examples
 #' data(example_set)
 #' \dontshow{.old_wd <- setwd(tempdir())}
-#' dc <- dc_cubic_spline(example_set)
-#' corrected <- dc$object
+#' dc <- dc_cubic_spline(example_set, assay.type = 1, name = "corrected", 
+#' name_predicted = "predicted")
 #' inspected <- inspect_dc(
-#'   orig = example_set, dc = corrected,
-#'   check_quality = TRUE
+#'   orig = example_set, dc = dc,
+#'   check_quality = TRUE, assay.type = "corrected"
 #' )
-#' save_dc_plots(
-#'   orig = example_set[1], dc = corrected[1], 
-#'   predicted = dc$predicted[1, ],
-#'   file = "drift_plots.pdf"
+#' save_dc_plots(dc[1],
+#'   file = "drift_plots.pdf",
+#'   assay.orig = 1, assay.dc = "corrected", assay.pred = "predicted"
 #' )
 #' \dontshow{setwd(.old_wd)}
 #' @noRd
-save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
-                          width = 16, height = 8, color = "QC", shape = color, 
+save_dc_plots <- function(object, file, log_transform = TRUE, 
+                          width = 16, height = 8,
+                          color = "QC", shape = color, 
                           color_scale = getOption("notame.color_scale_dis"),
                           shape_scale = scale_shape_manual(values = c(15, 16)),
-                          from, to){
+                          assay.orig, assay.dc = "corrected", 
+                          assay.pred = "drift_pred"){
   # Create a helper function for plotting
   dc_plot_helper <- function(data, fname, title = NULL) {
     p <- ggplot(data = data, mapping = aes(x = .data[["Injection_order"]], 
@@ -314,19 +318,20 @@ save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
       geom_point(data = data, mapping = aes(color = .data[[color]], 
                                             shape = .data[[shape]]))
   }
-  assays(orig) <- assays(orig)[from]
-  assays(dc) <- assays(dc)[to]
   
-  orig_data_log <- combined_data(log(orig))
-  dc_data_log <- combined_data(log(dc))
-  orig_data <- combined_data(orig)
-  dc_data <- combined_data(dc)
-  predictions <- as.data.frame(t(predicted))
+  assay(object, "log_orig") <- log(assay(object, assay.orig))
+  assay(object, "log_dc") <- log(assay(object, assay.dc))
+  
+  orig_data_log <- combined_data(object, assay.type = "log_orig")
+  dc_data_log <- combined_data(object, assay.type = "log_dc")
+  orig_data <- combined_data(object, assay.type = assay.orig)
+  dc_data <- combined_data(object, assay.type = assay.dc)
+  predictions <- as.data.frame(t(assay(object, assay.pred)))
   predictions$Injection_order <- orig_data$Injection_order
 
   grDevices::pdf(file, width = width, height = height)
 
-  for (fname in rownames(dc)) {
+  for (fname in rownames(object)) {
     p2 <- dc_plot_helper(data = dc_data, fname = fname, title = "After")
 
     if (log_transform) {
@@ -376,7 +381,9 @@ save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
 #' @param color_scale,shape_scale the color and shape scales as returned by a 
 #' ggplot function
 #' @param assay.type character, assay to be used in case of multiple assays
-#' @param name character, name of the resultant assay in case of multiple assays
+#' @param name character, name of the resultant assay
+#' @param name_predicted character, name of the resultant assay with predicted 
+#' values (for plotting)
 #'
 #' @return A SummarizedExperiment object as the one supplied, with 
 #' drift corrected features.
@@ -408,7 +415,8 @@ save_dc_plots <- function(orig, dc, predicted, file, log_transform = TRUE,
 #'
 #' @examples
 #' data(example_set)
-#' corrected <- correct_drift(example_set)
+#' corrected <- correct_drift(mark_nas(example_set[1:5, ], value = 0),
+#'   file = "drift_plots.pdf", plotting = TRUE)
 #'
 #' @seealso \code{\link[stats]{smooth.spline}} for details about the regression
 #'
@@ -421,33 +429,34 @@ correct_drift <- function(object, log_transform = TRUE, spar = NULL,
                           height = 8, color = "QC", shape = color, 
                           color_scale = getOption("notame.color_scale_dis"),
                           shape_scale = scale_shape_manual(values = c(15, 16)),
-                          assay.type = NULL, name = NULL) {
+                          assay.type = NULL, name = "corrected",
+                          name_predicted = "drift_pred") {
   from_to <- .get_from_to_names(object, assay.type, name)
   object <- .check_object(object, pheno_injection = TRUE, pheno_QC = TRUE, 
-                         assay.type = from_to[[1]])
+                          assay.type = from_to[[1]])
                          
   # Fit cubic spline and correct
-  corrected_list <- dc_cubic_spline(object, log_transform = log_transform, 
-                                    spar = spar, spar_lower = spar_lower,
-                                    spar_upper = spar_upper, 
-                                    assay.type = from_to[[1]],
-                                    name = from_to[[2]])
-  corrected <- corrected_list$object
+  corrected <- dc_cubic_spline(object, log_transform = log_transform, 
+                               spar = spar, spar_lower = spar_lower,
+                               spar_upper = spar_upper, 
+                               assay.type = from_to[[1]],
+                               name = from_to[[2]],
+                               name_predicted = name_predicted)
   # Only keep corrected versions of features with increased quality
   inspected <- inspect_dc(orig = object, dc = corrected, 
                           check_quality = check_quality, condition = condition, 
-                          from = from_to[[1]], to = from_to[[2]])
+                          assay.orig = from_to[[1]], assay.dc = from_to[[2]],
+                          name = from_to[[2]])
   # Optionally save before and after plots
   if (plotting) {
     if (is.null(file)) {
       stop("File must be specified.")
     }
-    save_dc_plots(orig = object, dc = corrected, 
-                  predicted = corrected_list$predicted, file = file,
+    save_dc_plots(inspected, file = file,
                   log_transform = log_transform, width = width, height = height,
                   color = color, shape = shape, color_scale = color_scale,
-                  shape_scale = shape_scale, from = from_to[[1]], 
-                  to = from_to[[2]])
+                  shape_scale = shape_scale, assay.orig = from_to[[1]],
+                  assay.dc = from_to[[2]], assay.pred = name_predicted)
   }
   # Return the final version
   inspected

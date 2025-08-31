@@ -61,8 +61,8 @@ data <- import_from_excel(
 names(assays(data)) <- "abundances"
 ```
 
-The function import_from_excel() returns a SummarizedExperiment object with three 
-main parts and corresponding accessors for streamlined data wrangling.
+The function import_from_excel() returns a SummarizedExperiment object with 
+three main parts and corresponding accessors for streamlined data wrangling.
 
 - `assay`: feature abundances across the samples  
 - `colData`: sample information  
@@ -93,7 +93,7 @@ methods. Steps performed separately for each mode include marking missing
 values as NA, flagging features with low detection rate [@qcguidelines], drift 
 correction [@driftcorrection], and flagging of low-quality features 
 [@qcguidelines]. Visualizations are drawn to monitor the process and explore 
-the data globally. The `visualizations()` wrapper does not include
+the data globally. The `save_QC_plots()` wrapper does not include
 feature-wise plots as it may not be feasible to inspect them at this 
 stage of the analysis. For example, drift correction visualizations are best 
 drawn for a subset of interesting features after feature selection.
@@ -109,21 +109,23 @@ for (i in seq_along(modes)) {
   # Flag features with low detection rate
   mode <- flag_detection(mode, group = "Group")
   # Visualize data before drift correction
-  visualizations(mode, prefix = paste0(ppath, "figures/", name, "_ORIG"),
+  save_QC_plots(mode, prefix = paste0(ppath, "figures/", name, "_ORIG"),
                  perplexity = 5, group = "Group", time = "Time", 
                  id = "Subject_ID", color = "Group")
   # Correct drift
   corrected <- correct_drift(mode)
   # Visualize data after drift correction
-  visualizations(corrected, prefix = paste0(ppath, "figures/", name, "_DRIFT"),
-                 perplexity = 5, group = "Group", time = "Time", 
-                 id = "Subject_ID", color = "Group")
+  save_QC_plots(corrected, prefix = paste0(ppath, "figures/", name, "_DRIFT"),
+                perplexity = 5, group = "Group", time = "Time", 
+                id = "Subject_ID", color = "Group", assay.type = "corrected")
   # Flag low-quality features
-  corrected <- corrected |> assess_quality() |> flag_quality()
+  corrected <- corrected |> 
+    assess_quality(object = _, assay.type = "corrected") |> 
+    flag_quality(object = _, assay.type = "corrected")
   # Visualize data after removal of low-quality features
-  visualizations(corrected, prefix = paste0(ppath, "figures/", name, "_CLEAN"),
-                 perplexity = 5, group = "Group", time = "Time",
-                 id = "Subject_ID", color = "Group")
+  save_QC_plots(corrected, prefix = paste0(ppath, "figures/", name, "_CLEAN"),
+                perplexity = 5, group = "Group", time = "Time",
+                id = "Subject_ID", color = "Group", assay.type = "corrected")
   # Save result of iteration
   processed[[i]] <- corrected
 }
@@ -146,10 +148,10 @@ rowData(processed[[1]])$DC_note
 Next, it is time to merge the modes together and visualize the complete dataset.
 
 ```{r}
-merged <- merge_objects(processed)
-visualizations(merged, prefix = paste0(ppath, "figures/_FULL"),
-               group = "Group", time = "Time",
-               id = "Subject_ID", color = "Group")
+merged <- merge_objects(processed, assay.type = "corrected")
+save_QC_plots(merged, prefix = paste0(ppath, "figures/_FULL"),
+              group = "Group", time = "Time",
+              id = "Subject_ID", color = "Group")
 ```
 
 Then, QC samples can (and should) be removed, as they are no longer needed, and 
@@ -157,9 +159,9 @@ the dataset is visualized anew.
 
 ```{r}
 merged_no_qc <- drop_qcs(merged)
-visualizations(merged_no_qc, prefix = paste0(ppath, "figures/FULL_NO_QC"),
-               group = "Group", time = "Time",
-               id = "Subject_ID", color = "Group")
+save_QC_plots(merged_no_qc, prefix = paste0(ppath, "figures/FULL_NO_QC"),
+              group = "Group", time = "Time",
+              id = "Subject_ID", color = "Group")
 ```
 
 If there are any missing values in the data, they need to be imputed. Let's use 
@@ -170,9 +172,9 @@ forest imputation to guarantee reproducibility of results.
 ```{r}
 set.seed(2024)
 imputed <- impute_rf(merged_no_qc)
-visualizations(imputed, prefix = paste0(ppath, "figures/FULL_IMPUTED"),
-               group = "Group", time = "Time",
-               id = "Subject_ID", color = "Group")
+save_QC_plots(imputed, prefix = paste0(ppath, "figures/FULL_IMPUTED"),
+              group = "Group", time = "Time",
+              id = "Subject_ID", color = "Group")
 ```
 
 By default, the imputation procedure only operates on good quality features, 
