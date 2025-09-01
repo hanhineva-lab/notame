@@ -148,18 +148,18 @@
 #' @examples
 #' # Merge analytical modes
 #' data(hilic_neg_sample, hilic_pos_sample, rp_neg_sample, rp_pos_sample)
-#' merged <- merge_objects(
+#' merged <- merge_notame_sets(
 #'   hilic_neg_sample, hilic_pos_sample,
 #'   rp_neg_sample, rp_pos_sample
 #' )
 #' # Merge batches
 #' batch1 <- example_set[, example_set$Batch == 1]
 #' batch2 <- example_set[, example_set$Batch == 2]
-#' merged <- merge_objects(batch1, batch2, merge = "samples")
+#' merged <- merge_notame_sets(batch1, batch2, merge = "samples")
 #'
 #' @export
-merge_objects <- function(..., merge = c("features", "samples"),
-                          assay.type = NULL) {
+merge_notame_sets <- function(..., merge = c("features", "samples"),
+                              assay.type = NULL) {
   merge <- match.arg(merge)
   # Combine the objects to a list
   objects <- .to_list(...)

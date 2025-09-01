@@ -262,7 +262,7 @@ test_that("Creating dummy injection order works as expected", {
   colnames(modes$rp_pos)[22] <- "ID_999"
   colData(modes$rp_pos)$Sample_ID[22] <- "ID_999"
 
-  expect_warning(merged <- merge_objects(modes),
+  expect_warning(merged <- merge_notame_sets(modes),
     regexp = "Sample IDs are not identical|Unequal amount of samples"
   )
   # Dummy injection
