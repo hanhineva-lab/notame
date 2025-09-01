@@ -25,12 +25,12 @@ The repeatability ranges from 0 to 1. Higher repeatability depicts less
 variation between batches.
 }
 \examples{
-data(example_set)
+data(toy_notame_set)
 # Batch correction
-replicates <- list(which(example_set$QC == "QC"))
-batch_corrected <- ruvs_qc(example_set, replicates = replicates)
+replicates <- list(which(toy_notame_set$QC == "QC"))
+batch_corrected <- ruvs_qc(toy_notame_set, replicates = replicates)
 # Evaluate batch correction
-rep_orig <- perform_repeatability(example_set, group = "Group")
+rep_orig <- perform_repeatability(toy_notame_set, group = "Group")
 mean(rep_orig$Repeatability, na.rm = TRUE)
 rep_corr <- perform_repeatability(batch_corrected, group = "Group")
 mean(rep_corr$Repeatability, na.rm = TRUE)

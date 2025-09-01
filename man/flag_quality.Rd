@@ -41,11 +41,11 @@ The default condition keeps features that pass the following condition:
 \deqn{RSD_r < 0.2 \& D_ratio_r < 0.4}
 }
 \examples{
-data(example_set)
-ex_set <- flag_quality(example_set)
+data(toy_notame_set)
+ex_set <- flag_quality(toy_notame_set)
 rowData(ex_set)
 # Custom condition
-ex_set <- flag_quality(example_set, RSD = 0.1, D_ratio = 0.3)
+ex_set <- flag_quality(toy_notame_set, RSD = 0.1, D_ratio = 0.3)
 rowData(ex_set)
 
 }

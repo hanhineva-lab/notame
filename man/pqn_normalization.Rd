@@ -41,7 +41,7 @@ calculated from high-quality QC samples and the median of the reference is
 used for normalization. Check parameters for more options.
 }
 \examples{
-data(example_set)
-pqn_set <- pqn_normalization(example_set)
+data(toy_notame_set)
+pqn_set <- pqn_normalization(toy_notame_set)
 
 }

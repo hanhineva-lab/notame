@@ -33,9 +33,9 @@
 #' to feature data.
 #'
 #' @examples
-#' data(example_set)
+#' data(toy_notame_set)
 #' # The parameters are really weird because example data is imaginary
-#' clustered <- cluster_features(example_set, rt_window = 1, corr_thresh = 0.5, 
+#' clustered <- cluster_features(toy_notame_set, rt_window = 1, corr_thresh = 0.5, 
 #'   d_thresh = 0.6)
 #'
 #' @export
@@ -163,8 +163,8 @@ assign_cluster_id <- function(data, clusters, features, name_col) {
 #' cluster.
 #'
 #' @examples
-#' data(example_set)
-#' clustered <- cluster_features(example_set, 
+#' data(toy_notame_set)
+#' clustered <- cluster_features(toy_notame_set, 
 #'   rt_window = 1, corr_thresh = 0.5, d_thresh = 0.6)
 #' compressed <- compress_clusters(clustered)
 #'
@@ -258,9 +258,9 @@ pull_clusters <- function(data, features, name_col) {
 #'
 #' @examples 
 #' \dontshow{.old_wd <- setwd(tempdir())}
-#' data(example_set)
-#' data <- combined_data(example_set)
-#' features <- rowData(example_set)
+#' data(toy_notame_set)
+#' data <- combined_data(toy_notame_set)
+#' features <- rowData(toy_notame_set)
 #' features$MPA <- sapply(data[, features[, "Feature_ID"]], finite_median)
 #' conn <- find_connections(data = data, features = features,
 #'   corr_thresh = 0.4, rt_window = 2,
@@ -508,9 +508,9 @@ find_clusters <- function(connections, d_thresh = 0.8) {
 #' @inherit find_connections return examples
 #'
 #' @examples
-#' data(example_set)
+#' data(toy_notame_set)
 #' # The parameters are really weird because example data is imaginary
-#' clustered <- notame::cluster_features(example_set, rt_window = 1, 
+#' clustered <- notame::cluster_features(toy_notame_set, rt_window = 1, 
 #'                                       corr_thresh = 0.5, d_thresh = 0.6)
 #'
 #* #notameViz::visualise_clusters(clustered, rt_window = 1)

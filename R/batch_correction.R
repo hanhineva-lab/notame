@@ -14,12 +14,12 @@
 #' @return A SummarizedExperiment object with the normalized data.
 #'
 #' @examples
-#' data(example_set)
+#' data(toy_notame_set)
 #' # Batch correction
-#' replicates <- list(which(example_set$QC == "QC"))
-#' batch_corrected <- ruvs_qc(example_set, replicates = replicates)
+#' replicates <- list(which(toy_notame_set$QC == "QC"))
+#' batch_corrected <- ruvs_qc(toy_notame_set, replicates = replicates)
 #' # Evaluate batch correction
-#' pca_bhattacharyya_dist(example_set, batch = "Batch")
+#' pca_bhattacharyya_dist(toy_notame_set, batch = "Batch")
 #' pca_bhattacharyya_dist(batch_corrected, batch = "Batch")
 #'
 #' @export
@@ -80,12 +80,12 @@ ruvs_qc <- function(object, replicates, k = 3,
 #' @return A matrix of Bhattacharyya distances between batches.
 #'
 #' @examples
-#' data(example_set)
+#' data(toy_notame_set)
 #' # Batch correction
-#' replicates <- list(which(example_set$QC == "QC"))
-#' batch_corrected <- ruvs_qc(example_set, replicates = replicates)
+#' replicates <- list(which(toy_notame_set$QC == "QC"))
+#' batch_corrected <- ruvs_qc(toy_notame_set, replicates = replicates)
 #' # Evaluate batch correction
-#' pca_bhattacharyya_dist(example_set, batch = "Batch")
+#' pca_bhattacharyya_dist(toy_notame_set, batch = "Batch")
 #' pca_bhattacharyya_dist(batch_corrected, batch = "Batch")
 #'
 #' @export
@@ -176,12 +176,12 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
 #' @return A data frame with one row per feature with the repeatability measure.
 #'
 #' @examples
-#' data(example_set)
+#' data(toy_notame_set)
 #' # Batch correction
-#' replicates <- list(which(example_set$QC == "QC"))
-#' batch_corrected <- ruvs_qc(example_set, replicates = replicates)
+#' replicates <- list(which(toy_notame_set$QC == "QC"))
+#' batch_corrected <- ruvs_qc(toy_notame_set, replicates = replicates)
 #' # Evaluate batch correction
-#' rep_orig <- perform_repeatability(example_set, group = "Group")
+#' rep_orig <- perform_repeatability(toy_notame_set, group = "Group")
 #' mean(rep_orig$Repeatability, na.rm = TRUE)
 #' rep_corr <- perform_repeatability(batch_corrected, group = "Group")
 #' mean(rep_corr$Repeatability, na.rm = TRUE)

@@ -1,6 +1,6 @@
 context("Testing reading data")
 
-data(example_set, package = "notame")
+data(toy_notame_set, package = "notame")
 
 test_that("Column conversion works", {
   set.seed(38)
@@ -229,7 +229,7 @@ test_that("Splitting data works as expected", {
   ))
   
   # Check that colData is intact
-  se <- example_set
+  se <- toy_notame_set
   se <- fix_object(se)  
   se_modes <- fix_object(se, split_data = TRUE)
   expect_true(all(unlist(lapply(se_modes, function(se_mode) {

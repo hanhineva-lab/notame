@@ -19,9 +19,9 @@ without QC samples.
 Drop QC samples
 }
 \examples{
-data(example_set)
-dim(example_set)
-noqc <- drop_qcs(example_set)
+data(toy_notame_set)
+dim(toy_notame_set)
+noqc <- drop_qcs(toy_notame_set)
 dim(noqc)
 
 }

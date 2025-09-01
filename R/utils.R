@@ -72,8 +72,8 @@ utils::globalVariables(c('i', '.'))
 #'
 #' @examples
 #' citations()
-#' data(example_set)
-#' ex_set <- flag_quality(example_set)
+#' data(toy_notame_set)
+#' ex_set <- flag_quality(toy_notame_set)
 #' # Broadhurst et al.(2018) added to citations
 #' citations()
 #'
@@ -158,8 +158,8 @@ finite_quantile <- function(x, ...) {
 #' @return A numeric, the proportion of non-missing values in a vector.
 #'
 #' @examples
-#' data(example_set)
-#' ex_set <- mark_nas(example_set, value = 0)
+#' data(toy_notame_set)
+#' ex_set <- mark_nas(toy_notame_set, value = 0)
 #' prop_na(assay(ex_set))
 #' 
 #' @noRd
@@ -174,9 +174,9 @@ prop_na <- function(x) {
 #' @return A numeric, the proportion of non-missing values in vector.
 #'
 #' @examples
-#' data(example_set)
-#' ex_set <- mark_nas(example_set, value = 0)
-#' prop_found(assay(example_set))
+#' data(toy_notame_set)
+#' ex_set <- mark_nas(toy_notame_set, value = 0)
+#' prop_found(assay(toy_notame_set))
 #'
 #' @noRd
 prop_found <- function(x) {

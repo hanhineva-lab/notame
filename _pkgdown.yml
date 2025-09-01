@@ -27,7 +27,7 @@ reference:
 
 - title: Preprocessing visualizations
 - contents:
-  - notameViz::visualizations
+  - notameViz::save_QC_plots
   - notameViz::plot_injection_lm
   - notameViz::plot_sample_boxplots
   - notameViz::plot_dist_density
@@ -62,7 +62,7 @@ reference:
   - notameStats::summary_statistics
   - notameStats::summarize_results
   
-- title: Feature wise visualizations
+- title: Feature-wise visualizations
 - contents:
   - notameViz::save_beeswarm_plots
   - notameViz::save_group_boxplots
@@ -88,7 +88,7 @@ reference:
   - join_rowData
   - join_colData
   - combined_data
-  - merge_objects
+  - merge_notame_sets
   - fix_object
   
 - title: Other utilities
@@ -102,7 +102,7 @@ reference:
 
 - title: Datasets
 - contents:
-  - example_set
+  - toy_notame_set
   
 - title: Package
 - contents: 

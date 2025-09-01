@@ -147,9 +147,9 @@ colnames(assay_data) <- rownames(pheno_data)
 feature_data <- bind_rows(feature_data_modes)
   
 # Construct objects, with all modes and separately
-example_set <- SummarizedExperiment(assays = assay_data, 
-                                    colData = pheno_data,                     
-                                    rowData = feature_data)
+toy_notame_set <- SummarizedExperiment(assays = assay_data, 
+                                       colData = pheno_data,
+                                       rowData = feature_data)
                                     
 
 hilic_neg_sample <- SummarizedExperiment(
@@ -172,7 +172,7 @@ rp_pos_sample <- SummarizedExperiment(
   colData = pheno_data, 
   rowData = feature_data[feature_data$Split == "RP_pos", ])
 
-usethis::use_data(example_set, overwrite = TRUE)
+usethis::use_data(toy_notame_set, overwrite = TRUE)
 usethis::use_data(hilic_neg_sample, overwrite = TRUE)
 usethis::use_data(hilic_pos_sample, overwrite = TRUE)
 usethis::use_data(rp_neg_sample, overwrite = TRUE)

@@ -34,8 +34,8 @@ Use parallelize = "variables" to run in parallel for faster testing.
 NOTE: running in parallel prevents user from setting a seed number.
 }
 \examples{
-data(example_set)
-missing <- mark_nas(example_set, 0)
+data(toy_notame_set)
+missing <- mark_nas(toy_notame_set, 0)
 set.seed(38)
 imputed <- impute_rf(missing)
 

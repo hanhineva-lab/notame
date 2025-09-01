@@ -23,8 +23,8 @@ Assess features using the quality metrics defined in (Broadhurst
 \code{\link{flag_quality}}
 }
 \examples{
-data(example_set)
-ex_set <- assess_quality(example_set)
+data(toy_notame_set)
+ex_set <- assess_quality(toy_notame_set)
 rowData(ex_set)
 
 }

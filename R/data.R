@@ -9,16 +9,16 @@
 #' m/z and retention time as would be the case with real-world data. In 
 #' essence, the example data reflects that features were aligned perfectly 
 #' between batches. 
-"example_set"
+"toy_notame_set"
 
-#' @rdname example_set
+#' @rdname toy_notame_set
 "hilic_neg_sample"
 
-#' @rdname example_set
+#' @rdname toy_notame_set
 "hilic_pos_sample"
 
-#' @rdname example_set
+#' @rdname toy_notame_set
 "rp_neg_sample"
 
-#' @rdname example_set
+#' @rdname toy_notame_set
 "rp_pos_sample"

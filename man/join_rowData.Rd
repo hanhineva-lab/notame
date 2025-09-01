@@ -23,12 +23,12 @@ SummarizedExperiment object. The data frame needs to have a column
 functions in the package, but can be useful.
 }
 \examples{
-data(example_set)
+data(toy_notame_set)
 new_info <- data.frame(
-  Feature_ID = rownames(example_set),
-  Feature_number = seq_len(nrow(example_set))
+  Feature_ID = rownames(toy_notame_set),
+  Feature_number = seq_len(nrow(toy_notame_set))
 )
-with_new_info <- join_rowData(example_set, new_info)
+with_new_info <- join_rowData(toy_notame_set, new_info)
 colnames(rowData(with_new_info))
 
 }

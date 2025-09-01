@@ -103,8 +103,8 @@ The main functions return modified objects and are largely
 based on pooled QC samples [@qcguidelines]. Tabular data preprocessing is 
 generally performed separately for each mode. The visualizations used to 
 monitor tabular data preprocessing are saved to file by default, but can also 
-be returned as ggplot objects. The `visualizations()` wrapper can be used for 
-saving visualizations at different stages of processing.
+be returned as ggplot objects. The `notameViz::save_QC_plots()` wrapper can be 
+used for saving central visualizations at different stages of processing.
 
 ## Feature selection
 Univariate statistics functions return a `data.frame`, to be manually 

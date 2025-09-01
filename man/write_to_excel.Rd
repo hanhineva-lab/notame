@@ -30,8 +30,8 @@ but can take quite a while.
 }
 \examples{
 \dontshow{.old_wd <- setwd(tempdir())}
-data(example_set)
-write_to_excel(example_set, file = "example_set.xlsx")
+data(toy_notame_set)
+write_to_excel(toy_notame_set, file = "toy_notame_set.xlsx")
 \dontshow{setwd(.old_wd)}
 
 }

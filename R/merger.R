@@ -153,8 +153,8 @@
 #'   rp_neg_sample, rp_pos_sample
 #' )
 #' # Merge batches
-#' batch1 <- example_set[, example_set$Batch == 1]
-#' batch2 <- example_set[, example_set$Batch == 2]
+#' batch1 <- toy_notame_set[, toy_notame_set$Batch == 1]
+#' batch2 <- toy_notame_set[, toy_notame_set$Batch == 2]
 #' merged <- merge_notame_sets(batch1, batch2, merge = "samples")
 #'
 #' @export

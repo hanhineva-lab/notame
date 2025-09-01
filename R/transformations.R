@@ -16,8 +16,8 @@
 #' missing values correctly set to NA.
 #'
 #' @examples
-#' data(example_set)
-#' nas_marked <- mark_nas(example_set, value = 0)
+#' data(toy_notame_set)
+#' nas_marked <- mark_nas(toy_notame_set, value = 0)
 #'
 #' @export
 mark_nas <- function(object, value, assay.type = NULL, name = NULL) {
@@ -59,9 +59,9 @@ mark_nas <- function(object, value, assay.type = NULL, name = NULL) {
 #' publication-ready MS/MS peak information.
 #'
 #' @examples
-#' data(example_set)
+#' data(toy_notame_set)
 #' # Spectra before fixing
-#' ex_set <- example_set
+#' ex_set <- toy_notame_set
 #' rowData(ex_set)$MS_MS_spectrum <- NA
 #' rowData(ex_set)[1, ]$MS_MS_spectrum <- 
 #'   "28.769:53 44.933:42 52.106:89 69.518:140"
@@ -129,9 +129,9 @@ fix_MSMS <- function(object, ms_ms_spectrum_col = "MS_MS_spectrum",
 #' without QC samples.
 #'
 #' @examples
-#' data(example_set)
-#' dim(example_set)
-#' noqc <- drop_qcs(example_set)
+#' data(toy_notame_set)
+#' dim(toy_notame_set)
+#' noqc <- drop_qcs(toy_notame_set)
 #' dim(noqc)
 #'
 #' @export
@@ -159,9 +159,9 @@ drop_qcs <- function(object) {
 #' flagged features.
 #'
 #' @examples
-#' data(example_set)
-#' dim(example_set)
-#' flagged <- flag_quality(example_set)
+#' data(toy_notame_set)
+#' dim(toy_notame_set)
+#' flagged <- flag_quality(toy_notame_set)
 #' noflags <- drop_flagged(flagged)
 #' dim(noflags)
 #'
@@ -191,8 +191,8 @@ drop_flagged <- function(object, all_features = FALSE) {
 #' values.
 #'
 #' @examples
-#' data(example_set)
-#' ex_set <- example_set[1:5, 1:5]
+#' data(toy_notame_set)
+#' ex_set <- toy_notame_set[1:5, 1:5]
 #' assay(ex_set)
 #' # Create a matrix of replacment values for rows 1, 3, 5 and columns 1, 3, 4
 #' replacement <- matrix(1:9,
@@ -245,8 +245,8 @@ merge_assay <- function(object, y, assay.type = NULL, name = NULL) {
 #' values imputed.
 #'
 #' @examples
-#' data(example_set)
-#' missing <- mark_nas(example_set, 0)
+#' data(toy_notame_set)
+#' missing <- mark_nas(toy_notame_set, 0)
 #' set.seed(38)
 #' imputed <- impute_rf(missing)
 #'
@@ -330,8 +330,8 @@ impute_rf <- function(object, all_features = FALSE, assay.type = NULL,
 #' @return A SummarizedExperiment object with imputed peak table.
 #'
 #' @examples
-#' data(example_set)
-#' missing <- mark_nas(example_set, 0)
+#' data(toy_notame_set)
+#' missing <- mark_nas(toy_notame_set, 0)
 #' imputed <- impute_simple(missing, value = "min")
 #'
 #' @export
@@ -401,8 +401,8 @@ impute_simple <- function(object, value, na_limit = 0, assay.type = NULL,
 #' @return An object as the one supplied, with normalized features.
 #'
 #' @examples
-#' data(example_set)
-#' normalized <- inverse_normalize(example_set)
+#' data(toy_notame_set)
+#' normalized <- inverse_normalize(toy_notame_set)
 #' @export
 inverse_normalize <- function(object, assay.type = NULL, name = NULL) {
   from_to <- .get_from_to_names(object, assay.type, name)
@@ -428,8 +428,8 @@ inverse_normalize <- function(object, assay.type = NULL, name = NULL) {
 #' @return A data frame with the number of features at each stage of flagging.
 #'
 #' @examples
-#' data(example_set)
-#' flagged <- example_set |>
+#' data(toy_notame_set)
+#' flagged <- toy_notame_set |>
 #'   mark_nas(0) |>
 #'   flag_detection(group = "Group") |>
 #'   flag_quality()
@@ -480,8 +480,8 @@ flag_report <- function(object) {
 #' abundances.
 #'
 #' @examples
-#' data(example_set)
-#' pqn_set <- pqn_normalization(example_set)
+#' data(toy_notame_set)
+#' pqn_set <- pqn_normalization(toy_notame_set)
 #'
 #' @export
 pqn_normalization <- function(object, ref = c("qc", "all"),

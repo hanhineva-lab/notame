@@ -43,22 +43,22 @@ marked as blanks and are not QCs. If the median of blanks > the median of
 biological samples times a set ratio, the feature is flagged as contaminant.
 }
 \examples{
-data(example_set)
+data(toy_notame_set)
 # Make a blank sample which has one (first) feature exceeding the threshold
 ## Abundance matrix
-med <- median(assay(example_set)[1, example_set$QC != "QC"])
+med <- median(assay(toy_notame_set)[1, toy_notame_set$QC != "QC"])
 assay <- matrix(c(med * 0.05 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
                   dimnames = list(NULL, "Demo_51"))
-assay <- cbind(assay(example_set), assay)
+assay <- cbind(assay(toy_notame_set), assay)
 ## Sample metadata
-pheno_data <- colData(example_set)[1, ]
+pheno_data <- colData(toy_notame_set)[1, ]
 rownames(pheno_data) <- "Demo_51"
 pheno_data$Sample_ID <- "Demo_51"
 pheno_data$Injection_order <- 51
 pheno_data[c("Subject_ID", "Group", "QC", "Time")] <- "Blank"
-pheno_data <- rbind(colData(example_set), pheno_data)
+pheno_data <- rbind(colData(toy_notame_set), pheno_data)
 ## Feature metadata
-feature_data <- rowData(example_set)
+feature_data <- rowData(toy_notame_set)
 
 # Construct SummarizedExperiment object with blank sample
 ex_set <- SummarizedExperiment(assays = assay, 

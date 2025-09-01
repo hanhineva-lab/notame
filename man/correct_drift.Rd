@@ -100,8 +100,8 @@ and the original is retained.
 By default, the column used for color is also used for shape.
 }
 \examples{
-data(example_set)
-corrected <- correct_drift(mark_nas(example_set[1:5, ], value = 0),
+data(toy_notame_set)
+corrected <- correct_drift(mark_nas(toy_notame_set[1:5, ], value = 0),
   file = "drift_plots.pdf", plotting = TRUE)
 
 }

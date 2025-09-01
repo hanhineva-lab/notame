@@ -64,9 +64,9 @@ peak area (median abundance). This is a wrapper around numerous functions
 that are based on the MATLAB code by David Broadhurst.
 }
 \examples{
-data(example_set)
+data(toy_notame_set)
 # The parameters are really weird because example data is imaginary
-clustered <- cluster_features(example_set, rt_window = 1, corr_thresh = 0.5, 
+clustered <- cluster_features(toy_notame_set, rt_window = 1, corr_thresh = 0.5, 
   d_thresh = 0.6)
 
 }

@@ -47,9 +47,9 @@ m/z  (Abundance)
 73.03 (100), 23.193 (27), 73.14 (12.8), 55.016 (8.7)
 }
 \examples{
-data(example_set)
+data(toy_notame_set)
 # Spectra before fixing
-ex_set <- example_set
+ex_set <- toy_notame_set
 rowData(ex_set)$MS_MS_spectrum <- NA
 rowData(ex_set)[1, ]$MS_MS_spectrum <- 
   "28.769:53 44.933:42 52.106:89 69.518:140"

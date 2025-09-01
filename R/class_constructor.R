@@ -378,13 +378,13 @@
 #' }
 #'
 #' @details
-#' If skip_checks = FALSE, \code{\link{import_from_excel}} attempts to modify the 
-#' data as per \code{\link{fix_object}} and checks the data. If skip_checks 
+#' If skip_checks = FALSE, \code{\link{import_from_excel}} attempts to modify 
+#' the data as per \code{\link{fix_object}} and checks the data. If skip_checks 
 #' = TRUE, parameters for \code{fix_object} are ignored.
 #'
 #' @examples
 #' data <- import_from_excel(
-#'   file = system.file("extdata", "example_set.xlsx", 
+#'   file = system.file("extdata", "toy_notame_set.xlsx", 
 #'   package = "notame"), sheet = 1, corner_row = 11, corner_column = "H",
 #'   split_by = c("Column", "Ion_mode"))
 #'
@@ -516,8 +516,8 @@ import_from_excel <- function(file, sheet = 1, id_column = NULL,
 #'
 #' @examples
 #' \dontshow{.old_wd <- setwd(tempdir())}
-#' data(example_set)
-#' write_to_excel(example_set, file = "example_set.xlsx")
+#' data(toy_notame_set)
+#' write_to_excel(toy_notame_set, file = "toy_notame_set.xlsx")
 #' \dontshow{setwd(.old_wd)}
 #'
 #' @export
@@ -568,8 +568,8 @@ write_to_excel <- function(object, file, ...) {
 #' one row per sample.
 #'
 #' @examples
-#' data(example_set)
-#' combined_data(example_set)
+#' data(toy_notame_set)
+#' combined_data(toy_notame_set)
 #'
 #' @export
 combined_data <- function(object, assay.type = NULL) {
@@ -586,9 +586,9 @@ combined_data <- function(object, assay.type = NULL) {
 #' @return Character vector of feature flags.
 #'
 #' @examples
-#' data(example_set)
+#' data(toy_notame_set)
 #' # Get values in flag column of rowData
-#' flag(example_set)
+#' flag(toy_notame_set)
 #'
 #' @export
 flag <- function(object) rowData(object)$Flag
@@ -602,9 +602,9 @@ flag <- function(object) rowData(object)$Flag
 #' @return For the endomorphism, an object with a modified flag column.
 #'
 #' @examples
-#' data(example_set)
+#' data(toy_notame_set)
 #' # Flag a suspicious feature manually
-#' flag(example_set)[1] <- "Contaminant, known from experience"
+#' flag(toy_notame_set)[1] <- "Contaminant, known from experience"
 #' @export
 "flag<-" <-  function(object, value) {
   rowData(object)$Flag <- value
@@ -688,8 +688,8 @@ flag <- function(object) rowData(object)$Flag
 #' \code{id_prefix} and injection order or by renaming \code{id_column}.
 #'
 #' @examples
-#' data(example_set)
-#' ex_set <- example_set
+#' data(toy_notame_set)
+#' ex_set <- toy_notame_set
 #' rowData(ex_set)$Flag <- NULL
 # 'Flag' column is created in feature data
 #' fixed <- fix_object(ex_set)
@@ -851,12 +851,12 @@ fix_object <- function(object, id_prefix = "ID_", id_column = NULL,
 #' @param dframe a data frame with the new information
 #'
 #' @examples
-#' data(example_set)
+#' data(toy_notame_set)
 #' new_info <- data.frame(
-#'   Feature_ID = rownames(example_set),
-#'   Feature_number = seq_len(nrow(example_set))
+#'   Feature_ID = rownames(toy_notame_set),
+#'   Feature_number = seq_len(nrow(toy_notame_set))
 #' )
-#' with_new_info <- join_rowData(example_set, new_info)
+#' with_new_info <- join_rowData(toy_notame_set, new_info)
 #' colnames(rowData(with_new_info))
 #'
 #' @return A SummarizedExperiment object with the new information added to 
@@ -883,12 +883,12 @@ join_rowData <- function(object, dframe) {
 #' @param dframe a data frame with the new information
 #'
 #' @examples
-#' data(example_set)
+#' data(toy_notame_set)
 #' new_info <- data.frame(
-#'   Sample_ID = colnames(example_set),
-#'   BMI = stats::runif(ncol(example_set), 22, 26)
+#'   Sample_ID = colnames(toy_notame_set),
+#'   BMI = stats::runif(ncol(toy_notame_set), 22, 26)
 #' )
-#' with_new_info <- join_colData(example_set, new_info)
+#' with_new_info <- join_colData(toy_notame_set, new_info)
 #' colnames(colData(with_new_info))
 #'
 #' @return A SummarizedExperiment object with the new information added to 

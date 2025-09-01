@@ -21,8 +21,8 @@ The output is written to the current log file, if specified.
 }
 \examples{
 citations()
-data(example_set)
-ex_set <- flag_quality(example_set)
+data(toy_notame_set)
+ex_set <- flag_quality(toy_notame_set)
 # Broadhurst et al.(2018) added to citations
 citations()
 

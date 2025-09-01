@@ -23,6 +23,6 @@ Applies inverse rank normalization to all features to approximate
 a normal distribution.
 }
 \examples{
-data(example_set)
-normalized <- inverse_normalize(example_set)
+data(toy_notame_set)
+normalized <- inverse_normalize(toy_notame_set)
 }

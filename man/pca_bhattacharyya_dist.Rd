@@ -47,12 +47,12 @@ after projecting the samples into PCA space with
 \code{\link[pcaMethods]{pca}}.
 }
 \examples{
-data(example_set)
+data(toy_notame_set)
 # Batch correction
-replicates <- list(which(example_set$QC == "QC"))
-batch_corrected <- ruvs_qc(example_set, replicates = replicates)
+replicates <- list(which(toy_notame_set$QC == "QC"))
+batch_corrected <- ruvs_qc(toy_notame_set, replicates = replicates)
 # Evaluate batch correction
-pca_bhattacharyya_dist(example_set, batch = "Batch")
+pca_bhattacharyya_dist(toy_notame_set, batch = "Batch")
 pca_bhattacharyya_dist(batch_corrected, batch = "Batch")
 
 }

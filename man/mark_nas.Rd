@@ -28,7 +28,7 @@ For example, vendor software might use 0 or 1 to signal a missing value,
 which is not understood by R.
 }
 \examples{
-data(example_set)
-nas_marked <- mark_nas(example_set, value = 0)
+data(toy_notame_set)
+nas_marked <- mark_nas(toy_notame_set, value = 0)
 
 }

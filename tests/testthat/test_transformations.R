@@ -1,10 +1,10 @@
 context("Testing transformations")
 
-data(example_set, package = "notame")
+data(toy_notame_set, package = "notame")
 
 test_that("Marking NAs works properly", {
-  marked <- mark_nas(example_set, value = 0)
-  zero_idx <- assay(example_set) == 0
+  marked <- mark_nas(toy_notame_set, value = 0)
+  zero_idx <- assay(toy_notame_set) == 0
   na_idx <- is.na(assay(marked))
 
   expect_equal(zero_idx, na_idx)
@@ -12,7 +12,7 @@ test_that("Marking NAs works properly", {
 
 
 test_that("RF imputation works as expected", {
-  marked <- mark_nas(example_set, value = 0)
+  marked <- mark_nas(toy_notame_set, value = 0)
   imputed <- impute_rf(marked)
 
   # Check that all missing values are imputed
@@ -34,45 +34,45 @@ test_that("Flagging works as expected", {
       "Demo_1"
     )
   )
-  mrg <- merge_assay(example_set, single_change)
+  mrg <- merge_assay(toy_notame_set, single_change)
   expect_equal(assay(mrg)[2, 1], 1111)
 
   block_change <- matrix(stats::runif(9),
     nrow = 3, ncol = 3,
     dimnames = list(
-      rownames(assay(example_set))[4:6],
-      colnames(assay(example_set))[5:7]
+      rownames(assay(toy_notame_set))[4:6],
+      colnames(assay(toy_notame_set))[5:7]
     )
   )
-  mrg2 <- merge_assay(example_set, block_change)
+  mrg2 <- merge_assay(toy_notame_set, block_change)
   expect_true(all(assay(mrg2)[4:6, 5:7] == block_change))
 
   scattered_change <- matrix(stats::runif(9),
     nrow = 3, ncol = 3,
     dimnames = list(
-      rownames(assay(example_set))[c(1, 5, 7)],
-      colnames(assay(example_set))[c(2, 5, 8)]
+      rownames(assay(toy_notame_set))[c(1, 5, 7)],
+      colnames(assay(toy_notame_set))[c(2, 5, 8)]
     )
   )
-  mrg3 <- merge_assay(example_set, scattered_change)
+  mrg3 <- merge_assay(toy_notame_set, scattered_change)
   expect_true(all(assay(mrg3)[c(1, 5, 7), c(2, 5, 8)] == scattered_change))
 
   wrong_names <- matrix(stats::runif(9), nrow = 3)
-  expect_error(merge_assay(example_set, wrong_names), "Column names")
+  expect_error(merge_assay(toy_notame_set, wrong_names), "Column names")
 
   wrong_names2 <- matrix(stats::runif(9),
     nrow = 3,
     dimnames = list(
       letters[1:3],
-      colnames(assay(example_set))[5:7]
+      colnames(assay(toy_notame_set))[5:7]
     )
   )
-  expect_error(merge_assay(example_set, wrong_names2), "Row names")
+  expect_error(merge_assay(toy_notame_set, wrong_names2), "Row names")
 })
 
 
 test_that("Flagged compounds are not imputed", {
-  marked <- mark_nas(example_set, 0)
+  marked <- mark_nas(toy_notame_set, 0)
   flag(marked)[c(1, 4, 6)] <- "Flagged"
 
   imputed <- impute_rf(marked)
@@ -88,7 +88,7 @@ test_that("Flagged compounds are not imputed", {
 })
 
 test_that("Inverse normalization works as expected", {
-  marked <- mark_nas(example_set, value = 0)
+  marked <- mark_nas(toy_notame_set, value = 0)
   imputed <- impute_rf(marked)
   normalized <- inverse_normalize(imputed)
 
@@ -118,7 +118,7 @@ test_that("Inverse normalization works as expected", {
 })
 
 test_that("Simple imputation works as expected", {
-  marked <- mark_nas(example_set, value = 0)
+  marked <- mark_nas(toy_notame_set, value = 0)
   imputed <- impute_simple(marked, value = 0)
 
   # Check that all missing values are imputed
@@ -133,7 +133,7 @@ test_that("Simple imputation works as expected", {
 })
 
 test_that("Simple imputation with only one feature works", {
-  marked <- example_set
+  marked <- toy_notame_set
   assay(marked)[2, 5] <- NA
   imputed <- impute_simple(marked, value = 0)
   #
@@ -141,19 +141,19 @@ test_that("Simple imputation with only one feature works", {
 })
 
 test_that("PQN normalization works correctly using median of QC samples as reference", {
-  data <- assay(example_set)
+  data <- assay(toy_notame_set)
   # Calculate the median of QC samples
-  reference <- apply(data[, example_set$QC == "QC"], 1, finite_median)
+  reference <- apply(data[, toy_notame_set$QC == "QC"], 1, finite_median)
   # do the normalization
   quotient <- data / reference
   quotient_md <- apply(quotient, 2, finite_median)
   pqn_data <- t(t(data) / quotient_md)
 
-  expect_equal(pqn_data, assay(pqn_normalization(example_set)))
+  expect_equal(pqn_data, assay(pqn_normalization(toy_notame_set)))
 })
 
 test_that("PQN normalization works correctly using median of all samples as reference", {
-  data <- assay(example_set)
+  data <- assay(toy_notame_set)
   # Calculate the median of all samples
   reference <- apply(data, 1, finite_median)
   # do the normalization
@@ -161,23 +161,23 @@ test_that("PQN normalization works correctly using median of all samples as refe
   quotient_md <- apply(quotient, 2, finite_median)
   pqn_data <- t(t(data) / quotient_md)
 
-  expect_equal(pqn_data, assay(pqn_normalization(example_set, ref = "all")))
+  expect_equal(pqn_data, assay(pqn_normalization(toy_notame_set, ref = "all")))
 })
 
 test_that("PQN normalization works correctly using mean of QC samples as reference", {
-  data <- assay(example_set)
+  data <- assay(toy_notame_set)
   # Calculate the mean of QC samples
-  reference <- apply(data[, example_set$QC == "QC"], 1, finite_mean)
+  reference <- apply(data[, toy_notame_set$QC == "QC"], 1, finite_mean)
   # do the normalization
   quotient <- data / reference
   quotient_md <- apply(quotient, 2, finite_median)
   pqn_data <- t(t(data) / quotient_md)
 
-  expect_equal(pqn_data, assay(pqn_normalization(example_set, method = "mean")))
+  expect_equal(pqn_data, assay(pqn_normalization(toy_notame_set, method = "mean")))
 })
 
 test_that("PQN normalization works correctly using mean of all samples as reference", {
-  data <- assay(example_set)
+  data <- assay(toy_notame_set)
   # Calculate the mean of all samples
   reference <- apply(data, 1, finite_mean)
   # do the normalization
@@ -185,14 +185,14 @@ test_that("PQN normalization works correctly using mean of all samples as refere
   quotient_md <- apply(quotient, 2, finite_median)
   pqn_data <- t(t(data) / quotient_md)
 
-  expect_equal(pqn_data, assay(pqn_normalization(example_set, ref = "all", 
+  expect_equal(pqn_data, assay(pqn_normalization(toy_notame_set, ref = "all", 
                                                  method = "mean")))
 })
 
 test_that("PQN normalization works with flagged features", {
-  flagged_mset <- flag_quality(example_set)
+  flagged_mset <- flag_quality(toy_notame_set)
   ref_data <- assay(drop_flagged(flagged_mset))
-  reference_spectrum <- apply(ref_data[, example_set$QC == "QC"], 1, finite_median)
+  reference_spectrum <- apply(ref_data[, toy_notame_set$QC == "QC"], 1, finite_median)
   quotient <- ref_data / reference_spectrum
   quotient_md <- apply(quotient, 2, finite_median)
 
@@ -204,7 +204,7 @@ test_that("PQN normalization works with flagged features", {
 })
 
 test_that("Assay control works for transformations (with drift correction)", {
-  ex_set <- example_set[1:10, ]
+  ex_set <- toy_notame_set[1:10, ]
   # New assays can be added to objects with one assay
   corrected <- correct_drift(ex_set, name = "corrected")
   # Assay not found with a single unnamed assay

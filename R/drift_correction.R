@@ -68,8 +68,8 @@
 #' [\code{spar_lower, spar_upper}] using cross validation.
 #'
 #' @examples
-#' data(example_set)
-#' dc <- dc_cubic_spline(example_set)
+#' data(toy_notame_set)
+#' dc <- dc_cubic_spline(toy_notame_set)
 #' corrected <- dc$object
 #'
 #' @seealso  \code{\link[stats]{smooth.spline}} for details about the 
@@ -187,11 +187,11 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
 #' @seealso \code{\link{correct_drift}}, \code{\link{save_dc_plots}}
 #'
 #' @examples
-#' data(example_set)
-#' dc <- dc_cubic_spline(example_set)
+#' data(toy_notame_set)
+#' dc <- dc_cubic_spline(toy_notame_set)
 #' corrected <- dc$object
 #' inspected <- inspect_dc(
-#'   orig = example_set, dc = corrected,
+#'   orig = toy_notame_set, dc = corrected,
 #'   check_quality = TRUE
 #' )
 #'
@@ -265,12 +265,12 @@ inspect_dc <- function(orig, dc, check_quality,
 #' @seealso \code{\link{correct_drift}}
 #'
 #' @examples
-#' data(example_set)
+#' data(toy_notame_set)
 #' \dontshow{.old_wd <- setwd(tempdir())}
-#' dc <- dc_cubic_spline(example_set, assay.type = 1, name = "corrected", 
+#' dc <- dc_cubic_spline(toy_notame_set, assay.type = 1, name = "corrected", 
 #' name_predicted = "predicted")
 #' inspected <- inspect_dc(
-#'   orig = example_set, dc = dc,
+#'   orig = toy_notame_set, dc = dc,
 #'   check_quality = TRUE, assay.type = "corrected"
 #' )
 #' save_dc_plots(dc[1],
@@ -412,8 +412,8 @@ save_dc_plots <- function(object, file, log_transform = TRUE,
 #' By default, the column used for color is also used for shape.
 #'
 #' @examples
-#' data(example_set)
-#' corrected <- correct_drift(mark_nas(example_set[1:5, ], value = 0),
+#' data(toy_notame_set)
+#' corrected <- correct_drift(mark_nas(toy_notame_set[1:5, ], value = 0),
 #'   file = "drift_plots.pdf", plotting = TRUE)
 #'
 #' @seealso \code{\link[stats]{smooth.spline}} for details about the regression

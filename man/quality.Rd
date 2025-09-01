@@ -18,8 +18,8 @@ A data frame with quality metrics for each feature.
 Extract quality information of features
 }
 \examples{
-data(example_set)
-ex_set <- assess_quality(example_set)
+data(toy_notame_set)
+ex_set <- assess_quality(toy_notame_set)
 quality(ex_set)
 
 }

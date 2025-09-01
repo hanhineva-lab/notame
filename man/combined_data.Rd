@@ -21,7 +21,7 @@ one row per sample.
 Retrieve both sample information and features
 }
 \examples{
-data(example_set)
-combined_data(example_set)
+data(toy_notame_set)
+combined_data(toy_notame_set)
 
 }

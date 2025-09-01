@@ -75,13 +75,13 @@ This function separates the three parts from the file, and returns them in a
 list.
 }
 \details{
-If skip_checks = FALSE, \code{\link{import_from_excel}} attempts to modify the 
-data as per \code{\link{fix_object}} and checks the data. If skip_checks 
+If skip_checks = FALSE, \code{\link{import_from_excel}} attempts to modify 
+the data as per \code{\link{fix_object}} and checks the data. If skip_checks 
 = TRUE, parameters for \code{fix_object} are ignored.
 }
 \examples{
 data <- import_from_excel(
-  file = system.file("extdata", "example_set.xlsx", 
+  file = system.file("extdata", "toy_notame_set.xlsx", 
   package = "notame"), sheet = 1, corner_row = 11, corner_column = "H",
   split_by = c("Column", "Ion_mode"))
 

@@ -8,8 +8,8 @@
 #' @return A data frame with quality metrics for each feature.
 #'
 #' @examples
-#' data(example_set)
-#' ex_set <- assess_quality(example_set)
+#' data(toy_notame_set)
+#' ex_set <- assess_quality(toy_notame_set)
 #' quality(ex_set)
 #'
 #' @export
@@ -49,8 +49,8 @@ quality <- function(object) {
 #' feature data.
 #' 
 #' @examples
-#' data(example_set)
-#' ex_set <- assess_quality(example_set)
+#' data(toy_notame_set)
+#' ex_set <- assess_quality(toy_notame_set)
 #' rowData(ex_set)
 #'
 #' @export
@@ -93,7 +93,7 @@ assess_quality <- function(object, assay.type = NULL) {
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
 #' object
 #' @param RSD character, minimum RSD to keep feature
-#' @param D_ratio character, minimum D_ratio to keep feature
+#' @param D_ratio character, minimum D-ratio to keep feature
 #' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @details The quality metrics measure two things: internal spread of the QCs,
@@ -119,11 +119,11 @@ assess_quality <- function(object, assay.type = NULL) {
 #' 72. doi:10.1007/s11306-018-1367-3
 #'  
 #' @examples
-#' data(example_set)
-#' ex_set <- flag_quality(example_set)
+#' data(toy_notame_set)
+#' ex_set <- flag_quality(toy_notame_set)
 #' rowData(ex_set)
 #' # Custom condition
-#' ex_set <- flag_quality(example_set, RSD = 0.1, D_ratio = 0.3)
+#' ex_set <- flag_quality(toy_notame_set, RSD = 0.1, D_ratio = 0.3)
 #' rowData(ex_set)
 #'
 #' @export
@@ -178,8 +178,8 @@ flag_quality <- function(object, assay.type = NULL, RSD = 0.2,
 #' @return A SummarizedExperiment object with the features flagged.
 #'
 #' @examples
-#' data(example_set)
-#' ex_set <- mark_nas(example_set, value = 0)
+#' data(toy_notame_set)
+#' ex_set <- mark_nas(toy_notame_set, value = 0)
 #' ex_set <- flag_detection(ex_set, group = "Group")
 #' rowData(ex_set)
 #'
@@ -263,22 +263,22 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' flagged.
 #'
 #' @examples
-#' data(example_set)
+#' data(toy_notame_set)
 #' # Make a blank sample which has one (first) feature exceeding the threshold
 #' ## Abundance matrix
-#' med <- median(assay(example_set)[1, example_set$QC != "QC"])
+#' med <- median(assay(toy_notame_set)[1, toy_notame_set$QC != "QC"])
 #' assay <- matrix(c(med * 0.05 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
 #'                   dimnames = list(NULL, "Demo_51"))
-#' assay <- cbind(assay(example_set), assay)
+#' assay <- cbind(assay(toy_notame_set), assay)
 #' ## Sample metadata
-#' pheno_data <- colData(example_set)[1, ]
+#' pheno_data <- colData(toy_notame_set)[1, ]
 #' rownames(pheno_data) <- "Demo_51"
 #' pheno_data$Sample_ID <- "Demo_51"
 #' pheno_data$Injection_order <- 51
 #' pheno_data[c("Subject_ID", "Group", "QC", "Time")] <- "Blank"
-#' pheno_data <- rbind(colData(example_set), pheno_data)
+#' pheno_data <- rbind(colData(toy_notame_set), pheno_data)
 #' ## Feature metadata
-#' feature_data <- rowData(example_set)
+#' feature_data <- rowData(toy_notame_set)
 #'
 #' # Construct SummarizedExperiment object with blank sample
 #' ex_set <- SummarizedExperiment(assays = assay, 

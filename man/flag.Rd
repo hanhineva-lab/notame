@@ -25,11 +25,11 @@ For the endomorphism, an object with a modified flag column.
 Get and set the values in the flag column
 }
 \examples{
-data(example_set)
+data(toy_notame_set)
 # Get values in flag column of rowData
-flag(example_set)
+flag(toy_notame_set)
 
-data(example_set)
+data(toy_notame_set)
 # Flag a suspicious feature manually
-flag(example_set)[1] <- "Contaminant, known from experience"
+flag(toy_notame_set)[1] <- "Contaminant, known from experience"
 }

@@ -21,8 +21,8 @@ the feature with the highest median peak area. The features that were
 discarded are recorded in feature data, under Cluster_features.
 }
 \examples{
-data(example_set)
-clustered <- cluster_features(example_set, 
+data(toy_notame_set)
+clustered <- cluster_features(toy_notame_set, 
   rt_window = 1, corr_thresh = 0.5, d_thresh = 0.6)
 compressed <- compress_clusters(clustered)
 

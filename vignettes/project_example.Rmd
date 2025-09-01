@@ -54,7 +54,7 @@ modes.
 
 ```{r}
 data <- import_from_excel(
-  file = system.file("extdata", "example_set.xlsx", package = "notame"), 
+  file = system.file("extdata", "toy_notame_set.xlsx", package = "notame"), 
   sheet = 1, corner_row = 11, corner_column = "H", 
   split_by = c("Column", "Ion_mode"))
   
@@ -148,7 +148,7 @@ rowData(processed[[1]])$DC_note
 Next, it is time to merge the modes together and visualize the complete dataset.
 
 ```{r}
-merged <- merge_objects(processed, assay.type = "corrected")
+merged <- merge_notame_sets(processed, assay.type = "corrected")
 save_QC_plots(merged, prefix = paste0(ppath, "figures/_FULL"),
               group = "Group", time = "Time",
               id = "Subject_ID", color = "Group")
