@@ -135,7 +135,7 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
   } else if (check_quality) {
     pass <- paste0("qdiff[feature, ] |> dplyr::filter(", condition, 
                    ") |> nrow() |> as.logical()") |>
-      parse(text = .) |>
+      parse(text = _) |>
       eval()
     if (!pass) {
       dc_note <- "Low_quality"
@@ -370,9 +370,8 @@ save_dc_plots <- function(object, file, log_transform = TRUE,
 #' @param spar_lower,spar_upper lower and upper limits for the smoothing 
 #' parameter
 #' @param check_quality logical, whether quality should be monitored.
-#' @param condition a character specifying the condition used to decide whether 
-#' drift correction
-#' works adequately, see Details
+#' @param RSD character, change in RSD to keep feature
+#' @param D_ratio character, change in D_ratio to keep feature
 #' @param plotting logical, whether plots should be drawn
 #' @param file path to the PDF file where the plots should be saved
 #' @param width,height width and height of the plots in inches
@@ -404,11 +403,10 @@ save_dc_plots <- function(object, file, log_transform = TRUE,
 #' If \code{spar} is set to \code{NULL} (the default), the smoothing parameter 
 #' will be separately chosen for each feature from the range
 #' [\code{spar_lower, spar_upper}] using cross validation. 
-#' If  \code{check_quality = TRUE}, the \code{condition} parameter should be a 
-#' character giving a condition compatible with \code{\link[dplyr]{filter}}. 
-#' The condition is applied on the \strong{changes} in the quality metrics
-#' RSD, RSD_r, D_ratio and D_ratio_r. For example, the default is "RSD_r < 0 
-#' and D_ratio_r < 0", meaning that both RSD_r and D_ratio_r need to decrease 
+#' If  \code{check_quality = TRUE}, the RSD and D_ratio condition is applied on 
+#' the \strong{changes} in the quality metrics RSD_r, and D_ratio_r. For 
+#' example, the default is RSD_r < 0 and D_ratio_r < 0, meaning that both RSD_r 
+#' and D_ratio_r need to decrease 
 #' in the drift correction, otherwise the drift corrected feature is discarded 
 #' and the original is retained.
 #' By default, the column used for color is also used for shape.
@@ -424,7 +422,7 @@ save_dc_plots <- function(object, file, log_transform = TRUE,
 correct_drift <- function(object, log_transform = TRUE, spar = NULL, 
                           spar_lower = 0.5, spar_upper = 1.5,
                           check_quality = FALSE, 
-                          condition = "RSD_r < 0 & D_ratio_r < 0", 
+                          RSD = 0, D_ratio = 0, 
                           plotting = FALSE, file = NULL, width = 16, 
                           height = 8, color = "QC", shape = color, 
                           color_scale = getOption("notame.color_scale_dis"),
@@ -434,7 +432,7 @@ correct_drift <- function(object, log_transform = TRUE, spar = NULL,
   from_to <- .get_from_to_names(object, assay.type, name)
   object <- .check_object(object, pheno_injection = TRUE, pheno_QC = TRUE, 
                           assay.type = from_to[[1]])
-                         
+                          
   # Fit cubic spline and correct
   corrected <- dc_cubic_spline(object, log_transform = log_transform, 
                                spar = spar, spar_lower = spar_lower,
@@ -443,10 +441,11 @@ correct_drift <- function(object, log_transform = TRUE, spar = NULL,
                                name = from_to[[2]],
                                name_predicted = name_predicted)
   # Only keep corrected versions of features with increased quality
+  condition = paste0("RSD_r < ", RSD, " & D_ratio_r < ", D_ratio)
   inspected <- inspect_dc(orig = object, dc = corrected, 
                           check_quality = check_quality, condition = condition, 
-                          assay.orig = from_to[[1]], assay.dc = from_to[[2]],
-                          name = from_to[[2]])
+                          assay.orig = from_to[[1]],
+                          assay.dc = from_to[[2]], name = from_to[[2]])
   # Optionally save before and after plots
   if (plotting) {
     if (is.null(file)) {

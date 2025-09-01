@@ -4,10 +4,7 @@
 \alias{flag_quality}
 \title{Flag low-quality features}
 \usage{
-flag_quality
-flag_quality(object, assay.type = NULL, condition =
-  "(RSD_r < 0.2 & D_ratio_r < 0.4) | 
-  (RSD < 0.1 & RSD_r < 0.1 & D_ratio < 0.1)")
+flag_quality(object, assay.type = NULL, RSD = 0.2, D_ratio = 0.4)
 }
 \arguments{
 \item{object}{a \code{
@@ -16,45 +13,39 @@ object}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
-\item{condition}{character, condition for keeping the features, see Details}
+\item{RSD}{character, minimum RSD to keep feature}
+
+\item{D_ratio}{character, minimum D-ratio to keep feature}
 }
 \value{
 a SummarizedExperiment object with the features flagged.
 }
 \description{
 Flags low-quality features using the quality metrics defined in (Broadhurst 
-2018). The metrics are described in more detain in Details. A condition for 
-keeping the features is given as a character, which is passed to 
-\code{\link[dplyr]{filter}}.
+2018). The metrics are described in more detain in Details. A dual RSD and 
+D_ratio condition for keeping the features is given.
 }
 \details{
 The quality metrics measure two things: internal spread of the QCs,
 and spread of the QCs compared to the spread of the biological samples.
 Internal spread is measured with relative standard deviation (RSD), also 
 known as coefficient of variation (CV).
-\deqn{RSD = sd(QC) / mean(QC) }
-Where \eqn{sd(QC)} is the standard deviation of the QC samples and 
-'\eqn{mean(QC)} is the sample mean of the signal in the QC samples.
-RSD can also be replaced by a non-parametric, robust version based on the 
+RSD used here is the non-parametric, robust version based on the 
 median and median absolute deviation (MAD):
   \deqn{RSD_r = 1.4826 * MAD(QC) / median(QC)}
 The spread of the QC samples compared to the biological samples is measured 
-using a metric called D-ratio:
-  \deqn{D_ratio = sd(QC) / sd(biological)}
-Or, as before, a non-parametric, robust alternative:
-  \deqn{D_ratio_r = MAD(QC) / MAD(biolofical) }
-The default condition keeps features that pass either of the two following 
-conditions:
+using a metric called D-ratio. The non-parametric, robust alternative is 
+used here:
+  \deqn{D_ratio_r = MAD(QC) / MAD(biological) }
+The default condition keeps features that pass the following condition:
 \deqn{RSD_r < 0.2 \& D_ratio_r < 0.4}
-\deqn{RSD < 0.1 \& RSD_r < 0.1 \& D_ratio < 0.1}
 }
 \examples{
 data(example_set)
 ex_set <- flag_quality(example_set)
 rowData(ex_set)
 # Custom condition
-ex_set <- flag_quality(example_set, 
-  condition = "RSD_r < 0.3 & D_ratio_r < 0.6")
+ex_set <- flag_quality(example_set, RSD = 0.1, D_ratio = 0.3)
 rowData(ex_set)
 
 }
