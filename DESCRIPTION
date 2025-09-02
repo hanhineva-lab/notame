@@ -34,11 +34,8 @@ Depends:
 Imports:
     BiocGenerics,
     BiocParallel,
-    cowplot,
     dplyr,
     futile.logger,
-    ggrepel,
-    grDevices,
     methods,
     openxlsx,
     S4Vectors,

@@ -236,125 +236,6 @@ inspect_dc <- function(orig, dc, check_quality,
   dc
 }
 
-#' Save drift correction plots
-#'
-#' Plots the data before and after drift correction, with the regression line 
-#' drawn with the original data. If the drift correction was done on 
-#' log-transformed data, then plots of both the original and log-transformed 
-#' data before and after correction are drawn.
-#' The plot shows 2 standard deviation spread for both QC samples and regular 
-#' samples.
-#'
-#' @param orig a SummarizedExperiment object, before drift correction
-#' @param dc a SummarizedExperiment object, after drift correction as returned 
-#' by correct_drift
-#' @param predicted a matrix of predicted values, as returned by dc_cubic_spline
-#' @param file path to the PDF file where the plots should be saved
-#' @param log_transform logical, was the drift correction done on log-
-#' transformed data?
-#' @param width,height width and height of the plots in inches
-#' @param color character, name of the column used for coloring the points
-#' @param shape character, name of the column used for shape
-#' @param color_scale the color scale as returned by a ggplot function
-#' @param shape_scale the shape scale as returned by a ggplot function
-#'
-#' @return None, the function is invoked for its plot-saving side effect.
-#'
-#' @details By default, the column used for color is also used for shape.
-#'
-#' @seealso \code{\link{correct_drift}}
-#'
-#' @examples
-#' data(toy_notame_set)
-#' \dontshow{.old_wd <- setwd(tempdir())}
-#' dc <- dc_cubic_spline(toy_notame_set, assay.type = 1, name = "corrected", 
-#' name_predicted = "predicted")
-#' inspected <- inspect_dc(
-#'   orig = toy_notame_set, dc = dc,
-#'   check_quality = TRUE, assay.type = "corrected"
-#' )
-#' save_dc_plots(dc[1],
-#'   file = "drift_plots.pdf",
-#'   assay.orig = 1, assay.dc = "corrected", assay.pred = "predicted"
-#' )
-#' \dontshow{setwd(.old_wd)}
-#' @noRd
-save_dc_plots <- function(object, file, log_transform = TRUE, 
-                          width = 16, height = 8,
-                          color = "QC", shape = color, 
-                          color_scale = getOption("notame.color_scale_dis"),
-                          shape_scale = scale_shape_manual(values = c(15, 16)),
-                          assay.orig, assay.dc = "corrected", 
-                          assay.pred = "drift_pred"){
-  # Create a helper function for plotting
-  dc_plot_helper <- function(data, fname, title = NULL) {
-    p <- ggplot(data = data, mapping = aes(x = .data[["Injection_order"]], 
-                y = .data[[fname]])) +
-      theme_bw() +
-      theme(panel.grid = element_blank()) +
-      color_scale +
-      shape_scale +
-      labs(title = title)
-
-    mean_qc <- finite_mean(data[data$QC == "QC", fname])
-    sd_qc <- finite_sd(data[data$QC == "QC", fname])
-    mean_sample <- finite_mean(data[data$QC != "QC", fname])
-    sd_sample <- finite_sd(data[data$QC != "QC", fname])
-
-    y_intercepts <- sort(c(
-      "-2 SD (Sample)" = mean_sample - 2 * sd_sample,
-      "-2 SD (QC)" = mean_qc - 2 * sd_qc,
-      "+2 SD (QC)" = mean_qc + 2 * sd_qc,
-      "+2 SD (Sample)" = mean_sample + 2 * sd_sample
-    ))
-
-    for (yint in y_intercepts) {
-      p <- p + geom_hline(yintercept = yint, color = "grey", 
-                          linetype = "dashed")
-    }
-    p +
-      scale_y_continuous(sec.axis = sec_axis(~., breaks = y_intercepts, 
-                                             labels = names(y_intercepts))) +
-      geom_point(data = data, mapping = aes(color = .data[[color]], 
-                                            shape = .data[[shape]]))
-  }
-  
-  assay(object, "log_orig") <- log(assay(object, assay.orig))
-  assay(object, "log_dc") <- log(assay(object, assay.dc))
-  
-  orig_data_log <- combined_data(object, assay.type = "log_orig")
-  dc_data_log <- combined_data(object, assay.type = "log_dc")
-  orig_data <- combined_data(object, assay.type = assay.orig)
-  dc_data <- combined_data(object, assay.type = assay.dc)
-  predictions <- as.data.frame(t(assay(object, assay.pred)))
-  predictions$Injection_order <- orig_data$Injection_order
-
-  grDevices::pdf(file, width = width, height = height)
-
-  for (fname in rownames(object)) {
-    p2 <- dc_plot_helper(data = dc_data, fname = fname, title = "After")
-
-    if (log_transform) {
-      p1 <- dc_plot_helper(data = orig_data, fname = fname, title = "Before")
-      p3 <- dc_plot_helper(data = orig_data_log, fname = fname,
-                           title = "Drift correction in log space") +
-        geom_line(data = predictions, color = "grey")
-
-      p4 <- dc_plot_helper(data = dc_data_log, fname = fname,
-                           title = "Corrected data in log space")
-      p <- cowplot::plot_grid(p1, p3, p2, p4, nrow = 2)
-    } else {
-      p1 <- dc_plot_helper(data = orig_data, fname = fname,
-                           title = "Before (original values)") +
-        geom_line(data = predictions, color = "grey")
-      p <- cowplot::plot_grid(p1, p2, nrow = 2)
-    }
-    plot(p)
-  }
-  grDevices::dev.off()
-  log_text(paste("\nSaved drift correction plots to:", file))
-}
-
 #' Correct drift using cubic spline
 #'
 #' A wrapper function for applying cubic spline drift correction and saving
@@ -451,11 +332,15 @@ correct_drift <- function(object, log_transform = TRUE, spar = NULL,
     if (is.null(file)) {
       stop("File must be specified.")
     }
-    save_dc_plots(inspected, file = file,
-                  log_transform = log_transform, width = width, height = height,
-                  color = color, shape = shape, color_scale = color_scale,
-                  shape_scale = shape_scale, assay.orig = from_to[[1]],
-                  assay.dc = from_to[[2]], assay.pred = name_predicted)
+    if (!requireNamespace("notameViz", quietly = TRUE)) {
+      stop("Package \"notameViz\" needed for this function to work.",
+           " Please install it.", call. = FALSE)
+    }
+    notameViz::save_dc_plots(inspected, file = file,
+      log_transform = log_transform, width = width, height = height,
+      color = color, shape = shape, color_scale = color_scale,
+      shape_scale = shape_scale, assay.orig = from_to[[1]],
+      assay.dc = from_to[[2]], assay.pred = name_predicted)
   }
   # Return the final version
   inspected
