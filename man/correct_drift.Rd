@@ -11,9 +11,7 @@ correct_drift(
   spar_lower = 0.5,
   spar_upper = 1.5,
   check_quality = FALSE,
-  RSD = 0,
-  D_ratio = 0,
-  plotting = FALSE,
+  condition = "RSD_r < 0 & D_ratio_r < 0",
   file = NULL,
   width = 16,
   height = 8,
@@ -22,8 +20,7 @@ correct_drift(
   color_scale = getOption("notame.color_scale_dis"),
   shape_scale = scale_shape_manual(values = c(15, 16)),
   assay.type = NULL,
-  name = "corrected",
-  name_predicted = "drift_pred"
+  name = NULL
 )
 }
 \arguments{
@@ -42,11 +39,8 @@ parameter}
 
 \item{check_quality}{logical, whether quality should be monitored.}
 
-\item{RSD}{character, change in RSD to keep feature}
-
-\item{D_ratio}{character, change in D_ratio to keep feature}
-
-\item{plotting}{logical, whether plots should be drawn}
+\item{condition}{a character specifying the condition used to decide whether 
+drift correction works adequately, see Details}
 
 \item{file}{path to the PDF file where the plots should be saved}
 
@@ -62,9 +56,6 @@ ggplot function}
 \item{assay.type}{character, assay to be used in case of multiple assays}
 
 \item{name}{character, name of the resultant assay}
-
-\item{name_predicted}{character, name of the resultant assay with predicted 
-values (for plotting)}
 }
 \value{
 A SummarizedExperiment object as the one supplied, with 
@@ -88,21 +79,18 @@ data better follows the assumptions of cubic spline regression. The drift
 correction in the original space also sometimes results
 in negative values, and results in rejection of the drift corrrection 
 procedure.
-If \code{spar} is set to \code{NULL} (the default), the smoothing parameter 
-will be separately chosen for each feature from the range
-[\code{spar_lower, spar_upper}] using cross validation. 
-If  \code{check_quality = TRUE}, the RSD and D_ratio condition is applied on 
-the \strong{changes} in the quality metrics RSD_r, and D_ratio_r. For 
-example, the default is RSD_r < 0 and D_ratio_r < 0, meaning that both RSD_r 
-and D_ratio_r need to decrease 
+If  \code{check_quality = TRUE}, the \code{condition} parameter should be a 
+character giving a condition compatible with \code{\link[dplyr]{filter}}. 
+The condition is applied on the \strong{changes} in the quality metrics
+RSD, RSD_r, D_ratio and D_ratio_r. For example, the default is "RSD_r < 0 
+and D_ratio_r < 0", meaning that both RSD_r and D_ratio_r need to decrease
 in the drift correction, otherwise the drift corrected feature is discarded 
 and the original is retained.
 By default, the column used for color is also used for shape.
 }
 \examples{
 data(toy_notame_set)
-corrected <- correct_drift(mark_nas(toy_notame_set[1:5, ], value = 0),
-  file = "drift_plots.pdf", plotting = TRUE)
+corrected <- correct_drift(mark_nas(toy_notame_set[1:5, ], value = 0))
 
 }
 \seealso{

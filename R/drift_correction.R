@@ -80,8 +80,7 @@
 #' @noRd
 dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
                             spar_lower = 0.5, spar_upper = 1.5, 
-                            assay.type = NULL, name = NULL,
-                            name_predicted = NULL) {
+                            assay.type = NULL, name = NULL) {
   # Start log
   log_text(paste("\nStarting drift correction at", Sys.time()))
   # Zero values do not behave correctly
@@ -114,7 +113,6 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
   if (log_transform) {
     corrected <- exp(corrected)
   }
-  assay(object, name_predicted) <- dc_data$predicted
   assay(object, name) <- corrected
   # Recompute quality metrics
   object <- assess_quality(object, assay.type = name)
@@ -198,7 +196,7 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
 #' @noRd
 inspect_dc <- function(orig, dc, check_quality,
                        condition = "RSD_r < 0 & D_ratio_r < 0",
-                       assay.orig = NULL, assay.dc = NULL, name = NULL) {
+                       assay.orig = NULL, assay.dc = NULL) {
   if (is.null(quality(orig))) {
     orig <- assess_quality(orig, assay.type = assay.orig)
   }
@@ -218,8 +216,8 @@ inspect_dc <- function(orig, dc, check_quality,
   
   inspected <- do.call(.comb, inspected)
 
-  assay(dc, name) <- inspected$data
-  dc <- assess_quality(dc, assay.type = name)
+  assay(dc, assay.dc) <- inspected$data
+  dc <- assess_quality(dc, assay.type = assay.dc)
   dc <- join_rowData(dc, inspected$dc_notes)
 
   log_text(paste("Drift correction results inspected at", Sys.time()))
@@ -251,9 +249,8 @@ inspect_dc <- function(orig, dc, check_quality,
 #' @param spar_lower,spar_upper lower and upper limits for the smoothing 
 #' parameter
 #' @param check_quality logical, whether quality should be monitored.
-#' @param RSD character, change in RSD to keep feature
-#' @param D_ratio character, change in D_ratio to keep feature
-#' @param plotting logical, whether plots should be drawn
+#' @param condition a character specifying the condition used to decide whether 
+#' drift correction works adequately, see Details
 #' @param file path to the PDF file where the plots should be saved
 #' @param width,height width and height of the plots in inches
 #' @param color character, name of the column used for coloring the points
@@ -262,8 +259,6 @@ inspect_dc <- function(orig, dc, check_quality,
 #' ggplot function
 #' @param assay.type character, assay to be used in case of multiple assays
 #' @param name character, name of the resultant assay
-#' @param name_predicted character, name of the resultant assay with predicted 
-#' values (for plotting)
 #'
 #' @return A SummarizedExperiment object as the one supplied, with 
 #' drift corrected features.
@@ -281,21 +276,18 @@ inspect_dc <- function(orig, dc, check_quality,
 #' correction in the original space also sometimes results
 #' in negative values, and results in rejection of the drift corrrection 
 #' procedure.
-#' If \code{spar} is set to \code{NULL} (the default), the smoothing parameter 
-#' will be separately chosen for each feature from the range
-#' [\code{spar_lower, spar_upper}] using cross validation. 
-#' If  \code{check_quality = TRUE}, the RSD and D_ratio condition is applied on 
-#' the \strong{changes} in the quality metrics RSD_r, and D_ratio_r. For 
-#' example, the default is RSD_r < 0 and D_ratio_r < 0, meaning that both RSD_r 
-#' and D_ratio_r need to decrease 
+#' If  \code{check_quality = TRUE}, the \code{condition} parameter should be a 
+#' character giving a condition compatible with \code{\link[dplyr]{filter}}. 
+#' The condition is applied on the \strong{changes} in the quality metrics
+#' RSD, RSD_r, D_ratio and D_ratio_r. For example, the default is "RSD_r < 0 
+#' and D_ratio_r < 0", meaning that both RSD_r and D_ratio_r need to decrease
 #' in the drift correction, otherwise the drift corrected feature is discarded 
 #' and the original is retained.
 #' By default, the column used for color is also used for shape.
 #'
 #' @examples
 #' data(toy_notame_set)
-#' corrected <- correct_drift(mark_nas(toy_notame_set[1:5, ], value = 0),
-#'   file = "drift_plots.pdf", plotting = TRUE)
+#' corrected <- correct_drift(mark_nas(toy_notame_set[1:5, ], value = 0))
 #'
 #' @seealso \code{\link[stats]{smooth.spline}} for details about the regression
 #'
@@ -303,13 +295,12 @@ inspect_dc <- function(orig, dc, check_quality,
 correct_drift <- function(object, log_transform = TRUE, spar = NULL, 
                           spar_lower = 0.5, spar_upper = 1.5,
                           check_quality = FALSE, 
-                          RSD = 0, D_ratio = 0, 
-                          plotting = FALSE, file = NULL, width = 16, 
+                          condition = "RSD_r < 0 & D_ratio_r < 0",
+                          file = NULL, width = 16, 
                           height = 8, color = "QC", shape = color, 
                           color_scale = getOption("notame.color_scale_dis"),
                           shape_scale = scale_shape_manual(values = c(15, 16)),
-                          assay.type = NULL, name = "corrected",
-                          name_predicted = "drift_pred") {
+                          assay.type = NULL, name = NULL) {
   from_to <- .get_from_to_names(object, assay.type, name)
   object <- .check_object(object, pheno_injection = TRUE, pheno_QC = TRUE, 
                           assay.type = from_to[[1]])
@@ -319,29 +310,11 @@ correct_drift <- function(object, log_transform = TRUE, spar = NULL,
                                spar = spar, spar_lower = spar_lower,
                                spar_upper = spar_upper, 
                                assay.type = from_to[[1]],
-                               name = from_to[[2]],
-                               name_predicted = name_predicted)
+                               name = from_to[[2]])
   # Only keep corrected versions of features with increased quality
-  condition = paste0("RSD_r < ", RSD, " & D_ratio_r < ", D_ratio)
   inspected <- inspect_dc(orig = object, dc = corrected, 
                           check_quality = check_quality, condition = condition, 
-                          assay.orig = from_to[[1]],
-                          assay.dc = from_to[[2]], name = from_to[[2]])
-  # Optionally save before and after plots
-  if (plotting) {
-    if (is.null(file)) {
-      stop("File must be specified.")
-    }
-    if (!requireNamespace("notameViz", quietly = TRUE)) {
-      stop("Package \"notameViz\" needed for this function to work.",
-           " Please install it.", call. = FALSE)
-    }
-    notameViz::save_dc_plots(inspected, file = file,
-      log_transform = log_transform, width = width, height = height,
-      color = color, shape = shape, color_scale = color_scale,
-      shape_scale = shape_scale, assay.orig = from_to[[1]],
-      assay.dc = from_to[[2]], assay.pred = name_predicted)
-  }
+                          assay.orig = from_to[[1]], assay.dc = from_to[[2]])
   # Return the final version
   inspected
 }
