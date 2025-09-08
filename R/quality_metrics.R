@@ -86,29 +86,35 @@ assess_quality <- function(object, assay.type = NULL) {
 #' Flag low-quality features
 #'
 #' Flags low-quality features using the quality metrics defined in (Broadhurst 
-#' 2018). The metrics are described in more detain in Details. A dual RSD and 
-#' D_ratio condition for keeping the features is given.
+#' 2018). The metrics are described in more detain in Details. A condition for 
+#' keeping the features is given as a character, which is passed to 
+#' \code{\link[dplyr]{filter}}.
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
 #' object
-#' @param RSD character, minimum RSD to keep feature
-#' @param D_ratio character, minimum D-ratio to keep feature
+#' @param condition character, condition for keeping the features, see Details
 #' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @details The quality metrics measure two things: internal spread of the QCs,
 #' and spread of the QCs compared to the spread of the biological samples.
 #' Internal spread is measured with relative standard deviation (RSD), also 
 #' known as coefficient of variation (CV).
-#' RSD used here is the non-parametric, robust version based on the 
+#' \deqn{RSD = sd(QC) / mean(QC) }
+#' Where \eqn{sd(QC)} is the standard deviation of the QC samples and 
+#' '\eqn{mean(QC)} is the sample mean of the signal in the QC samples.
+#' RSD can also be replaced by a non-parametric, robust version based on the 
 #' median and median absolute deviation (MAD):
 #'   \deqn{RSD_r = 1.4826 * MAD(QC) / median(QC)}
 #' The spread of the QC samples compared to the biological samples is measured 
-#' using a metric called D-ratio. The non-parametric, robust alternative is 
-#' used here:
-#'   \deqn{D_ratio_r = MAD(QC) / MAD(biological) }
-#' The default condition keeps features that pass the following condition:
+#' using a metric called D-ratio:
+#'   \deqn{D_ratio = sd(QC) / sd(biological)}
+#' Or, as before, a non-parametric, robust alternative:
+#'   \deqn{D_ratio_r = MAD(QC) / MAD(biolofical) }
+#' The default condition keeps features that pass either of the two following 
+#' conditions:
 #' \deqn{RSD_r < 0.2 \& D_ratio_r < 0.4}
+#' \deqn{RSD < 0.1 \& RSD_r < 0.1 \& D_ratio < 0.1}
 #'
 #' @return a SummarizedExperiment object with the features flagged.
 #'
@@ -118,17 +124,23 @@ assess_quality <- function(object, assay.type = NULL) {
 #' Metabolomics : Official journal of the Metabolomic Society vol. 14,6 (2018): 
 #' 72. doi:10.1007/s11306-018-1367-3
 #'  
+#' @usage flag_quality
+#' flag_quality(object, assay.type = NULL, condition =
+#'   "(RSD_r < 0.2 & D_ratio_r < 0.4) | 
+#'   (RSD < 0.1 & RSD_r < 0.1 & D_ratio < 0.1)")
 #' @examples
 #' data(toy_notame_set)
 #' ex_set <- flag_quality(toy_notame_set)
 #' rowData(ex_set)
 #' # Custom condition
-#' ex_set <- flag_quality(toy_notame_set, RSD = 0.1, D_ratio = 0.3)
+#' ex_set <- flag_quality(toy_notame_set,
+#'   condition = "RSD_r < 0.3 & D_ratio_r < 0.6")
 #' rowData(ex_set)
 #'
 #' @export
-flag_quality <- function(object, assay.type = NULL, RSD = 0.2, 
-                         D_ratio = 0.4) {
+flag_quality <- function(object, assay.type = NULL, condition = 
+  "(RSD_r < 0.2 & D_ratio_r < 0.4) | 
+  (RSD < 0.1 & RSD_r < 0.1 & D_ratio < 0.1)") {
   if (is.null(quality(object))) {
     object <- assess_quality(object, assay.type)
   }
@@ -140,9 +152,12 @@ flag_quality <- function(object, assay.type = NULL, RSD = 0.2,
     "Metabolomics : Official journal of the Metabolomic Society",
     "vol. 14,6 (2018): 72. doi:10.1007/s11306-018-1367-3"))
 
-  good_ind <- rowData(object)$RSD_r < RSD & rowData(object)$D_ratio_r < D_ratio
-  good <- rowData(object)[good_ind, ]$Feature_ID
-
+  good <- paste0("as.data.frame(rowData(object)) |> 
+                 dplyr::filter(", condition, ")") |>
+    parse(text = _) |>
+    eval()
+  good <- good$Feature_ID
+  
   idx <- is.na(flag(object)) & !rowData(object)$Feature_ID %in% good
   flag(object)[idx] <- "Low_quality"
 
