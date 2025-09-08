@@ -42,6 +42,7 @@ reference:
   - notameViz::plot_pca_loadings
   - notameViz::plot_quality
   - notameViz::save_batch_plots
+  - notameViz::visualize_clusters
 
 - title: Feature selection
 - subtitle: Univariate analysis
@@ -80,7 +81,7 @@ reference:
   
 - title: Object utilities
 - contents:
-  - import_MSDIAL
+  - import_from_excel
   - write_to_excel
   - flag
   - drop_flagged

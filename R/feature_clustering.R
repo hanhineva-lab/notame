@@ -35,8 +35,8 @@
 #' @examples
 #' data(toy_notame_set)
 #' # The parameters are really weird because example data is imaginary
-#' clustered <- cluster_features(toy_notame_set, rt_window = 1, corr_thresh = 0.5, 
-#'   d_thresh = 0.6)
+#' clustered <- cluster_features(toy_notame_set, rt_window = 1,
+#'   corr_thresh = 0.5, d_thresh = 0.6)
 #'
 #' @export
 cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
@@ -100,7 +100,7 @@ cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
       stop("Package \"notameViz\" needed for this function to work.",
            " Please install it.", call. = FALSE)
     }
-    notameViz::visualise_clusters(clustered, min_size = min_size_plotting,
+    notameViz::visualize_clusters(clustered, min_size = min_size_plotting,
       rt_window = rt_window, mz_col = mz_col, rt_col = rt_col, 
       file_path = prefix)
     log_text(paste("Saved cluster plots to:", prefix))

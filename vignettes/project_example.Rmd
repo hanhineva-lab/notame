@@ -117,15 +117,15 @@ for (i in seq_along(modes)) {
   # Visualize data after drift correction
   save_QC_plots(corrected, prefix = paste0(ppath, "figures/", name, "_DRIFT"),
                 perplexity = 5, group = "Group", time = "Time", 
-                id = "Subject_ID", color = "Group", assay.type = "corrected")
+                id = "Subject_ID", color = "Group")
   # Flag low-quality features
   corrected <- corrected |> 
-    assess_quality(object = _, assay.type = "corrected") |> 
-    flag_quality(object = _, assay.type = "corrected")
+    assess_quality(object = _) |> 
+    flag_quality(object = _,)
   # Visualize data after removal of low-quality features
   save_QC_plots(corrected, prefix = paste0(ppath, "figures/", name, "_CLEAN"),
                 perplexity = 5, group = "Group", time = "Time",
-                id = "Subject_ID", color = "Group", assay.type = "corrected")
+                id = "Subject_ID", color = "Group")
   # Save result of iteration
   processed[[i]] <- corrected
 }
@@ -148,7 +148,7 @@ rowData(processed[[1]])$DC_note
 Next, it is time to merge the modes together and visualize the complete dataset.
 
 ```{r}
-merged <- merge_notame_sets(processed, assay.type = "corrected")
+merged <- merge_notame_sets(processed)
 save_QC_plots(merged, prefix = paste0(ppath, "figures/_FULL"),
               group = "Group", time = "Time",
               id = "Subject_ID", color = "Group")
