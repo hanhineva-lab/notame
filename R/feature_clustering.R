@@ -22,10 +22,6 @@
 #' @param corr_thresh the correlation threshold required for potential links 
 #' between features
 #' @param d_thresh the threshold for the relative degree required by each node
-#' @param plotting should plots be drawn for each cluster?
-#' @param min_size_plotting the minimum number of features a cluster needs to 
-#' have to be plotted
-#' @param prefix the prefix to the files to be plotted
 #' @param assay.type character, assay to be used in case of multiple assays
 #'
 #' @return a SummarizedExperiment object, with median peak area 
@@ -42,8 +38,15 @@
 cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
                              all_features = FALSE, rt_window = 1 / 60,
                              corr_thresh = 0.9, d_thresh = 0.8, 
-                             plotting = TRUE, min_size_plotting = 3, 
-                             prefix = NULL, assay.type = NULL) {
+                             assay.type = NULL) {
+  if (!requireNamespace("igraph", quietly = TRUE)) {
+    stop("Package \"igraph\" needed for this function to work.",
+         " Please install it.", call. = FALSE)
+  }
+  .add_citation(paste0("igraph package was used to construct networks of", 
+                       " features for feature clustering:"), 
+                citation("igraph"))
+
   # Drop flagged compounds before clustering
   from <- .get_from_name(object, assay.type)
   orig <- .check_object(object)
@@ -94,17 +97,6 @@ cluster_features <- function(object, mz_col = NULL, rt_col = NULL,
   clustered <- join_rowData(orig, features[c("Feature_ID", "MPA",
                                             "Cluster_ID", "Cluster_size",
                                             "Cluster_features")])
-                                            
-  if (plotting) {
-    if (!requireNamespace("notameViz", quietly = TRUE)) {
-      stop("Package \"notameViz\" needed for this function to work.",
-           " Please install it.", call. = FALSE)
-    }
-    notameViz::visualize_clusters(clustered, min_size = min_size_plotting,
-      rt_window = rt_window, mz_col = mz_col, rt_col = rt_col, 
-      file_path = prefix)
-    log_text(paste("Saved cluster plots to:", prefix))
-  }
   clustered
 }
 
@@ -338,14 +330,6 @@ find_connections <- function(data, features, corr_thresh = 0.9,
 #'
 #' @noRd
 find_clusters <- function(connections, d_thresh = 0.8) {
-  if (!requireNamespace("igraph", quietly = TRUE)) {
-    stop("Package \"igraph\" needed for this function to work.",
-         " Please install it.", call. = FALSE)
-  }
-  .add_citation(paste0("igraph package was used to construct networks of", 
-                       " features for feature clustering:"), 
-                citation("igraph"))
-
   # Construct graph from the given edges
   g <- igraph::graph_from_edgelist(as.matrix(connections[seq_len(2)]), 
                                    directed = FALSE)

@@ -220,9 +220,9 @@ merge_notame_sets <- function(..., merge = c("features", "samples"),
   merged_rowdata <- rbind(fx, fy[new_features, ])
 
   if (non_identical_cols) {
-    merged_rowdata <-dplyr::left_join(merged_rowdata, only_x, 
-                                      by = "Feature_ID") |>
-      dplyr::left_join(only_y, by = "Feature_ID")
+    merged_rowdata <- merge(merged_rowdata, only_x, by = "Feature_ID", 
+                            all.x = TRUE, sort = FALSE) |>
+      merge(only_y, by = "Feature_ID", all.x = TRUE, sort = FALSE)
     rownames(merged_rowdata) <- merged_rowdata$Feature_ID
   }
   merged_rowdata

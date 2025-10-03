@@ -8,7 +8,7 @@ output:
     toc_depth: 2
     number_sections: true
 vignette: >
-  %\VignetteIndexEntry{General introduction}
+  %\VignetteIndexEntry{Non-targeted metabolomics preprocessing and wrangling}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: references.bib
@@ -23,26 +23,29 @@ knitr::opts_chunk$set(
 ```
 
 # Motivation
-
 From the perspective of metabolites as the continuation of the central dogma of 
 biology, metabolomics provides the closest link to many phenotypes of interest. 
 This makes metabolomics research promising in teasing apart the complexities of 
 living systems, attracting many new practitioners.
 
-The *notame* R package was developed in parallel with an associated protocol 
+The notame R package was developed in parallel with a protocol 
 article as a general guideline for data analysis in untargeted 
-metabolomics studies [@notame]. The main outcome is identifying interesting 
-features for laborious downstream steps relating to biological context, such as 
-metabolite identification and pathway analysis, which fall outside the purview 
-of *notame*. Bioconductor packages with complementary functionality in 
-Bioconductor include pmp, phenomis and qmtools; *notame* brings partially 
-overlapping and new functionality to the table. There are also Bioconductor 
-packages for preprocessing, metabolite identification and pathway analysis. 
-Together, *notame*, Bioconductor's dependency management and other Bioconductor 
-functionality allow for quality, reproducible metabolomics research.
+metabolomics studies [@notame]. The notame package was split into notame, 
+notameViz and notameStats for Bioconductor. 
+The primary goal is identifying quality, interesting features for 
+laborious downstream steps relating to biological context, such as 
+metabolite identification and pathway analysis. Bioconductor packages with 
+complementary functionality in Bioconductor include pmp, phenomis and qmtools; 
+notame packages brings partially overlapping and new functionality to the 
+table. There are also Bioconductor packages for preprocessing, metabolite 
+identification and pathway analysis. Together, notame, Bioconductor's 
+dependency management and other Bioconductor functionality allow for quality, 
+reproducible metabolomics research.  Please see the [notame website](https://
+hanhineva-lab.github.io/notame/) and protocol article for more information 
+[@notame].
 
 # Installation
-To install *notame*, install BiocManager first, if it is not installed. 
+To install notame, install BiocManager first, if it is not installed. 
 Afterwards use the install function from BiocManager.
 
 ```{r, eval = FALSE}
@@ -52,74 +55,117 @@ BiocManager::install("notame")
 library(notame)
 ```
 
-# How it works
-SummarizedExperiment is the primary data structure of this package. One can use 
-a single peak table throughout the analysis as with MetaboSet and also use 
-multiple peak tables with SummarizedExperiment, using the `assay.type` and 
-`name` arguments.
+## Drift correction 
+Untargeted LC-MS metabolomics data usually suffers from signal intensity drift, 
+i.e. systematic variation in the signal intensity as a function of injection 
+order. Features of a dataset often have very different drift patterns. This 
+means that to correct for the drift, we need a tool that can adapt to different 
+drift patterns.
 
-The functionality of *notame* can be broadly divided into tabular data 
-preprocessing and feature selection, excluding sample preprocessing and 
-functionality related to biological context (Figure 1). Tabular data processing
-involves reducing unwanted variation and data preparation dependent on 
-downstream methods. The many visualizations used for inspecting the process 
-also serve as exploratory data analysis. Feature selection aims to select a 
-subset of interesting features across study groups before laborious steps 
-relating to biological context. Please see the documentation for an overview of 
-functionality (?notame), the Project Example vignette for usage and the 
-associated protocol article for more information [@notame].
+The approach used in this package models the drift separately for each feature, 
+using pooled QC samples and cubic spline regression. The smoothing parameter 
+controls the "wiggliness" of the function: the larger the smoothing parameter, 
+the closer the spline is to a linear function. By default, the smoothing 
+parameter is chosen automatically using cross validation, and can vary between 
+0.5 and 1.5, where 1.5 is large enough to guarantee that the curve is 
+practically linear. This interval seems to work well in practice.
 
-```{r, echo = FALSE}
-#| fig.cap = "Overview of untargeted LC-MS metabolomics data analysis."
-knitr::include_graphics("Overview.png")
+We run the drift correction on log-transformed data. Log-transformed data 
+follows the assumptions of the drift function model better, and avoids some 
+practical issues. The corrected feature abundance for a sample with injection 
+order $i$ is then computed using the following formula:
+$$x_{corrected}(i) = x_{original}(i) + \overline{x}_{QC} - f_{drift}(i)$$
+
+```{r}
+library(notame)
+data(toy_notame_set, package = "notame")
+se <- toy_notame_set
+names(assays(se)) <- "rawbundances"
+# Mark missing values as NA
+se <- mark_nas(se, value = 0)
+# Correct drift
+se <- correct_drift(se, name = "dc")
 ```
 
-## Input
+## Flagging low quality compounds
+LC-MS metabolomics datasets contain a significant number of low-quality 
+features. We use three established quality metrics based on pooled QC samples 
+to flag those features: detection rate, relative standard deviation and 
+dispersion ratio[@qcguidelines]. We are using the robust versions of relative 
+standard deviation and dispersion ratio as they are less affected by a single 
+outlying QC and since the original RSD works best if the data is normally 
+distributed, which is often not the case with our data. In addition, one can 
+use `flag_contaminants()` to, well, flag contaminants. 
+
+By default, we use a slightly more lenient detection threshold, 0.5. The 
+recommended limits for RSD and D-ratio are 0.2 and 0.4, respectively. Since we 
+are using the robust alternatives, we have added an additional condition: 
+signals with classic RSD, RSD\* and basic D-ratio all below 0.1 are kept. This 
+additional condition prevents the removal of signals with very low values in 
+all but a few samples. These signals tend to have a very high value of D-
+ratio\*, since the median absolute deviation of the biological samples is not 
+affected by the large concentration in a handful of samples, causing the D-
+ratio* to overestimate the significance of random errors in measurements of QC 
+samples. Thus, other quality metrics are applied, with a conservative limit of 
+0.1 to ensure that only good quality signals are kept this way.
+
+```{r}
+se <- flag_detection(se, assay.type = "dc")
+se <- flag_quality(se, assay.type = "dc")
+head(rowData(se)$Flag)
+```
+
+Flagged features are not removed from the data, but the flag information is 
+stored in the "Flag" column of `rowData(se)`. In notame, notameViz and 
+notameStats packages, the flagged features are silently ignored in operations 
+that involve muliple features at a time, including random forest imputation, 
+PCA visualization and multivariate statistical models. For feature-wise 
+statistics, the statistical model is fit for flagged features, but FDR 
+correction is only done for non-flagged features. One can also set 
+`all_features = TRUE` in these functions to include all features in the model.
+
+## Imputation of missing values
+LC-MS data often contain missing values. Note that even if some statistical 
+methods state that they "can deal with missing values", they sometimes just 
+ignore samples or variables with at least one missing value, or impute the 
+missing values before applying the actual method. 
+
+There are many different imputation strategies out there. We have tested a 
+bunch of them on our data and we concluded that random forest imputation works 
+best for our data [@kokla2019random]. To be brief, the method predicts the 
+missing part of the data by fitting a random forest on the observed part of the 
+data [@missForest]. The downside of random forest imputation is that it is 
+rather slow. Thus, we recommend running the imputation separately for each 
+analysis mode if the dataset has more than 100 samples, or if there are lots of 
+missing values.
+
+```{r}
+set.seed(2025)
+se <- impute_rf(se, assay.type = "dc", name = "imputed")
+```
+
+Simple imputation strategies included in `impute_simple()` are imputation by 
+constant value, imputation by mean, median, minimum or half minimum value or by 
+a small random value. Simple imputation strategies rely on the assumption that 
+missingness is mostly caused by the fact that the metabolite concentration is 
+below the detection limit.
+
+## Utilities
 Data can be read with `import_from_excel()`, which includes checks and 
 preparation of metadata. To accommodate typical output from peak-picking 
 software such as Agilent's MassHunter or MS-DIAL, the output is transformed 
 into a spreadsheet for `import_from_excel()`. Alternatively, data in R can be 
-wrangled and passed to the `SummarizedExperiment()` constructor. 
+wrangled and passed to the `SummarizedExperiment()` constructor.
 
 ```{r, echo = FALSE}
 #| fig.cap = "Structure of spreadsheet for import_from_excel()."
 knitr::include_graphics("Data_input.png")
 ```
 
-There are a few obligatory fields for `import_from_excel()`, including 
-"Injection_order" in sample information, "Mass" or "Average mz" in feature data 
-and "Retention time", "RetentionTime", "Average rt(min)" or "rt" in feature 
-information (not case sensitive). There are further optional fields, including 
-"Sample_ID" and "QC" in sample data as well as "Feature_ID" in feature data, 
-which are automatically generated if unavailable. One or more fields in feature 
-data can be used to split the data into parts, usually LC column x ionization 
-mode, supplied as arguments to the `split_by` parameter. If the file only 
-contains one mode, specify the name of the mode, e.g. "HILIC_pos" to the `name` 
-parameter. 
-
-## Tabular data preprocessing
-The main functions return modified objects and are largely 
-based on pooled QC samples [@qcguidelines]. Tabular data preprocessing is 
-generally performed separately for each mode. The visualizations used to 
-monitor tabular data preprocessing are saved to file by default, but can also 
-be returned as ggplot objects. The `notameViz::save_QC_plots()` wrapper can be 
-used for saving central visualizations at different stages of processing.
-
-## Feature selection
-Univariate statistics functions return a `data.frame`, to be manually 
-filtered before inclusion into the feature data of the instance. Supervised 
-learning functions return various data structures. 
-
-Comprehensive results visualizations are returned as ggplot objects and can be 
-saved to file using `save_plot()`. Interesting features can be inspected with 
-feature-wise visualizations which are saved to file by default but can be 
-returned as a list.
-
-## Utilities
 General utilities include `combined_data()` for representing the instance in a
 `data.frame` suitable for plotting and various functions for data wrangling. 
-For keeping track of the analysis, *notame* offers a logging system operated 
-using `init_log()`, `log_text()` and `finish_log()`. *notame* also keeps track 
+For keeping track of the analysis, notame offers a logging system operated 
+using `init_log()`, `log_text()` and `finish_log()`. notame also keeps track 
 of all the external packages used, offering you references for each. To see and 
 log a list of references, use `citations()`.
 
@@ -133,7 +179,7 @@ BiocParallel::register(BiocParallel::SerialParam())
 
 # Authors & Acknowledgements
 
-The first version of *notame* was written by Anton Klåvus for his master's 
+The first version of notame was written by Anton Klåvus for his master's 
 thesis in Bioinformatics at Aalto university (published under former name Anton 
 Mattsson), while working for University of Eastern Finland and Afekta 
 Technologies. The package is inspired by analysis scripts written by Jussi 

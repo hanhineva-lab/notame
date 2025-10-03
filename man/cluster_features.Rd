@@ -12,9 +12,6 @@ cluster_features(
   rt_window = 1/60,
   corr_thresh = 0.9,
   d_thresh = 0.8,
-  plotting = TRUE,
-  min_size_plotting = 3,
-  prefix = NULL,
   assay.type = NULL
 )
 }
@@ -39,13 +36,6 @@ NOTE: use the same unit as the retention time}
 between features}
 
 \item{d_thresh}{the threshold for the relative degree required by each node}
-
-\item{plotting}{should plots be drawn for each cluster?}
-
-\item{min_size_plotting}{the minimum number of features a cluster needs to 
-have to be plotted}
-
-\item{prefix}{the prefix to the files to be plotted}
 
 \item{assay.type}{character, assay to be used in case of multiple assays}
 }
