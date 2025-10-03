@@ -42,6 +42,7 @@ reference:
   - notameViz::plot_pca_loadings
   - notameViz::plot_quality
   - notameViz::save_batch_plots
+  - notameViz::save_dc_plots
   - notameViz::visualize_clusters
 
 - title: Feature selection
@@ -62,6 +63,16 @@ reference:
   - notameStats::fold_change
   - notameStats::summary_statistics
   - notameStats::summarize_results
+  
+- subtitle: Multivariate analysis
+- contents:
+  - notameStats::fit_rf
+  - notameStats::importance_rf
+  - notameStats::mixomics_pls
+  - notameStats::mixomics_pls_optimize
+  - notameStats::mixomics_spls_optimize
+  - notameStats::mixomics_plsda_optimize
+  - notameStats::mixomics_splsda_optimize
   
 - title: Feature-wise visualizations
 - contents:

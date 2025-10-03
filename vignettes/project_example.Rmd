@@ -41,6 +41,7 @@ output for the rest of the document for brevity.
 library(notame)
 library(notameViz)
 library(notameStats)
+library(dplyr)
 ppath <- tempdir()
 init_log(log_file = file.path(ppath, "log.txt"))
 ```
