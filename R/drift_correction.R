@@ -3,35 +3,31 @@
   mapply(rbind, x, ..., SIMPLIFY = FALSE)
 }
 
-.calc_cubic_spline <- function(feature, full_data, full_order, qc_data, n,
-                               qc_order, log_transform, 
+.calc_cubic_spline <- function(feature, sample_data, log_transform, 
                                spar, spar_lower, spar_upper) {
-  dnames <- list(feature, colnames(full_data))
   # Spline cannot be fitted if there are les than 4 QC values
-  qc_detected <- !is.na(qc_data[feature, ])
+  qc_detected <- sample_data$QC == "QC"
   if (sum(qc_detected) < 4) {
-    return(list(
-      corrected = matrix(NA_real_, nrow = 1, ncol = n, dimnames = dnames),
-      predicted = matrix(NA_real_, nrow = 1, ncol = n, dimnames = dnames)))
+    return(rep(NA, length(feature)))
   }
-  # Spline regression
-  fit <- stats::smooth.spline(x = qc_order[qc_detected], 
-                              y = qc_data[feature, qc_detected], 
+  # Spline regression on the QC samples
+  fit <- stats::smooth.spline(x = sample_data$Injection_order[qc_detected], 
+                              y = feature[qc_detected], 
                               all.knots = TRUE, spar = spar, 
                               control.spar = 
                               list("low" = spar_lower, "high" = spar_upper))
-  predicted <- stats::predict(fit, full_order)$y
+  # Predicted values for all samples
+  predicted <- stats::predict(fit, sample_data$Injection_order)$y
   # Substraction in log space, division in original space
   if (log_transform) {
-    corrected <- full_data[feature, ] + 
-      mean(qc_data[feature, qc_detected]) - predicted
+    corrected <- feature + 
+      mean(feature[qc_detected]) - predicted
   } else {
     corr_factors <- predicted[1] / predicted
-    corrected <- full_data[feature, ] * corr_factors
+    corrected <- feature * corr_factors
   }
-  # Each iteration of the loop returns one row to both corrected and predicted
-  list(corrected = matrix(corrected, ncol = n, dimnames = dnames),
-       predicted = matrix(predicted, ncol = n, dimnames = dnames))
+
+  corrected
 }
 
 #' Fit a cubic spline to correct drift
@@ -90,31 +86,31 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
                     " Zeroes will be replaced with 1.1."))
     full_data[full_data == 0] <- 1.1
   }
-  # Extract data and injection order for QC samples and the full dataset
-  features <- rownames(object)
-  qc_data <- full_data[, object$QC == "QC"]
-  qc_order <- object[, object$QC == "QC"]$Injection_order
-  full_order <- object$Injection_order
   
   # log-transform before fiting the cubic spline
   if (log_transform) {
-    qc_data <- log(qc_data)
     full_data <- log(full_data)
   }
-  # comb needs a matrix with the right amount of columns
-  n <- ncol(full_data)
+
   # Return both predicted values (for plotting) and drift corrected values
-  dc_data <- BiocParallel::bplapply(features, .calc_cubic_spline, full_data,
-                                    full_order, qc_data, n, qc_order,
-                                    log_transform, spar, spar_lower, spar_upper)
-  dc_data <- do.call(.comb, dc_data)
-  corrected <- dc_data$corrected
+  dc_data <- BiocParallel::bplapply(
+    as.data.frame(t(full_data)),
+    .calc_cubic_spline,
+    colData(object),
+    log_transform,
+    spar,
+    spar_lower,
+    spar_upper
+  )
+  corrected <- do.call(rbind, dc_data)
+  colnames(corrected) <- colnames(full_data)
   # Inverse the initial log transformation
   if (log_transform) {
     corrected <- exp(corrected)
   }
   assay(object, name) <- corrected
   # Recompute quality metrics
+  log_text("Recomputing quality metrics for drift corrected data")
   object <- assess_quality(object, assay.type = name)
   
   log_text(paste("Drift correction performed at", Sys.time()))
@@ -123,32 +119,33 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
 }
 
 
-.help_inspect_dc <- function(feature, orig_data, dc_data, qdiff,
-                             check_quality, condition) {
-  data <- orig_data[feature, ]
-  if (all(is.na(dc_data[feature, ]))) {
-    dc_note <- "Missing_QCS"
-  } else if (any(dc_data[feature, ] < 0, na.rm = TRUE)) {
-    dc_note <- "Negative_DC"
-  } else if (check_quality) {
-    pass <- paste0("qdiff[feature, ] |> dplyr::filter(", condition, 
-                   ") |> nrow() |> as.logical()") |>
+.help_inspect_dc <- function(dc, orig, check_quality, condition,
+                             assay.orig, assay.dc) {
+  orig_data <- assay(orig, assay.orig)
+  dc_data <- assay(dc, assay.dc)
+  features <- rownames(orig)
+  rowData(dc)$DC_note <- NA
+  missing_qcs <- apply(dc_data, 1, \(x) all(is.na(x)))
+  rowData(dc)$DC_note[missing_qcs] <- "Missing_QCS"
+  negative_dc <- apply(dc_data, 1, \(x) any(x < 0, na.rm = TRUE))
+  rowData(dc)$DC_note[negative_dc & !missing_qcs] <- "Negative_DC"
+  not_passing <- rep(FALSE, length(features))
+  if (check_quality){
+    qdiff <- quality(dc)[2:5] - quality(orig)[2:5] |> 
+      as.data.frame() |> 
+      t()
+    pass <- paste0("qdiff |> dplyr::filter(", condition, ")") |>
       parse(text = _) |>
-      eval()
-    if (!pass) {
-      dc_note <- "Low_quality"
-    } else {
-      data <- dc_data[feature, ]
-      dc_note <- "Drift_corrected"
-    }
-  } else {
-    data <- dc_data[feature, ]
-    dc_note <- "Drift_corrected"
+      eval() |>
+      rownames()
+    not_passing <- (features %in% !pass) & !(missing_qcs | negative_dc)
+    rowData(dc)$DC_note[not_passing] <- "Low_quality"
   }
-
-  list(data = matrix(data, nrow = 1, dimnames = list(feature, names(data))),
-       dc_notes = data.frame(Feature_ID = feature, DC_note = dc_note,
-                             stringsAsFactors = FALSE))
+  dc_passing <- !(missing_qcs | negative_dc | not_passing)
+  rowData(dc)$DC_note[dc_passing] <- "Drift_corrected"
+  #  Replace the features that did not pass with the original values
+  assay(dc, assay.dc)[!dc_passing, ] <- orig_data[!dc_passing, ]
+  dc
 }
 
 #' Flag the results of drift correction
@@ -197,33 +194,24 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
 inspect_dc <- function(orig, dc, check_quality,
                        condition = "RSD_r < 0 & D_ratio_r < 0",
                        assay.orig = NULL, assay.dc = NULL) {
+  log_text(paste("Inspecting drift correction results", Sys.time()))
   if (is.null(quality(orig))) {
+    log_text("Original quality metrics missing, recomputing")
     orig <- assess_quality(orig, assay.type = assay.orig)
   }
   if (is.null(quality(dc))) {
+    log_text("Drift corrected quality metrics missing, recomputing")
     dc <- assess_quality(dc, assay.type = assay.dc)
   }
-
-  orig_data <- assay(orig, assay.orig)
-  dc_data <- assay(dc, assay.dc)
-  features <- rownames(orig)
-  qdiff <- quality(dc)[2:5] - quality(orig)[2:5]
-
-  log_text(paste("Inspecting drift correction results", Sys.time()))
-
-  inspected <- BiocParallel::bplapply(features, .help_inspect_dc, orig_data,
-                                      dc_data, qdiff, check_quality, condition)
   
-  inspected <- do.call(.comb, inspected)
-
-  assay(dc, assay.dc) <- inspected$data
+  dc <- .help_inspect_dc(dc, orig, check_quality, condition,
+                         assay.orig, assay.dc)
   dc <- assess_quality(dc, assay.type = assay.dc)
-  dc <- join_rowData(dc, inspected$dc_notes)
 
   log_text(paste("Drift correction results inspected at", Sys.time()))
 
   # Log information
-  dc_note <- inspected$dc_notes$DC_note
+  dc_note <- rowData(dc)$DC_note
   note_counts <- table(dc_note) |> unname()
   note_percentage <- note_counts / sum(note_counts)
   note_percentage <- scales::percent(as.numeric(note_percentage))
