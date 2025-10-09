@@ -78,7 +78,7 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
                             spar_lower = 0.5, spar_upper = 1.5, 
                             assay.type = NULL, name = NULL) {
   # Start log
-  log_text(paste("\nStarting drift correction at", Sys.time()))
+  log_text("Starting drift correction")
   # Zero values do not behave correctly
   full_data <- assay(object, assay.type)
   if (sum(full_data == 0, na.rm = TRUE)) {
@@ -113,7 +113,7 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
   log_text("Recomputing quality metrics for drift corrected data")
   object <- assess_quality(object, assay.type = name)
   
-  log_text(paste("Drift correction performed at", Sys.time()))
+  log_text("Drift correction performed")
 
   object
 }
@@ -197,7 +197,7 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
 inspect_dc <- function(orig, dc, check_quality,
                        condition = "RSD_r < 0 & D_ratio_r < 0",
                        assay.orig = NULL, assay.dc = NULL) {
-  log_text(paste("Inspecting drift correction results", Sys.time()))
+  log_text("Inspecting drift correction results")
   if (is.null(quality(orig))) {
     log_text("Original quality metrics missing, recomputing")
     orig <- assess_quality(orig, assay.type = assay.orig)
@@ -217,7 +217,7 @@ inspect_dc <- function(orig, dc, check_quality,
   note_percentage <- scales::percent(as.numeric(note_percentage))
   note_labels <- table(dc_note) |> names()
   report <- paste(note_labels, note_percentage, sep = ": ", collapse = ",  ")
-  log_text(paste0("\nDrift correction results inspected, report:\n", report))
+  log_text(paste0("Drift correction results inspected: ", report))
 
   dc
 }
