@@ -145,6 +145,9 @@ dc_cubic_spline <- function(object, log_transform = TRUE, spar = NULL,
   rowData(dc)$DC_note[dc_passing] <- "Drift_corrected"
   #  Replace the features that did not pass with the original values
   assay(dc, assay.dc)[!dc_passing, ] <- orig_data[!dc_passing, ]
+  quality_cols <- c("RSD", "RSD_r", "D_ratio", "D_ratio_r")
+  rowData(dc)[!dc_passing, quality_cols] <-
+    rowData(orig)[!dc_passing, quality_cols]
   dc
 }
 
@@ -206,9 +209,6 @@ inspect_dc <- function(orig, dc, check_quality,
   
   dc <- .help_inspect_dc(dc, orig, check_quality, condition,
                          assay.orig, assay.dc)
-  dc <- assess_quality(dc, assay.type = assay.dc)
-
-  log_text(paste("Drift correction results inspected at", Sys.time()))
 
   # Log information
   dc_note <- rowData(dc)$DC_note
