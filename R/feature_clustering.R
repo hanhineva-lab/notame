@@ -260,7 +260,7 @@ pull_clusters <- function(data, features, name_col) {
 #' features$MPA <- sapply(data, finite_median)
 #' conn <- find_connections(data = data, features = features,
 #'   corr_thresh = 0.4, rt_window = 2,
-#'   name_col = "Feature_ID", mz_col = "Mass", rt_col = "RetentionTime")
+#'   name_col = "Feature_ID", mz_col = "Average_Mz", rt_col = "Average_Rt_min")
 #' clusters <- find_clusters(connections = conn, d_thresh = 0.6)
 #' features_clustered <- assign_cluster_id(data, clusters, features,
 #'   name_col = "Feature_ID")
