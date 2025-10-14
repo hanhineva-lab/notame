@@ -9,9 +9,9 @@ flag_contaminants(
   blank_col,
   blank_label,
   blank_type = c("median", "mean", "max"),
-  sample_type = c("median", "mean", "max"),
+  sample_type = c("max", "median", "mean"),
   flag_thresh = 20,
-  flag_label = "Contaminant.",
+  flag_label = "Contaminant",
   assay.type = NULL
 )
 }
@@ -24,12 +24,12 @@ object}
 
 \item{blank_label}{character, the label for blank samples in blank_col}
 
-\item{blank_type}{character, one of "median", "mean", or "max"}
+\item{blank_type}{character, one of "mean", "median", or "max"}
 
-\item{sample_type}{character, one of "median", "mean", or "max"}
+\item{sample_type}{character, one of "max", "median", or "mean"}
 
-\item{flag_thresh}{numeric, the ratio threshold for flagging contaminants.
-If the blank_type(blanks) * flag_thresh > sample_type(biological samples), the 
+\item{flag_thresh}{numeric, the scaled ratio threshold for flagging contaminants.
+If blank_type(blanks) * flag_thresh > sample_type(biological samples), the 
 feature gets flagged.}
 
 \item{flag_label}{character, the label used when flagging contaminants. Can 
@@ -43,17 +43,21 @@ A SummarizedExperiment object with contaminant features
 flagged.
 }
 \description{
-Flags contaminant features by comparing either median, mean or max of blanks and 
-biological samples. Biological samples are defined as samples that are not 
-marked as blanks and are not QCs. If the calculation(biological samples) < the 
-calculation(blanks) times a set ratio, the feature is flagged as contaminant.
+Flags contaminant features by comparing either median, mean or max of blanks 
+and biological samples. Biological samples are defined as samples that are 
+not marked as blanks and are not QCs.
+}
+\details{
+If the calculation(biological samples) < the calculation(blanks) times a set 
+ratio, the feature is flagged as contaminant. Default calculations are "max" 
+for biological samples and mean for blanks.
 }
 \examples{
 data(toy_notame_set)
 # Make a blank sample which has one (first) feature exceeding the threshold
 ## Abundance matrix
 med <- median(assay(toy_notame_set)[1, toy_notame_set$QC != "QC"])
-assay <- matrix(c(med * 0.05 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
+assay <- matrix(c(med * 0.08 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
                   dimnames = list(NULL, "Demo_51"))
 assay <- cbind(assay(toy_notame_set), assay)
 ## Sample metadata
@@ -72,9 +76,6 @@ ex_set <- SummarizedExperiment(assays = assay,
                                rowData = feature_data)
 # Flag contaminant(s)
 contaminants_flagged <- flag_contaminants(ex_set, blank_col = "QC", 
-                                          blank_label = "Blank",
-                                          blank_type = "mean",
-                                          sample_type = "max",
-                                          flag_thresh = 20)
+                                          blank_label = "Blank")
 
 }
