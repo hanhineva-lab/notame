@@ -45,7 +45,7 @@ that are based on the MATLAB code by David Broadhurst."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Cluster correlated features originating from the same metabolite</h1>
-      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/include-rworkflows/R/feature_clustering.R" class="external-link"><code>R/feature_clustering.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/mock_PR_brnch/R/feature_clustering.R" class="external-link"><code>R/feature_clustering.R</code></a></small>
       <div class="d-none name"><code>cluster_features.Rd</code></div>
     </div>
 
@@ -129,23 +129,23 @@ to feature data.</p>
 <span class="r-in"><span><span class="co"># The parameters are really weird because example data is imaginary</span></span></span>
 <span class="r-in"><span><span class="va">clustered</span> <span class="op">&lt;-</span> <span class="fu">cluster_features</span><span class="op">(</span><span class="va">toy_notame_set</span>, rt_window <span class="op">=</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>  corr_thresh <span class="op">=</span> <span class="fl">0.5</span>, d_thresh <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Starting feature clustering at 2025-10-14 12:29:25.570477</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Finding connections between features in HILIC_neg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Found 1 connections in HILIC_neg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Finding connections between features in HILIC_pos</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Found 4 connections in HILIC_pos</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Finding connections between features in RP_neg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Found 1 connections in RP_neg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Finding connections between features in RP_pos</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Found 2 connections in RP_pos</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Found 8 connections</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:51] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:51] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:51] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:51] </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Starting feature clustering at 2025-10-14 14:36:51.918038</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:51] Finding connections between features in HILIC_neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:51] Found 1 connections in HILIC_neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:51] Finding connections between features in HILIC_pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:51] Found 4 connections in HILIC_pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:51] Finding connections between features in RP_neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:51] Found 1 connections in RP_neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:51] Finding connections between features in RP_pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:51] Found 2 connections in RP_pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:51] Found 8 connections</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 5 components found</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 1 components found</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Found 5 clusters of 2 or more features, clustering finished at 2025-10-14 12:29:25.621926</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:51] Found 5 clusters of 2 or more features, clustering finished at 2025-10-14 14:36:51.966557</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -45,7 +45,7 @@ NOTE: running in parallel prevents user from setting a seed number.'></head><bod
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Impute missing values using random forest</h1>
-      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/include-rworkflows/R/transformations.R" class="external-link"><code>R/transformations.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/mock_PR_brnch/R/transformations.R" class="external-link"><code>R/transformations.R</code></a></small>
       <div class="d-none name"><code>impute_rf.Rd</code></div>
     </div>
 
@@ -108,10 +108,10 @@ and the parameters</p></div>
 <span class="r-in"><span><span class="va">missing</span> <span class="op">&lt;-</span> <span class="fu"><a href="mark_nas.html">mark_nas</a></span><span class="op">(</span><span class="va">toy_notame_set</span>, <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">38</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">imputed</span> <span class="op">&lt;-</span> <span class="fu">impute_rf</span><span class="op">(</span><span class="va">missing</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:32] </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Starting random forest imputation at 2025-10-14 12:29:32.93876</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:36] Out-of-bag error in random forest imputation: 0.467</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:36] Random forest imputation finished at 2025-10-14 12:29:36.556142 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:59] </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Starting random forest imputation at 2025-10-14 14:36:59.654919</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:37:03] Out-of-bag error in random forest imputation: 0.467</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:37:03] Random forest imputation finished at 2025-10-14 14:37:03.637701 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
