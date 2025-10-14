@@ -6,8 +6,8 @@
 .calc_cubic_spline <- function(feature, sample_data, log_transform, 
                                spar, spar_lower, spar_upper) {
   # Spline cannot be fitted if there are les than 4 QC values
-  qc_detected <- sample_data$QC == "QC"
-  if (sum(!is.na(feature[qc_detected])) < 4) {
+  qc_detected <- sample_data$QC == "QC" & !is.na(feature)
+  if (sum(qc_detected) < 4) {
     return(rep(NA, length(feature)))
   }
   # Spline regression on the QC samples
