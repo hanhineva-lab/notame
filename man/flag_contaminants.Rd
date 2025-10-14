@@ -10,7 +10,7 @@ flag_contaminants(
   blank_label,
   blank_type = c("mean", "median", "max"),
   sample_type = c("max", "median", "mean"),
-  flag_thresh = 20,
+  flag_thresh = 5,
   flag_label = "Contaminant",
   assay.type = NULL
 )

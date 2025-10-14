@@ -313,7 +313,7 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 flag_contaminants <- function(object, blank_col, blank_label,
                               blank_type = c("mean", "median", "max"),
                               sample_type = c("max", "median", "mean"),
-                              flag_thresh = 20, flag_label = "Contaminant",
+                              flag_thresh = 5, flag_label = "Contaminant",
                               assay.type = NULL) {
   blank_type <- tryCatch(
     match.arg(blank_type),
