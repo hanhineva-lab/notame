@@ -19,7 +19,7 @@ that are based on the MATLAB code by David Broadhurst."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">notame</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,7 +30,7 @@ that are based on the MATLAB code by David Broadhurst."></head><body>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">General introduction</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">Non-targeted metabolomics preprocessing and data wrangling</a></li>
     <li><a class="dropdown-item" href="../articles/project_example.html">Project example</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -45,7 +45,7 @@ that are based on the MATLAB code by David Broadhurst."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Cluster correlated features originating from the same metabolite</h1>
-      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/main/R/feature_clustering.R" class="external-link"><code>R/feature_clustering.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/include-rworkflows/R/feature_clustering.R" class="external-link"><code>R/feature_clustering.R</code></a></small>
       <div class="d-none name"><code>cluster_features.Rd</code></div>
     </div>
 
@@ -69,9 +69,6 @@ that are based on the MATLAB code by David Broadhurst.</p>
 <span>  rt_window <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="fl">60</span>,</span>
 <span>  corr_thresh <span class="op">=</span> <span class="fl">0.9</span>,</span>
 <span>  d_thresh <span class="op">=</span> <span class="fl">0.8</span>,</span>
-<span>  plotting <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  min_size_plotting <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>  prefix <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  assay.type <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -83,7 +80,7 @@ that are based on the MATLAB code by David Broadhurst.</p>
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
 <dd><p>a <code>
 <a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">SummarizedExperiment</a></code>
-or <code><a href="MetaboSet-class.html">MetaboSet</a></code> object</p></dd>
+object</p></dd>
 
 
 <dt id="arg-mz-col">mz_col<a class="anchor" aria-label="anchor" href="#arg-mz-col"></a></dt>
@@ -115,54 +112,40 @@ between features</p></dd>
 <dd><p>the threshold for the relative degree required by each node</p></dd>
 
 
-<dt id="arg-plotting">plotting<a class="anchor" aria-label="anchor" href="#arg-plotting"></a></dt>
-<dd><p>should plots be drawn for each cluster?</p></dd>
-
-
-<dt id="arg-min-size-plotting">min_size_plotting<a class="anchor" aria-label="anchor" href="#arg-min-size-plotting"></a></dt>
-<dd><p>the minimum number of features a cluster needs to
-have to be plotted</p></dd>
-
-
-<dt id="arg-prefix">prefix<a class="anchor" aria-label="anchor" href="#arg-prefix"></a></dt>
-<dd><p>the prefix to the files to be plotted</p></dd>
-
-
 <dt id="arg-assay-type">assay.type<a class="anchor" aria-label="anchor" href="#arg-assay-type"></a></dt>
 <dd><p>character, assay to be used in case of multiple assays</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>a SummarizedExperiment or MetaboSet object, with median peak area
+    <p>a SummarizedExperiment object, with median peak area
 (MPA), the cluster ID, the features in the cluster, and cluster size added
 to feature data.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_set</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_notame_set</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># The parameters are really weird because example data is imaginary</span></span></span>
-<span class="r-in"><span><span class="va">clustered</span> <span class="op">&lt;-</span> <span class="fu">cluster_features</span><span class="op">(</span><span class="va">example_set</span>, rt_window <span class="op">=</span> <span class="fl">1</span>, corr_thresh <span class="op">=</span> <span class="fl">0.5</span>, </span></span>
-<span class="r-in"><span>  d_thresh <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:26] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:26] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:26] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:26] </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Starting feature clustering at 2025-06-23 22:36:26.484164</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:26] Finding connections between features in HILIC_neg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:26] Found 1 connections in HILIC_neg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:26] Finding connections between features in HILIC_pos</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:26] Found 4 connections in HILIC_pos</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:26] Finding connections between features in RP_neg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:26] Found 1 connections in RP_neg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:26] Finding connections between features in RP_pos</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:26] Found 2 connections in RP_pos</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:26] Found 8 connections</span>
+<span class="r-in"><span><span class="va">clustered</span> <span class="op">&lt;-</span> <span class="fu">cluster_features</span><span class="op">(</span><span class="va">toy_notame_set</span>, rt_window <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  corr_thresh <span class="op">=</span> <span class="fl">0.5</span>, d_thresh <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Starting feature clustering at 2025-10-14 12:29:25.570477</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Finding connections between features in HILIC_neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Found 1 connections in HILIC_neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Finding connections between features in HILIC_pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Found 4 connections in HILIC_pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Finding connections between features in RP_neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Found 1 connections in RP_neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Finding connections between features in RP_pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Found 2 connections in RP_pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Found 8 connections</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 5 components found</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 1 components found</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:26] Found 5 clusters of 2 or more features, clustering finished at 2025-06-23 22:36:26.968162</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:27] Saved cluster plots to: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:25] Found 5 clusters of 2 or more features, clustering finished at 2025-10-14 12:29:25.621926</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -9,7 +9,7 @@ Only features that do not have a flag (Flag == NA) are retained."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">notame</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,7 +20,7 @@ Only features that do not have a flag (Flag == NA) are retained."></head><body>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">General introduction</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">Non-targeted metabolomics preprocessing and data wrangling</a></li>
     <li><a class="dropdown-item" href="../articles/project_example.html">Project example</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -35,7 +35,7 @@ Only features that do not have a flag (Flag == NA) are retained."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Drop flagged features</h1>
-      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/main/R/transformations.R" class="external-link"><code>R/transformations.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/include-rworkflows/R/transformations.R" class="external-link"><code>R/transformations.R</code></a></small>
       <div class="d-none name"><code>drop_flagged.Rd</code></div>
     </div>
 
@@ -46,13 +46,7 @@ Only features that do not have a flag (Flag == NA) are retained.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">drop_flagged</span><span class="op">(</span><span class="va">object</span>, all_features <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S4 method for class 'MetaboSet'</span></span>
-<span><span class="fu">drop_flagged</span><span class="op">(</span><span class="va">object</span>, all_features <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S4 method for class 'SummarizedExperiment'</span></span>
-<span><span class="fu">drop_flagged</span><span class="op">(</span><span class="va">object</span>, all_features <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">drop_flagged</span><span class="op">(</span><span class="va">object</span>, all_features <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -62,7 +56,7 @@ Only features that do not have a flag (Flag == NA) are retained.</p>
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
 <dd><p>a <code>
 <a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">SummarizedExperiment</a></code>
-or <code><a href="MetaboSet-class.html">MetaboSet</a></code> object</p></dd>
+object</p></dd>
 
 
 <dt id="arg-all-features">all_features<a class="anchor" aria-label="anchor" href="#arg-all-features"></a></dt>
@@ -72,17 +66,17 @@ internal functions</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A SummarizedExperiment or MetaboSet object without the previously
+    <p>A SummarizedExperiment object without the previously
 flagged features.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_set</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">example_set</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_notame_set</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">toy_notame_set</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 80 50</span>
-<span class="r-in"><span><span class="va">flagged</span> <span class="op">&lt;-</span> <span class="fu"><a href="flag_quality.html">flag_quality</a></span><span class="op">(</span><span class="va">example_set</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:32] </span>
+<span class="r-in"><span><span class="va">flagged</span> <span class="op">&lt;-</span> <span class="fu"><a href="flag_quality.html">flag_quality</a></span><span class="op">(</span><span class="va">toy_notame_set</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:29] </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 92% of features flagged for low quality</span>
 <span class="r-in"><span><span class="va">noflags</span> <span class="op">&lt;-</span> <span class="fu">drop_flagged</span><span class="op">(</span><span class="va">flagged</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">noflags</span><span class="op">)</span></span></span>

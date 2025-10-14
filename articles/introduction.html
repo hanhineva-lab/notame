@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>General introduction • notame</title>
+<title>Non-targeted metabolomics preprocessing and data wrangling • notame</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="General introduction">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Non-targeted metabolomics preprocessing and data wrangling">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">notame</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,7 +33,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/introduction.html">General introduction</a></li>
+<li><a class="dropdown-item" href="../articles/introduction.html">Non-targeted metabolomics preprocessing and data wrangling</a></li>
     <li><a class="dropdown-item" href="../articles/project_example.html">Project example</a></li>
   </ul>
 </li>
@@ -56,13 +56,13 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>General introduction</h1>
+      <h1>Non-targeted metabolomics preprocessing and data wrangling</h1>
                         <h4 data-toc-skip class="author">Anton Klåvus,
 Vilhelm Suksi</h4>
             
-            <h4 data-toc-skip class="date">2025-06-23</h4>
+            <h4 data-toc-skip class="date">2025-10-14</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/main/vignettes/introduction.Rmd" class="external-link"><code>vignettes/introduction.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/include-rworkflows/vignettes/introduction.Rmd" class="external-link"><code>vignettes/introduction.Rmd</code></a></small>
       <div class="d-none name"><code>introduction.Rmd</code></div>
     </div>
 
@@ -76,139 +76,261 @@ central dogma of biology, metabolomics provides the closest link to many
 phenotypes of interest. This makes metabolomics research promising in
 teasing apart the complexities of living systems, attracting many new
 practitioners.</p>
-<p>The <em>notame</em> R package was developed in parallel with an
-associated protocol article as a general guideline for data analysis in
-untargeted metabolomics studies <span class="citation">(Klåvus et al.
-2020)</span>. The main outcome is identifying interesting features for
-laborious downstream steps relating to biological context, such as
-metabolite identification and pathway analysis, which fall outside the
-purview of <em>notame</em>. Bioconductor packages with complementary
-functionality in Bioconductor include pmp, phenomis and qmtools;
-<em>notame</em> brings partially overlapping and new functionality to
-the table. There are also Bioconductor packages for preprocessing,
-metabolite identification and pathway analysis. Together,
-<em>notame</em>, Bioconductor’s dependency management and other
-Bioconductor functionality allow for quality, reproducible metabolomics
-research.</p>
+<p>The notame R package was developed in parallel with a protocol
+article as a general guideline for data analysis in untargeted
+metabolomics studies <span class="citation">(<span class="nocase">Klåvus
+et al.</span> 2020)</span>. The notame package was split into notame,
+notameViz and notameStats for Bioconductor. The primary goal is
+identifying quality, interesting features for laborious downstream steps
+relating to biological context, such as metabolite identification and
+pathway analysis. Bioconductor packages with complementary functionality
+in Bioconductor include pmp, phenomis and qmtools; notame packages
+brings partially overlapping and new functionality to the table. There
+are also Bioconductor packages for preprocessing, metabolite
+identification and pathway analysis. Together, notame, Bioconductor’s
+dependency management and other Bioconductor functionality allow for
+quality, reproducible metabolomics research. Please see the <a href="https://%20hanhineva-lab.github.io/notame/" class="external-link">notame website</a> and
+protocol article for more information <span class="citation">(<span class="nocase">Klåvus et al.</span> 2020)</span>.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>To install <em>notame</em>, install BiocManager first, if it is not
-installed. Afterwards use the install function from BiocManager.</p>
+<p>To install notame, install BiocManager first, if it is not installed.
+Afterwards use the install function from BiocManager.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
 <span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"notame"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hanhineva-lab/notame" class="external-link">notame</a></span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
-</h2>
-<p>SummarizedExperiment is the primary data structure of this package,
-but MetaboSet is still supported for old users’ preference. One can use
-a single peak table throughout the analysis as with MetaboSet and also
-use multiple peak tables with SummarizedExperiment, using the
-<code>assay.type</code> and <code>name</code> arguments.</p>
-<p>The functionality of <em>notame</em> can be broadly divided into
-tabular data preprocessing and feature selection, excluding sample
-preprocessing and functionality related to biological context (Figure
-1). Tabular data processing involves reducing unwanted variation and
-data preparation dependent on downstream methods. The many
-visualizations used for inspecting the process also serve as exploratory
-data analysis. Feature selection aims to select a subset of interesting
-features across study groups before laborious steps relating to
-biological context. Please see the documentation for an overview of
-functionality (?notame), the Project Example vignette for usage and the
-associated protocol article for more information <span class="citation">(Klåvus et al. 2020)</span>.</p>
-<div class="figure">
-<img src="Overview.png" alt="Overview of untargeted LC-MS metabolomics data analysis." width="372"><p class="caption">
-Overview of untargeted LC-MS metabolomics data analysis.
-</p>
+<div class="section level3">
+<h3 id="drift-correction">Drift correction<a class="anchor" aria-label="anchor" href="#drift-correction"></a>
+</h3>
+<p>Untargeted LC-MS metabolomics data usually suffers from signal
+intensity drift, i.e. systematic variation in the signal intensity as a
+function of injection order. Features of a dataset often have very
+different drift patterns. This means that to correct for the drift, we
+need a tool that can adapt to different drift patterns.</p>
+<p>The approach used in this package models the drift separately for
+each feature, using pooled QC samples and cubic spline regression. The
+smoothing parameter controls the “wiggliness” of the function: the
+larger the smoothing parameter, the closer the spline is to a linear
+function. By default, the smoothing parameter is chosen automatically
+using cross validation, and can vary between 0.5 and 1.5, where 1.5 is
+large enough to guarantee that the curve is practically linear. This
+interval seems to work well in practice.</p>
+<p>We run the drift correction on log-transformed data. Log-transformed
+data follows the assumptions of the drift function model better, and
+avoids some practical issues. The corrected feature abundance for a
+sample with injection order
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+is then computed using the following formula:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mrow><mi>c</mi><mi>o</mi><mi>r</mi><mi>r</mi><mi>e</mi><mi>c</mi><mi>t</mi><mi>e</mi><mi>d</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>x</mi><mrow><mi>o</mi><mi>r</mi><mi>i</mi><mi>g</mi><mi>i</mi><mi>n</mi><mi>a</mi><mi>l</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mover><mi>x</mi><mo accent="true">¯</mo></mover><mrow><mi>Q</mi><mi>C</mi></mrow></msub><mo>−</mo><msub><mi>f</mi><mrow><mi>d</mi><mi>r</mi><mi>i</mi><mi>f</mi><mi>t</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">x_{corrected}(i) = x_{original}(i) + \overline{x}_{QC} - f_{drift}(i)</annotation></semantics></math></p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hanhineva-lab/notame" class="external-link">notame</a></span><span class="op">)</span></span>
+<span><span class="co">## Loading required package: ggplot2</span></span>
+<span><span class="co">## Loading required package: SummarizedExperiment</span></span>
+<span><span class="co">## Loading required package: MatrixGenerics</span></span>
+<span><span class="co">## Loading required package: matrixStats</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Attaching package: 'MatrixGenerics'</span></span>
+<span><span class="co">## The following objects are masked from 'package:matrixStats':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,</span></span>
+<span><span class="co">##     colCounts, colCummaxs, colCummins, colCumprods, colCumsums,</span></span>
+<span><span class="co">##     colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,</span></span>
+<span><span class="co">##     colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,</span></span>
+<span><span class="co">##     colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,</span></span>
+<span><span class="co">##     colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,</span></span>
+<span><span class="co">##     colWeightedMeans, colWeightedMedians, colWeightedSds,</span></span>
+<span><span class="co">##     colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,</span></span>
+<span><span class="co">##     rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,</span></span>
+<span><span class="co">##     rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,</span></span>
+<span><span class="co">##     rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,</span></span>
+<span><span class="co">##     rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,</span></span>
+<span><span class="co">##     rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,</span></span>
+<span><span class="co">##     rowWeightedMads, rowWeightedMeans, rowWeightedMedians,</span></span>
+<span><span class="co">##     rowWeightedSds, rowWeightedVars</span></span>
+<span><span class="co">## Loading required package: GenomicRanges</span></span>
+<span><span class="co">## Loading required package: stats4</span></span>
+<span><span class="co">## Loading required package: BiocGenerics</span></span>
+<span><span class="co">## Loading required package: generics</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Attaching package: 'generics'</span></span>
+<span><span class="co">## The following objects are masked from 'package:base':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     as.difftime, as.factor, as.ordered, intersect, is.element, setdiff,</span></span>
+<span><span class="co">##     setequal, union</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Attaching package: 'BiocGenerics'</span></span>
+<span><span class="co">## The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     IQR, mad, sd, var, xtabs</span></span>
+<span><span class="co">## The following objects are masked from 'package:base':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     anyDuplicated, aperm, append, as.data.frame, basename, cbind,</span></span>
+<span><span class="co">##     colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,</span></span>
+<span><span class="co">##     get, grep, grepl, is.unsorted, lapply, Map, mapply, match, mget,</span></span>
+<span><span class="co">##     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,</span></span>
+<span><span class="co">##     rbind, Reduce, rownames, sapply, saveRDS, table, tapply, unique,</span></span>
+<span><span class="co">##     unsplit, which.max, which.min</span></span>
+<span><span class="co">## Loading required package: S4Vectors</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Attaching package: 'S4Vectors'</span></span>
+<span><span class="co">## The following object is masked from 'package:utils':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     findMatches</span></span>
+<span><span class="co">## The following objects are masked from 'package:base':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     expand.grid, I, unname</span></span>
+<span><span class="co">## Loading required package: IRanges</span></span>
+<span><span class="co">## Loading required package: Seqinfo</span></span>
+<span><span class="co">## Loading required package: Biobase</span></span>
+<span><span class="co">## Welcome to Bioconductor</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     Vignettes contain introductory material; view with</span></span>
+<span><span class="co">##     'browseVignettes()'. To cite Bioconductor, see</span></span>
+<span><span class="co">##     'citation("Biobase")', and for packages 'citation("pkgname")'.</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Attaching package: 'Biobase'</span></span>
+<span><span class="co">## The following object is masked from 'package:MatrixGenerics':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     rowMedians</span></span>
+<span><span class="co">## The following objects are masked from 'package:matrixStats':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     anyMissing, rowMedians</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_notame_set</span>, package <span class="op">=</span> <span class="st">"notame"</span><span class="op">)</span></span>
+<span><span class="va">se</span> <span class="op">&lt;-</span> <span class="va">toy_notame_set</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assays</a></span><span class="op">(</span><span class="va">se</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"rawbundances"</span></span>
+<span><span class="co"># Mark missing values as NA</span></span>
+<span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mark_nas.html">mark_nas</a></span><span class="op">(</span><span class="va">se</span>, value <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="co"># Correct drift</span></span>
+<span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/correct_drift.html">correct_drift</a></span><span class="op">(</span><span class="va">se</span>, name <span class="op">=</span> <span class="st">"dc"</span><span class="op">)</span></span>
+<span><span class="co">## INFO [2025-10-14 12:29:54] Starting drift correction</span></span>
+<span><span class="co">## INFO [2025-10-14 12:29:56] Recomputing quality metrics for drift corrected data</span></span>
+<span><span class="co">## INFO [2025-10-14 12:29:56] Drift correction performed</span></span>
+<span><span class="co">## INFO [2025-10-14 12:29:56] Inspecting drift correction results</span></span>
+<span><span class="co">## INFO [2025-10-14 12:29:56] Original quality metrics missing, recomputing</span></span>
+<span><span class="co">## INFO [2025-10-14 12:29:56] Drift correction results inspected: Drift_corrected: 100%</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="input">Input<a class="anchor" aria-label="anchor" href="#input"></a>
+<h3 id="flagging-low-quality-compounds">Flagging low quality compounds<a class="anchor" aria-label="anchor" href="#flagging-low-quality-compounds"></a>
 </h3>
-<p>Data can be read with <code><a href="../reference/read_from_excel.html">read_from_excel()</a></code>, which includes
-checks and preparation of metadata. To accommodate typical output from
-peak-picking software such as Agilent’s MassHunter or MS-DIAL, the
-output is transformed into a spreadsheet for
-<code><a href="../reference/read_from_excel.html">read_from_excel()</a></code>. Alternatively, data in R can be wrangled
-and passed to the <code><a href="../reference/construct_metabosets.html">construct_metabosets()</a></code> or
-<code><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">SummarizedExperiment()</a></code> constructor.</p>
-<div class="figure">
-<img src="Data_input.png" alt="Structure of spreadsheet for read_from_excel()." width="640"><p class="caption">
-Structure of spreadsheet for read_from_excel().
-</p>
-</div>
-<p>There are a few obligatory fields for <code><a href="../reference/read_from_excel.html">read_from_excel()</a></code>,
-including “Injection_order” in sample information, “Mass” or “Average
-mz” in feature data and “Retention time”, “RetentionTime”, “Average
-rt(min)” or “rt” in feature information (not case sensitive). There are
-further optional fields, including “Sample_ID” and “QC” in sample data
-as well as “Feature_ID” in feature data, which are automatically
-generated if unavailable. One or more fields in feature data can be used
-to split the data into parts, usually LC column x ionization mode,
-supplied as arguments to the <code>split_by</code> parameter. If the
-file only contains one mode, specify the name of the mode,
-e.g. “HILIC_pos” to the <code>name</code> parameter.</p>
+<p>LC-MS metabolomics datasets contain a significant number of
+low-quality features. We use three established quality metrics based on
+pooled QC samples to flag those features: detection rate, relative
+standard deviation and dispersion ratio<span class="citation">(Broadhurst et al. 2018)</span>. We are using the
+robust versions of relative standard deviation and dispersion ratio as
+they are less affected by a single outlying QC and since the original
+RSD works best if the data is normally distributed, which is often not
+the case with our data. In addition, one can use
+<code><a href="../reference/flag_contaminants.html">flag_contaminants()</a></code> to, well, flag contaminants.</p>
+<p>By default, we use a slightly more lenient detection threshold, 0.5.
+The recommended limits for RSD and D-ratio are 0.2 and 0.4,
+respectively. Since we are using the robust alternatives, we have added
+an additional condition: signals with classic RSD, RSD* and basic
+D-ratio all below 0.1 are kept. This additional condition prevents the
+removal of signals with very low values in all but a few samples. These
+signals tend to have a very high value of D- ratio*, since the median
+absolute deviation of the biological samples is not affected by the
+large concentration in a handful of samples, causing the D- ratio* to
+overestimate the significance of random errors in measurements of QC
+samples. Thus, other quality metrics are applied, with a conservative
+limit of 0.1 to ensure that only good quality signals are kept this
+way.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flag_detection.html">flag_detection</a></span><span class="op">(</span><span class="va">se</span>, assay.type <span class="op">=</span> <span class="st">"dc"</span><span class="op">)</span></span>
+<span><span class="co">## INFO [2025-10-14 12:29:56] </span></span>
+<span><span class="co">## 1% of features flagged for low detection rate</span></span>
+<span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flag_quality.html">flag_quality</a></span><span class="op">(</span><span class="va">se</span>, assay.type <span class="op">=</span> <span class="st">"dc"</span><span class="op">)</span></span>
+<span><span class="co">## INFO [2025-10-14 12:29:56] </span></span>
+<span><span class="co">## 71% of features flagged for low quality</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">se</span><span class="op">)</span><span class="op">$</span><span class="va">Flag</span><span class="op">)</span></span>
+<span><span class="co">## [1] NA            "Low_quality" "Low_quality" "Low_quality" "Low_quality"</span></span>
+<span><span class="co">## [6] "Low_quality"</span></span></code></pre></div>
+<p>Flagged features are not removed from the data, but the flag
+information is stored in the “Flag” column of <code>rowData(se)</code>.
+In notame, notameViz and notameStats packages, the flagged features are
+silently ignored in operations that involve muliple features at a time,
+including random forest imputation, PCA visualization and multivariate
+statistical models. For feature-wise statistics, the statistical model
+is fit for flagged features, but FDR correction is only done for
+non-flagged features. One can also set <code>all_features = TRUE</code>
+in these functions to include all features in the model.</p>
 </div>
 <div class="section level3">
-<h3 id="tabular-data-preprocessing">Tabular data preprocessing<a class="anchor" aria-label="anchor" href="#tabular-data-preprocessing"></a>
+<h3 id="imputation-of-missing-values">Imputation of missing values<a class="anchor" aria-label="anchor" href="#imputation-of-missing-values"></a>
 </h3>
-<p>The main functions return modified objects and are largely based on
-pooled QC samples <span class="citation">(Broadhurst et al.
-2018)</span>. Tabular data preprocessing is generally performed
-separately for each mode. The visualizations used to monitor tabular
-data preprocessing are saved to file by default, but can also be
-returned as ggplot objects. The <code><a href="../reference/visualizations.html">visualizations()</a></code> wrapper
-can be used for saving visualizations at different stages of
-processing.</p>
-</div>
-<div class="section level3">
-<h3 id="feature-selection">Feature selection<a class="anchor" aria-label="anchor" href="#feature-selection"></a>
-</h3>
-<p>Univariate statistics functions return a <code>data.frame</code>, to
-be manually filtered before inclusion into the feature data of the
-instance. Supervised learning functions return various data
-structures.</p>
-<p>Comprehensive results visualizations are returned as ggplot objects
-and can be saved to file using <code><a href="../reference/save_plot.html">save_plot()</a></code>. Interesting
-features can be inspected with feature-wise visualizations which are
-saved to file by default but can be returned as a list.</p>
+<p>LC-MS data often contain missing values. Note that even if some
+statistical methods state that they “can deal with missing values”, they
+sometimes just ignore samples or variables with at least one missing
+value, or impute the missing values before applying the actual
+method.</p>
+<p>There are many different imputation strategies out there. We have
+tested a bunch of them on our data and we concluded that random forest
+imputation works best for our data <span class="citation">(Kokla et al.
+2019)</span>. To be brief, the method predicts the missing part of the
+data by fitting a random forest on the observed part of the data <span class="citation">(Stekhoven and Bühlmann 2011)</span>. The downside of
+random forest imputation is that it is rather slow. Thus, we recommend
+running the imputation separately for each analysis mode if the dataset
+has more than 100 samples, or if there are lots of missing values.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2025</span><span class="op">)</span></span>
+<span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/impute_rf.html">impute_rf</a></span><span class="op">(</span><span class="va">se</span>, assay.type <span class="op">=</span> <span class="st">"dc"</span>, name <span class="op">=</span> <span class="st">"imputed"</span><span class="op">)</span></span>
+<span><span class="co">## INFO [2025-10-14 12:29:56] </span></span>
+<span><span class="co">## Starting random forest imputation at 2025-10-14 12:29:56.945265</span></span>
+<span><span class="co">## INFO [2025-10-14 12:29:57] Out-of-bag error in random forest imputation: 0.645</span></span>
+<span><span class="co">## INFO [2025-10-14 12:29:57] Random forest imputation finished at 2025-10-14 12:29:57.521828</span></span></code></pre></div>
+<p>Simple imputation strategies included in <code><a href="../reference/impute_simple.html">impute_simple()</a></code>
+are imputation by constant value, imputation by mean, median, minimum or
+half minimum value or by a small random value. Simple imputation
+strategies rely on the assumption that missingness is mostly caused by
+the fact that the metabolite concentration is below the detection
+limit.</p>
 </div>
 <div class="section level3">
 <h3 id="utilities">Utilities<a class="anchor" aria-label="anchor" href="#utilities"></a>
 </h3>
+<p>Data can be read with <code><a href="../reference/import_from_excel.html">import_from_excel()</a></code>, which
+includes checks and preparation of metadata. To accommodate typical
+output from peak-picking software such as Agilent’s MassHunter or
+MS-DIAL, the output is transformed into a spreadsheet for
+<code><a href="../reference/import_from_excel.html">import_from_excel()</a></code>. Alternatively, data in R can be
+wrangled and passed to the <code><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">SummarizedExperiment()</a></code>
+constructor.</p>
+<div class="figure">
+<img src="Data_input.png" alt="Structure of spreadsheet for import_from_excel()." width="640"><p class="caption">
+Structure of spreadsheet for import_from_excel().
+</p>
+</div>
 <p>General utilities include <code><a href="../reference/combined_data.html">combined_data()</a></code> for
 representing the instance in a <code>data.frame</code> suitable for
 plotting and various functions for data wrangling. For keeping track of
-the analysis, <em>notame</em> offers a logging system operated using
+the analysis, notame offers a logging system operated using
 <code><a href="../reference/init_log.html">init_log()</a></code>, <code><a href="../reference/log_text.html">log_text()</a></code> and
-<code><a href="../reference/finish_log.html">finish_log()</a></code>. <em>notame</em> also keeps track of all the
-external packages used, offering you references for each. To see and log
-a list of references, use <code><a href="../reference/citations.html">citations()</a></code>.</p>
+<code><a href="../reference/finish_log.html">finish_log()</a></code>. notame also keeps track of all the external
+packages used, offering you references for each. To see and log a list
+of references, use <code><a href="../reference/citations.html">citations()</a></code>.</p>
 <p>Parallellization is used in many feature-wise calculations and is
 provided by the BiocParallel package. BiocParallel defaults to a
 parallel backend. For small-scale testing on Windows, it can be quicker
 to use serial execution:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">BiocParallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocParallel/man/register.html" class="external-link">register</a></span><span class="op">(</span><span class="fu">BiocParallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocParallel/man/SerialParam-class.html" class="external-link">SerialParam</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="authors-acknowledgements">Authors &amp; Acknowledgements<a class="anchor" aria-label="anchor" href="#authors-acknowledgements"></a>
 </h2>
-<p>The first version of <em>notame</em> was written by Anton Klåvus for
-his master’s thesis in Bioinformatics at Aalto university (published
-under former name Anton Mattsson), while working for University of
-Eastern Finland and Afekta Technologies. The package is inspired by
-analysis scripts written by Jussi Paananen and Oskari Timonen. The
-algorithm for clustering molecular features originating from the same
-compound is based on MATLAB code written by David Broadhurst, Professor
-of Data Science &amp; Biostatistics in the School of Science, and
-director of the Centre for Integrative Metabolomics &amp; Computational
-Biology at the Edith Covan University.</p>
+<p>The first version of notame was written by Anton Klåvus for his
+master’s thesis in Bioinformatics at Aalto university (published under
+former name Anton Mattsson), while working for University of Eastern
+Finland and Afekta Technologies. The package is inspired by analysis
+scripts written by Jussi Paananen and Oskari Timonen. The algorithm for
+clustering molecular features originating from the same compound is
+based on MATLAB code written by David Broadhurst, Professor of Data
+Science &amp; Biostatistics in the School of Science, and director of
+the Centre for Integrative Metabolomics &amp; Computational Biology at
+the Edith Covan University.</p>
 <p>If you find any bugs or other things to fix, please submit an issue
 on GitHub! All contributions to the package are always welcome!</p>
 </div>
@@ -217,56 +339,87 @@ on GitHub! All contributions to the package are always welcome!</p>
 </h2>
 <pre><code><span><span class="co">## R version 4.5.1 (2025-06-13)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">## Running under: Ubuntu 24.04.2 LTS</span></span>
+<span><span class="co">## Running under: Ubuntu 24.04.3 LTS</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
 <span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
 <span><span class="co">## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## locale:</span></span>
-<span><span class="co">##  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
-<span><span class="co">##  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   </span></span>
-<span><span class="co">##  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          </span></span>
-<span><span class="co">## [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   </span></span>
+<span><span class="co">##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              </span></span>
+<span><span class="co">##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    </span></span>
+<span><span class="co">##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   </span></span>
+<span><span class="co">##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 </span></span>
+<span><span class="co">##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            </span></span>
+<span><span class="co">## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## time zone: UTC</span></span>
 <span><span class="co">## tzcode source: system (glibc)</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## attached base packages:</span></span>
-<span><span class="co">## [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
+<span><span class="co">## [1] stats4    stats     graphics  grDevices utils     datasets  methods  </span></span>
+<span><span class="co">## [8] base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">## [1] BiocStyle_2.36.0</span></span>
+<span><span class="co">##  [1] notame_0.99.7               SummarizedExperiment_1.39.2</span></span>
+<span><span class="co">##  [3] Biobase_2.69.1              GenomicRanges_1.61.5       </span></span>
+<span><span class="co">##  [5] Seqinfo_0.99.2              IRanges_2.43.5             </span></span>
+<span><span class="co">##  [7] S4Vectors_0.47.4            BiocGenerics_0.55.3        </span></span>
+<span><span class="co">##  [9] generics_0.1.4              MatrixGenerics_1.21.0      </span></span>
+<span><span class="co">## [11] matrixStats_1.5.0           ggplot2_4.0.0              </span></span>
+<span><span class="co">## [13] BiocStyle_2.37.1           </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##  [1] digest_0.6.37       desc_1.4.3          R6_2.6.1           </span></span>
-<span><span class="co">##  [4] bookdown_0.43       fastmap_1.2.0       xfun_0.52          </span></span>
-<span><span class="co">##  [7] cachem_1.1.0        knitr_1.50          htmltools_0.5.8.1  </span></span>
-<span><span class="co">## [10] png_0.1-8           rmarkdown_2.29      lifecycle_1.0.4    </span></span>
-<span><span class="co">## [13] cli_3.6.5           sass_0.4.10         pkgdown_2.1.3      </span></span>
-<span><span class="co">## [16] textshaping_1.0.1   jquerylib_0.1.4     systemfonts_1.2.3  </span></span>
-<span><span class="co">## [19] compiler_4.5.1      tools_4.5.1         ragg_1.4.0         </span></span>
-<span><span class="co">## [22] evaluate_1.0.4      bslib_0.9.0         yaml_2.3.10        </span></span>
-<span><span class="co">## [25] BiocManager_1.30.26 jsonlite_2.0.0      rlang_1.1.6        </span></span>
-<span><span class="co">## [28] fs_1.6.6            htmlwidgets_1.6.4</span></span></code></pre>
+<span><span class="co">##  [1] gtable_0.3.6         xfun_0.53            bslib_0.9.0         </span></span>
+<span><span class="co">##  [4] htmlwidgets_1.6.4    lattice_0.22-7       vctrs_0.6.5         </span></span>
+<span><span class="co">##  [7] tools_4.5.1          parallel_4.5.1       missForest_1.5      </span></span>
+<span><span class="co">## [10] tibble_3.3.0         pkgconfig_2.0.3      Matrix_1.7-4        </span></span>
+<span><span class="co">## [13] RColorBrewer_1.1-3   rngtools_1.5.2       S7_0.2.0            </span></span>
+<span><span class="co">## [16] desc_1.4.3           lifecycle_1.0.4      compiler_4.5.1      </span></span>
+<span><span class="co">## [19] farver_2.1.2         textshaping_1.0.3    codetools_0.2-20    </span></span>
+<span><span class="co">## [22] htmltools_0.5.8.1    sass_0.4.10          yaml_2.3.10         </span></span>
+<span><span class="co">## [25] pillar_1.11.1        pkgdown_2.1.3        crayon_1.5.3        </span></span>
+<span><span class="co">## [28] jquerylib_0.1.4      BiocParallel_1.43.4  cachem_1.1.0        </span></span>
+<span><span class="co">## [31] DelayedArray_0.35.3  doRNG_1.8.6.2        iterators_1.0.14    </span></span>
+<span><span class="co">## [34] foreach_1.5.2        abind_1.4-8          tidyselect_1.2.1    </span></span>
+<span><span class="co">## [37] digest_0.6.37        dplyr_1.1.4          bookdown_0.45       </span></span>
+<span><span class="co">## [40] fastmap_1.2.0        grid_4.5.1           cli_3.6.5           </span></span>
+<span><span class="co">## [43] SparseArray_1.9.1    magrittr_2.0.4       S4Arrays_1.9.1      </span></span>
+<span><span class="co">## [46] randomForest_4.7-1.2 withr_3.0.2          scales_1.4.0        </span></span>
+<span><span class="co">## [49] rmarkdown_2.30       lambda.r_1.2.4       XVector_0.49.1      </span></span>
+<span><span class="co">## [52] futile.logger_1.4.3  png_0.1-8            ragg_1.5.0          </span></span>
+<span><span class="co">## [55] evaluate_1.0.5       knitr_1.50           viridisLite_0.4.2   </span></span>
+<span><span class="co">## [58] itertools_0.1-3      rlang_1.1.6          futile.options_1.0.1</span></span>
+<span><span class="co">## [61] glue_1.8.0           BiocManager_1.30.26  formatR_1.14        </span></span>
+<span><span class="co">## [64] jsonlite_2.0.0       R6_2.6.1             systemfonts_1.3.1   </span></span>
+<span><span class="co">## [67] fs_1.6.6</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-qcguidelines" class="csl-entry">
-Broadhurst, David, Royston Goodacre, Stacey N Reinke, Julia Kuligowski,
-Ian D Wilson, Matthew R Lewis, and Warwick B Dunn. 2018.
+Broadhurst, David, Royston Goodacre, Stacey N Reinke, et al. 2018.
 <span>“Guidelines and Considerations for the Use of System Suitability
 and Quality Control Samples in Mass Spectrometry Assays Applied in
 Untargeted Clinical Metabolomic Studies.”</span> <em>Metabolomics</em>
 14: 1–17.
 </div>
 <div id="ref-notame" class="csl-entry">
-Klåvus, Anton, Marietta Kokla, Stefania Noerman, Ville M Koistinen,
-Marjo Tuomainen, Iman Zarei, Topi Meuronen, et al. 2020.
-<span>“<span>‘Notame’</span>: Workflow for Non-Targeted LC–MS Metabolic
-Profiling.”</span> <em>Metabolites</em> 10 (4): 135.
+<span class="nocase">Klåvus, Anton, Marietta Kokla, Stefania Noerman, et
+al.</span> 2020. <span>“<span>‘Notame’</span>: Workflow for Non-Targeted
+LC–MS Metabolic Profiling.”</span> <em>Metabolites</em> 10 (4): 135.
+</div>
+<div id="ref-kokla2019random" class="csl-entry">
+Kokla, Marietta, Jyrki Virtanen, Marjukka Kolehmainen, Jussi Paananen,
+and Kati Hanhineva. 2019. <span>“Random Forest-Based Imputation
+Outperforms Other Methods for Imputing LC-MS Metabolomics Data: A
+Comparative Study.”</span> <em>BMC Bioinformatics</em> 20 (1): 492.
+</div>
+<div id="ref-missForest" class="csl-entry">
+Stekhoven, Daniel J., and Peter Bühlmann. 2011.
+<span>“MissForest—Non-Parametric Missing Value Imputation for Mixed-Type
+Data.”</span> <em>Bioinformatics</em> 28 (1): 112–18. <a href="https://doi.org/10.1093/bioinformatics/btr597" class="external-link">https://doi.org/10.1093/bioinformatics/btr597</a>.
 </div>
 </div>
 </div>

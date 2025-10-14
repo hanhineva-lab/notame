@@ -9,7 +9,7 @@ overwrite the file. Also used internally by many functions in the package."></he
 
     <a class="navbar-brand me-2" href="../index.html">notame</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,7 +20,7 @@ overwrite the file. Also used internally by many functions in the package."></he
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">General introduction</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">Non-targeted metabolomics preprocessing and data wrangling</a></li>
     <li><a class="dropdown-item" href="../articles/project_example.html">Project example</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -35,7 +35,7 @@ overwrite the file. Also used internally by many functions in the package."></he
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Log text to the current log file</h1>
-      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/main/R/logging.R" class="external-link"><code>R/logging.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/include-rworkflows/R/logging.R" class="external-link"><code>R/logging.R</code></a></small>
       <div class="d-none name"><code>log_text.Rd</code></div>
     </div>
 
@@ -70,14 +70,14 @@ overwrite the file. Also used internally by many functions in the package.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">file_name</span> <span class="op">&lt;-</span> <span class="st">"log.txt"</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="init_log.html">init_log</a></span><span class="op">(</span><span class="va">file_name</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:43] Starting logging</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:37] Starting logging</span>
 <span class="r-in"><span><span class="fu">log_text</span><span class="op">(</span><span class="st">"Hello World!"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-06-23 22:36:43] Hello World!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 12:29:37] Hello World!</span>
 <span class="r-in"><span><span class="co"># Print the contents of the file</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/scan.html" class="external-link">scan</a></span><span class="op">(</span><span class="va">file_name</span>, sep <span class="op">=</span> <span class="st">"\n"</span>, what <span class="op">=</span> <span class="st">"character"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "INFO [2025-06-23 22:36:42] Starting logging"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "INFO [2025-06-23 22:36:43] Starting logging"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "INFO [2025-06-23 22:36:43] Hello World!"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "INFO [2025-10-14 12:29:36] Starting logging"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "INFO [2025-10-14 12:29:37] Starting logging"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "INFO [2025-10-14 12:29:37] Hello World!"    </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

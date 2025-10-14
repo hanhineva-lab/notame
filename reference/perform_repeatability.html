@@ -13,7 +13,7 @@ variation between batches."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">notame</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,7 +24,7 @@ variation between batches."></head><body>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">General introduction</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">Non-targeted metabolomics preprocessing and data wrangling</a></li>
     <li><a class="dropdown-item" href="../articles/project_example.html">Project example</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -39,7 +39,7 @@ variation between batches."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Compute repeatability measures</h1>
-      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/main/R/batch_correction.R" class="external-link"><code>R/batch_correction.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/include-rworkflows/R/batch_correction.R" class="external-link"><code>R/batch_correction.R</code></a></small>
       <div class="d-none name"><code>perform_repeatability.Rd</code></div>
     </div>
 
@@ -62,7 +62,7 @@ variation between batches.</p>
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
 <dd><p>a <code>
 <a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">SummarizedExperiment</a></code>
-or <code><a href="MetaboSet-class.html">MetaboSet</a></code> object</p></dd>
+object</p></dd>
 
 
 <dt id="arg-group">group<a class="anchor" aria-label="anchor" href="#arg-group"></a></dt>
@@ -80,12 +80,12 @@ or <code><a href="MetaboSet-class.html">MetaboSet</a></code> object</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_set</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_notame_set</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Batch correction</span></span></span>
-<span class="r-in"><span><span class="va">replicates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">example_set</span><span class="op">$</span><span class="va">QC</span> <span class="op">==</span> <span class="st">"QC"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">batch_corrected</span> <span class="op">&lt;-</span> <span class="fu"><a href="ruvs_qc.html">ruvs_qc</a></span><span class="op">(</span><span class="va">example_set</span>, replicates <span class="op">=</span> <span class="va">replicates</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">replicates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">toy_notame_set</span><span class="op">$</span><span class="va">QC</span> <span class="op">==</span> <span class="st">"QC"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">batch_corrected</span> <span class="op">&lt;-</span> <span class="fu"><a href="ruvs_qc.html">ruvs_qc</a></span><span class="op">(</span><span class="va">toy_notame_set</span>, replicates <span class="op">=</span> <span class="va">replicates</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Evaluate batch correction</span></span></span>
-<span class="r-in"><span><span class="va">rep_orig</span> <span class="op">&lt;-</span> <span class="fu">perform_repeatability</span><span class="op">(</span><span class="va">example_set</span>, group <span class="op">=</span> <span class="st">"Group"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">rep_orig</span> <span class="op">&lt;-</span> <span class="fu">perform_repeatability</span><span class="op">(</span><span class="va">toy_notame_set</span>, group <span class="op">=</span> <span class="st">"Group"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">rep_orig</span><span class="op">$</span><span class="va">Repeatability</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.3658633</span>
 <span class="r-in"><span><span class="va">rep_corr</span> <span class="op">&lt;-</span> <span class="fu">perform_repeatability</span><span class="op">(</span><span class="va">batch_corrected</span>, group <span class="op">=</span> <span class="st">"Group"</span><span class="op">)</span></span></span>

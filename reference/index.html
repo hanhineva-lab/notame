@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">notame</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,7 +18,7 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">General introduction</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">Non-targeted metabolomics preprocessing and data wrangling</a></li>
     <li><a class="dropdown-item" href="../articles/project_example.html">Project example</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -138,18 +138,6 @@
         <dd>Compress clusters of features to a single feature</dd>
       </dl><dl><dt>
 
-          <code><a href="log.html">log(<i>&lt;MetaboSet&gt;</i>)</a></code> <code><a href="log.html">log2(<i>&lt;MetaboSet&gt;</i>)</a></code> <code><a href="log.html">log10(<i>&lt;MetaboSet&gt;</i>)</a></code> <code><a href="log.html">log(<i>&lt;SummarizedExperiment&gt;</i>)</a></code> <code><a href="log.html">log2(<i>&lt;SummarizedExperiment&gt;</i>)</a></code> <code><a href="log.html">log10(<i>&lt;SummarizedExperiment&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Logarithm</dd>
-      </dl><dl><dt>
-
-          <code><a href="exponential.html">exponential()</a></code>
-
-        </dt>
-        <dd>Exponential function</dd>
-      </dl><dl><dt>
-
           <code><a href="pqn_normalization.html">pqn_normalization()</a></code>
 
         </dt>
@@ -160,12 +148,6 @@
 
         </dt>
         <dd>Inverse-rank normalization</dd>
-      </dl><dl><dt>
-
-          <code><a href="scale.html">scale(<i>&lt;MetaboSet&gt;</i>)</a></code> <code><a href="scale.html">scale(<i>&lt;SummarizedExperiment&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Scale peak table</dd>
       </dl></div><div class="section level2">
       <h2 id="preprocessing-visualizations">Preprocessing visualizations<a class="anchor" aria-label="anchor" href="#preprocessing-visualizations"></a></h2>
 
@@ -179,94 +161,106 @@
 
       <dl><dt>
 
-          <code><a href="visualizations.html">visualizations()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/save_QC_plots.html" class="external-link">save_QC_plots()</a></code>
 
         </dt>
-        <dd>Write all relevant preprocessing visualizations to pdf</dd>
+        <dd>Write all relevant pretreatment visualizations to pdf (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="plot_injection_lm.html">plot_injection_lm()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/plot_injection_lm.html" class="external-link">plot_injection_lm()</a></code>
 
         </dt>
-        <dd>Estimate the magnitude of drift</dd>
+        <dd>Estimate the magnitude of drift (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="plot_sample_boxplots.html">plot_sample_boxplots()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/plot_sample_boxplots.html" class="external-link">plot_sample_boxplots()</a></code>
 
         </dt>
-        <dd>Plot a boxplot for each sample</dd>
+        <dd>Plot a boxplot for each sample (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="plot_dist_density.html">plot_dist_density()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/plot_dist_density.html" class="external-link">plot_dist_density()</a></code>
 
         </dt>
-        <dd>Plot distance density</dd>
+        <dd>Plot distance density (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="plot_tsne.html">plot_tsne()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/plot_tsne.html" class="external-link">plot_tsne()</a></code>
 
         </dt>
-        <dd>t-SNE scatter plot</dd>
+        <dd>t-SNE scatter plot (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="plot_pca.html">plot_pca()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/plot_pca.html" class="external-link">plot_pca()</a></code>
 
         </dt>
-        <dd>PCA scatter plot</dd>
+        <dd>PCA scatter plot (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="plot_tsne_arrows.html">plot_tsne_arrows()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/plot_tsne_arrows.html" class="external-link">plot_tsne_arrows()</a></code>
 
         </dt>
-        <dd>t-SNE plot with arrows</dd>
+        <dd>t-SNE plot with arrows (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="plot_pca_arrows.html">plot_pca_arrows()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/plot_pca_arrows.html" class="external-link">plot_pca_arrows()</a></code>
 
         </dt>
-        <dd>PCA plot with arrows</dd>
+        <dd>PCA plot with arrows (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="plot_tsne_hexbin.html">plot_tsne_hexbin()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/plot_tsne_hexbin.html" class="external-link">plot_tsne_hexbin()</a></code>
 
         </dt>
-        <dd>t-SNE hexbin plot</dd>
+        <dd>t-SNE hexbin plot (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="plot_pca_hexbin.html">plot_pca_hexbin()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/plot_pca_hexbin.html" class="external-link">plot_pca_hexbin()</a></code>
 
         </dt>
-        <dd>PCA hexbin plot</dd>
+        <dd>PCA hexbin plot (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="plot_dendrogram.html">plot_dendrogram()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/plot_dendrogram.html" class="external-link">plot_dendrogram()</a></code>
 
         </dt>
-        <dd>Sample dendrogram</dd>
+        <dd>Sample dendrogram (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="plot_sample_heatmap.html">plot_sample_heatmap()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/plot_sample_heatmap.html" class="external-link">plot_sample_heatmap()</a></code>
 
         </dt>
-        <dd>Sample heatmap</dd>
+        <dd>Sample heatmap (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="plot_pca_loadings.html">plot_pca_loadings()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/plot_pca_loadings.html" class="external-link">plot_pca_loadings()</a></code>
 
         </dt>
-        <dd>PCA loadings plot</dd>
+        <dd>PCA loadings plot (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="plot_quality.html">plot_quality()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/plot_quality.html" class="external-link">plot_quality()</a></code>
 
         </dt>
-        <dd>Plot quality metrics</dd>
+        <dd>Plot quality metrics (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="save_batch_plots.html">save_batch_plots()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/save_batch_plots.html" class="external-link">save_batch_plots()</a></code>
 
         </dt>
-        <dd>Save batch correction plots</dd>
+        <dd>Save batch correction plots (from notameViz)</dd>
+      </dl><dl><dt>
+
+          <code><a href="https://rdrr.io/pkg/notameViz/man/save_dc_plots.html" class="external-link">save_dc_plots()</a></code>
+
+        </dt>
+        <dd>Save drift correction plots (from notameViz)</dd>
+      </dl><dl><dt>
+
+          <code><a href="https://rdrr.io/pkg/notameViz/man/visualize_clusters.html" class="external-link">visualize_clusters()</a></code>
+
+        </dt>
+        <dd>Visualize clusters of features (from notameViz)</dd>
       </dl></div><div class="section level2">
       <h2 id="feature-selection">Feature selection<a class="anchor" aria-label="anchor" href="#feature-selection"></a></h2>
 
@@ -286,97 +280,97 @@
 
       <dl><dt>
 
-          <code><a href="perform_lm.html">perform_lm()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/perform_lm.html" class="external-link">perform_lm()</a></code>
 
         </dt>
-        <dd>Linear models</dd>
+        <dd>Linear models (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="perform_logistic.html">perform_logistic()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/perform_logistic.html" class="external-link">perform_logistic()</a></code>
 
         </dt>
-        <dd>Logistic regression</dd>
+        <dd>Logistic regression (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="perform_lmer.html">perform_lmer()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/perform_lmer.html" class="external-link">perform_lmer()</a></code>
 
         </dt>
-        <dd>Linear mixed models</dd>
+        <dd>Linear mixed models (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="perform_oneway_anova.html">perform_oneway_anova()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/perform_oneway_anova.html" class="external-link">perform_oneway_anova()</a></code>
 
         </dt>
-        <dd>Welch's ANOVA and classic ANOVA</dd>
+        <dd>Welch's ANOVA and classic ANOVA (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="perform_lm_anova.html">perform_lm_anova()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/perform_lm_anova.html" class="external-link">perform_lm_anova()</a></code>
 
         </dt>
-        <dd>Linear models ANOVA table</dd>
+        <dd>Linear models ANOVA table (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="perform_t_test.html">perform_t_test()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/perform_t_test.html" class="external-link">perform_t_test()</a></code>
 
         </dt>
-        <dd>Pairwise and paired t-tests</dd>
+        <dd>Pairwise and paired t-tests (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="perform_kruskal_wallis.html">perform_kruskal_wallis()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/perform_kruskal_wallis.html" class="external-link">perform_kruskal_wallis()</a></code>
 
         </dt>
-        <dd>Kruskal-Wallis rank-sum test</dd>
+        <dd>Kruskal-Wallis rank-sum test (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="perform_non_parametric.html">perform_non_parametric()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/perform_non_parametric.html" class="external-link">perform_non_parametric()</a></code>
 
         </dt>
-        <dd>Pairwise and paired non-parametric tests</dd>
+        <dd>Pairwise and paired non-parametric tests (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="perform_correlation_tests.html">perform_correlation_tests()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/perform_correlation_tests.html" class="external-link">perform_correlation_tests()</a></code>
 
         </dt>
-        <dd>Correlation test</dd>
+        <dd>Correlation test (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="perform_auc.html">perform_auc()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/perform_auc.html" class="external-link">perform_auc()</a></code>
 
         </dt>
-        <dd>Area under curve</dd>
+        <dd>Area under curve (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="perform_homoscedasticity_tests.html">perform_homoscedasticity_tests()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/perform_homoscedasticity_tests.html" class="external-link">perform_homoscedasticity_tests()</a></code>
 
         </dt>
-        <dd>Test homoscedasticity</dd>
+        <dd>Test homoscedasticity (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="cohens_d.html">cohens_d()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/cohens_d.html" class="external-link">cohens_d()</a></code>
 
         </dt>
-        <dd>Cohen's D</dd>
+        <dd>Cohen's D (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="fold_change.html">fold_change()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/fold_change.html" class="external-link">fold_change()</a></code>
 
         </dt>
-        <dd>Fold change</dd>
+        <dd>Fold change (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="summary_statistics.html">summary_statistics()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/summary_statistics.html" class="external-link">summary_statistics()</a></code>
 
         </dt>
-        <dd>Summary statistics</dd>
+        <dd>Summary statistics (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="summarize_results.html">summarize_results()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/summarize_results.html" class="external-link">summarize_results()</a></code>
 
         </dt>
-        <dd>Statistics cleaning</dd>
+        <dd>Statistics cleaning (from notameStats)</dd>
       </dl></div><div class="section level2">
 
-      <h3 id="supervised-learning">Supervised learning<a class="anchor" aria-label="anchor" href="#supervised-learning"></a></h3>
+      <h3 id="multivariate-analysis">Multivariate analysis<a class="anchor" aria-label="anchor" href="#multivariate-analysis"></a></h3>
 
 
 
@@ -387,42 +381,48 @@
 
       <dl><dt>
 
-          <code><a href="muvr_analysis.html">muvr_analysis()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/fit_rf.html" class="external-link">fit_rf()</a></code>
 
         </dt>
-        <dd>Multivariate modelling with minimally biased variable selection (MUVR)</dd>
+        <dd>Fit Random Forest (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="pls.html">mixomics_pls()</a></code> <code><a href="pls.html">mixomics_pls_optimize()</a></code> <code><a href="pls.html">mixomics_spls_optimize()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/importance_rf.html" class="external-link">importance_rf()</a></code>
 
         </dt>
-        <dd>PLS</dd>
+        <dd>Feature importance in random forest (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="pls_da.html">mixomics_plsda()</a></code> <code><a href="pls_da.html">mixomics_plsda_optimize()</a></code> <code><a href="pls_da.html">mixomics_splsda_optimize()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/pls.html" class="external-link">mixomics_pls()</a></code> <code><a href="https://rdrr.io/pkg/notameStats/man/pls.html" class="external-link">mixomics_pls_optimize()</a></code> <code><a href="https://rdrr.io/pkg/notameStats/man/pls.html" class="external-link">mixomics_spls_optimize()</a></code>
 
         </dt>
-        <dd>PLS-DA</dd>
+        <dd>PLS (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="fit_rf.html">fit_rf()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/pls.html" class="external-link">mixomics_pls()</a></code> <code><a href="https://rdrr.io/pkg/notameStats/man/pls.html" class="external-link">mixomics_pls_optimize()</a></code> <code><a href="https://rdrr.io/pkg/notameStats/man/pls.html" class="external-link">mixomics_spls_optimize()</a></code>
 
         </dt>
-        <dd>Fit Random Forest</dd>
+        <dd>PLS (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="importance_rf.html">importance_rf()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/pls.html" class="external-link">mixomics_pls()</a></code> <code><a href="https://rdrr.io/pkg/notameStats/man/pls.html" class="external-link">mixomics_pls_optimize()</a></code> <code><a href="https://rdrr.io/pkg/notameStats/man/pls.html" class="external-link">mixomics_spls_optimize()</a></code>
 
         </dt>
-        <dd>Feature importance in random forest</dd>
+        <dd>PLS (from notameStats)</dd>
       </dl><dl><dt>
 
-          <code><a href="perform_permanova.html">perform_permanova()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameStats/man/pls_da.html" class="external-link">mixomics_plsda()</a></code> <code><a href="https://rdrr.io/pkg/notameStats/man/pls_da.html" class="external-link">mixomics_plsda_optimize()</a></code> <code><a href="https://rdrr.io/pkg/notameStats/man/pls_da.html" class="external-link">mixomics_splsda_optimize()</a></code>
 
         </dt>
-        <dd>PERMANOVA</dd>
+        <dd>PLS-DA (from notameStats)</dd>
+      </dl><dl><dt>
+
+          <code><a href="https://rdrr.io/pkg/notameStats/man/pls_da.html" class="external-link">mixomics_plsda()</a></code> <code><a href="https://rdrr.io/pkg/notameStats/man/pls_da.html" class="external-link">mixomics_plsda_optimize()</a></code> <code><a href="https://rdrr.io/pkg/notameStats/man/pls_da.html" class="external-link">mixomics_splsda_optimize()</a></code>
+
+        </dt>
+        <dd>PLS-DA (from notameStats)</dd>
       </dl></div><div class="section level2">
-      <h2 id="feature-wise-visualizations">Feature wise visualizations<a class="anchor" aria-label="anchor" href="#feature-wise-visualizations"></a></h2>
+      <h2 id="feature-wise-visualizations">Feature-wise visualizations<a class="anchor" aria-label="anchor" href="#feature-wise-visualizations"></a></h2>
 
 
 
@@ -434,34 +434,34 @@
 
       <dl><dt>
 
-          <code><a href="save_beeswarm_plots.html">save_beeswarm_plots()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/save_beeswarm_plots.html" class="external-link">save_beeswarm_plots()</a></code>
 
         </dt>
-        <dd>Save beeswarm plots of each feature by group</dd>
+        <dd>Save beeswarm plots of each feature by group (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="save_group_boxplots.html">save_group_boxplots()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/save_group_boxplots.html" class="external-link">save_group_boxplots()</a></code>
 
         </dt>
-        <dd>Save box plots of each feature by group</dd>
+        <dd>Save box plots of each feature by group (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="save_scatter_plots.html">save_scatter_plots()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/save_scatter_plots.html" class="external-link">save_scatter_plots()</a></code>
 
         </dt>
-        <dd>Save scatter plots of each feature against a set variable</dd>
+        <dd>Save scatter plots of each feature against a set variable (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="save_subject_line_plots.html">save_subject_line_plots()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/save_subject_line_plots.html" class="external-link">save_subject_line_plots()</a></code>
 
         </dt>
-        <dd>Save line plots with mean</dd>
+        <dd>Save line plots with mean (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="save_group_lineplots.html">save_group_lineplots()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/save_group_lineplots.html" class="external-link">save_group_lineplots()</a></code>
 
         </dt>
-        <dd>Save line plots with errorbars by group</dd>
+        <dd>Save line plots with errorbars by group (from notameViz)</dd>
       </dl></div><div class="section level2">
       <h2 id="results-visualizations">Results visualizations<a class="anchor" aria-label="anchor" href="#results-visualizations"></a></h2>
 
@@ -475,34 +475,34 @@
 
       <dl><dt>
 
-          <code><a href="plot_p_histogram.html">plot_p_histogram()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/plot_p_histogram.html" class="external-link">plot_p_histogram()</a></code>
 
         </dt>
-        <dd>Histogram of p-values</dd>
+        <dd>Histogram of p-values (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="volcano_plot.html">volcano_plot()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/volcano_plot.html" class="external-link">volcano_plot()</a></code>
 
         </dt>
-        <dd>Volcano plot</dd>
+        <dd>Volcano plot (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="manhattan_plot.html">manhattan_plot()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/manhattan_plot.html" class="external-link">manhattan_plot()</a></code>
 
         </dt>
-        <dd>Manhattan plot</dd>
+        <dd>Manhattan plot (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="mz_rt_plot.html">mz_rt_plot()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/mz_rt_plot.html" class="external-link">mz_rt_plot()</a></code>
 
         </dt>
-        <dd>Plot m/z vs retention time plot (cloud plot)</dd>
+        <dd>Plot m/z vs retention time plot (cloud plot) (from notameViz)</dd>
       </dl><dl><dt>
 
-          <code><a href="plot_effect_heatmap.html">plot_effect_heatmap()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/plot_effect_heatmap.html" class="external-link">plot_effect_heatmap()</a></code>
 
         </dt>
-        <dd>Heatmap of effects between variables, such as correlations</dd>
+        <dd>Heatmap of effects between variables, such as correlations (from notameViz)</dd>
       </dl></div><div class="section level2">
       <h2 id="object-utilities">Object utilities<a class="anchor" aria-label="anchor" href="#object-utilities"></a></h2>
 
@@ -516,40 +516,16 @@
 
       <dl><dt>
 
-          <code><a href="read_from_excel.html">read_from_excel()</a></code>
+          <code><a href="import_from_excel.html">import_from_excel()</a></code>
 
         </dt>
         <dd>Read formatted Excel files</dd>
-      </dl><dl><dt>
-
-          <code><a href="construct_metabosets.html">construct_metabosets()</a></code>
-
-        </dt>
-        <dd>Construct MetaboSet objects</dd>
       </dl><dl><dt>
 
           <code><a href="write_to_excel.html">write_to_excel()</a></code>
 
         </dt>
         <dd>Write results to Excel file</dd>
-      </dl><dl><dt>
-
-          <code><a href="group_col.html">group_col()</a></code> <code><a href="group_col.html">`group_col&lt;-`()</a></code>
-
-        </dt>
-        <dd>Get and set name of the special column for group labels</dd>
-      </dl><dl><dt>
-
-          <code><a href="time_col.html">time_col()</a></code> <code><a href="time_col.html">`time_col&lt;-`()</a></code>
-
-        </dt>
-        <dd>Get and set the name of the special column for time points</dd>
-      </dl><dl><dt>
-
-          <code><a href="subject_col.html">subject_col()</a></code> <code><a href="subject_col.html">`subject_col&lt;-`()</a></code>
-
-        </dt>
-        <dd>Get and set the name of special column for subject identifiers</dd>
       </dl><dl><dt>
 
           <code><a href="flag.html">flag()</a></code> <code><a href="flag.html">`flag&lt;-`()</a></code>
@@ -570,18 +546,6 @@
         <dd>Drop QC samples</dd>
       </dl><dl><dt>
 
-          <code><a href="join_fData.html">join_fData()</a></code>
-
-        </dt>
-        <dd>Join new columns to feature data</dd>
-      </dl><dl><dt>
-
-          <code><a href="join_pData.html">join_pData()</a></code>
-
-        </dt>
-        <dd>Join new columns to pheno data</dd>
-      </dl><dl><dt>
-
           <code><a href="join_rowData.html">join_rowData()</a></code>
 
         </dt>
@@ -600,13 +564,7 @@
         <dd>Retrieve both sample information and features</dd>
       </dl><dl><dt>
 
-          <code><a href="merge_metabosets.html">merge_metabosets()</a></code>
-
-        </dt>
-        <dd>Merge MetaboSet objects together</dd>
-      </dl><dl><dt>
-
-          <code><a href="merge_objects.html">merge_objects()</a></code>
+          <code><a href="merge_notame_sets.html">merge_notame_sets()</a></code>
 
         </dt>
         <dd>Merge SummarizedExperiment objects together</dd>
@@ -616,12 +574,6 @@
 
         </dt>
         <dd>Fix object for functioning of notame</dd>
-      </dl><dl><dt>
-
-          <code><a href="MetaboSet-class.html">combined_data(<i>&lt;MetaboSet&gt;</i>)</a></code> <code><a href="MetaboSet-class.html">group_col(<i>&lt;MetaboSet&gt;</i>)</a></code> <code><a href="MetaboSet-class.html">`group_col&lt;-`(<i>&lt;MetaboSet&gt;</i>)</a></code> <code><a href="MetaboSet-class.html">time_col(<i>&lt;MetaboSet&gt;</i>)</a></code> <code><a href="MetaboSet-class.html">`time_col&lt;-`(<i>&lt;MetaboSet&gt;</i>)</a></code> <code><a href="MetaboSet-class.html">subject_col(<i>&lt;MetaboSet&gt;</i>)</a></code> <code><a href="MetaboSet-class.html">`subject_col&lt;-`(<i>&lt;MetaboSet&gt;</i>)</a></code> <code><a href="MetaboSet-class.html">flag(<i>&lt;MetaboSet&gt;</i>)</a></code> <code><a href="MetaboSet-class.html">`flag&lt;-`(<i>&lt;MetaboSet&gt;</i>)</a></code> <code><a href="MetaboSet-class.html">join_fData(<i>&lt;MetaboSet&gt;</i>,<i>&lt;data.frame&gt;</i>)</a></code> <code><a href="MetaboSet-class.html">join_pData(<i>&lt;MetaboSet&gt;</i>,<i>&lt;data.frame&gt;</i>)</a></code>
-
-        </dt>
-        <dd>An S4 class used to represent LC-MS datasets</dd>
       </dl></div><div class="section level2">
       <h2 id="other-utilities">Other utilities<a class="anchor" aria-label="anchor" href="#other-utilities"></a></h2>
 
@@ -659,10 +611,10 @@
         <dd>Finish a log</dd>
       </dl><dl><dt>
 
-          <code><a href="save_plot.html">save_plot()</a></code>
+          <code><a href="https://rdrr.io/pkg/notameViz/man/save_plot.html" class="external-link">save_plot()</a></code>
 
         </dt>
-        <dd>Save plot to chosen format</dd>
+        <dd>Save plot to chosen format (from notameViz)</dd>
       </dl><dl><dt>
 
           <code><a href="fix_MSMS.html">fix_MSMS()</a></code>
@@ -682,7 +634,7 @@
 
       <dl><dt>
 
-          <code><a href="example_set.html">example_set</a></code> <code><a href="example_set.html">hilic_neg_sample</a></code> <code><a href="example_set.html">hilic_pos_sample</a></code> <code><a href="example_set.html">rp_neg_sample</a></code> <code><a href="example_set.html">rp_pos_sample</a></code>
+          <code><a href="toy_notame_set.html">toy_notame_set</a></code> <code><a href="toy_notame_set.html">hilic_neg_sample</a></code> <code><a href="toy_notame_set.html">hilic_pos_sample</a></code> <code><a href="toy_notame_set.html">rp_neg_sample</a></code> <code><a href="toy_notame_set.html">rp_pos_sample</a></code>
 
         </dt>
         <dd>Toy data set</dd>
