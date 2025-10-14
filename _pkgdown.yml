@@ -119,3 +119,7 @@ reference:
 - title: Package
 - contents: 
   - notame-package
+  
+- title: Deprecated functions
+- contents: []
+
