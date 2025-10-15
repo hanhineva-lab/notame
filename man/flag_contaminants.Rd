@@ -56,8 +56,8 @@ for biological samples and "mean" for blanks.
 data(toy_notame_set)
 # Make a blank sample which has one (first) feature exceeding the threshold
 ## Abundance matrix
-med <- median(assay(toy_notame_set)[1, toy_notame_set$QC != "QC"])
-assay <- matrix(c(med * 0.08 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
+max_sample <- max(assay(toy_notame_set)[1, toy_notame_set$QC != "QC"])
+assay <- matrix(c(max_sample * 0.20 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
                   dimnames = list(NULL, "Demo_51"))
 assay <- cbind(assay(toy_notame_set), assay)
 ## Sample metadata

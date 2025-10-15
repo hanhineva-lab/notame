@@ -268,7 +268,8 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' @param blank_label character, the label for blank samples in blank_col
 #' @param blank_type character, one of "mean", "median", or "max"
 #' @param sample_type character, one of "max", "median", or "mean"
-#' @param flag_thresh numeric, the scaled ratio threshold for flagging contaminants.
+#' @param flag_thresh numeric, the scaled ratio threshold for flagging 
+#' contaminants.
 #' If blank_type(blanks) * flag_thresh > sample_type(biological samples), the 
 #' feature gets flagged.
 #' @param flag_label character, the label used when flagging contaminants. Can 
@@ -287,8 +288,8 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' data(toy_notame_set)
 #' # Make a blank sample which has one (first) feature exceeding the threshold
 #' ## Abundance matrix
-#' med <- median(assay(toy_notame_set)[1, toy_notame_set$QC != "QC"])
-#' assay <- matrix(c(med * 0.08 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
+#' max_sample <- max(assay(toy_notame_set)[1, toy_notame_set$QC != "QC"])
+#' assay <- matrix(c(max_sample * 0.20 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
 #'                   dimnames = list(NULL, "Demo_51"))
 #' assay <- cbind(assay(toy_notame_set), assay)
 #' ## Sample metadata
@@ -317,11 +318,13 @@ flag_contaminants <- function(object, blank_col, blank_label,
                               assay.type = NULL) {
   blank_type <- tryCatch(
     match.arg(blank_type),
-    error = function(e) stop("Wrong contaminant calculation type selected", call. = FALSE)
+    error = function(e) stop("Wrong contaminant calculation type selected", 
+    call. = FALSE)
   )
   sample_type <- tryCatch(
     match.arg(sample_type),
-    error = function(e) stop("Wrong sample calculation type selected", call. = FALSE)
+    error = function(e) stop("Wrong sample calculation type selected", 
+    call. = FALSE)
   )
   
   from <- .get_from_name(object, assay.type)
