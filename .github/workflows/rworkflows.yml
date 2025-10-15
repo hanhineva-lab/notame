@@ -2,18 +2,16 @@ name: rworkflows
 "on":
   push:
     branches:
-    #  - master
-    #  - main
-    #  - devel
-    #  - RELEASE_**
-      - include-rworkflows
+      - master
+      - main
+      - devel
+      - RELEASE_**
   pull_request:
     branches:
-    #  - master
-    #  - main
-    #  - devel
-    #  - RELEASE_**
-      - include-rworkflows
+      - master
+      - main
+      - devel
+      - RELEASE_**
 jobs:
   rworkflows:
     permissions: write-all
