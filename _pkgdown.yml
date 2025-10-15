@@ -109,7 +109,6 @@ reference:
   - init_log
   - log_text
   - finish_log
-  - notameViz::save_plot
   - fix_MSMS
 
 - title: Datasets
@@ -119,3 +118,4 @@ reference:
 - title: Package
 - contents: 
   - notame-package
+
