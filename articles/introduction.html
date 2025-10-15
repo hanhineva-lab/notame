@@ -60,9 +60,9 @@
                         <h4 data-toc-skip class="author">Anton Klåvus,
 Vilhelm Suksi</h4>
             
-            <h4 data-toc-skip class="date">2025-10-14</h4>
+            <h4 data-toc-skip class="date">2025-10-15</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/mock_PR_brnch/vignettes/introduction.Rmd" class="external-link"><code>vignettes/introduction.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/include-rworkflows/vignettes/introduction.Rmd" class="external-link"><code>vignettes/introduction.Rmd</code></a></small>
       <div class="d-none name"><code>introduction.Rmd</code></div>
     </div>
 
@@ -205,12 +205,12 @@ is then computed using the following formula:
 <span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mark_nas.html">mark_nas</a></span><span class="op">(</span><span class="va">se</span>, value <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="co"># Correct drift</span></span>
 <span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/correct_drift.html">correct_drift</a></span><span class="op">(</span><span class="va">se</span>, name <span class="op">=</span> <span class="st">"dc"</span><span class="op">)</span></span>
-<span><span class="co">## INFO [2025-10-14 14:37:20] Starting drift correction</span></span>
-<span><span class="co">## INFO [2025-10-14 14:37:22] Recomputing quality metrics for drift corrected data</span></span>
-<span><span class="co">## INFO [2025-10-14 14:37:22] Drift correction performed</span></span>
-<span><span class="co">## INFO [2025-10-14 14:37:22] Inspecting drift correction results</span></span>
-<span><span class="co">## INFO [2025-10-14 14:37:22] Original quality metrics missing, recomputing</span></span>
-<span><span class="co">## INFO [2025-10-14 14:37:22] Drift correction results inspected: Drift_corrected: 100%</span></span></code></pre></div>
+<span><span class="co">## INFO [2025-10-15 07:26:28] Starting drift correction</span></span>
+<span><span class="co">## INFO [2025-10-15 07:26:30] Recomputing quality metrics for drift corrected data</span></span>
+<span><span class="co">## INFO [2025-10-15 07:26:30] Drift correction performed</span></span>
+<span><span class="co">## INFO [2025-10-15 07:26:30] Inspecting drift correction results</span></span>
+<span><span class="co">## INFO [2025-10-15 07:26:30] Original quality metrics missing, recomputing</span></span>
+<span><span class="co">## INFO [2025-10-15 07:26:30] Drift correction results inspected: Drift_corrected: 100%</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="flagging-low-quality-compounds">Flagging low quality compounds<a class="anchor" aria-label="anchor" href="#flagging-low-quality-compounds"></a>
@@ -239,10 +239,10 @@ limit of 0.1 to ensure that only good quality signals are kept this
 way.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flag_detection.html">flag_detection</a></span><span class="op">(</span><span class="va">se</span>, assay.type <span class="op">=</span> <span class="st">"dc"</span><span class="op">)</span></span>
-<span><span class="co">## INFO [2025-10-14 14:37:23] </span></span>
+<span><span class="co">## INFO [2025-10-15 07:26:30] </span></span>
 <span><span class="co">## 1% of features flagged for low detection rate</span></span>
 <span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flag_quality.html">flag_quality</a></span><span class="op">(</span><span class="va">se</span>, assay.type <span class="op">=</span> <span class="st">"dc"</span><span class="op">)</span></span>
-<span><span class="co">## INFO [2025-10-14 14:37:23] </span></span>
+<span><span class="co">## INFO [2025-10-15 07:26:30] </span></span>
 <span><span class="co">## 71% of features flagged for low quality</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">se</span><span class="op">)</span><span class="op">$</span><span class="va">Flag</span><span class="op">)</span></span>
 <span><span class="co">## [1] NA            "Low_quality" "Low_quality" "Low_quality" "Low_quality"</span></span>
@@ -276,10 +276,10 @@ has more than 100 samples, or if there are lots of missing values.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2025</span><span class="op">)</span></span>
 <span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/impute_rf.html">impute_rf</a></span><span class="op">(</span><span class="va">se</span>, assay.type <span class="op">=</span> <span class="st">"dc"</span>, name <span class="op">=</span> <span class="st">"imputed"</span><span class="op">)</span></span>
-<span><span class="co">## INFO [2025-10-14 14:37:23] </span></span>
-<span><span class="co">## Starting random forest imputation at 2025-10-14 14:37:23.242347</span></span>
-<span><span class="co">## INFO [2025-10-14 14:37:23] Out-of-bag error in random forest imputation: 0.645</span></span>
-<span><span class="co">## INFO [2025-10-14 14:37:23] Random forest imputation finished at 2025-10-14 14:37:23.863666</span></span></code></pre></div>
+<span><span class="co">## INFO [2025-10-15 07:26:30] </span></span>
+<span><span class="co">## Starting random forest imputation at 2025-10-15 07:26:30.685447</span></span>
+<span><span class="co">## INFO [2025-10-15 07:26:31] Out-of-bag error in random forest imputation: 0.645</span></span>
+<span><span class="co">## INFO [2025-10-15 07:26:31] Random forest imputation finished at 2025-10-15 07:26:31.264489</span></span></code></pre></div>
 <p>Simple imputation strategies included in <code><a href="../reference/impute_simple.html">impute_simple()</a></code>
 are imputation by constant value, imputation by mean, median, minimum or
 half minimum value or by a small random value. Simple imputation

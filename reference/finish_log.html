@@ -33,7 +33,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Finish a log</h1>
-      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/mock_PR_brnch/R/logging.R" class="external-link"><code>R/logging.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/include-rworkflows/R/logging.R" class="external-link"><code>R/logging.R</code></a></small>
       <div class="d-none name"><code>finish_log.Rd</code></div>
     </div>
 
@@ -58,66 +58,66 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">finish_log</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] Finished analysis. Tue Oct 14 14:36:56 2025</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] Finished analysis. Wed Oct 15 07:26:04 2025</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Session info:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] R version 4.5.1 (2025-06-13)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] Platform: x86_64-pc-linux-gnu</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] Running under: Ubuntu 24.04.3 LTS</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] Matrix products: default</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] locale:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56]  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56]  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=C              </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56]  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56]  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56]  [9] LC_ADDRESS=C               LC_TELEPHONE=C            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] time zone: UTC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] tzcode source: system (glibc)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] attached base packages:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [1] stats4    stats     graphics  grDevices utils     datasets  methods  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [8] base     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] other attached packages:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56]  [1] notame_0.99.7               SummarizedExperiment_1.39.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56]  [3] Biobase_2.69.1              GenomicRanges_1.61.5       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56]  [5] Seqinfo_0.99.2              IRanges_2.43.5             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56]  [7] S4Vectors_0.47.4            BiocGenerics_0.55.3        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56]  [9] generics_0.1.4              MatrixGenerics_1.21.0      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [11] matrixStats_1.5.0           ggplot2_4.0.0              </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] loaded via a namespace (and not attached):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56]  [1] gtable_0.3.6         xfun_0.53            bslib_0.9.0         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56]  [4] httr2_1.2.1          htmlwidgets_1.6.4    lattice_0.22-7      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56]  [7] notameStats_0.99.1   vctrs_0.6.5          tools_4.5.1         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [10] parallel_4.5.1       curl_7.0.0           fansi_1.0.6         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [13] tibble_3.3.0         pkgconfig_2.0.3      Matrix_1.7-4        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [16] RColorBrewer_1.1-3   S7_0.2.0             desc_1.4.3          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [19] lifecycle_1.0.4      compiler_4.5.1       farver_2.1.2        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [22] textshaping_1.0.3    fontawesome_0.5.3    codetools_0.2-20    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [25] htmltools_0.5.8.1    sass_0.4.10          yaml_2.3.10         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [28] pillar_1.11.1        pkgdown_2.1.3        crayon_1.5.3        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [31] jquerylib_0.1.4      whisker_0.4.1        BiocParallel_1.43.4 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [34] openssl_2.3.4        DelayedArray_0.35.3  cachem_1.1.0        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [37] abind_1.4-8          notameViz_0.99.5     tidyselect_1.2.1    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [40] digest_0.6.37        dplyr_1.1.4          purrr_1.1.0         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [43] fastmap_1.2.0        grid_4.5.1           cli_3.6.5           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [46] SparseArray_1.9.1    magrittr_2.0.4       S4Arrays_1.9.1      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [49] withr_3.0.2          scales_1.4.0         rappdirs_0.3.3      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [52] lambda.r_1.2.4       rmarkdown_2.30       XVector_0.49.1      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [55] igraph_2.2.0         futile.logger_1.4.3  ragg_1.5.0          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [58] askpass_1.2.1        memoise_2.0.1        evaluate_1.0.5      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [61] knitr_1.50           viridisLite_0.4.2    futile.options_1.0.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [64] rlang_1.1.6          downlit_0.4.4        glue_1.8.0          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [67] formatR_1.14         BiocManager_1.30.26  xml2_1.4.0          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [70] rstudioapi_0.17.1    jsonlite_2.0.0       R6_2.6.1            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:56] [73] systemfonts_1.3.1    fs_1.6.6            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] R version 4.5.1 (2025-06-13)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] Platform: x86_64-pc-linux-gnu</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] Running under: Ubuntu 24.04.3 LTS</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] Matrix products: default</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] locale:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04]  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04]  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=C              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04]  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04]  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04]  [9] LC_ADDRESS=C               LC_TELEPHONE=C            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] time zone: UTC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] tzcode source: system (glibc)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] attached base packages:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [1] stats4    stats     graphics  grDevices utils     datasets  methods  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [8] base     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] other attached packages:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04]  [1] notame_0.99.7               SummarizedExperiment_1.39.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04]  [3] Biobase_2.69.1              GenomicRanges_1.61.5       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04]  [5] Seqinfo_0.99.2              IRanges_2.43.5             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04]  [7] S4Vectors_0.47.4            BiocGenerics_0.55.3        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04]  [9] generics_0.1.4              MatrixGenerics_1.21.0      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [11] matrixStats_1.5.0           ggplot2_4.0.0              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] loaded via a namespace (and not attached):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04]  [1] gtable_0.3.6         xfun_0.53            bslib_0.9.0         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04]  [4] httr2_1.2.1          htmlwidgets_1.6.4    lattice_0.22-7      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04]  [7] notameStats_0.99.1   vctrs_0.6.5          tools_4.5.1         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [10] parallel_4.5.1       curl_7.0.0           fansi_1.0.6         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [13] tibble_3.3.0         pkgconfig_2.0.3      Matrix_1.7-4        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [16] RColorBrewer_1.1-3   S7_0.2.0             desc_1.4.3          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [19] lifecycle_1.0.4      compiler_4.5.1       farver_2.1.2        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [22] textshaping_1.0.3    fontawesome_0.5.3    codetools_0.2-20    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [25] htmltools_0.5.8.1    sass_0.4.10          yaml_2.3.10         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [28] pillar_1.11.1        pkgdown_2.1.3        crayon_1.5.3        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [31] jquerylib_0.1.4      whisker_0.4.1        BiocParallel_1.43.4 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [34] openssl_2.3.4        DelayedArray_0.35.3  cachem_1.1.0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [37] abind_1.4-8          notameViz_0.99.5     tidyselect_1.2.1    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [40] digest_0.6.37        dplyr_1.1.4          purrr_1.1.0         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [43] fastmap_1.2.0        grid_4.5.1           cli_3.6.5           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [46] SparseArray_1.9.1    magrittr_2.0.4       S4Arrays_1.9.1      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [49] withr_3.0.2          scales_1.4.0         rappdirs_0.3.3      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [52] lambda.r_1.2.4       rmarkdown_2.30       XVector_0.49.1      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [55] igraph_2.2.0         futile.logger_1.4.3  ragg_1.5.0          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [58] askpass_1.2.1        memoise_2.0.1        evaluate_1.0.5      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [61] knitr_1.50           viridisLite_0.4.2    futile.options_1.0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [64] rlang_1.1.6          downlit_0.4.4        glue_1.8.0          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [67] formatR_1.14         BiocManager_1.30.26  xml2_1.4.0          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [70] rstudioapi_0.17.1    jsonlite_2.0.0       R6_2.6.1            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:04] [73] systemfonts_1.3.1    fs_1.6.6            </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

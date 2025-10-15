@@ -37,7 +37,7 @@ discarded are recorded in feature data, under Cluster_features."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Compress clusters of features to a single feature</h1>
-      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/mock_PR_brnch/R/feature_clustering.R" class="external-link"><code>R/feature_clustering.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/include-rworkflows/R/feature_clustering.R" class="external-link"><code>R/feature_clustering.R</code></a></small>
       <div class="d-none name"><code>compress_clusters.Rd</code></div>
     </div>
 
@@ -77,25 +77,25 @@ cluster.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_notame_set</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">clustered</span> <span class="op">&lt;-</span> <span class="fu"><a href="cluster_features.html">cluster_features</a></span><span class="op">(</span><span class="va">toy_notame_set</span>, </span></span>
 <span class="r-in"><span>  rt_window <span class="op">=</span> <span class="fl">1</span>, corr_thresh <span class="op">=</span> <span class="fl">0.5</span>, d_thresh <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:52] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:52] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:52] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:52] </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Starting feature clustering at 2025-10-14 14:36:52.343833</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:52] Finding connections between features in HILIC_neg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:52] Found 1 connections in HILIC_neg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:52] Finding connections between features in HILIC_pos</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:52] Found 4 connections in HILIC_pos</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:52] Finding connections between features in RP_neg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:52] Found 1 connections in RP_neg</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:52] Finding connections between features in RP_pos</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:52] Found 2 connections in RP_pos</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:52] Found 8 connections</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:01] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:01] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:01] Identified m/z column Average_Mz and retention time column Average_Rt_min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:01] </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Starting feature clustering at 2025-10-15 07:26:01.091982</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:01] Finding connections between features in HILIC_neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:01] Found 1 connections in HILIC_neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:01] Finding connections between features in HILIC_pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:01] Found 4 connections in HILIC_pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:01] Finding connections between features in RP_neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:01] Found 1 connections in RP_neg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:01] Finding connections between features in RP_pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:01] Found 2 connections in RP_pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:01] Found 8 connections</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 5 components found</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 1 components found</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:52] Found 5 clusters of 2 or more features, clustering finished at 2025-10-14 14:36:52.374935</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:01] Found 5 clusters of 2 or more features, clustering finished at 2025-10-15 07:26:01.126197</span>
 <span class="r-in"><span><span class="va">compressed</span> <span class="op">&lt;-</span> <span class="fu">compress_clusters</span><span class="op">(</span><span class="va">clustered</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-14 14:36:52] Clusters compressed, left with 73 features</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-15 07:26:01] Clusters compressed, left with 73 features</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
