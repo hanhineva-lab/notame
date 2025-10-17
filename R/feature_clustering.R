@@ -255,12 +255,12 @@ pull_clusters <- function(data, features, name_col) {
 #' @examples 
 #' \dontshow{.old_wd <- setwd(tempdir())}
 #' data(toy_notame_set)
-#' data <- combined_data(toy_notame_set)
+#' data <- t(assay(toy_notame_set))
 #' features <- rowData(toy_notame_set)
-#' features$MPA <- sapply(data[, features[, "Feature_ID"]], finite_median)
+#' features$MPA <- sapply(data, finite_median)
 #' conn <- find_connections(data = data, features = features,
 #'   corr_thresh = 0.4, rt_window = 2,
-#'   name_col = "Feature_ID", mz_col = "Mass", rt_col = "RetentionTime")
+#'   name_col = "Feature_ID", mz_col = "Average_Mz", rt_col = "Average_Rt_min")
 #' clusters <- find_clusters(connections = conn, d_thresh = 0.6)
 #' features_clustered <- assign_cluster_id(data, clusters, features,
 #'   name_col = "Feature_ID")
@@ -277,35 +277,24 @@ pull_clusters <- function(data, features, name_col) {
 #' @noRd
 find_connections <- function(data, features, corr_thresh = 0.9,
                              rt_window = 1 / 60, name_col, mz_col, rt_col) {
-  d <- data[features[, name_col]]
-  if (ncol(d) < 2) {
+  if (ncol(data) < 2) {
     stop("Need at least 2 features to do any clustering!")
   }
   n <- nrow(features)
-  
-  connections <- BiocParallel::bplapply(seq_len(n -1), function(i) {
-    if (i %% 100 == 0) {
-      message(i)
-    }
-    connections_tmp <- data.frame()
-    for (j in (i + 1):n) {
-      rt_diff <- features[j, rt_col] - features[i, rt_col]
-      cor_coef <- stats::cor(d[, i], d[, j], use = "na.or.complete")
-      if (!is.na(cor_coef)) {
-        if (abs(rt_diff) < rt_window && cor_coef > corr_thresh) {
-          mz_diff <- features[j, mz_col] - features[i, mz_col]
-          connections_tmp <- rbind(connections_tmp, 
-                                   data.frame(x = features[i, name_col], 
-                                              y = features[j, name_col],
-                                              cor = cor_coef, 
-                                              rt_diff = rt_diff, 
-                                              mz_diff = mz_diff))
-        }
-      }
-    }
-    connections_tmp
-  })
-  connections <- do.call(rbind, connections)
+
+  rt_diff_mat <- abs(outer(features[, rt_col], features[, rt_col], "-"))
+  mz_diff_mat <- abs(outer(features[, mz_col], features[, mz_col], "-"))
+  cor_mat <- stats::cor(data, use = "na.or.complete")
+  cor_mat[lower.tri(cor_mat, diag = TRUE)] <- NA
+  idx <- which(rt_diff_mat < rt_window & cor_mat > corr_thresh, arr.ind = TRUE)
+
+  data.frame(
+    x = features[idx[, 1], name_col],
+    y = features[idx[, 2], name_col],
+    cor = cor_mat[idx],
+    rt_diff = rt_diff_mat[idx],
+    mz_diff = mz_diff_mat[idx]
+  )
 }
 
 #' Extract the densely connected clusters

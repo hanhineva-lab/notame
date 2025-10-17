@@ -62,25 +62,28 @@ assess_quality <- function(object, assay.type = NULL) {
     object <- .erase_quality(object)
   }
 
-  qc_data <- assay(object, from)[, object$QC == "QC"]
-  sample_data <- assay(object, from)[, object$QC != "QC"]
-  features <- rownames(sample_data)
+  qc_idx <- object$QC == "QC"
+  mat <- assay(object, from)
+  qc_mat <- mat[, qc_idx, drop = FALSE]
+  nonqc_mat <- mat[, !qc_idx, drop = FALSE]
+
+  qc_sd <- apply(qc_mat, 1, finite_sd)
+  qc_mean <- apply(qc_mat, 1, finite_mean)
+  qc_mad <- apply(qc_mat, 1, finite_mad)
+  qc_median <- apply(qc_mat, 1, finite_median)
+  nonqc_sd <- apply(nonqc_mat, 1, finite_sd)
+  nonqc_mad <- apply(nonqc_mat, 1, finite_mad)
+
+  quality_metrics <- data.frame(
+    Feature_ID = rownames(object),
+    RSD = qc_sd / abs(qc_mean),
+    RSD_r = qc_mad / abs(qc_median),
+    D_ratio = qc_sd / nonqc_sd,
+    D_ratio_r = qc_mad / nonqc_mad,
+    stringsAsFactors = FALSE
+  )
   
-  quality_metrics <- BiocParallel::bplapply(features, function(feature) {
-    data.frame(
-      Feature_ID = feature,
-      RSD = finite_sd(qc_data[feature, ]) / 
-      abs(finite_mean(qc_data[feature,])),
-      RSD_r = finite_mad(qc_data[feature, ]) /
-        abs(finite_median(qc_data[feature, ])),
-      D_ratio = finite_sd(qc_data[feature, ]) /
-        finite_sd(sample_data[feature, ]),
-      D_ratio_r = finite_mad(qc_data[feature, ]) /
-        finite_mad(sample_data[feature, ]),
-      row.names = feature, stringsAsFactors = FALSE)
-  })
-  quality_metrics <- do.call(rbind, quality_metrics)
-  object <- join_rowData(object, quality_metrics)
+  join_rowData(object, quality_metrics)
 }
 
 #' Flag low-quality features

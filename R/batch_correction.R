@@ -151,11 +151,11 @@ pca_bhattacharyya_dist <- function(object, batch, all_features = FALSE,
   sum(n * (means - mean(x))^2) / k_1
 }
 
-.repeatability <- function(x, group) {
+.repeatability <- function(mat, group) {
   # Calculate pooled variance
-  pv <- .pooled_variance(x, group)
+  pv <- apply(mat, 1, .pooled_variance, group)
   # Calculate between group variance
-  bv <- .between_variance(x, group)
+  bv <- apply(mat, 1, .between_variance, group)
   bv / (bv + pv)
 }
 
@@ -191,14 +191,9 @@ perform_repeatability <- function(object, group, assay.type = NULL) {
   from <- .get_from_name(object, assay.type)
   object <- .check_object(object, pheno_factors = group, assay.type = from)
   group <- colData(object)[, group]
-  features <- rownames(object)
-  repeatability <- BiocParallel::bplapply(
-    X = features, 
-    FUN = function(feature) {
-      result_row <- data.frame(
-        Feature_ID = feature,
-        Repeatability = .repeatability(assay(object)[feature, ], group))
-      }
-    )
-  do.call(rbind, repeatability)
+  
+  data.frame(
+    "Feature_ID" = rownames(object),
+    "Repeatability" = .repeatability(assay(object, from), group)
+  )
 }
