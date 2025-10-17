@@ -260,18 +260,20 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 
 #' Flag contaminants based on blanks
 #'
-#' Flags contaminant features by comparing the median values of blanks and 
-#' biological samples. Biological sampels are defined as samples that are not 
-#' marked as blanks and are not QCs. If the median of blanks > the median of 
-#' biological samples times a set ratio, the feature is flagged as contaminant.
+#' Flags contaminant features by comparing either median, mean or max of blanks 
+#' and biological samples. Biological samples are defined as samples that are 
+#' not marked as blanks and are not QCs.
 #'
 #' @param object a \code{
 #' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}}
 #' object
-#' @param blank_col character, the column name in pheno data with blank labels
+#' @param blank_col character, the column name in colData with blank labels
 #' @param blank_label character, the label for blank samples in blank_col
-#' @param flag_thresh numeric, the ratio threshold for flagging contaminants.
-#' If the median of blanks > flag_thresh * median of biological samples, the 
+#' @param blank_type character, one of "mean", "median", or "max"
+#' @param sample_type character, one of "max", "median", or "mean"
+#' @param flag_thresh numeric, the scaled ratio threshold for flagging 
+#' contaminants.
+#' If blank_type(blanks) * flag_thresh > sample_type(biological samples), the 
 #' feature gets flagged.
 #' @param flag_label character, the label used when flagging contaminants. Can 
 #' be changed if sample processing contaminants and carryover contaminants are 
@@ -280,12 +282,17 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #' @return A SummarizedExperiment object with contaminant features 
 #' flagged.
 #'
+#' @details
+#' If the calculation(biological samples) < the calculation(blanks) times a set 
+#' ratio, the feature is flagged as contaminant. Default calculations are "max" 
+#' for biological samples and "mean" for blanks.
+#' 
 #' @examples
 #' data(toy_notame_set)
 #' # Make a blank sample which has one (first) feature exceeding the threshold
 #' ## Abundance matrix
-#' med <- median(assay(toy_notame_set)[1, toy_notame_set$QC != "QC"])
-#' assay <- matrix(c(med * 0.05 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
+#' max_sample <- max(assay(toy_notame_set)[1, toy_notame_set$QC != "QC"])
+#' assay <- matrix(c(max_sample * 0.20 + 1, rep(0, 79)), ncol = 1, nrow = 80, 
 #'                   dimnames = list(NULL, "Demo_51"))
 #' assay <- cbind(assay(toy_notame_set), assay)
 #' ## Sample metadata
@@ -307,9 +314,22 @@ flag_detection <- function(object, qc_limit = 0.7, group_limit = 0.5,
 #'                                           blank_label = "Blank")
 #' 
 #' @export
-flag_contaminants <- function(object, blank_col, blank_label, 
-                              flag_thresh = 0.05, flag_label = "Contaminant",
+flag_contaminants <- function(object, blank_col, blank_label,
+                              blank_type = c("mean", "median", "max"),
+                              sample_type = c("max", "median", "mean"),
+                              flag_thresh = 5, flag_label = "Contaminant",
                               assay.type = NULL) {
+  blank_type <- tryCatch(
+    match.arg(blank_type),
+    error = function(e) stop("Wrong contaminant calculation type selected", 
+    call. = FALSE)
+  )
+  sample_type <- tryCatch(
+    match.arg(sample_type),
+    error = function(e) stop("Wrong sample calculation type selected", 
+    call. = FALSE)
+  )
+  
   from <- .get_from_name(object, assay.type)
   object <- .check_object(object, pheno_QC = TRUE, pheno_cols = blank_col, 
                          assay.type = from)
@@ -317,10 +337,20 @@ flag_contaminants <- function(object, blank_col, blank_label,
   blanks <- object[, colData(object)[, blank_col] == blank_label]
   samples <- object[, object$QC != "QC" &
                     colData(object)[, blank_col] != blank_label]
+  
+  stat_functions <- list(
+    median = finite_median,
+    mean   = finite_mean,
+    max    = finite_max
+  )
+  
+  # select the function to be used
+  blank_fun  <- stat_functions[[blank_type]]
+  sample_fun <- stat_functions[[sample_type]]
 
-  blank_median <- apply(assay(blanks, from), 1, finite_median)
-  sample_median <- apply(assay(samples, from), 1, finite_median)
-  blank_flag <- blank_median / sample_median > flag_thresh
+  blank_statistic <- apply(assay(blanks, from), 1, blank_fun)
+  sample_statistic <- apply(assay(samples, from), 1, sample_fun)
+  blank_flag <- sample_statistic / blank_statistic  < flag_thresh
 
   idx <- is.na(flag(object)) & !is.na(blank_flag)
   idx <- idx & blank_flag
@@ -331,7 +361,7 @@ flag_contaminants <- function(object, blank_col, blank_label,
   log_text(paste0("\n", percentage, " of features flagged as contaminants"))
 
   blank_ratio <- data.frame(Feature_ID = rownames(object), 
-                            Blank_ratio = blank_median / sample_median,
+                            Blank_ratio = round(sample_statistic / blank_statistic,digits = 1),
                             stringsAsFactors = FALSE)
   object <- join_rowData(object, blank_ratio)
 
