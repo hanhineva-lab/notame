@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: neurogenomics/rworkflows@master
         env: 
-          DEPLOY_PKGDOWN: ${{ github.ref == 'refs/heads/main' }}
+          RUN_PKGDOWN: ${{ github.ref == 'refs/heads/devel' }}
         with:
           run_bioccheck: ${{ false }}
           run_rcmdcheck: ${{ true }}
@@ -48,7 +48,7 @@ jobs:
           run_vignettes: ${{ true }}
           has_testthat: ${{ true }}
           run_covr: ${{ true }}
-          run_pkgdown: ${{ env.DEPLOY_PKGDOWN }}
+          run_pkgdown: ${{ env.RUN_PKGDOWN }}
           has_runit: ${{ false }}
           has_latex: ${{ false }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
