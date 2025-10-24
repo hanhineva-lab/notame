@@ -1,5 +1,7 @@
-Changes in version 0.99.x (Bioc release 1.0.x)
+Changes in version 0.99.0
 - submitted to Bioconductor
+
+Changes in version 1.0.x
 - split notameViz and notameStats from notame
 - removed MetaboSet-support
 - included SummarizedExperiment-support
