@@ -95,7 +95,7 @@ function from <code>BiocManager</code> and load
 <span></span>
 <span><span class="va">ppath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/init_log.html">init_log</a></span><span class="op">(</span>log_file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">ppath</span>, <span class="st">"log.txt"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## INFO [2025-10-24 09:33:27] Starting logging</span></span></code></pre>
+<pre><code><span><span class="co">## INFO [2025-10-24 10:42:38] Starting logging</span></span></code></pre>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">hilic_neg_sample</span>, package <span class="op">=</span> <span class="st">"notame"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_notame_set</span>, package <span class="op">=</span> <span class="st">"notame"</span><span class="op">)</span></span></code></pre></div>
@@ -129,8 +129,8 @@ to a PDF file, use <code>save_plot</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lm_results</span> <span class="op">&lt;-</span> <span class="fu">notameStats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/notameStats/man/perform_lm.html" class="external-link">perform_lm</a></span><span class="op">(</span><span class="fu">notame</span><span class="fu">::</span><span class="fu"><a href="../reference/drop_qcs.html">drop_qcs</a></span><span class="op">(</span><span class="va">toy_notame_set</span><span class="op">)</span>, </span>
 <span>  formula_char <span class="op">=</span> <span class="st">"Feature ~ Group"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## INFO [2025-10-24 09:33:28] Starting linear regression.</span></span>
-<span><span class="co">## INFO [2025-10-24 09:33:31] Linear regression performed.</span></span></code></pre>
+<pre><code><span><span class="co">## INFO [2025-10-24 10:42:39] Starting linear regression.</span></span>
+<span><span class="co">## INFO [2025-10-24 10:42:41] Linear regression performed.</span></span></code></pre>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">with_results</span> <span class="op">&lt;-</span> <span class="fu">notame</span><span class="fu">::</span><span class="fu"><a href="../reference/join_rowData.html">join_rowData</a></span><span class="op">(</span><span class="va">toy_notame_set</span>, <span class="va">lm_results</span><span class="op">)</span></span>
 <span></span>

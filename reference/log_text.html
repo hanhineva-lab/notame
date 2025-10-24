@@ -73,14 +73,14 @@ overwrite the file. Also used internally by many functions in the package.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">file_name</span> <span class="op">&lt;-</span> <span class="st">"log.txt"</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="init_log.html">init_log</a></span><span class="op">(</span><span class="va">file_name</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-24 09:32:55] Starting logging</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-24 10:42:11] Starting logging</span>
 <span class="r-in"><span><span class="fu">log_text</span><span class="op">(</span><span class="st">"Hello World!"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-24 09:32:55] Hello World!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-24 10:42:11] Hello World!</span>
 <span class="r-in"><span><span class="co"># Print the contents of the file</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/scan.html" class="external-link">scan</a></span><span class="op">(</span><span class="va">file_name</span>, sep <span class="op">=</span> <span class="st">"\n"</span>, what <span class="op">=</span> <span class="st">"character"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "INFO [2025-10-24 09:32:54] Starting logging"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "INFO [2025-10-24 09:32:55] Starting logging"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "INFO [2025-10-24 09:32:55] Hello World!"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "INFO [2025-10-24 10:42:10] Starting logging"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "INFO [2025-10-24 10:42:11] Starting logging"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "INFO [2025-10-24 10:42:11] Hello World!"    </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
