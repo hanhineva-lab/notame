@@ -6,6 +6,7 @@ name: rworkflows
       - main
       - devel
       - RELEASE_**
+      - include-articles
   pull_request:
     branches:
       - master
@@ -48,7 +49,7 @@ jobs:
           run_vignettes: ${{ true }}
           has_testthat: ${{ true }}
           run_covr: ${{ true }}
-          run_pkgdown: ${{ env.DEPLOY_PKGDOWN }}
+          run_pkgdown: ${{ true }}
           has_runit: ${{ false }}
           has_latex: ${{ false }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

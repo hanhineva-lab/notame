@@ -1,0 +1,128 @@
+---
+title: "Non-targeted metabolomics visualization"
+author: "Anton Klåvus, Vilhelm Suksi"
+date: "`r Sys.Date()`"
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{Non-targeted metabolomics visualization}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: references.bib
+biblio-style: apalike
+---
+
+The visualizations in `notameViz` can be used to monitor the processing and 
+explore the data, inspect individual features as well as plot results. Please 
+see the [notame website](https://
+hanhineva-lab.github.io/notame/) and protocol article for more information 
+[@notame]. Similar functionality is available in `miaViz` and `scater` 
+packages.
+
+# Installation
+
+To install `notameViz`, install `BiocManager` first, if it is not installed.
+Afterwards use the `install` function from `BiocManager` and load `notameViz`.
+
+```{r install, eval=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("notameViz")
+```
+
+```{r setup, message = FALSE}
+library(notame)
+library(notameViz)
+library(notameStats)
+
+ppath <- tempdir()
+init_log(log_file = file.path(ppath, "log.txt"))
+
+data(hilic_neg_sample, package = "notame")
+data(toy_notame_set, package = "notame")
+```
+
+# Preprocessing visualizations
+
+Preprocessing visualizations are used to monitor preprocessing such as drift 
+correction and explore the data. Preprocessing visualizations return ggplot2 
+objects. Preprocessing is performed separately for each mode. 
+
+
+```{r}
+plot_sample_boxplots(hilic_neg_sample, order_by = "Group", fill_by = "Group")
+```
+
+The function `save_QC_plots` conveniently saves common visualizations after 
+each round of processing, ignoring flagged features by default. You can see 
+this in action in the project example vignette in the notame package. It also 
+allows you to merge all saved plots into one file by setting `merge = 
+TRUE`. NOTE that this requires you to install external tools. For Windows, 
+install [pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/). For 
+linux, make sure `pdfunite` is installed.
+
+
+# Results visualizations
+
+Results visualizations return ggplot2 objects. Common visalizations include 
+effect heatmaps and volcano plots. Manhattan plots and cloud plots can be used 
+to relate results to biochemical features such as m/z and RT and are plotted 
+separately for each mode. To save these functions to a PDF file, use 
+`save_plot`.
+
+
+```{r}
+lm_results <- notameStats::perform_lm(notame::drop_qcs(toy_notame_set), 
+  formula_char = "Feature ~ Group")
+
+with_results <- notame::join_rowData(toy_notame_set, lm_results)
+
+p <- volcano_plot(with_results,
+  x = "GroupB.estimate", p = "GroupB.p.value", p_fdr = "GroupB.p.value_FDR")
+
+# save_plot(p, file = "volcano_plot.pdf")
+
+p 
+```
+
+# Feature-wise visualizations
+
+The following visualizations are applied to each feature and directly saved to 
+a PDF file, one page per feature. If `save = FALSE`, a list of plots is 
+returned: 
+
+```{r}
+beeswarm_list <- save_beeswarm_plots(toy_notame_set[1:10],
+  save = FALSE, x = "Group", color = "Group")
+  
+beeswarm_list[[1]]
+```
+
+# Color scales
+
+Color scales and other scales can be set separately for each function call, and 
+the defaults are set as options in the package. The scales are ggplot scales, 
+returned by e.g. `scale_color_x`. It is also possible to change the scales 
+globally for the complete project. To do this, use e.g. 
+`options("notame.color_scale_dis") <- scale_color_brewer(palette = 
+"Dark2")`. Below is a list of all the scales used in the package and their 
+default values (con = continuous, dis = discrete, div = diverging):
+
+- `notame.color_scale_con = ggplot2::scale_color_viridis_c()`
+- `notame.color_scale_dis = ggplot2::scale_color_brewer(palette = "Set1")`
+- `notame.fill_scale_con = ggplot2::scale_fill_viridis_c()`
+- `notame.fill_scale_dis = ggplot2::scale_fill_brewer(palette = "Set1")`
+- `notame.fill_scale_div = ggplot2::scale_fill_distiller(palette = "RdBu")`
+- `notame.shape_scale = ggplot2::scale_shape_manual(values = c(16, 17, 15, 3, 
+7, 8, 11, 13))`
+
+# Session information
+
+```{r, echo = FALSE, results = 'markup'}
+sessionInfo()
+```
+
+# References
+
