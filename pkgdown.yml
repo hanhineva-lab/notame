@@ -3,8 +3,11 @@ pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   introduction: introduction.html
+  articles/Non_targeted_metabolomics_visualization: Non_targeted_metabolomics_visualization.html
+  articles/Non-targeted_metabolomics_feature_prioritization: Non-targeted_metabolomics_feature_prioritization.html
   project_example: project_example.html
-last_built: 2025-10-17T09:17Z
+  articles/project_template: project_template.html
+last_built: 2025-10-24T09:32Z
 urls:
   reference: https://hanhineva-lab.github.io/notame/reference
   article: https://hanhineva-lab.github.io/notame/articles

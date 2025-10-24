@@ -21,7 +21,10 @@ before and after plots."></head><body>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">Non-targeted metabolomics preprocessing and data wrangling</a></li>
+    <li><a class="dropdown-item" href="../articles/Non_targeted_metabolomics_visualization.html">Non-targeted metabolomics visualization</a></li>
+    <li><a class="dropdown-item" href="../articles/Non-targeted_metabolomics_feature_prioritization.html">Non-targeted metabolomics feature prioritization</a></li>
     <li><a class="dropdown-item" href="../articles/project_example.html">Project example</a></li>
+    <li><a class="dropdown-item" href="../articles/project_template.html">Project template</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -35,7 +38,7 @@ before and after plots."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Correct drift using cubic spline</h1>
-      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/main/R/drift_correction.R" class="external-link"><code>R/drift_correction.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/include-articles/R/drift_correction.R" class="external-link"><code>R/drift_correction.R</code></a></small>
       <div class="d-none name"><code>correct_drift.Rd</code></div>
     </div>
 
@@ -167,12 +170,12 @@ By default, the column used for color is also used for shape.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_notame_set</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">corrected</span> <span class="op">&lt;-</span> <span class="fu">correct_drift</span><span class="op">(</span><span class="fu"><a href="mark_nas.html">mark_nas</a></span><span class="op">(</span><span class="va">toy_notame_set</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="op">]</span>, value <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-17 09:17:40] Starting drift correction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-17 09:17:42] Recomputing quality metrics for drift corrected data</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-17 09:17:42] Drift correction performed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-17 09:17:42] Inspecting drift correction results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-17 09:17:42] Original quality metrics missing, recomputing</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-17 09:17:42] Drift correction results inspected: Drift_corrected: 100%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-24 09:32:43] Starting drift correction</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-24 09:32:45] Recomputing quality metrics for drift corrected data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-24 09:32:45] Drift correction performed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-24 09:32:45] Inspecting drift correction results</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-24 09:32:45] Original quality metrics missing, recomputing</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-24 09:32:45] Drift correction results inspected: Drift_corrected: 100%</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
