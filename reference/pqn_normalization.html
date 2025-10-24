@@ -13,7 +13,7 @@ used for normalization. Check parameters for more options."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">notame</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.9</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,10 +25,7 @@ used for normalization. Check parameters for more options."></head><body>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">Non-targeted metabolomics preprocessing and data wrangling</a></li>
-    <li><a class="dropdown-item" href="../articles/Non_targeted_metabolomics_visualization.html">Non-targeted metabolomics visualization</a></li>
-    <li><a class="dropdown-item" href="../articles/Non-targeted_metabolomics_feature_prioritization.html">Non-targeted metabolomics feature prioritization</a></li>
     <li><a class="dropdown-item" href="../articles/project_example.html">Project example</a></li>
-    <li><a class="dropdown-item" href="../articles/project_template.html">Project template</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -42,7 +39,7 @@ used for normalization. Check parameters for more options."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Probabilistic quotient normalization</h1>
-      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/include-articles/R/transformations.R" class="external-link"><code>R/transformations.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hanhineva-lab/notame/blob/devel/R/transformations.R" class="external-link"><code>R/transformations.R</code></a></small>
       <div class="d-none name"><code>pqn_normalization.Rd</code></div>
     </div>
 
@@ -107,8 +104,8 @@ abundances.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">toy_notame_set</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">pqn_set</span> <span class="op">&lt;-</span> <span class="fu">pqn_normalization</span><span class="op">(</span><span class="va">toy_notame_set</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-24 10:42:18] Starting PQN normalization</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-24 10:42:18] Using median of qc samples as reference spectrum</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-24 13:52:53] Starting PQN normalization</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> INFO [2025-10-24 13:52:53] Using median of qc samples as reference spectrum</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
