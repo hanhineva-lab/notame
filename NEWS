@@ -1,11 +1,24 @@
-Changes in version 0.99.0
+Changes in version 0.99.x (Bioc release 1.0.x)
 - submitted to Bioconductor
-- SummarizedExperiment-support
+- split notameViz and notameStats from notame
+- removed MetaboSet-support
+- included SummarizedExperiment-support
 - parallelization with BiocParallel
-- removed functionality for using MetaboSet grouping slots (group_col etc.) as default values to facilitate parallel SummarizedExperiment implementation, concerns visualizations and univariate statistics
-- removed exports with replacement: perform_t_test() now covers functionality of removed perform_paired_t_test() and perform_pairwise_t_test(). Similarly, perform_non_parametric() now covers functionality of removed perform_wilcoxon_signed_rank() and perform_pairwise_non_parametric()
-- de-exported: low-level functionality for drift correction and feature clustering
-- removed deprecated exports: dobc(), merge_batches()
-- removed exports with external replacement: align_batches() and normalize_batches() will be available with SummarizedExperiment in the batchCorr package
-- removed functions for various reasons: install_dependencies(), merge_exprs(), plot_sample_suprahex(), prop_found(), prop_na(), finite helpers such as finite_mean()
-- renamed exports: clean_stats_results() renamed to summarize_results()
+- included website with rworkflows (reference index and vignette also cover notameViz and notameStats)
+- removed perform_pairwise_t_test() and perform_paired_t_test(), replaced by perform_t_test()
+- removed perform_pairwise_non_parametric() and perform_wilcoxon_signed_rank(), replaced by perform_non_parametric()
+- removed align_batches(), replaced by batchCorr::alignBatches()
+- removed normalize_batches(), replaced by batchCorr::normalizeBatches()
+- other removed functions: install_dependencies(), merge_exprs(), plot_sample_suprahex(), prop_found(), prop_na(), finite helpers such as finite_mean() and simple transformations such as exponential()
+- removed plotting in correct_drift(), replaced by save_dc_plots()
+- removed plotting in cluster_features(), replaced by visualize_clusters()
+- de-exported low-level functionality for drift correction and feature clustering
+- renamed read_from_excel() to import_from_excel()
+- renamed clean_stats_results() to summarize_results()
+- renamed visualizations() to save_QC_plots()
+- renamed merge_objects() to merge_notame_sets()
+- renamed example_set to toy_notame_set and removed other example data
+- reworked vignettes
+- reworked plotting functionality in mixOmics_pls() and other mixOmics wrappers
+- updated flag_contaminants to use whole number instead of ratio in threshold and include more metrics to flag by
+- updated muvr_analysis() to use MUVR2 instead of MUVR package
