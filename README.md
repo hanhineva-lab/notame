@@ -1,4 +1,14 @@
-# notame - Workflow for non-targeted LC-MS metabolic profiling 
+# notame - Workflow for non-targeted LC-MS metabolic profiling <img src="man/figures/notame_logo.png" align="right" width="120" />
+
+<!-- badges: start -->
+
+[![Platforms](https://bioconductor.org/shields/availability/devel/notame.svg)](https://bioconductor.org/packages/devel/bioc/html/notame.html)
+[![rworkflows](https://github.com/hanhineva-lab/notame/actions/workflows/rworkflows.yml/badge.svg?branch=devel)](https://github.com/hanhineva-lab/notame/actions)
+[![Bioc-release](http://bioconductor.org/shields/build/devel/bioc/notame.svg)](http://bioconductor.org/packages/devel/bioc/html/notame.html)
+[![Bioc-age](http://bioconductor.org/shields/years-in-bioc/notame.svg)](https://bioconductor.org/packages/devel/bioc/html/notame.html)
+[![Dependencies](https://bioconductor.org/shields/dependencies/devel/notame.svg)](https://bioconductor.org/packages/devel/bioc/html/notame.html)
+
+<!-- badges: end -->
 
 The notame packages can be used to analyze preprocessed LC-MS data in non-targeted metabolomics. Notame was developed at the [research group of nutritional metabolomics at University of Eastern Finland](https://hanhinevalab.com/home) and [Afekta Technologies](https://afekta.com/), a spinoff metabolomics company. We use notame as a way to bundle together all the preprocessing methods we use for our non-targeted LC-MS metabolomics data, so it mainly consists of methods found in other packages, and a bunch of visualizations we have found useful.
 
