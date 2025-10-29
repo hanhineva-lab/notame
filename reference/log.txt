@@ -1,2 +1,2 @@
-INFO [2025-10-24 13:52:53] Starting PQN normalization
-INFO [2025-10-24 13:52:53] Using median of qc samples as reference spectrum
+INFO [2025-10-29 12:03:12] Starting PQN normalization
+INFO [2025-10-29 12:03:12] Using median of qc samples as reference spectrum
