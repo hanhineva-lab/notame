@@ -24,3 +24,6 @@ Changes in version 1.0.x
 - reworked plotting functionality in mixOmics_pls() and other mixOmics wrappers
 - updated flag_contaminants to use whole number instead of ratio in threshold and include more metrics to flag by
 - updated muvr_analysis() to use MUVR2 instead of MUVR package
+
+Changes in version 1.1.x
+- Added function `read_from_msdial()` which reads MS-DIAL output files (tab-separated .txt files) into a SummarizedExperiment object
