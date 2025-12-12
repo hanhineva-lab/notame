@@ -864,8 +864,12 @@ fix_object <- function(object, id_prefix = "ID_", id_column = NULL,
 #'
 #' @export
 join_rowData <- function(object, dframe) {
-  rowData(object) <- merge(rowData(object), dframe, by = "Feature_ID", 
-                           all.x = TRUE, sort = FALSE)
+  with_new <- dplyr::left_join(
+    as.data.frame(rowData(object)),
+    dframe,
+    by = "Feature_ID"
+  )
+  rowData(object) <- S4Vectors::DataFrame(with_new)
   rownames(object) <- rowData(object)$Feature_ID
   if (validObject(object)) {
     return(object)
@@ -896,8 +900,12 @@ join_rowData <- function(object, dframe) {
 #'
 #' @export
 join_colData <- function(object, dframe) {
-  colData(object) <- merge(colData(object), dframe, by = "Sample_ID",
-                           all.x = TRUE, sort = FALSE)
+  with_new <- dplyr::left_join(
+    as.data.frame(colData(object)),
+    dframe,
+    by = "Sample_ID"
+  )
+  colData(object) <- S4Vectors::DataFrame(with_new)
   rownames(colData(object)) <- colData(object)$Sample_ID
   object
 }
