@@ -221,8 +221,6 @@ prop_found <- function(x) {
     to <- 1
   } else if (is.null(name)) {
     stop("When using multiple assays, specify name of new assay", call. = FALSE)
-  } else if (name == from & from != 1) {
-    stop("'name' must be different from `assay.type`.", call. = FALSE)
   } else {
     to <- name
   }
