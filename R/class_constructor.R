@@ -524,7 +524,7 @@ import_from_excel <- function(file, sheet = 1, id_column = NULL,
 #' the TSV file.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Read a TSV peak table
 #' # data <- import_from_msdial(file = "path/to/peak_table.tsv", name = "RP_neg")
 #' }
@@ -861,9 +861,11 @@ fix_object <- function(object, id_prefix = "ID_", id_column = NULL,
                             log_messages = FALSE, clean = TRUE) {
   # If QC column is not provided explicitly, attempt to create it
   if (!"QC" %in% colnames(x)) {
-    qc_found <- sapply(x, grepl, pattern = "QC")
+    qc_found <- apply(x, 1, function(y) {
+      any(grepl("QC", y))
+    })
     if (any(qc_found)) {
-      x$QC <- ifelse(rowSums(qc_found) > 0, "QC", "Sample")
+      x$QC <- ifelse(qc_found, "QC", "Sample")
       log_text(paste("QC column generated from rows containing 'QC'"))
     } else {
       warning("QC not found and column can not be generated.", 

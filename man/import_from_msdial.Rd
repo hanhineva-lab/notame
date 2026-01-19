@@ -52,7 +52,7 @@ statistics computed by MS-DIAL, such as average abundances, since these are
 not valid after notame processing.
 }
 \examples{
-\dontrun{
+\donttest{
 # Read a TSV peak table
 # data <- import_from_msdial(file = "path/to/peak_table.tsv", name = "RP_neg")
 }
