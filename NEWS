@@ -1,7 +1,13 @@
-Changes in version 0.99.0
-- submitted to Bioconductor
+Changes in version 1.1.0
 
-Changes in version 1.0.x
+New features:
+- Added function `read_from_msdial()` which reads MS-DIAL output files (tab-separated .txt files) into a SummarizedExperiment object
+- Improved type conversion when importing data with notame functions
+
+Bug fixes:
+- Fixed an issue where metadata was not properly retained when joining new data with join_rowData() and join_colData()
+
+Changes in version 1.0.0
 - split notameViz and notameStats from notame
 - removed MetaboSet-support
 - included SummarizedExperiment-support
@@ -25,6 +31,6 @@ Changes in version 1.0.x
 - updated flag_contaminants to use whole number instead of ratio in threshold and include more metrics to flag by
 - updated muvr_analysis() to use MUVR2 instead of MUVR package
 
-Changes in version 1.1.x
-- Added function `read_from_msdial()` which reads MS-DIAL output files (tab-separated .txt files) into a SummarizedExperiment object
-- Improved type conversion when importing data with notame functions
+Changes in version 0.99.0
+- submitted to Bioconductor
+
