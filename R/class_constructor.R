@@ -938,8 +938,7 @@ fix_object <- function(object, id_prefix = "ID_", id_column = NULL,
     pre_clean <- feature_data
     feature_data <- as.data.frame(feature_data) |>
       dplyr::select("Feature_ID", "Split", dplyr::everything()) |>
-      .best_classes() |> 
-      dplyr::mutate_if(is.factor, as.character)
+      .best_classes()
     # Replace dots with underscores in colnames
     colnames(feature_data) <- gsub("[.]", "_", colnames(feature_data)) |>
     # Remove duplicate underscores

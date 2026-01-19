@@ -27,3 +27,4 @@ Changes in version 1.0.x
 
 Changes in version 1.1.x
 - Added function `read_from_msdial()` which reads MS-DIAL output files (tab-separated .txt files) into a SummarizedExperiment object
+- Improved type conversion when importing data with notame functions

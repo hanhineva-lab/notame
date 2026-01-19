@@ -184,15 +184,12 @@ prop_found <- function(x) {
 }
 
 .best_class <- function(x) {
-  x <- utils::type.convert(as.character(x), as.is = TRUE)
-  if (inherits(x, "numeric")) {
-    x <- x
-  } else if (length(unique(x)) < length(x) / 4) {
+  x <- as.character(x)
+  x <- gsub("false", "FALSE", x, ignore.case = TRUE)
+  x <- gsub("true", "TRUE", x, ignore.case = TRUE)
+  x <- utils::type.convert(x, as.is = TRUE, na.strings = c("NA", "", "null"))
+  if ((is.character(x) || is.integer(x)) && length(unique(x)) < 9) {
     x <- as.factor(x)
-  } else if (is.integer(x)) {
-    x <- as.numeric(x)
-  } else {
-    x <- as.character(x)
   }
   x
 }
