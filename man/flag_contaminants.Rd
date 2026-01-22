@@ -28,7 +28,8 @@ object}
 
 \item{sample_type}{character, one of "max", "median", or "mean"}
 
-\item{flag_thresh}{numeric, the scaled ratio threshold for flagging contaminants.
+\item{flag_thresh}{numeric, the scaled ratio threshold for flagging 
+contaminants.
 If blank_type(blanks) * flag_thresh > sample_type(biological samples), the 
 feature gets flagged.}
 

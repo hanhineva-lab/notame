@@ -13,7 +13,7 @@ test_that("Column conversion works", {
   )
   converted <- .best_classes(df)
   converted_classes <- unname(sapply(converted, class))
-  expected_classes <- c("numeric", "factor", "factor", "character", "numeric")
+  expected_classes <- c("integer", "factor", "factor", "character", "numeric")
 
   expect_equal(converted_classes, expected_classes)
 })
@@ -21,12 +21,13 @@ test_that("Column conversion works", {
 test_that("Pheno data fixing works", {
   # No action is taken if "Sample_ID is" supplied (unless there are na's in 
   # only this specific case to not break functionality), safe default behavior # for all columns
-  df <- data.frame(Sample_ID = 1:5, QC = rep("QC", 5))
+  df <- data.frame(Sample_ID = 1:10, QC = rep("QC", 10))
   expect_no_error(.fix_pheno_data(df))
   # User can specify which column should be used for "Sample_ID"
-  df <- data.frame(Sample_ID = 1:5, id = 6:10, QC = rep("QC", 5))
+  new_id <- paste0("ID", df$Sample_ID)
+  df$id <- new_id
   df <- .fix_pheno_data(df, id_column = "id")
-  expect_equal(df$Sample_ID, 6:10)
+  expect_equal(df$Sample_ID, new_id)
 
   # Check if conversion to numeric works
   df <- data.frame(Injection_order = c(1:2, "3", 4:9))
@@ -80,11 +81,11 @@ test_that("Pheno data checking works", {
 test_that("Feature data fixing works", {
   # No action is taken for "Feature_ID" if supplied, safe default behavior for 
   # all columns
-  df <- data.frame(Feature_ID = 1:5, mz = "nope")
+  df <- data.frame(Feature_ID = 1:10, mz = "nope")
   mode <- "HILIC_pos"
   expect_no_error(.fix_feature_data(feature_data = df, name = mode))
   
-  df <- data.frame(Split = rep("HILIC_pos", 5))
+  df <- data.frame(Split = rep("HILIC_pos", 10))
   expect_error(.fix_feature_data(feature_data = df, name = mode),
                "No mass to charge ratio column found - should match ...")
   mz <- as.numeric(seq_len(nrow(df)))
@@ -95,7 +96,7 @@ test_that("Feature data fixing works", {
   df$Average_Rt_min <- rt
   df <- .fix_feature_data(feature_data = df, name = mode)
   
-  expect_equal(df$Feature_ID,  paste0(mode, "_", mz, "a", rt))
+  expect_equal(df$Feature_ID, paste0(mode, "_", mz, "a", rt))
 })
 
 test_that("Feature data checking works", {
@@ -118,7 +119,7 @@ test_that("Easy example data is read correctly", {
   pd <- data.frame(
     Sample_ID = paste0("TEST_", seq_len(12)),
     Injection_order = seq_len(12),
-    Group = factor(rep(LETTERS[1:2], times = c(5, 7))),
+    Group = as.factor(rep(LETTERS[1:2], times = c(5, 7))),
     QC = as.factor("Sample"),
     easy_Datafile = paste0("190102SR_RP_pos_0", 10:21),
     stringsAsFactors = FALSE
@@ -128,12 +129,12 @@ test_that("Easy example data is read correctly", {
   # Feature data
   fd <- data.frame(
     Feature_ID = "",
-    Split = "easy",
+    Split = as.factor("easy"),
     Alignment = as.numeric(seq_len(10)),
     Mass = 50 * seq_len(10),
     RetentionTime = 0.5 * seq_len(10),
-    "MS_MS_Spectrum" = c("(123.45; 678)", rep(NA, 9)),
-    Flag = as.character(NA),
+    MS_MS_Spectrum = as.factor(c("(123.45; 678)", rep(NA, 9))),
+    Flag = NA,
     stringsAsFactors = FALSE
   )
   fd <- .name_features(fd)
@@ -164,7 +165,10 @@ test_that("Data is split correctly", {
   pd <- data.frame(
     Sample_ID = paste0("TEST_", seq_len(12)),
     Injection_order = seq_len(12),
-    Group = rep(LETTERS[1:2], times = c(5, 7)),
+    Group = factor(
+      rep(LETTERS[1:2], times = c(5, 7)),
+      levels = c("A", "B", "QC")
+    ),
     QC = "Sample",
     Datafile = paste0("190102SR_RP_pos_0", 10:21),
     stringsAsFactors = FALSE
@@ -178,14 +182,14 @@ test_that("Data is split correctly", {
   # Feature data
   fd <- data.frame(
     Feature_ID = "",
-    Split = rep(c("RP_pos", "Hilic_pos", "Hilic_neg", "RP_neg"), each = 4),
+    Split = as.factor(rep(c("RP_pos", "Hilic_pos", "Hilic_neg", "RP_neg"), each = 4)),
     Alignment = as.numeric(seq_len(16)),
     Mass = 50 * seq_len(16),
     RetentionTime = 0.5 * seq_len(16),
-    Column = rep(c("RP", "Hilic", "RP"), times = c(4, 8, 4)),
-    Mode = rep(c("pos", "neg"), each = 8),
-    "MS_MS_Spectrum" = c("(123.45; 678)", rep(NA, 15)),
-    Flag = as.character(NA),
+    Column = as.factor(rep(c("RP", "Hilic", "RP"), times = c(4, 8, 4))),
+    Mode = as.factor(rep(c("pos", "neg"), each = 8)),
+    MS_MS_Spectrum = as.factor(c("(123.45; 678)", rep(NA, 15))),
+    Flag = NA,
     stringsAsFactors = FALSE
   )
   fd <- .name_features(fd)
