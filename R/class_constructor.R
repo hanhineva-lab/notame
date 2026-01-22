@@ -438,7 +438,7 @@ import_from_excel <- function(file, sheet = 1, id_column = NULL,
   }
 
   SummarizedExperiment(
-    assays = extracted$assay_,
+    assays = as.matrix(extracted$assay_),
     rowData = extracted$feature_data,
     colData = extracted$pheno_data
   )
@@ -446,13 +446,14 @@ import_from_excel <- function(file, sheet = 1, id_column = NULL,
 
 .extract_from_tsv <- function(file, name) {
   # Read the raw file
-  raw <- read.delim(
+  raw <- utils::read.delim(
     file = file,
     header = FALSE,
     sep = "\t",
     stringsAsFactors = FALSE,
     fill = TRUE,
-    quote = NULL
+    quote = NULL,
+    na.strings = c("NA", "", "null")
   )
 
   # first row tells us which columns hold samples
@@ -479,16 +480,17 @@ import_from_excel <- function(file, sheet = 1, id_column = NULL,
   if (!is.null(name)) {
     log_text(paste0('Naming the last column of sample information "', name,
                     '_Datafile"'))
-    colnames(sample_data)[length(colnames(sample_data))] <- paste0(name, "_Datafile")
+    datafile_col <- paste0(name, "_Datafile")
   } else {
     log_text('Naming the last column of sample information "Datafile"')
-    colnames(sample_data)[length(colnames(sample_data))] <- "Datafile"
+    datafile_col <- "Datafile"
   }
-  rownames(sample_data) <- sample_data[["Datafile"]]
+  colnames(sample_data)[length(colnames(sample_data))] <- datafile_col
+  rownames(sample_data) <- sample_data[, datafile_col]
 
   # Gather abundance values from intersection
   values <- raw[feature_rows[-1], sample_cols[-1]]
-  values <- as.matrix(sapply(values, as.numeric))
+  values <- as.matrix(as.data.frame(lapply(values, as.numeric)))
   colnames(values) <- raw[feature_rows[1], sample_cols[-1]]
 
   list("pheno_data" = sample_data, "feature_data" = feature_data, 
@@ -544,7 +546,7 @@ import_from_msdial <- function(file, id_column = NULL,
   }
 
   SummarizedExperiment(
-    assays = extracted$assay_,
+    assays = as.matrix(extracted$assay_),
     rowData = extracted$feature_data,
     colData = extracted$pheno_data
   )
