@@ -40,7 +40,7 @@ Other contributors:
 \itemize{
   \item Ville Koistinen (\href{https://orcid.org/0000-0003-1587-8361}{ORCID}) [contributor]
   \item Olli Kärkkäinen (\href{https://orcid.org/0000-0003-0825-4956}{ORCID}) [contributor]
-  \item Artur Sannikov [contributor]
+  \item Artur Sannikov (\href{https://orcid.org/0000-0001-7765-123X}{ORCID}) [contributor]
 }
 
 }
