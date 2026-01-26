@@ -1,0 +1,335 @@
+# notame - Workflow for non-targeted LC-MS metabolic profiling ![](reference/figures/notame_logo.png)
+
+The notame packages can be used to analyze preprocessed LC-MS data in
+non-targeted metabolomics. Notame was developed at the [research group
+of nutritional metabolomics at University of Eastern
+Finland](https://hanhinevalab.com/home) and [Afekta
+Technologies](https://afekta.com/), a spinoff metabolomics company. We
+use notame as a way to bundle together all the preprocessing methods we
+use for our non-targeted LC-MS metabolomics data, so it mainly consists
+of methods found in other packages, and a bunch of visualizations we
+have found useful.
+
+For more detailed information on how we run our LC-MS experiments and
+where this package fits in our workflow, you can find the paper here:
+[“notame”: Workflow for Non-Targeted LC-MS Metabolic
+Profiling](https://www.mdpi.com/2218-1989/10/4/135). A huge thank you
+for everyone involved in the paper!
+
+Currently, notame is developed by Afekta Technologies and was reworked
+for Bioconductor to promote interoperability with functionality that can
+complement the notame workflow. This resulted in some breaking changes
+(see NEWS for user-facing changes). See the vignettes and documentation
+for more information, for example on the
+[website](https://hanhineva-lab.github.io/notame/).
+
+### What does notame do?
+
+Before we go into the list of features, it is good for you to know how
+the workflow in our lab works. The first step is to take raw data files
+created by the LC-MS instrument and create a peak table using a peak
+picking software (we use
+[MS-DIAL](https://systemsomicslab.github.io/compms/msdial/main.html)).
+After peak picking with the dedicated software, we use R for data
+preprocessing, quality control, statistical analysis and visualization.
+We then use the obtained results in identification of the actual
+metabolites. During the years, we ended up with various scripts that
+were hard to handle and update, so we decided to make notame to keep
+things under control.
+
+Here is a list of the current main functionalities of notame:
+
+- Reading data from Excel spreadsheets created with MS-DIAL
+- Data is stored in a SummarizedExperiment object that holds all the
+  information about the features and samples along with the feature
+  abundance matrix. This allows for a simple interface for all of the
+  functions in notame, as there is no need to juggle with different
+  matrices/data frames.
+- Drift correction: correcting for systematic drift in the intensity of
+  molecular features using cubic spline correction (see [Kirwan &
+  Broadhurst et al.](https://doi.org/10.1007/s00216-013-6856-7))
+- Identifying and flagging (or removing) low-quality molecular features
+  using quality metrics defined by [Broadhurst et
+  al.](https://doi.org/10.1007/s11306-018-1367-3)
+- Imputing missing values, multiple strategies available. Random forest
+  imputation recommended, see [Kokla et
+  al.](https://doi.org/10.1186/s12859-019-3110-0)
+- Batch effect correction: correcting for systematic variation between
+  batches
+- A novel method for clustering similar molecular features
+- A bunch of statistical analyses, both feature-wise tests and
+  multivariate models
+- A rather nice set of visualizations for use in quality control,
+  explorative analysis and interpretation of results from statistical
+  tests
+
+## Installation and getting started
+
+### Bioc-release
+
+    if (!requireNamespace("BiocManager", quietly = TRUE))
+        install.packages("BiocManager")
+
+    BiocManager::install("notame")
+
+### Bioc-devel
+
+    if (!requireNamespace("BiocManager", quietly = TRUE))
+        install.packages("BiocManager")
+
+    # The following initializes usage of Bioc devel
+    BiocManager::install(version='devel')
+
+    BiocManager::install("notame")
+
+## Credits and license
+
+The first version of notame was written by Anton Klåvus for his master’s
+thesis in Bioinformatics at Aalto university (published under former
+name Anton Mattsson), while working for University of Eastern Finland
+and Afekta Technologies. Notame is inspired by analysis scripts written
+by Jussi Paananen, Oskari Timonen and Anton Klåvus at University of
+Eastern Finland. The algorithm for clustering molecular features
+originating from the same compound is based on MATLAB code written by
+David Broadhurst. Development was picked up by Atte Lihtamo, Retu
+Haikonen, Vilhelm Suksi and Leo Lahti, leading to the Bioconductor
+release.
+
+If you find any bugs or other things to fix, please submit an issue on
+GitHub! All contributions to notame are always welcome!
+
+notame is published under an MIT license (tl;dr: it’s really
+permissive!)
+
+# Package index
+
+## Tabular data preprocessing
+
+- [`mark_nas()`](https://hanhineva-lab.github.io/notame/reference/mark_nas.md)
+  : Mark specified values as missing
+- [`flag_detection()`](https://hanhineva-lab.github.io/notame/reference/flag_detection.md)
+  : Flag features with low detection rate
+- [`flag_contaminants()`](https://hanhineva-lab.github.io/notame/reference/flag_contaminants.md)
+  : Flag contaminants based on blanks
+- [`correct_drift()`](https://hanhineva-lab.github.io/notame/reference/correct_drift.md)
+  : Correct drift using cubic spline
+- [`ruvs_qc()`](https://hanhineva-lab.github.io/notame/reference/ruvs_qc.md)
+  : Remove Unwanted Variation (RUV) between batches
+- [`pca_bhattacharyya_dist()`](https://hanhineva-lab.github.io/notame/reference/pca_bhattacharyya_dist.md)
+  : Bhattacharyya distance between batches in PCA space
+- [`perform_repeatability()`](https://hanhineva-lab.github.io/notame/reference/perform_repeatability.md)
+  : Compute repeatability measures
+- [`assess_quality()`](https://hanhineva-lab.github.io/notame/reference/assess_quality.md)
+  : Assess quality information of features
+- [`quality()`](https://hanhineva-lab.github.io/notame/reference/quality.md)
+  : Extract quality information of features
+- [`flag_quality`](https://hanhineva-lab.github.io/notame/reference/flag_quality.md)
+  [`flag_quality()`](https://hanhineva-lab.github.io/notame/reference/flag_quality.md)
+  : Flag low-quality features
+- [`flag_report()`](https://hanhineva-lab.github.io/notame/reference/flag_report.md)
+  : A report of flagged features
+- [`impute_rf()`](https://hanhineva-lab.github.io/notame/reference/impute_rf.md)
+  : Impute missing values using random forest
+- [`impute_simple()`](https://hanhineva-lab.github.io/notame/reference/impute_simple.md)
+  : Simple imputation
+- [`cluster_features()`](https://hanhineva-lab.github.io/notame/reference/cluster_features.md)
+  : Cluster correlated features originating from the same metabolite
+- [`compress_clusters()`](https://hanhineva-lab.github.io/notame/reference/compress_clusters.md)
+  : Compress clusters of features to a single feature
+- [`pqn_normalization()`](https://hanhineva-lab.github.io/notame/reference/pqn_normalization.md)
+  : Probabilistic quotient normalization
+- [`inverse_normalize()`](https://hanhineva-lab.github.io/notame/reference/inverse_normalize.md)
+  : Inverse-rank normalization
+
+## Preprocessing visualizations
+
+- [`save_QC_plots()`](https://rdrr.io/pkg/notameViz/man/save_QC_plots.html)
+  : Write all relevant pretreatment visualizations to pdf (from
+  notameViz)
+- [`plot_injection_lm()`](https://rdrr.io/pkg/notameViz/man/plot_injection_lm.html)
+  : Estimate the magnitude of drift (from notameViz)
+- [`plot_sample_boxplots()`](https://rdrr.io/pkg/notameViz/man/plot_sample_boxplots.html)
+  : Plot a boxplot for each sample (from notameViz)
+- [`plot_dist_density()`](https://rdrr.io/pkg/notameViz/man/plot_dist_density.html)
+  : Plot distance density (from notameViz)
+- [`plot_tsne()`](https://rdrr.io/pkg/notameViz/man/plot_tsne.html) :
+  t-SNE scatter plot (from notameViz)
+- [`plot_pca()`](https://rdrr.io/pkg/notameViz/man/plot_pca.html) : PCA
+  scatter plot (from notameViz)
+- [`plot_tsne_arrows()`](https://rdrr.io/pkg/notameViz/man/plot_tsne_arrows.html)
+  : t-SNE plot with arrows (from notameViz)
+- [`plot_pca_arrows()`](https://rdrr.io/pkg/notameViz/man/plot_pca_arrows.html)
+  : PCA plot with arrows (from notameViz)
+- [`plot_tsne_hexbin()`](https://rdrr.io/pkg/notameViz/man/plot_tsne_hexbin.html)
+  : t-SNE hexbin plot (from notameViz)
+- [`plot_pca_hexbin()`](https://rdrr.io/pkg/notameViz/man/plot_pca_hexbin.html)
+  : PCA hexbin plot (from notameViz)
+- [`plot_dendrogram()`](https://rdrr.io/pkg/notameViz/man/plot_dendrogram.html)
+  : Sample dendrogram (from notameViz)
+- [`plot_sample_heatmap()`](https://rdrr.io/pkg/notameViz/man/plot_sample_heatmap.html)
+  : Sample heatmap (from notameViz)
+- [`plot_pca_loadings()`](https://rdrr.io/pkg/notameViz/man/plot_pca_loadings.html)
+  : PCA loadings plot (from notameViz)
+- [`plot_quality()`](https://rdrr.io/pkg/notameViz/man/plot_quality.html)
+  : Plot quality metrics (from notameViz)
+- [`save_batch_plots()`](https://rdrr.io/pkg/notameViz/man/save_batch_plots.html)
+  : Save batch correction plots (from notameViz)
+- [`save_dc_plots()`](https://rdrr.io/pkg/notameViz/man/save_dc_plots.html)
+  : Save drift correction plots (from notameViz)
+- [`visualize_clusters()`](https://rdrr.io/pkg/notameViz/man/visualize_clusters.html)
+  : Visualize clusters of features (from notameViz)
+
+## Feature selection
+
+### Univariate analysis
+
+- [`perform_lm()`](https://rdrr.io/pkg/notameStats/man/perform_lm.html)
+  : Linear models (from notameStats)
+- [`perform_logistic()`](https://rdrr.io/pkg/notameStats/man/perform_logistic.html)
+  : Logistic regression (from notameStats)
+- [`perform_lmer()`](https://rdrr.io/pkg/notameStats/man/perform_lmer.html)
+  : Linear mixed models (from notameStats)
+- [`perform_oneway_anova()`](https://rdrr.io/pkg/notameStats/man/perform_oneway_anova.html)
+  : Welch's ANOVA and classic ANOVA (from notameStats)
+- [`perform_lm_anova()`](https://rdrr.io/pkg/notameStats/man/perform_lm_anova.html)
+  : Linear models ANOVA table (from notameStats)
+- [`perform_t_test()`](https://rdrr.io/pkg/notameStats/man/perform_t_test.html)
+  : Pairwise and paired t-tests (from notameStats)
+- [`perform_kruskal_wallis()`](https://rdrr.io/pkg/notameStats/man/perform_kruskal_wallis.html)
+  : Kruskal-Wallis rank-sum test (from notameStats)
+- [`perform_non_parametric()`](https://rdrr.io/pkg/notameStats/man/perform_non_parametric.html)
+  : Pairwise and paired non-parametric tests (from notameStats)
+- [`perform_correlation_tests()`](https://rdrr.io/pkg/notameStats/man/perform_correlation_tests.html)
+  : Correlation test (from notameStats)
+- [`perform_auc()`](https://rdrr.io/pkg/notameStats/man/perform_auc.html)
+  : Area under curve (from notameStats)
+- [`perform_homoscedasticity_tests()`](https://rdrr.io/pkg/notameStats/man/perform_homoscedasticity_tests.html)
+  : Test homoscedasticity (from notameStats)
+- [`cohens_d()`](https://rdrr.io/pkg/notameStats/man/cohens_d.html) :
+  Cohen's D (from notameStats)
+- [`fold_change()`](https://rdrr.io/pkg/notameStats/man/fold_change.html)
+  : Fold change (from notameStats)
+- [`summary_statistics()`](https://rdrr.io/pkg/notameStats/man/summary_statistics.html)
+  : Summary statistics (from notameStats)
+- [`summarize_results()`](https://rdrr.io/pkg/notameStats/man/summarize_results.html)
+  : Statistics cleaning (from notameStats)
+
+### Multivariate analysis
+
+- [`fit_rf()`](https://rdrr.io/pkg/notameStats/man/fit_rf.html) : Fit
+  Random Forest (from notameStats)
+- [`importance_rf()`](https://rdrr.io/pkg/notameStats/man/importance_rf.html)
+  : Feature importance in random forest (from notameStats)
+- [`mixomics_pls()`](https://rdrr.io/pkg/notameStats/man/pls.html)
+  [`mixomics_pls_optimize()`](https://rdrr.io/pkg/notameStats/man/pls.html)
+  [`mixomics_spls_optimize()`](https://rdrr.io/pkg/notameStats/man/pls.html)
+  : PLS (from notameStats)
+- [`mixomics_pls()`](https://rdrr.io/pkg/notameStats/man/pls.html)
+  [`mixomics_pls_optimize()`](https://rdrr.io/pkg/notameStats/man/pls.html)
+  [`mixomics_spls_optimize()`](https://rdrr.io/pkg/notameStats/man/pls.html)
+  : PLS (from notameStats)
+- [`mixomics_pls()`](https://rdrr.io/pkg/notameStats/man/pls.html)
+  [`mixomics_pls_optimize()`](https://rdrr.io/pkg/notameStats/man/pls.html)
+  [`mixomics_spls_optimize()`](https://rdrr.io/pkg/notameStats/man/pls.html)
+  : PLS (from notameStats)
+- [`mixomics_plsda()`](https://rdrr.io/pkg/notameStats/man/pls_da.html)
+  [`mixomics_plsda_optimize()`](https://rdrr.io/pkg/notameStats/man/pls_da.html)
+  [`mixomics_splsda_optimize()`](https://rdrr.io/pkg/notameStats/man/pls_da.html)
+  : PLS-DA (from notameStats)
+- [`mixomics_plsda()`](https://rdrr.io/pkg/notameStats/man/pls_da.html)
+  [`mixomics_plsda_optimize()`](https://rdrr.io/pkg/notameStats/man/pls_da.html)
+  [`mixomics_splsda_optimize()`](https://rdrr.io/pkg/notameStats/man/pls_da.html)
+  : PLS-DA (from notameStats)
+
+## Feature-wise visualizations
+
+- [`save_beeswarm_plots()`](https://rdrr.io/pkg/notameViz/man/save_beeswarm_plots.html)
+  : Save beeswarm plots of each feature by group (from notameViz)
+- [`save_group_boxplots()`](https://rdrr.io/pkg/notameViz/man/save_group_boxplots.html)
+  : Save box plots of each feature by group (from notameViz)
+- [`save_scatter_plots()`](https://rdrr.io/pkg/notameViz/man/save_scatter_plots.html)
+  : Save scatter plots of each feature against a set variable (from
+  notameViz)
+- [`save_subject_line_plots()`](https://rdrr.io/pkg/notameViz/man/save_subject_line_plots.html)
+  : Save line plots with mean (from notameViz)
+- [`save_group_lineplots()`](https://rdrr.io/pkg/notameViz/man/save_group_lineplots.html)
+  : Save line plots with errorbars by group (from notameViz)
+
+## Results visualizations
+
+- [`plot_p_histogram()`](https://rdrr.io/pkg/notameViz/man/plot_p_histogram.html)
+  : Histogram of p-values (from notameViz)
+- [`volcano_plot()`](https://rdrr.io/pkg/notameViz/man/volcano_plot.html)
+  : Volcano plot (from notameViz)
+- [`manhattan_plot()`](https://rdrr.io/pkg/notameViz/man/manhattan_plot.html)
+  : Manhattan plot (from notameViz)
+- [`mz_rt_plot()`](https://rdrr.io/pkg/notameViz/man/mz_rt_plot.html) :
+  Plot m/z vs retention time plot (cloud plot) (from notameViz)
+- [`plot_effect_heatmap()`](https://rdrr.io/pkg/notameViz/man/plot_effect_heatmap.html)
+  : Heatmap of effects between variables, such as correlations (from
+  notameViz)
+
+## Object utilities
+
+- [`import_from_excel()`](https://hanhineva-lab.github.io/notame/reference/import_from_excel.md)
+  : Read formatted Excel files
+- [`import_from_msdial()`](https://hanhineva-lab.github.io/notame/reference/import_from_msdial.md)
+  : Import data from a TSV file created by MS-DIAL
+- [`write_to_excel()`](https://hanhineva-lab.github.io/notame/reference/write_to_excel.md)
+  : Write results to Excel file
+- [`flag()`](https://hanhineva-lab.github.io/notame/reference/flag.md)
+  [`` `flag<-`() ``](https://hanhineva-lab.github.io/notame/reference/flag.md)
+  : Get and set the values in the flag column
+- [`drop_flagged()`](https://hanhineva-lab.github.io/notame/reference/drop_flagged.md)
+  : Drop flagged features
+- [`drop_qcs()`](https://hanhineva-lab.github.io/notame/reference/drop_qcs.md)
+  : Drop QC samples
+- [`join_rowData()`](https://hanhineva-lab.github.io/notame/reference/join_rowData.md)
+  : Join new columns to feature data
+- [`join_colData()`](https://hanhineva-lab.github.io/notame/reference/join_colData.md)
+  : Join new columns to pheno data
+- [`combined_data()`](https://hanhineva-lab.github.io/notame/reference/combined_data.md)
+  : Retrieve both sample information and features
+- [`merge_notame_sets()`](https://hanhineva-lab.github.io/notame/reference/merge_notame_sets.md)
+  : Merge SummarizedExperiment objects together
+- [`fix_object()`](https://hanhineva-lab.github.io/notame/reference/fix_object.md)
+  : Fix object for functioning of notame
+
+## Other utilities
+
+- [`citations()`](https://hanhineva-lab.github.io/notame/reference/citations.md)
+  : Show citations
+- [`init_log()`](https://hanhineva-lab.github.io/notame/reference/init_log.md)
+  : Initialize log to a file
+- [`log_text()`](https://hanhineva-lab.github.io/notame/reference/log_text.md)
+  : Log text to the current log file
+- [`finish_log()`](https://hanhineva-lab.github.io/notame/reference/finish_log.md)
+  : Finish a log
+- [`fix_MSMS()`](https://hanhineva-lab.github.io/notame/reference/fix_MSMS.md)
+  : Transform the MS/MS output to publication ready
+
+## Datasets
+
+- [`toy_notame_set`](https://hanhineva-lab.github.io/notame/reference/toy_notame_set.md)
+  [`hilic_neg_sample`](https://hanhineva-lab.github.io/notame/reference/toy_notame_set.md)
+  [`hilic_pos_sample`](https://hanhineva-lab.github.io/notame/reference/toy_notame_set.md)
+  [`rp_neg_sample`](https://hanhineva-lab.github.io/notame/reference/toy_notame_set.md)
+  [`rp_pos_sample`](https://hanhineva-lab.github.io/notame/reference/toy_notame_set.md)
+  : Toy data set
+
+## Package
+
+- [`notame`](https://hanhineva-lab.github.io/notame/reference/notame-package.md)
+  [`notame-package`](https://hanhineva-lab.github.io/notame/reference/notame-package.md)
+  :
+
+  `notame` package.
+
+# Articles
+
+### All vignettes
+
+- [Non-targeted metabolomics preprocessing and data
+  wrangling](https://hanhineva-lab.github.io/notame/articles/introduction.md):
+- [Project
+  example](https://hanhineva-lab.github.io/notame/articles/project_example.md):
