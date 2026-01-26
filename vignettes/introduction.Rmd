@@ -20,6 +20,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "##"
 )
+# To improve runtime on Windows
+BiocParallel::register(BiocParallel::SerialParam())
 ```
 
 # Motivation

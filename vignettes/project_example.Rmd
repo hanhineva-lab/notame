@@ -22,6 +22,8 @@ knitr::opts_chunk$set(
   results = FALSE,
   comment = "##"
 )
+# To improve runtime on Windows
+BiocParallel::register(BiocParallel::SerialParam())
 ```
 
 In this project example, core functionality of notame, notameViz and 
