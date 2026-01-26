@@ -93,6 +93,7 @@ reference:
 - title: Object utilities
 - contents:
   - import_from_excel
+  - import_from_msdial
   - write_to_excel
   - flag
   - drop_flagged
