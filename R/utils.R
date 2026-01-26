@@ -203,7 +203,6 @@ prop_found <- function(x) {
 }
 
 .get_from_to_names <- function(object, assay.type, name) {
-  object <- as(object, "SummarizedExperiment")
   # Input behavior (from)
   # If assay.type is not supplied and there is only one assay in the objcet, 
   # choose the first assay
@@ -221,8 +220,6 @@ prop_found <- function(x) {
     to <- 1
   } else if (is.null(name)) {
     stop("When using multiple assays, specify name of new assay", call. = FALSE)
-  } else if (name == from & from != 1) {
-    stop("'name' must be different from `assay.type`.", call. = FALSE)
   } else {
     to <- name
   }
@@ -230,7 +227,6 @@ prop_found <- function(x) {
 }
 
 .get_from_name <- function(object, assay.type) {
-  object <- as(object, "SummarizedExperiment")
   # Input behavior (from)
   if (is.null(assay.type) && length(assays(object)) == 1) {
     from <- 1
