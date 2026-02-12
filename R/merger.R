@@ -1,6 +1,6 @@
 # Check that two SummarizedExperiment objects can be combined
 #
-# Checks many matching criteria, basically pheno data needs to have similar 
+# Checks many matching criteria, basically pheno data needs to have similar
 # special columns,
 # the number of samples needs to be the same and feature data need to have the
 # same columns names. Throws an error if any of the criteria is not fulfilled.
@@ -126,7 +126,7 @@
 
 #' Merge SummarizedExperiment objects together
 #'
-#' Merges two or more SummarizedExperiment objects together. Can be used to 
+#' Merges two or more SummarizedExperiment objects together. Can be used to
 #' merge analytical modes or batches.
 #'
 #' @param ... \code{
@@ -134,16 +134,19 @@
 #' objects or a list of objects
 #' @param merge what to merge? features is used for combining analytical modes,
 #' samples is used for batches
-#' @param assay.type character, assay to be used in case of multiple assays. 
-#' The same assay needs to be present in all objects to be merged, and the 
+#' @param assay.type character, assay to be used in case of multiple assays.
+#' The same assay needs to be present in all objects to be merged, and the
 #' resultant object contains this single assay.
 #'
 #' @return A merged SummarizedExperiment object.
 #'
-#' @details When merging samples, sample IDs that begin with "QC" or "Ref" are 
-#' combined so that they have running numbers on them. This means that if both 
+#' @details When merging samples, sample IDs that begin with "QC" or "Ref" are
+#' combined so that they have running numbers on them. This means that if both
 #' batches have samples called "QC_1", this will not result in an error,
-#' but the sample IDs will be adjusted so that they are unique.
+#' but the sample IDs will be adjusted so that they are unique. Column names in
+#' the feature data that are shared between batches but have different content
+#' are renamed by adding a suffix to avoid data loss. The suffix is the index
+#' of the batch in the input list.
 #'
 #' @examples
 #' # Merge analytical modes
@@ -158,8 +161,11 @@
 #' merged <- merge_notame_sets(batch1, batch2, merge = "samples")
 #'
 #' @export
-merge_notame_sets <- function(..., merge = c("features", "samples"),
-                              assay.type = NULL) {
+merge_notame_sets <- function(
+  ...,
+  merge = c("features", "samples"),
+  assay.type = NULL
+) {
   merge <- match.arg(merge)
   # Combine the objects to a list
   objects <- .to_list(...)
@@ -170,8 +176,10 @@ merge_notame_sets <- function(..., merge = c("features", "samples"),
   # Check assay.type and prepare objects for merge
   from_list <- lapply(objects, .get_from_name, assay.type)
   if (!length(unique(from_list)) == 1) {
-    stop("The same assay must be present in all objects or alternatively,
-          use objects with a single assay")
+    stop(
+      "The same assay must be present in all objects or alternatively,
+          use objects with a single assay"
+    )
   } else {
     from <- unlist(unique(from_list))
   }
@@ -182,86 +190,115 @@ merge_notame_sets <- function(..., merge = c("features", "samples"),
 
   # Choose merging function
   if (merge == "features") {
-    merge_fun <- .merge_mode_helper
+    merged <- Reduce(.merge_mode_helper, objects)
   } else {
-    merge_fun <- .merge_batch_helper
-  }
-  # Merge objects together one by one
-  merged <- NULL
-  for (object in objects) {
-    if (is.null(merged)) {
-      merged <- object
-    } else {
-      merged <- merge_fun(merged, object)
-    }
+    merged <- .merge_batch_helper(objects)
+    merged <- .recreate_flag(merged)
   }
   merged
 }
 
-.rowdata_batch_helper <- function(fx, fy) {
-  non_identical_cols <- !identical(colnames(fx), colnames(fy))
-  if (non_identical_cols) {
-    only_x_cols <- setdiff(colnames(fx), colnames(fy))
-    only_x <- fx[c("Feature_ID", only_x_cols)]
-    fx[only_x_cols] <- NULL
-    only_y_cols <- setdiff(colnames(fy), colnames(fx))
-    only_y <- fy[c("Feature_ID", only_y_cols)]
-    fy[only_y_cols] <- NULL
-  }
+.rowdata_batch_helper <- function(list_of_dfs) {
+  # Find all common columns
+  list_of_dfs <- lapply(list_of_dfs, as.data.frame)
+  all_cols <- lapply(list_of_dfs, colnames)
+  common_cols <- Reduce(intersect, all_cols)
 
-  # Combine common features: all NAs in fx are replaced by a value from fy
-  common_features <- intersect(fx$Feature_ID, fy$Feature_ID)
-  for (cf in common_features) {
-    na_idx <- is.na(fx[cf, ])
-    fx[cf, na_idx] <- fy[cf, na_idx]
-  }
-  new_features <- setdiff(fy$Feature_ID, fx$Feature_ID)
+  # Find columns with same name but different content
+  # If not all contents are identical, mark for suffixing
+  nonmatching_cols_idx <- vapply(
+    common_cols,
+    function(col) {
+      col_list <- lapply(list_of_dfs, `[[`, col)
+      !all(vapply(col_list[-1], identical, logical(1), col_list[[1]]))
+    },
+    logical(1)
+  )
 
-  merged_rowdata <- rbind(fx, fy[new_features, ])
+  # Add suffix to nonmatching columns in each dataframe
+  nonmatching_cols <- common_cols[nonmatching_cols_idx]
+  list_of_dfs <- mapply(
+    function(df, idx) {
+      cols_to_rename <- colnames(df) %in% nonmatching_cols
+      colnames(df)[cols_to_rename] <- paste0(
+        colnames(df)[cols_to_rename],
+        "_",
+        idx
+      )
+      df
+    },
+    list_of_dfs,
+    seq_along(list_of_dfs),
+    SIMPLIFY = FALSE
+  )
 
-  if (non_identical_cols) {
-    merged_rowdata <- merge(merged_rowdata, only_x, by = "Feature_ID", 
-                            all.x = TRUE, sort = FALSE) |>
-      merge(only_y, by = "Feature_ID", all.x = TRUE, sort = FALSE)
-    rownames(merged_rowdata) <- merged_rowdata$Feature_ID
-  }
-  merged_rowdata
+  # Merge all dataframes
+  merged <- Reduce(
+    function(x, y) {
+      dplyr::full_join(x, y, by = common_cols[!nonmatching_cols_idx])
+    },
+    list_of_dfs
+  )
+  merged <- S4Vectors::DataFrame(merged)
+  merged
 }
 
-
-.merge_batch_helper <- function(x, y) {
-  merged_coldata <- rbind(colData(x), colData(y))
-  if (anyDuplicated(merged_coldata$Sample_ID)) {
-    log_text(paste0("Found duplicated sample IDs when merging, ",
-                    "renaming QC and Ref samples"))
-    qc_idx <- grepl("QC", merged_coldata$Sample_ID)
-    merged_coldata$Sample_ID[qc_idx] <- 
-      paste0("QC_", seq_len(sum(grepl("QC", merged_coldata$Sample_ID))))
-    ref_idx <- grepl("Ref", merged_coldata$Sample_ID)
-    merged_coldata$Sample_ID[ref_idx] <- 
-      paste0("Ref_", seq_len(sum(grepl("Ref", merged_coldata$Sample_ID))))
+# Helper function to recreate the Flag column after merging batches, since the
+# original Flag columns are renamed to avoid data loss, we need to combine them
+# back into a single Flag column that contains all the information.
+.recreate_flag <- function(se) {
+  flags <- grep("Flag", colnames(rowData(se)))
+  flag_df <- rowData(se)[, flags, drop = FALSE]
+  low <- rowSums(is.na(flag_df)) != ncol(flag_df)
+  rowData(se)$Flag <- NA_character_
+  if(any(low)) {
+    rowData(se)$Flag[low] <- apply(flag_df[low, ], 1, paste0, collapse = ";")
   }
+  se
+}
 
-  rownames(merged_coldata) <- merged_coldata$Sample_ID
-  merged_coldata <- merged_coldata |>
-    S4Vectors::DataFrame()
-
-  if (identical(rownames(assay(x)), rownames(assay(y)))) {
-    merged_assay <- cbind(assay(x), assay(y))
-    colnames(merged_assay) <- rownames(merged_coldata)
-  } else {
-    merged_assay <- dplyr::bind_rows(as.data.frame(t(assay(x))),
-                                     as.data.frame(t(assay(y)))) |> 
-     t()
-    colnames(merged_assay) <- rownames(merged_coldata)
+.check_batch_coldata <- function(cd) {
+  if (anyDuplicated(cd$Sample_ID)) {
+    log_text(paste0(
+      "Found duplicated sample IDs when merging, ",
+      "renaming QC and Ref samples"
+    ))
+    qc_idx <- grepl("QC", cd$Sample_ID)
+    cd$Sample_ID[qc_idx] <- paste0(
+      "QC_",
+      seq_len(sum(qc_idx))
+    )
+    ref_idx <- grepl("Ref", cd$Sample_ID)
+    cd$Sample_ID[ref_idx] <- paste0(
+      "Ref_",
+      seq_len(sum(ref_idx))
+    )
+    rownames(cd) <- cd$Sample_ID
   }
+  cd
+}
 
-  merged_rowdata <- .rowdata_batch_helper(rowData(x), rowData(y)) |>
-    S4Vectors::DataFrame()
+.merge_batch_helper <- function(objects) {
+  # Handle column data
+  cds <- lapply(objects, colData)
+  merged_coldata <- do.call(rbind, cds)
+  merged_coldata <- .check_batch_coldata(merged_coldata)
 
-  merged_object <- SummarizedExperiment(assays = merged_assay, 
-                                        colData = merged_coldata,
-                                        rowData = merged_rowdata)
+  # Handle assay data, bind_rows to preserve all features
+  assays <- lapply(objects, assay)
+  assays <- lapply(assays, \(df) as.data.frame(t(df)))
+  merged_assay <- t(as.matrix(dplyr::bind_rows(assays)))
+  colnames(merged_assay) <- rownames(merged_coldata)
+
+  # Handle row data
+  rds <- lapply(objects, rowData)
+  merged_rowdata <- .rowdata_batch_helper(rds)
+
+  merged_object <- SummarizedExperiment(
+    assays = merged_assay,
+    colData = merged_coldata,
+    rowData = merged_rowdata
+  )
 
   merged_object
 }
