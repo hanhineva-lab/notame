@@ -146,7 +146,8 @@
 #' but the sample IDs will be adjusted so that they are unique. Column names in
 #' the feature data that are shared between batches but have different content
 #' are renamed by adding a suffix to avoid data loss. The suffix is the index
-#' of the batch in the input list.
+#' of the batch in the input list. The most common flag value across batches
+#' is included in the "Flag" column in the merged object.
 #'
 #' @examples
 #' # Merge analytical modes
@@ -248,18 +249,19 @@ merge_notame_sets <- function(
 # back into a single Flag column that contains all the information.
 .recreate_flag <- function(se) {
   flags <- grep("Flag", colnames(rowData(se)))
-  flag_mat <- as.matrix(rowData(se)[, flags, drop = FALSE])
-  low <- rowSums(is.na(flag_mat)) < ncol(flag_mat)
-  if (length(flags) < 2 || sum(low) == 0) {
+  # If we have less than 2 flag columns, we can just return the original object
+  # since the merge of Flag columns was successful
+  if (length(flags) < 2) {
     return(se)
   }
   # Compute the most common flag for each feature across batches
   # and use that as the final flag for the merged object
-  counts <- apply(flag_mat[low, ], 1, table)
+  flag_mat <- rowData(se)[, flags, drop = FALSE]
+  low <- rowSums(is.na(flag_mat)) < ncol(flag_mat)
+  counts <- apply(flag_mat[low, ], 1, table, simplify = FALSE)
   most_common <- vapply(counts, function(t) {
     names(t)[which.max(t)]
   }, character(1))
-
   rowData(se)$Flag <- NA_character_
   rowData(se)$Flag[low] <- most_common
   se
