@@ -257,13 +257,17 @@ merge_notame_sets <- function(
   # Compute the most common flag for each feature across batches
   # and use that as the final flag for the merged object
   flag_mat <- rowData(se)[, flags, drop = FALSE]
-  low <- rowSums(is.na(flag_mat)) < ncol(flag_mat)
-  counts <- apply(flag_mat[low, ], 1, table, simplify = FALSE)
-  most_common <- vapply(counts, function(t) {
-    names(t)[which.max(t)]
-  }, character(1))
-  rowData(se)$Flag <- NA_character_
-  rowData(se)$Flag[low] <- most_common
+  unique_flags <- c(sort(unique(as.vector(as.matrix(flag_mat)))))
+  counts <- apply(flag_mat, 1, function(row) {
+    tabulate(factor(row, levels = unique_flags), nbins = length(unique_flags))
+  }, simplify = FALSE)
+  most_common <- unname(vapply(counts, function(count) {
+    if (all(count == 0)) {
+      return(NA_character_)
+    }
+    unique_flags[which.max(count)]
+  }, character(1)))
+  rowData(se)$Flag <- most_common
   se
 }
 
