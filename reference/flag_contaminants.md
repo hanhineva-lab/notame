@@ -96,6 +96,6 @@ ex_set <- SummarizedExperiment(assays = assay,
 # Flag contaminant(s)
 contaminants_flagged <- flag_contaminants(ex_set, blank_col = "QC", 
                                           blank_label = "Blank")
-#> INFO [2026-01-26 11:40:27] 
+#> INFO [2026-02-26 10:48:33] 
 #> 1% of features flagged as contaminants
 ```

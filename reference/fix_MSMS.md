@@ -70,7 +70,7 @@ rowData(ex_set)$MS_MS_spectrum[
 #> [1] "28.769:53 44.933:42 52.106:89 69.518:140"
 # Fixing spectra with default settings
 fixed_MSMS_peaks <- fix_MSMS(ex_set)
-#> INFO [2026-01-26 11:40:26] Saving fixed MS/MS spectra to column 'MS_MS_Spectrum_clean' in rowData
+#> INFO [2026-02-26 10:48:33] Saving fixed MS/MS spectra to column 'MS_MS_Spectrum_clean' in rowData
 # Spectra after fixing
 rowData(fixed_MSMS_peaks)$MS_MS_Spectrum_clean[
   !is.na(rowData(fixed_MSMS_peaks)$MS_MS_Spectrum_clean)]

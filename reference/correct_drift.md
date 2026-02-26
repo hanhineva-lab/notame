@@ -122,10 +122,10 @@ details about the regression
 ``` r
 data(toy_notame_set)
 corrected <- correct_drift(mark_nas(toy_notame_set[1:5, ], value = 0))
-#> INFO [2026-01-26 11:40:23] Starting drift correction
-#> INFO [2026-01-26 11:40:25] Recomputing quality metrics for drift corrected data
-#> INFO [2026-01-26 11:40:25] Drift correction performed
-#> INFO [2026-01-26 11:40:25] Inspecting drift correction results
-#> INFO [2026-01-26 11:40:25] Original quality metrics missing, recomputing
-#> INFO [2026-01-26 11:40:25] Drift correction results inspected: Drift_corrected: 100%
+#> INFO [2026-02-26 10:48:29] Starting drift correction
+#> INFO [2026-02-26 10:48:31] Recomputing quality metrics for drift corrected data
+#> INFO [2026-02-26 10:48:31] Drift correction performed
+#> INFO [2026-02-26 10:48:31] Inspecting drift correction results
+#> INFO [2026-02-26 10:48:31] Original quality metrics missing, recomputing
+#> INFO [2026-02-26 10:48:31] Drift correction results inspected: Drift_corrected: 100%
 ```

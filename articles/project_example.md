@@ -47,8 +47,8 @@ The function
 returns a SummarizedExperiment object with three main parts and
 corresponding accessors for streamlined data wrangling.
 
-- `assay`: feature abundances across the samples  
-- `colData`: sample information  
+- `assay`: feature abundances across the samples\
+- `colData`: sample information\
 - `rowData`: feature information
 
 The example data contains four analytical modes, so we separate them
@@ -239,9 +239,9 @@ finish_log()
 
 ## Session information
 
-    ## R Under development (unstable) (2026-01-25 r89330)
+    ## R Under development (unstable) (2026-02-22 r89452)
     ## Platform: x86_64-pc-linux-gnu
-    ## Running under: Ubuntu 24.04.3 LTS
+    ## Running under: Ubuntu 24.04.4 LTS
     ## 
     ## Matrix products: default
     ## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -263,43 +263,44 @@ finish_log()
     ## [8] base     
     ## 
     ## other attached packages:
-    ##  [1] dplyr_1.1.4                 notameStats_1.1.1          
-    ##  [3] notameViz_1.1.1             notame_1.1.3               
-    ##  [5] SummarizedExperiment_1.41.0 Biobase_2.71.0             
+    ##  [1] dplyr_1.2.0                 notameStats_1.1.1          
+    ##  [3] notameViz_1.1.4             notame_1.1.4               
+    ##  [5] SummarizedExperiment_1.41.1 Biobase_2.71.0             
     ##  [7] GenomicRanges_1.63.1        Seqinfo_1.1.0              
     ##  [9] IRanges_2.45.0              S4Vectors_0.49.0           
     ## [11] BiocGenerics_0.57.0         generics_0.1.4             
     ## [13] MatrixGenerics_1.23.0       matrixStats_1.5.0          
-    ## [15] ggplot2_4.0.1               BiocStyle_2.39.0           
+    ## [15] ggplot2_4.0.2               BiocStyle_2.39.0           
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] tidyselect_1.2.1     viridisLite_0.4.2    farver_2.1.2        
+    ##  [1] tidyselect_1.2.1     viridisLite_0.4.3    farver_2.1.2        
     ##  [4] S7_0.2.1             fastmap_1.2.0        digest_0.6.39       
-    ##  [7] lifecycle_1.0.5      magrittr_2.0.4       compiler_4.6.0      
-    ## [10] rngtools_1.5.2       rlang_1.1.7          sass_0.4.10         
-    ## [13] tools_4.6.0          yaml_2.3.12          knitr_1.51          
-    ## [16] lambda.r_1.2.4       doRNG_1.8.6.2        S4Arrays_1.11.1     
-    ## [19] labeling_0.4.3       htmlwidgets_1.6.4    DelayedArray_0.37.0 
-    ## [22] RColorBrewer_1.1-3   abind_1.4-8          BiocParallel_1.45.0 
-    ## [25] withr_3.0.2          purrr_1.2.1          itertools_0.1-3     
-    ## [28] desc_1.4.3           grid_4.6.0           iterators_1.0.14    
-    ## [31] scales_1.4.0         MASS_7.3-65          cli_3.6.5           
-    ## [34] rmarkdown_2.30       ragg_1.5.0           otel_0.2.0          
-    ## [37] cachem_1.1.0         parallel_4.6.0       formatR_1.14        
-    ## [40] BiocManager_1.30.27  XVector_0.51.0       vctrs_0.7.1         
-    ## [43] Matrix_1.7-4         jsonlite_2.0.0       bookdown_0.46       
-    ## [46] systemfonts_1.3.1    foreach_1.5.2        jquerylib_0.1.4     
-    ## [49] tidyr_1.3.2          ggdendro_0.2.0       missForest_1.6.1    
-    ## [52] glue_1.8.0           pkgdown_2.2.0        codetools_0.2-20    
-    ## [55] cowplot_1.2.0        stringi_1.8.7        gtable_0.3.6        
-    ## [58] futile.logger_1.4.9  tibble_3.3.1         pillar_1.11.1       
-    ## [61] pcaMethods_2.3.0     htmltools_0.5.9      randomForest_4.7-1.2
-    ## [64] R6_2.6.1             Rdpack_2.6.5         textshaping_1.0.4   
-    ## [67] evaluate_1.0.5       lattice_0.22-7       rbibutils_2.4.1     
-    ## [70] futile.options_1.0.1 backports_1.5.0      openxlsx_4.2.8.1    
-    ## [73] broom_1.0.11         bslib_0.10.0         Rcpp_1.1.1          
-    ## [76] zip_2.3.3            SparseArray_1.11.10  ranger_0.18.0       
-    ## [79] xfun_0.56            fs_1.6.6             pkgconfig_2.0.3
+    ##  [7] lifecycle_1.0.5      statmod_1.5.1        magrittr_2.0.4      
+    ## [10] compiler_4.6.0       rngtools_1.5.2       rlang_1.1.7         
+    ## [13] sass_0.4.10          tools_4.6.0          yaml_2.3.12         
+    ## [16] knitr_1.51           lambda.r_1.2.4       doRNG_1.8.6.3       
+    ## [19] S4Arrays_1.11.1      labeling_0.4.3       htmlwidgets_1.6.4   
+    ## [22] DelayedArray_0.37.0  RColorBrewer_1.1-3   abind_1.4-8         
+    ## [25] BiocParallel_1.45.0  Rtsne_0.17           withr_3.0.2         
+    ## [28] purrr_1.2.1          itertools_0.1-3      desc_1.4.3          
+    ## [31] grid_4.6.0           iterators_1.0.14     scales_1.4.0        
+    ## [34] MASS_7.3-65          cli_3.6.5            rmarkdown_2.30      
+    ## [37] ragg_1.5.0           otel_0.2.0           cachem_1.1.0        
+    ## [40] parallel_4.6.0       formatR_1.14         BiocManager_1.30.27 
+    ## [43] XVector_0.51.0       vctrs_0.7.1          Matrix_1.7-4        
+    ## [46] jsonlite_2.0.0       bookdown_0.46        systemfonts_1.3.1   
+    ## [49] foreach_1.5.2        limma_3.67.0         jquerylib_0.1.4     
+    ## [52] tidyr_1.3.2          ggdendro_0.2.0       missForest_1.6.1    
+    ## [55] glue_1.8.0           pkgdown_2.2.0        codetools_0.2-20    
+    ## [58] cowplot_1.2.0        stringi_1.8.7        gtable_0.3.6        
+    ## [61] futile.logger_1.4.9  tibble_3.3.1         pillar_1.11.1       
+    ## [64] pcaMethods_2.3.0     htmltools_0.5.9      randomForest_4.7-1.2
+    ## [67] R6_2.6.1             Rdpack_2.6.6         textshaping_1.0.4   
+    ## [70] evaluate_1.0.5       lattice_0.22-9       backports_1.5.0     
+    ## [73] rbibutils_2.4.1      futile.options_1.0.1 openxlsx_4.2.8.1    
+    ## [76] broom_1.0.12         bslib_0.10.0         Rcpp_1.1.1          
+    ## [79] zip_2.3.3            SparseArray_1.11.10  ranger_0.18.0       
+    ## [82] xfun_0.56            fs_1.6.6             pkgconfig_2.0.3
 
 ## References
 

@@ -74,21 +74,21 @@ data(toy_notame_set)
 # The parameters are really weird because example data is imaginary
 clustered <- cluster_features(toy_notame_set, rt_window = 1,
   corr_thresh = 0.5, d_thresh = 0.6)
-#> INFO [2026-01-26 11:40:22] Identified m/z column Average_Mz and retention time column Average_Rt_min
-#> INFO [2026-01-26 11:40:22] Identified m/z column Average_Mz and retention time column Average_Rt_min
-#> INFO [2026-01-26 11:40:22] Identified m/z column Average_Mz and retention time column Average_Rt_min
-#> INFO [2026-01-26 11:40:22] 
-#> Starting feature clustering at 2026-01-26 11:40:22.423585
-#> INFO [2026-01-26 11:40:22] Finding connections between features in HILIC_neg
-#> INFO [2026-01-26 11:40:22] Found 1 connections in HILIC_neg
-#> INFO [2026-01-26 11:40:22] Finding connections between features in HILIC_pos
-#> INFO [2026-01-26 11:40:22] Found 4 connections in HILIC_pos
-#> INFO [2026-01-26 11:40:22] Finding connections between features in RP_neg
-#> INFO [2026-01-26 11:40:22] Found 1 connections in RP_neg
-#> INFO [2026-01-26 11:40:22] Finding connections between features in RP_pos
-#> INFO [2026-01-26 11:40:22] Found 2 connections in RP_pos
-#> INFO [2026-01-26 11:40:22] Found 8 connections
+#> INFO [2026-02-26 10:48:28] Identified m/z column Average_Mz and retention time column Average_Rt_min
+#> INFO [2026-02-26 10:48:28] Identified m/z column Average_Mz and retention time column Average_Rt_min
+#> INFO [2026-02-26 10:48:28] Identified m/z column Average_Mz and retention time column Average_Rt_min
+#> INFO [2026-02-26 10:48:28] 
+#> Starting feature clustering at 2026-02-26 10:48:28.929036
+#> INFO [2026-02-26 10:48:28] Finding connections between features in HILIC_neg
+#> INFO [2026-02-26 10:48:28] Found 1 connections in HILIC_neg
+#> INFO [2026-02-26 10:48:28] Finding connections between features in HILIC_pos
+#> INFO [2026-02-26 10:48:28] Found 4 connections in HILIC_pos
+#> INFO [2026-02-26 10:48:28] Finding connections between features in RP_neg
+#> INFO [2026-02-26 10:48:28] Found 1 connections in RP_neg
+#> INFO [2026-02-26 10:48:28] Finding connections between features in RP_pos
+#> INFO [2026-02-26 10:48:28] Found 2 connections in RP_pos
+#> INFO [2026-02-26 10:48:28] Found 8 connections
 #> 5 components found
 #> 1 components found
-#> INFO [2026-01-26 11:40:22] Found 5 clusters of 2 or more features, clustering finished at 2026-01-26 11:40:22.446714
+#> INFO [2026-02-26 10:48:28] Found 5 clusters of 2 or more features, clustering finished at 2026-02-26 10:48:28.954183
 ```

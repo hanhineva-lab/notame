@@ -65,7 +65,7 @@ doi:10.1007/s11306-018-1367-3
 ``` r
 data(toy_notame_set)
 ex_set <- flag_quality(toy_notame_set)
-#> INFO [2026-01-26 11:40:27] 
+#> INFO [2026-02-26 10:48:34] 
 #> 92% of features flagged for low quality
 rowData(ex_set)
 #> DataFrame with 80 rows and 12 columns
@@ -111,7 +111,7 @@ rowData(ex_set)
 # Custom condition
 ex_set <- flag_quality(toy_notame_set,
   condition = "RSD_r < 0.3 & D_ratio_r < 0.6")
-#> INFO [2026-01-26 11:40:28] 
+#> INFO [2026-02-26 10:48:34] 
 #> 70% of features flagged for low quality
 rowData(ex_set)
 #> DataFrame with 80 rows and 12 columns

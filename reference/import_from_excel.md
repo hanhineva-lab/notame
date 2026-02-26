@@ -100,29 +100,29 @@ data <- import_from_excel(
   file = system.file("extdata", "toy_notame_set.xlsx", 
   package = "notame"), sheet = 1, corner_row = 11, corner_column = "H",
   split_by = c("Column", "Ion_mode"))
-#> INFO [2026-01-26 11:40:28] Corner detected correctly at row 11, column H
-#> INFO [2026-01-26 11:40:28] 
+#> INFO [2026-02-26 10:48:35] Corner detected correctly at row 11, column H
+#> INFO [2026-02-26 10:48:35] 
 #> Extracting sample information from rows 1 to 11 and columns I to BF
-#> INFO [2026-01-26 11:40:28] Replacing spaces in sample information column names with underscores (_)
-#> INFO [2026-01-26 11:40:28] Naming the last column of sample information "Datafile"
-#> INFO [2026-01-26 11:40:28] 
+#> INFO [2026-02-26 10:48:35] Replacing spaces in sample information column names with underscores (_)
+#> INFO [2026-02-26 10:48:35] Naming the last column of sample information "Datafile"
+#> INFO [2026-02-26 10:48:35] 
 #> Extracting feature information from rows 12 to 91 and columns A to H
-#> INFO [2026-01-26 11:40:28] 
+#> INFO [2026-02-26 10:48:35] 
 #> Extracting feature abundances from rows 12 to 91 and columns I to BF
-#> INFO [2026-01-26 11:40:28] Pheno data was cleaned
-#> INFO [2026-01-26 11:40:28] Feature data was cleaned
-#> INFO [2026-01-26 11:40:28] 
+#> INFO [2026-02-26 10:48:35] Pheno data was cleaned
+#> INFO [2026-02-26 10:48:35] Feature data was cleaned
+#> INFO [2026-02-26 10:48:35] 
 #> Checking sample information
-#> INFO [2026-01-26 11:40:28] Checking 'Injection_order' column in feature data
-#> INFO [2026-01-26 11:40:28] Checking 'Sample_ID' column in pheno data
-#> INFO [2026-01-26 11:40:28] Checking 'QC' column in feature data
-#> INFO [2026-01-26 11:40:28] Checking that feature abundances only contain numeric values
-#> INFO [2026-01-26 11:40:28] 
+#> INFO [2026-02-26 10:48:35] Checking 'Injection_order' column in feature data
+#> INFO [2026-02-26 10:48:35] Checking 'Sample_ID' column in pheno data
+#> INFO [2026-02-26 10:48:35] Checking 'QC' column in feature data
+#> INFO [2026-02-26 10:48:35] Checking that feature abundances only contain numeric values
+#> INFO [2026-02-26 10:48:35] 
 #> Checking feature information
-#> INFO [2026-01-26 11:40:28] Checking that feature IDs are unique and not storedas numbers
-#> INFO [2026-01-26 11:40:28] Checking that m/z and retention time values are reasonable.
-#> INFO [2026-01-26 11:40:28] Identified m/z column Average_Mz and retention time column Average_Rt_min
-#> INFO [2026-01-26 11:40:28] Identified m/z column Average_Mz and retention time column Average_Rt_min
-#> INFO [2026-01-26 11:40:28] Checking that feature data includes a 'Split' column
-#> INFO [2026-01-26 11:40:28] Checking that feature data includes a 'Flag' column
+#> INFO [2026-02-26 10:48:35] Checking that feature IDs are unique and not storedas numbers
+#> INFO [2026-02-26 10:48:35] Checking that m/z and retention time values are reasonable.
+#> INFO [2026-02-26 10:48:35] Identified m/z column Average_Mz and retention time column Average_Rt_min
+#> INFO [2026-02-26 10:48:35] Identified m/z column Average_Mz and retention time column Average_Rt_min
+#> INFO [2026-02-26 10:48:35] Checking that feature data includes a 'Split' column
+#> INFO [2026-02-26 10:48:35] Checking that feature data includes a 'Flag' column
 ```

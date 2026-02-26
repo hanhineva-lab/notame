@@ -28,9 +28,9 @@ flagged <- toy_notame_set |>
   mark_nas(0) |>
   flag_detection(group = "Group") |>
   flag_quality()
-#> INFO [2026-01-26 11:40:28] 
+#> INFO [2026-02-26 10:48:34] 
 #> 1% of features flagged for low detection rate
-#> INFO [2026-01-26 11:40:28] 
+#> INFO [2026-02-26 10:48:34] 
 #> 91% of features flagged for low quality
 flag_report(flagged)
 #>       Split Kept Low_quality Total Flagged Low_qc_detection

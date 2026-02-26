@@ -57,7 +57,7 @@ A SummarizedExperiment object with the features flagged.
 data(toy_notame_set)
 ex_set <- mark_nas(toy_notame_set, value = 0)
 ex_set <- flag_detection(ex_set, group = "Group")
-#> INFO [2026-01-26 11:40:27] 
+#> INFO [2026-02-26 10:48:34] 
 #> 1% of features flagged for low detection rate
 rowData(ex_set)
 #> DataFrame with 80 rows and 11 columns

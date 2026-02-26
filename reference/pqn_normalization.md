@@ -56,6 +56,6 @@ A SummarizedExperiment object with altered feature abundances.
 ``` r
 data(toy_notame_set)
 pqn_set <- pqn_normalization(toy_notame_set)
-#> INFO [2026-01-26 11:40:41] Starting PQN normalization
-#> INFO [2026-01-26 11:40:41] Using median of qc samples as reference spectrum
+#> INFO [2026-02-26 10:48:47] Starting PQN normalization
+#> INFO [2026-02-26 10:48:47] Using median of qc samples as reference spectrum
 ```

@@ -56,8 +56,8 @@ data(toy_notame_set)
 missing <- mark_nas(toy_notame_set, 0)
 set.seed(38)
 imputed <- impute_rf(missing)
-#> INFO [2026-01-26 11:40:31] 
-#> Starting random forest imputation at 2026-01-26 11:40:31.045137
-#> INFO [2026-01-26 11:40:31] Out-of-bag error in random forest imputation: 0.466
-#> INFO [2026-01-26 11:40:32] Random forest imputation finished at 2026-01-26 11:40:32.001863 
+#> INFO [2026-02-26 10:48:36] 
+#> Starting random forest imputation at 2026-02-26 10:48:36.923678
+#> INFO [2026-02-26 10:48:37] Out-of-bag error in random forest imputation: 0.466
+#> INFO [2026-02-26 10:48:37] Random forest imputation finished at 2026-02-26 10:48:37.964655 
 ```

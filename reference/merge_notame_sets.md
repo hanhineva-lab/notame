@@ -37,6 +37,9 @@ When merging samples, sample IDs that begin with "QC" or "Ref" are
 combined so that they have running numbers on them. This means that if
 both batches have samples called "QC_1", this will not result in an
 error, but the sample IDs will be adjusted so that they are unique.
+Column names in the feature data that are shared between batches but
+have different content are renamed by adding a suffix to avoid data
+loss. The suffix is the index of the batch in the input list.
 
 ## Examples
 

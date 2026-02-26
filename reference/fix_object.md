@@ -93,7 +93,7 @@ data(toy_notame_set)
 ex_set <- toy_notame_set
 rowData(ex_set)$Flag <- NULL
 fixed <- fix_object(ex_set)
-#> INFO [2026-01-26 11:40:26] Pheno data was cleaned
-#> INFO [2026-01-26 11:40:26] Initializing 'Flag' column with unflagged features
-#> INFO [2026-01-26 11:40:26] Feature data was cleaned
+#> INFO [2026-02-26 10:48:33] Pheno data was cleaned
+#> INFO [2026-02-26 10:48:33] Initializing 'Flag' column with unflagged features
+#> INFO [2026-02-26 10:48:33] Feature data was cleaned
 ```

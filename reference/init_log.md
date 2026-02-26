@@ -29,8 +29,8 @@ None, the function is invoked for its side effect.
 ``` r
 file_name <- "log.txt"
 init_log(file_name)
-#> INFO [2026-01-26 11:40:32] Starting logging
+#> INFO [2026-02-26 10:48:38] Starting logging
 # Print the contents of the file
 scan(file_name, sep = "\n", what = "character")
-#> [1] "INFO [2026-01-26 11:40:32] Starting logging"
+#> [1] "INFO [2026-02-26 10:48:38] Starting logging"
 ```

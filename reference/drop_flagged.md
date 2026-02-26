@@ -34,7 +34,7 @@ data(toy_notame_set)
 dim(toy_notame_set)
 #> [1] 80 50
 flagged <- flag_quality(toy_notame_set)
-#> INFO [2026-01-26 11:40:26] 
+#> INFO [2026-02-26 10:48:32] 
 #> 92% of features flagged for low quality
 noflags <- drop_flagged(flagged)
 dim(noflags)

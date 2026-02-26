@@ -144,12 +144,12 @@ names(assays(se)) <- "rawbundances"
 se <- mark_nas(se, value = 0)
 # Correct drift
 se <- correct_drift(se, name = "dc")
-## INFO [2026-01-26 11:40:50] Starting drift correction
-## INFO [2026-01-26 11:40:50] Recomputing quality metrics for drift corrected data
-## INFO [2026-01-26 11:40:50] Drift correction performed
-## INFO [2026-01-26 11:40:50] Inspecting drift correction results
-## INFO [2026-01-26 11:40:50] Original quality metrics missing, recomputing
-## INFO [2026-01-26 11:40:50] Drift correction results inspected: Drift_corrected: 100%
+## INFO [2026-02-26 10:48:56] Starting drift correction
+## INFO [2026-02-26 10:48:56] Recomputing quality metrics for drift corrected data
+## INFO [2026-02-26 10:48:56] Drift correction performed
+## INFO [2026-02-26 10:48:56] Inspecting drift correction results
+## INFO [2026-02-26 10:48:56] Original quality metrics missing, recomputing
+## INFO [2026-02-26 10:48:56] Drift correction results inspected: Drift_corrected: 100%
 ```
 
 ### Flagging low quality compounds
@@ -181,10 +181,10 @@ limit of 0.1 to ensure that only good quality signals are kept this way.
 ``` r
 
 se <- flag_detection(se, assay.type = "dc")
-## INFO [2026-01-26 11:40:50] 
+## INFO [2026-02-26 10:48:56] 
 ## 1% of features flagged for low detection rate
 se <- flag_quality(se, assay.type = "dc")
-## INFO [2026-01-26 11:40:51] 
+## INFO [2026-02-26 10:48:56] 
 ## 71% of features flagged for low quality
 head(rowData(se)$Flag)
 ## [1] NA            "Low_quality" "Low_quality" "Low_quality" "Low_quality"
@@ -222,10 +222,10 @@ values.
 
 set.seed(2025)
 se <- impute_rf(se, assay.type = "dc", name = "imputed")
-## INFO [2026-01-26 11:40:51] 
-## Starting random forest imputation at 2026-01-26 11:40:51.159314
-## INFO [2026-01-26 11:40:51] Out-of-bag error in random forest imputation: 0.645
-## INFO [2026-01-26 11:40:51] Random forest imputation finished at 2026-01-26 11:40:51.609201
+## INFO [2026-02-26 10:48:57] 
+## Starting random forest imputation at 2026-02-26 10:48:57.047541
+## INFO [2026-02-26 10:48:57] Out-of-bag error in random forest imputation: 0.645
+## INFO [2026-02-26 10:48:57] Random forest imputation finished at 2026-02-26 10:48:57.480899
 ```
 
 Simple imputation strategies included in
@@ -292,9 +292,9 @@ GitHub! All contributions to the package are always welcome!
 
 ## Session information
 
-    ## R Under development (unstable) (2026-01-25 r89330)
+    ## R Under development (unstable) (2026-02-22 r89452)
     ## Platform: x86_64-pc-linux-gnu
-    ## Running under: Ubuntu 24.04.3 LTS
+    ## Running under: Ubuntu 24.04.4 LTS
     ## 
     ## Matrix products: default
     ## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -316,17 +316,17 @@ GitHub! All contributions to the package are always welcome!
     ## [8] base     
     ## 
     ## other attached packages:
-    ##  [1] notame_1.1.3                SummarizedExperiment_1.41.0
+    ##  [1] notame_1.1.4                SummarizedExperiment_1.41.1
     ##  [3] Biobase_2.71.0              GenomicRanges_1.63.1       
     ##  [5] Seqinfo_1.1.0               IRanges_2.45.0             
     ##  [7] S4Vectors_0.49.0            BiocGenerics_0.57.0        
     ##  [9] generics_0.1.4              MatrixGenerics_1.23.0      
-    ## [11] matrixStats_1.5.0           ggplot2_4.0.1              
+    ## [11] matrixStats_1.5.0           ggplot2_4.0.2              
     ## [13] BiocStyle_2.39.0           
     ## 
     ## loaded via a namespace (and not attached):
     ##  [1] gtable_0.3.6         xfun_0.56            bslib_0.10.0        
-    ##  [4] htmlwidgets_1.6.4    lattice_0.22-7       Rdpack_2.6.5        
+    ##  [4] htmlwidgets_1.6.4    lattice_0.22-9       Rdpack_2.6.6        
     ##  [7] vctrs_0.7.1          tools_4.6.0          parallel_4.6.0      
     ## [10] missForest_1.6.1     tibble_3.3.1         pkgconfig_2.0.3     
     ## [13] Matrix_1.7-4         RColorBrewer_1.1-3   rngtools_1.5.2      
@@ -335,16 +335,16 @@ GitHub! All contributions to the package are always welcome!
     ## [22] codetools_0.2-20     htmltools_0.5.9      sass_0.4.10         
     ## [25] yaml_2.3.12          pillar_1.11.1        pkgdown_2.2.0       
     ## [28] jquerylib_0.1.4      BiocParallel_1.45.0  cachem_1.1.0        
-    ## [31] DelayedArray_0.37.0  doRNG_1.8.6.2        iterators_1.0.14    
+    ## [31] DelayedArray_0.37.0  doRNG_1.8.6.3        iterators_1.0.14    
     ## [34] foreach_1.5.2        abind_1.4-8          tidyselect_1.2.1    
-    ## [37] digest_0.6.39        dplyr_1.1.4          bookdown_0.46       
+    ## [37] digest_0.6.39        dplyr_1.2.0          bookdown_0.46       
     ## [40] fastmap_1.2.0        grid_4.6.0           cli_3.6.5           
     ## [43] SparseArray_1.11.10  magrittr_2.0.4       S4Arrays_1.11.1     
     ## [46] randomForest_4.7-1.2 withr_3.0.2          scales_1.4.0        
     ## [49] rmarkdown_2.30       lambda.r_1.2.4       XVector_0.51.0      
     ## [52] otel_0.2.0           ranger_0.18.0        futile.logger_1.4.9 
     ## [55] png_0.1-8            ragg_1.5.0           evaluate_1.0.5      
-    ## [58] knitr_1.51           rbibutils_2.4.1      viridisLite_0.4.2   
+    ## [58] knitr_1.51           rbibutils_2.4.1      viridisLite_0.4.3   
     ## [61] itertools_0.1-3      rlang_1.1.7          futile.options_1.0.1
     ## [64] Rcpp_1.1.1           glue_1.8.0           BiocManager_1.30.27 
     ## [67] formatR_1.14         jsonlite_2.0.0       R6_2.6.1            

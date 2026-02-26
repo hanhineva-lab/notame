@@ -39,5 +39,5 @@ None, the function is invoked for its side effect.
 ``` r
 data(toy_notame_set)
 write_to_excel(toy_notame_set, file = "toy_notame_set.xlsx")
-#> INFO [2026-01-26 11:40:43] Moved RP_pos_Datafile column to last to get meaningful column names for abundances
+#> INFO [2026-02-26 10:48:48] Moved RP_pos_Datafile column to last to get meaningful column names for abundances
 ```
