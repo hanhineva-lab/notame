@@ -14,22 +14,25 @@ objects or a list of objects}
 \item{merge}{what to merge? features is used for combining analytical modes,
 samples is used for batches}
 
-\item{assay.type}{character, assay to be used in case of multiple assays. 
-The same assay needs to be present in all objects to be merged, and the 
+\item{assay.type}{character, assay to be used in case of multiple assays.
+The same assay needs to be present in all objects to be merged, and the
 resultant object contains this single assay.}
 }
 \value{
 A merged SummarizedExperiment object.
 }
 \description{
-Merges two or more SummarizedExperiment objects together. Can be used to 
+Merges two or more SummarizedExperiment objects together. Can be used to
 merge analytical modes or batches.
 }
 \details{
-When merging samples, sample IDs that begin with "QC" or "Ref" are 
-combined so that they have running numbers on them. This means that if both 
+When merging samples, sample IDs that begin with "QC" or "Ref" are
+combined so that they have running numbers on them. This means that if both
 batches have samples called "QC_1", this will not result in an error,
-but the sample IDs will be adjusted so that they are unique.
+but the sample IDs will be adjusted so that they are unique. Column names in
+the feature data that are shared between batches but have different content
+are renamed by adding a suffix to avoid data loss. The suffix is the index
+of the batch in the input list.
 }
 \examples{
 # Merge analytical modes

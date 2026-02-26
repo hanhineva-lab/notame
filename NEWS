@@ -1,6 +1,7 @@
 Changes in version 1.1.0
 
 New features:
+- All feature data columns that differ between batches are now retained when merging batches: the most common flag value across batches is included in the "Flag" column in the merged object
 - Added function `read_from_msdial()` which reads MS-DIAL output files (tab-separated .txt files) into a SummarizedExperiment object
 - Improved type conversion when importing data with notame functions
 
